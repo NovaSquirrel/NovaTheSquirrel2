@@ -1,0 +1,86 @@
+A valid Super NES program must write to all writable ports in the
+S-CPU I/O and S-PPU at the start of a program.  This way, the
+machine starts in a known state.  The code in init.s establishes
+the following initial state:
+
+S-CPU registers
+
+A, X, Y: unspecified
+Program bank: main >> 16
+Data bank: unspecified (programs might want to PHK PLB)
+P: decimal mode off, width 16-bit
+S: $01FF
+D: $0000
+
+S-CPU I/O
+
+4200=00         Disable vblank NMI and htime/vtime IRQ
+4201=FF         Set pin 6 of controller ports high
+4202=00         Multiply 0 by 0
+4203=00
+4204=00         Divide 0 by 0 (OH SHI--)
+4205=00
+4206=00
+4207=00         htime = top of picture
+4208=00
+4209=00         vtime = left side of scanline
+420A=00
+420B=00         Stop DMA copies
+420C=00         Stop HDMA
+420D=00 or 01   Access $808000-$FFFFFF as slow or fast ROM
+                (depending on value in internal header)
+
+S-PPU
+
+2100=80         Forced blanking
+2101=00         Sprites 8x8 and 16x16, patterns at $0000-$1FFF
+2102=00         OAM address: $0000
+2103=00
+2104: skip      OAM write port
+2105=00         Background mode 0, all layers using 8x8 pixel tiles
+2106=00         Mosaic off
+2107=00         BG1 nametable at $0000, 1x1 screen
+2108=00         BG2 nametable at $0000, 1x1 screen
+2109=00         BG3 nametable at $0000, 1x1 screen
+210A=00         BG4 nametable at $0000, 1x1 screen
+210B=00         BG1 and BG2 tiles at $0000
+210C=00         BG3 and BG4 tiles at $0000
+210D=00 00      BG1 scroll at (0, 1).  The S-PPU skips the first line
+210E=00 00      of the picture, so Y=0 means start at line 1 of BG.
+210F=00 00      BG2 scroll at (0, 1)
+2110=00 00
+2111=00 00      BG3 scroll at (0, 1)
+2112=00 00
+2113=00 00      BG4 scroll at (0, 1)
+2114=00 00
+2115=80         Add 1 word to VRAM address after high byte write
+2116=00         VRAM address starts at 0
+2117=00
+2118-9: skip    VRAM write port
+211A=00
+211B=00 01      Set the mode 7 matrix to the identity matrix
+211C=00 00      [ 1.0  0.0 ]
+211D=00 00      [ 0.0  1.0 ]
+211E=00 01
+211F=00 00      Mode 7 scroll at (0, 0)
+2120=00 00
+2121=00         CGRAM address = 0
+2122: skip      CGRAM write port
+2123=00         Disable windows on BG1 and BG2
+2124=00         Disable windows on BG3 and BG4
+2125=00         Disable windows on sprites and blending
+2126=00         Window 1 left side = 0
+2127=00         Window 1 right side = 0
+2128=00         Window 2 left side = 0
+2129=00         Window 2 right side = 0
+212A=00         Combine background windows using OR logic
+212B=00         Combine sprites and blending using OR logic
+212C=00         Enable no layers on main screen
+212D=00         Enable no layers on sub screen
+212E=00         Disable no layers on main screen within the window
+212F=00         Disable no layers on sub screen within the window
+2130=30         Disable blending and 332 palette
+2131=00         Disable blending for all layers
+2132=E0         Set entire COLDATA to 0
+2133=00         Disable interlace and pseudo-hires, 224 lines
+

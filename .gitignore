@@ -1,0 +1,21 @@
+*.sw[a-p]
+*.o
+*.brr
+*~
+*.chrgb
+*.chrsfc
+/obj/snes/*.s
+/obj/snes/*.wav
+/zip.in
+/map.txt
+/spcmap.txt
+/lorom-template.sfc
+/lorom-template.spc
+/lorom-template-*.zip
+__pycache__/
+*.pyc
+
+# this is Super NES homebrew, not DSiWare
+*.DS_Store
+
+

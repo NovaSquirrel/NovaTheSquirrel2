@@ -1,0 +1,72 @@
+0.06 (2016-11-17)
+* wav2brr: option to produce a looped BRR
+* wav2brr: option to skip pre- and de-emphasis filtering
+* spc-ca65.inc: instructions that use DEFAULT_ABS work in
+  .proc blocks
+* Added Karplus-Strong synthesizer to tools
+* Sets DSP registers based on note number and instrument number,
+  which could form the basis for a music engine
+* Converted all Python tools to Python 3
+* Extra explanation for OBSEL, nmi_handler, pseudo hi-res,
+  and interlace (requested by nicklausw)
+* snes.inc has doc comments for seta/setxy (requested by Pokun)
+* Experimental checksum correction tool, not enabled by default
+* Now on GitHub
+
+0.05 (2015-02-13): The "Ho-ly-$#!+" Code Review
+* fixed branch bug in collision introduced during translation
+  from 6502 to "idiomatic" 65816 (reported by thefox)
+* added overall map of source code to README.md
+  (requested by Espozo)
+* comment readability improvements
+* added doc comments before more functions (requested by Espozo)
+* more consistent use of seta/setxy macros
+  to change processor word size
+* split code related to the background and the player
+  into separate files (requested by Espozo)
+* compensated for missing background line 0
+* explained unfamiliar register names
+* renamed .h files to .inc so as not to confuse with C headers
+  (requested by koitsu)
+* rewrote init code based on koitsu's InitializeSNES macro
+* indented forward branches (requested by Espozo)
+* moved ROM segments to $808000 to allow use of fast ROM
+  (requested by koitsu)
+* imported the direct page base address as a symbol
+  (requested by koitsu)
+* broke snes.inc into functional groups
+* added register name aliases from Martin Korth's fullsnes.htm
+  (requested by koitsu)
+
+0.04a (2015-01-28)
+* corrected missing lorom256k.cfg file
+
+0.04 (2014-11-09):
+* expanded to 256 KiB to demonstrate far operation
+* moved parts into separate banks to show use of multiple banks
+* snesheader: added symbolic names for mappers, regions, and
+  memory sizes and speeds
+* wav2brr.py: added proper command line options including
+  decompression of BRR back to WAV
+* spcimage.s: fixed stya macro (reported by doppel)
+
+0.03 (2014-10-03):
+* wav2brr.py: made NumPy dependency optional
+* added other explanatory comments to main.s
+* Corrected some errors related to BSS in linker config file
+* snes.h: macros for controlling accumulator and index width
+  (requested by Bisqwit)
+* snes.h: macro for nametable X, Y location (requested by Bisqwit)
+* New template for SPC files
+
+0.02 (2014-09-24): 
+* converted README to Markdown
+* added instructions for installing build environment to README
+  (requested by whicker)
+* corrected a few factual errors in README related to differences
+  between the NES and the Super NES
+* added a wav file and wav to BRR converter
+* removed Encyclopedia Dramatica "goes where" meme from index.txt
+
+0.01 (2014-09-21): 
+* initial release
