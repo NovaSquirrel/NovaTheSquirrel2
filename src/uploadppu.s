@@ -3,7 +3,7 @@
 .smart
 .i16
 
-.segment "CODE3"
+.segment "CODE"
 ;;
 ; Clears 2048 bytes ($1000 words) of video memory to a constant
 ; value.  This can be one nametable, 128 2bpp tiles, 64 4bpp tiles,
@@ -142,4 +142,56 @@ loop2:
   rtl
 .endproc
 
+.import GraphicsDirectory
+
+;;
+; Uploads a specific graphic asset to VRAM
+; @param A graphic number (0-255)
+.proc DoGraphicUpload
+  phx
+  php
+  setaxy16
+
+  ; Calculate the address
+  and #255
+  ; Multiply by 7 by subtracting the original value from value*8
+  sta 0
+  asl
+  asl
+  asl
+  sub 0
+  tax
+
+  ; Upload to VRAM
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE
+
+  ; Now access the stuff from GraphicsDirectory:
+  ; ppp dd ss - pointer, destination, size
+
+  ; Source address
+  lda f:GraphicsDirectory+0,x
+  stx DMAADDR
+
+  ; Destination address
+  lda f:GraphicsDirectory+3,x
+  sta PPUADDR
+
+  ; Size
+  lda f:GraphicsDirectory+5,x
+  sty DMALEN
+
+  ; Source bank
+  seta8
+  lda f:GraphicsDirectory+2,x
+  sta DMAADDRBANK
+
+  ; Initiate the transfer
+  lda #%00000001
+  sta COPYSTART
+
+  plp
+  plx
+  rtl
+.endproc
 

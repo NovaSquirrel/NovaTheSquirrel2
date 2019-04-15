@@ -6,7 +6,7 @@
 ; Mask off low byte to allow use of $000000-$00000F as local variables
 ZEROPAGE_BASE   = __ZEROPAGE_RUN__ & $FF00
 
-; Make sure these conform to the linker script (e.g. lorom256.cfg).
+; Make sure these conform to the linker script.
 STACK_BASE      = $0100
 STACK_SIZE      = $0100
 LAST_STACK_ADDR = STACK_BASE + STACK_SIZE - 1
@@ -44,7 +44,7 @@ map_mode        = $00FFD5
   jml reset_fastrom  ; Bank $00 is not fast, but its mirror $80 is
 .endproc
 
-.segment "CODE7"
+.segment "CODE"
 .proc reset_fastrom
   rep #$30         ; 16-bit AXY
   ldx #LAST_STACK_ADDR

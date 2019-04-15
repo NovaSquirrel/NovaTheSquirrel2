@@ -58,7 +58,7 @@ romname:
   .endif
   .byte MAPPER_LOROM|ROMSPEED_200NS
   .byte $00   ; 00: no extra RAM; 02: RAM with battery
-  .byte MEMSIZE_256KB  ; ROM size (08-0C typical)
+  .byte MEMSIZE_1MB  ; ROM size (08-0C typical)
   .byte MEMSIZE_NONE   ; backup RAM size (01,03,05 typical; Dezaemon has 07)
   .byte REGION_AMERICA
   .byte $33   ; publisher id, or $33 for see 16 bytes before header

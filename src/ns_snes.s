@@ -300,3 +300,8 @@ DJ_Label:
   eor #1
   ror
 .endmacro
+
+.proc tkb ; transfer K to B
+  phk
+  plb
+.endproc

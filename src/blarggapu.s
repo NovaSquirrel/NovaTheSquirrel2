@@ -16,7 +16,7 @@
 .smart
 .i16
 
-.segment "CODE2"
+.segment "CODE"
 
 ; Waits for SPC to finish booting. Call before first
 ; using SPC or after bootrom has been re-run.

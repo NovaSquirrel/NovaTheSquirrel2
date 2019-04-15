@@ -2,6 +2,7 @@
 .include "global.inc"
 .smart
 .export main, nmi_handler
+.include "graphicsenum.s"
 
 USE_PSEUDOHIRES = 0
 USE_INTERLACE = 0
@@ -54,7 +55,7 @@ OAMHI: .res 512
   rti
 .endproc
 
-.segment "CODE1"
+.segment "CODE"
 ; init.s sends us here
 .proc main
 
@@ -69,9 +70,14 @@ OAMHI: .res 512
     jsl spc_boot_apu
   .endif
 
-  jsl load_bg_tiles  ; fill pattern table
-  jsl draw_bg        ; fill nametable
-  jsl load_player_tiles
+  lda #GraphicsUpload::FGCommon
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::FGTropicalWood
+  jsl DoGraphicUpload
+
+;  jsl load_bg_tiles  ; fill pattern table
+;  jsl draw_bg        ; fill nametable
+;  jsl load_player_tiles
 
   ; In LoROM no larger than 16 Mbit, all program banks can reach
   ; the system area (low RAM, PPU ports, and DMA ports).
@@ -134,23 +140,23 @@ ilbit = 0
   sta PPUNMI
 
   ; Set up game variables, as if it were the start of a new level.
-  stz player_facing
-  stz player_dxlo
-  lda #184
-  sta player_yhi
+;  stz player_facing
+;  stz player_dxlo
+;  lda #184
+;  sta player_yhi
   setaxy16
-  stz player_frame_sub
-  lda #48 << 8
-  sta player_xlo
+;  stz player_frame_sub
+;  lda #48 << 8
+;  sta player_xlo
 
 forever:
 
-  jsl move_player
+;  jsl move_player
 
   ; Draw the player to a display list in main memory
   setaxy16
   stz oam_used
-  jsl draw_player_sprite
+;  jsl draw_player_sprite
 
   ; Mark remaining sprites as offscreen, then convert sprite size
   ; data from the convenient-to-manipulate format described by

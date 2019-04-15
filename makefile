@@ -10,14 +10,14 @@
 #
 
 # These are used in the title of the SFC program and the zip file.
-title = lorom-template
-version = 0.06
+title = nova-the-squirrel-2
+version = 0.01
 
 # Space-separated list of asm files without .s extension
 # (use a backslash to continue on the next line)
 objlist = \
-  snesheader init main bg player \
-  ppuclear blarggapu spcimage musicseq
+  snesheader init main player \
+  uploadppu blarggapu spcimage musicseq graphics
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -28,7 +28,8 @@ LD65 := ld65
 CFLAGS65 = 
 objdir := obj/snes
 srcdir := src
-imgdir := tilesets
+imgdir4 := tilesets4
+imgdir2 := tilesets2
 
 # If it's not bsnes, it's just BS.  But I acknowledge that being
 # stuck on an old Atom laptop is BS.  Atom N450 can't run bsnes at
@@ -65,13 +66,6 @@ wincwd := $(shell pwd | sed -e "s'/'\\\\\\\\'g")
 run: $(title).sfc
 	$(SNESEMU) $<
 
-# Per Martin Korth on 2014-09-16: NO$SNS requires absolute
-# paths because he screwed up and made the filename processing
-# too clever.
-# Not default 
-nocash-run: $(title).sfc
-	wine "C:\\Program Files (x86)\\nocash\\no\$$sns.exe" "Z:$(wincwd)\\$(title).sfc"
-
 # Special target for just the SPC700 image
 spcrun: $(title).spc
 	$(SPCPLAY) $<
@@ -102,8 +96,10 @@ $(objdir)/index.txt: makefile
 objlisto = $(foreach o,$(objlist),$(objdir)/$(o).o)
 objlistospc = $(foreach o,$(objlistspc),$(objdir)/$(o).o)
 brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
+chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
+chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 
-map.txt $(title).sfc: lorom256k.cfg $(objlisto)
+map.txt $(title).sfc: lorom1024k.cfg $(objlisto)
 	$(LD65) -o $(title).sfc -m map.txt -C $^
 	$(PY) tools/fixchecksum.py $(title).sfc
 
@@ -120,12 +116,19 @@ $(objdir)/mktables.s: tools/mktables.py
 	$< > $@
 
 # Files that depend on extra included files
-$(objdir)/bg.o: \
- $(objdir)/bggfx.chrgb
-$(objdir)/player.o: \
- $(objdir)/swinging2.chrsfc
+$(objdir)/bg.o:
+$(objdir)/player.o:
 $(objdir)/spcimage.o: $(brrlisto)
+
+# Automatically insert graphics into the ROM
+$(srcdir)/graphics.s: $(chr2all) $(chr4all)
+	$(PY) tools/insertthegfx.py
+
+#$(objdir)/graphics.o: $(chr2all) $(chr4all)
+
+
 $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
+
 
 # Rules for CHR data
 
@@ -133,11 +136,12 @@ $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
 # used by Game Boy and Game Boy Color, as well as Super NES
 # mode 0 (all planes), mode 1 (third plane), and modes 4 and 5
 # (second plane).
-$(objdir)/%.chrgb: tilesets/%.png
+# Try generating it in the folder it's for
+$(imgdir2)/%.chrgb: $(imgdir2)/%.png
 	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
-
-$(objdir)/%.chrsfc: tilesets/%.png
+$(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+
 
 # Rules for audio
 $(objdir)/%.brr: audio/%.wav
