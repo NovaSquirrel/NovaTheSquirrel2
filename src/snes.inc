@@ -180,6 +180,7 @@ CGADDR = $2121
 CGDATA = $2122  ; 5-bit BGR, write twice, low byte first
 CGDATARD = $213B  ; 5-bit BGR, read twice, low byte first
 .define RGB(r,g,b) ((r)|((g)<<5)|((b)<<10))
+.define RGB8(r,g,b) ((r/8)|((g/8)<<5)|((b/8)<<10))
 
 ; S-PPU window ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

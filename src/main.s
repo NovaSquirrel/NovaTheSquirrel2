@@ -75,6 +75,7 @@ OAMHI: .res 512
   lda #GraphicsUpload::FGTropicalWood
   jsl DoGraphicUpload
 
+
 ;  jsl load_bg_tiles  ; fill pattern table
 ;  jsl draw_bg        ; fill nametable
 ;  jsl load_player_tiles
@@ -84,6 +85,15 @@ OAMHI: .res 512
   ; This isn't true of larger LoROM or of HiROM (without tricks).
   phk
   plb
+
+  ; Upload palette
+  seta8
+  stz CGADDR
+  setaxy16
+  lda #DMAMODE_CGDATA
+  ldx #palette & $FFFF
+  ldy #palette_size
+  jsl ppu_copy
 
   ; Program the PPU for the display mode
   seta8
@@ -186,3 +196,22 @@ padwait:
 
 
 
+
+palette:
+  .word RGB(15,23,31)
+  .word RGB8(34, 32, 52)
+  .word RGB8(89, 86, 82)
+  .word RGB8(132, 126, 135)
+  .word RGB8(155, 173, 183)
+  .word RGB8(203, 219, 252)
+  .word RGB8(255, 255, 255)
+  .word RGB8(102, 57, 49)
+  .word RGB8(143, 86, 59)
+  .word RGB8(217, 160, 102)
+  .word RGB8(238, 195, 154)
+  .word RGB8(91, 110, 225)
+  .word RGB8(99, 155, 255)
+  .word RGB8(172, 50, 50)
+  .word RGB8(217, 87, 99)
+  .word RGB8(255, 0, 255)
+palette_size = * - palette
