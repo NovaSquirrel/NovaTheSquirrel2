@@ -58,7 +58,6 @@ OAMHI: .res 512
 .segment "CODE"
 ; init.s sends us here
 .proc main
-
   ; In the same way that the CPU of the Commodore 64 computer can
   ; interact with a floppy disk only through the CPU in the 1541 disk
   ; drive, the main CPU of the Super NES can interact with the audio
@@ -67,9 +66,11 @@ OAMHI: .res 512
   ; designed to receive data from the main CPU through communication
   ; ports at $2140-$2143.  Load a program and start it running.
   .if ::USE_AUDIO
-    jsl spc_boot_apu
+;    jsl spc_boot_apu
   .endif
 
+  seta8
+  setxy16
   lda #GraphicsUpload::FGCommon
   jsl DoGraphicUpload
   lda #GraphicsUpload::FGTropicalWood
@@ -97,17 +98,26 @@ OAMHI: .res 512
 
   ; Program the PPU for the display mode
   seta8
-  stz BGMODE     ; mode 0 (four 2-bit BGs) with 8x8 tiles
-  stz BGCHRADDR  ; bg planes 0-1 CHR at $0000
+  lda #1
+  sta BGMODE     ; mode 0 (four 2-bit BGs) with 8x8 tiles
+
+  stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
+  lda #$e>>1
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
 
   ; OBSEL needs the start of the sprite pattern table in $2000-word
   ; units.  In other words, bits 14 and 13 of the address go in bits
-  ; 1 and 0 of OBSEL.
-  lda #$4000 >> 13
-  sta OBSEL      ; sprite CHR at $4000, sprites are 8x8 and 16x16
-  lda #>$6000
-  sta NTADDR+0   ; plane 0 nametable at $6000
-  sta NTADDR+1   ; plane 1 nametable also at $6000
+  ; 0, 1 and 2 of OBSEL.
+  lda #$8000 >> 13
+  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
+
+  lda #1 | ($c000 >> 9)
+  sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
+  lda #1 | ($d000 >> 9)
+  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens wide
+  lda #0 | ($e000 >> 9)
+  sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
+
   ; set up plane 0's scroll
   stz BGSCROLLX+0
   stz BGSCROLLX+0
