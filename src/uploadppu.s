@@ -171,7 +171,7 @@ loop2:
 
   ; Source address
   lda f:GraphicsDirectory+0,x
-  stx DMAADDR
+  sta DMAADDR
 
   ; Destination address
   lda f:GraphicsDirectory+3,x
@@ -179,7 +179,7 @@ loop2:
 
   ; Size
   lda f:GraphicsDirectory+5,x
-  sty DMALEN
+  sta DMALEN
 
   ; Source bank
   seta8

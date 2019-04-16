@@ -69,17 +69,24 @@ OAMHI: .res 512
 ;    jsl spc_boot_apu
   .endif
 
+  ; Upload graphics
   seta8
   setxy16
   lda #GraphicsUpload::FGCommon
   jsl DoGraphicUpload
   lda #GraphicsUpload::FGTropicalWood
   jsl DoGraphicUpload
+  
+  ldx #$c000 >> 1
+  ldy #$15
+  jsl ppu_clear_nt
+  ldx #$d000 >> 1
+  ldy #$14
+  jsl ppu_clear_nt
+  ldx #$e000 >> 1
+  ldy #0
+  jsl ppu_clear_nt
 
-
-;  jsl load_bg_tiles  ; fill pattern table
-;  jsl draw_bg        ; fill nametable
-;  jsl load_player_tiles
 
   ; In LoROM no larger than 16 Mbit, all program banks can reach
   ; the system area (low RAM, PPU ports, and DMA ports).
@@ -125,35 +132,7 @@ OAMHI: .res 512
   sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
   sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
 
-  ; Pseudo hi-res and interlace are optional hardware features.
-  ; This demo doesn't use them much, but you can enable them when
-  ; building it to see what they look like.  They're described at
-  ; http://wiki.superfamicom.org/snes/show/Registers
-
-.if ::USE_PSEUDOHIRES
-  ; set up plane 1's scroll, offset by 4 pixels, to show
-  ; the half-pixels of pseudohires
-  lda #4
-  sta BGSCROLLX+2
-  stz BGSCROLLX+2
-  lda #$FF
-  sta BGSCROLLY+2
-  sta BGSCROLLY+2
-  lda #%00000010   ; enable plane 1 for left halves
-  sta BLENDSUB
-phbit = SUB_HIRES  ; split horizontal pixels
-.else
-phbit = 0
-.endif
-
-.if ::USE_INTERLACE
-ilbit = INTERLACE
-.else
-ilbit = 0
-.endif
-
-  lda #phbit|ilbit
-  sta PPURES
+  stz PPURES
   lda #%00010001  ; enable sprites and plane 0
   sta BLENDMAIN
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
@@ -164,7 +143,9 @@ ilbit = 0
 ;  stz player_dxlo
 ;  lda #184
 ;  sta player_yhi
-  setaxy16
+
+
+
 ;  stz player_frame_sub
 ;  lda #48 << 8
 ;  sta player_xlo

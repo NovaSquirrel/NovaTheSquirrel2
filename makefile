@@ -121,7 +121,7 @@ $(objdir)/player.o:
 $(objdir)/spcimage.o: $(brrlisto)
 
 # Automatically insert graphics into the ROM
-$(srcdir)/graphics.s: $(chr2all) $(chr4all)
+$(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
 	$(PY) tools/insertthegfx.py
 
 #$(objdir)/graphics.o: $(chr2all) $(chr4all)

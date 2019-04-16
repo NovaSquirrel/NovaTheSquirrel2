@@ -69,7 +69,7 @@ outfile.write('; Pointer, destination address, and then size\n')
 outfile.write('.proc GraphicsDirectory\n')
 for f in ordered_files:
 	outfile.write('  .faraddr File_%s\n' % f['name'])
-	outfile.write('  .word $%x, $%x\n' % (f['address'], f['size']))
+	outfile.write('  .word $%.4x>>1, $%.4x\n' % (f['address'], f['size']))
 outfile.write('.endproc\n')
 
 # Write out each individual bank
