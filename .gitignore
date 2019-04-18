@@ -24,3 +24,5 @@ graphics.s
 *.lnk
 nova-the-squirrel-2.sfc
 *.sfc
+src/blockenum.s
+src/blockdata.s

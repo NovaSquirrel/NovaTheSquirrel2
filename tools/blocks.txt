@@ -1,0 +1,111 @@
+# Comment test
+# this will be ignored
+
+alias common $0000
+alias wood $1000
+alias global_palette 0
+
+
+# Global tile stuff
+base common
+palette global_palette
+
++Empty
+t 0,0 0,0
+t 0,0 0,0
+
++Bricks
+solid
+t 0,2 1,2
+t 0,3 1,3
+
++Prize
+solid
+t 2,2 2,2h
+t 2,3 2,3h
+
++UsedPrize
+solid
+t 3,2 3,2h
+t 3,3 3,3h
+
++SolidBlock
+solid
+q 4,2
+
++PickupBlock
+solid
+q 6,2
+
++PushBlock
+solid
+t 4,2 5,2
+t 8,3 9,3
+
++Heart
+q 10,2
+
++SmallHeart
+q 12,2
+
++Sign
+q 14,2
+
++Money
+q 0,4
+
++PickupItem
+t 0,4 5,4
+t 2,5 3,5
+
++AutoItem
+t 0,4 5,4
+t 4,5 5,5
+
++SpikesUp
+solid
+t 6,4 6,4
+t 6,5 6,5
+
++SpikesDown
+solid
+t 7,4 7,4
+t 7,5 7,5
+
++Ice
+q 8,4
+
++Rope
+t 6,1 7,1
+t 6,1 7,1
+
++Spring
+t 0,0 0,0
+t 2,4 3,4
+
++SpringPressed
+t 0,0 0,0
+t 4,4 4,4h
+
+# Wood stuff
+base wood
+
++LadderTop
+q 0,0
+
++Ladder
+t 0,1 1,1
+t 0,1 1,1
+
++MoaiRight
+solid
+q 6,2
+
++MoaiLeft
+solid
+q 8,2
+
++Rock
+solid
+q 10,2
+

@@ -83,6 +83,6 @@
   LEVEL_WIDTH = 256
   LEVEL_HEIGHT = 32	 
   LEVEL_TILE_SIZE = 2
-  LevelBuf: .res 256*32*2
+  LevelBuf: .res 256*32*2 ; 16KB
 
 

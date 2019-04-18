@@ -17,7 +17,7 @@ version = 0.01
 # (use a backslash to continue on the next line)
 objlist = \
   snesheader init main player \
-  uploadppu blarggapu spcimage musicseq graphics
+  uploadppu blarggapu spcimage musicseq graphics blockdata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -120,9 +120,16 @@ $(objdir)/bg.o:
 $(objdir)/player.o:
 $(objdir)/spcimage.o: $(brrlisto)
 
+# Block data relies on the enum
+$(objdir)/blockdata.o: $(srcdir)/blockenum.s
+
 # Automatically insert graphics into the ROM
 $(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
 	$(PY) tools/insertthegfx.py
+
+# Automatically create the list of blocks from a description
+$(srcdir)/blockenum.s: tools/blocks.txt
+	$(PY) tools/makeblocks.py
 
 #$(objdir)/graphics.o: $(chr2all) $(chr4all)
 
