@@ -118,7 +118,7 @@ outfile = open("src/blockdata.s", "w")
 
 outfile.write('; This is automatically generated. Edit "blocks.txt" instead\n')
 outfile.write('.export BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight\n\n')
-outfile.write('.segment "PRG04"\n\n') # maybe pass this in via configuration or something
+outfile.write('.segment "BlockGraphicData"\n\n')
 
 corners = ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]
 for corner in range(len(corners)):

@@ -8,7 +8,7 @@ with open("tools/gfxlist.txt") as f:
 banks_free = {}
 banks_files = {}
 ordered_files = []
-for bank in ["PRG02", "PRG03"]:
+for bank in ["Graphics1", "Graphics2"]:
 	banks_free[bank] = 0x8000
 	banks_files[bank] = []
 
