@@ -29,10 +29,10 @@ def parseTile(tile):
 	value = value//32      # Divide by the bytes per tile to get tile number
 
 	if tile.endswith("v"): # Vertical flip
-		value |= 0x4000
+		value |= 0x8000
 		tile = tile[:-1]
 	if tile.endswith("h"): # Horizontal flip
-		value |= 0x8000
+		value |= 0x4000
 		tile = tile[:-1]
 	if tile.endswith("_"): # No-op separator
 		tile = tile[:-1]

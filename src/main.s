@@ -71,7 +71,7 @@ USE_AUDIO = 1
   jsl DoGraphicUpload
   lda #GraphicsUpload::FGTropicalWood
   jsl DoGraphicUpload
-  
+
   ; Clear three screens
   ldx #$c000 >> 1
   ldy #$15
@@ -83,6 +83,19 @@ USE_AUDIO = 1
   ldy #0
   jsl ppu_clear_nt
 
+  lda #1
+  sta f:LevelBuf+(64*0)
+  sta f:LevelBuf+(64*1)+1
+  sta f:LevelBuf+(64*2)+2
+  sta f:LevelBuf+(64*3)+3
+  sta f:LevelBuf+(64*4)+4
+  lda #2
+  sta f:LevelBuf+(64*5)+6
+  sta f:LevelBuf+(64*6)+8
+  sta f:LevelBuf+(64*7)+10
+  sta f:LevelBuf+(64*8)+12
+  sta f:LevelBuf+(64*9)+14
+  sta f:LevelBuf+(64*10)+16
   jsl RenderLevelScreens
 
   ; In LoROM no larger than 16 Mbit, all program banks can reach

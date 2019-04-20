@@ -128,6 +128,7 @@ $(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
+$(srcdir)/blockdata.s: tools/blocks.txt
 $(srcdir)/blockenum.s: tools/blocks.txt
 	$(PY) tools/makeblocks.py
 
