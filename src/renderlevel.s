@@ -1,10 +1,27 @@
+; Super Princess Engine
+; Copyright (C) 2019 NovaSquirrel
+;
+; This program is free software: you can redistribute it and/or
+; modify it under the terms of the GNU General Public License as
+; published by the Free Software Foundation; either version 3 of the
+; License, or (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
 .include "snes.inc"
 .include "global.inc"
 .smart
 .global LevelBuf
 .import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
 
-.code
+.segment "Player"
 
 .a16
 .i16
@@ -37,7 +54,7 @@ YPos = 4
 
   lda ScrollY
   xba
-  and #31
+  and #LEVEL_HEIGHT-1
   sta YPos
 
 Loop:
@@ -46,7 +63,7 @@ Loop:
   and #15
   asl
   ora #ForegroundBG>>1
-  sta ColumnUpdateAddress  
+  sta ColumnUpdateAddress
 
   ; Use the other nametable if necessary
   lda BlockNum
@@ -106,6 +123,54 @@ Loop:
 
   lda #INC_DATAHI
   sta PPUCTRL
+  plp
+  rtl
+.endproc
+
+.proc RenderLevelRowUpload
+  php
+
+  ; .------------------
+  ; | First screen
+  ; '------------------
+  seta16
+
+  ; Set DMA parameters  
+  lda RowUpdateAddress
+  sta PPUADDR
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE
+  lda #RowUpdateBuffer
+  sta DMAADDR
+  lda #32*2
+  sta DMALEN
+
+  seta8
+  stz DMAADDRBANK
+
+  lda #%00000001
+  sta COPYSTART
+
+  ; .------------------
+  ; | Second screen
+  ; '------------------
+  seta16
+
+  ; Reset the counters. Don't need to do DMAMODE again I assume?
+  lda RowUpdateAddress
+  add #2048>>1
+  sta PPUADDR
+  lda #RowUpdateBuffer+32*2
+  sta DMAADDR
+  lda #32*2
+  sta DMALEN
+
+  seta8
+  stz DMAADDRBANK
+
+  lda #%00000001
+  sta COPYSTART
+
   plp
   rtl
 .endproc
@@ -200,11 +265,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
-  sta ColumnUpdateBuffer,x
+  sta RowUpdateBuffer,x
   inx
   inx
   lda BlockTopRight,y
-  sta ColumnUpdateBuffer,x
+  sta RowUpdateBuffer,x
   inx
   inx
   ply
@@ -239,11 +304,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockBottomLeft,y
-  sta ColumnUpdateBuffer,x
+  sta RowUpdateBuffer,x
   inx
   inx
   lda BlockBottomRight,y
-  sta ColumnUpdateBuffer,x
+  sta RowUpdateBuffer,x
   inx
   inx
   ply

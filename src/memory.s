@@ -81,8 +81,8 @@
   ; Video updates from scrolling
   ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
   ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
-  ColumnRowAddress:    .res 2     ; Address to upload to, or zero for none
-  ColumnRowBuffer:     .res 64*2  ; 64 tiles horizontally
+  RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
+  RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
 
 .segment "BSS7E"
 

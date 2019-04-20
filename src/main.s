@@ -1,15 +1,27 @@
+; Super Princess Engine
+; Copyright (C) 2019 NovaSquirrel
+;
+; This program is free software: you can redistribute it and/or
+; modify it under the terms of the GNU General Public License as
+; published by the Free Software Foundation; either version 3 of the
+; License, or (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+
 .include "snes.inc"
 .include "global.inc"
 .smart
 .export main, nmi_handler
 .include "graphicsenum.s"
 
-USE_PSEUDOHIRES = 0
-USE_INTERLACE = 0
-USE_AUDIO = 1
-
 .segment "ZEROPAGE"
-
 .segment "BSS"
 
 .segment "CODE"
@@ -53,9 +65,7 @@ USE_AUDIO = 1
   ; the sound CPU is running the IPL (initial program load), which is
   ; designed to receive data from the main CPU through communication
   ; ports at $2140-$2143.  Load a program and start it running.
-  .if ::USE_AUDIO
-    jsl spc_boot_apu
-  .endif
+;  jsl spc_boot_apu
 
   seta8
   setxy16
@@ -98,9 +108,6 @@ USE_AUDIO = 1
   sta f:LevelBuf+(64*10)+16
   jsl RenderLevelScreens
 
-  ; In LoROM no larger than 16 Mbit, all program banks can reach
-  ; the system area (low RAM, PPU ports, and DMA ports).
-  ; This isn't true of larger LoROM or of HiROM (without tricks).
   phk
   plb
 
@@ -113,18 +120,15 @@ USE_AUDIO = 1
   ldy #palette_size
   jsl ppu_copy
 
-  ; Program the PPU for the display mode
+  ; Set up PPU registers
   seta8
   lda #1
-  sta BGMODE     ; mode 0 (four 2-bit BGs) with 8x8 tiles
+  sta BGMODE       ; mode 1
 
   stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
   lda #$e>>1
   sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
 
-  ; OBSEL needs the start of the sprite pattern table in $2000-word
-  ; units.  In other words, bits 14 and 13 of the address go in bits
-  ; 0, 1 of OBSEL.
   lda #$8000 >> 14
   sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
 
@@ -148,38 +152,40 @@ USE_AUDIO = 1
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
 
-  ; Set up game variables, as if it were the start of a new level.
-;  stz player_facing
-;  stz player_dxlo
-;  lda #184
-;  sta player_yhi
-
-
-
-;  stz player_frame_sub
-;  lda #48 << 8
-;  sta player_xlo
-
 forever:
-
-;  jsl move_player
-
   ; Draw the player to a display list in main memory
   setaxy16
   stz OamPtr
-;  jsl draw_player_sprite
+  jsl RunPlayer
+  jsl AdjustCamera
 
   ; Mark remaining sprites as offscreen, then convert sprite size
   ; data from the convenient-to-manipulate format described by
   ; psycopathicteen to the packed format that the PPU actually uses.
+  setaxy16
   ldx OamPtr
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
+
+  ; -------------------
 
   ; Backgrounds and OAM can be modified only during vertical blanking.
   ; Wait for vertical blanking and copy prepared data to OAM.
   jsl ppu_vsync
   jsl ppu_copy_oam
+
+  ; Do row/column updates if required
+  lda ColumnUpdateAddress
+  beq :+
+    jsl RenderLevelColumnUpload
+    stz ColumnUpdateAddress
+  :
+  lda RowUpdateAddress
+  beq :+
+    jsl RenderLevelRowUpload
+    stz RowUpdateAddress
+  :
+
   seta8
   lda #$0F
   sta PPUBRIGHT  ; turn on rendering
@@ -189,12 +195,38 @@ forever:
 padwait:
   bit VBLSTATUS
   bne padwait
-  stz BGSCROLLX
-  stz BGSCROLLX
+
+  ; Update scroll registers
+  seta16
+  lda ScrollX
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+
+  lda ScrollY
+  dec a ; SNES displays lines 1-224 so shift it up to 0-223
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 2
+  seta8
+
+  lda 0
+  sta BGSCROLLX
+  lda 1
+  sta BGSCROLLX
+  lda 2
+  sta BGSCROLLY
+  lda 3
+  sta BGSCROLLY
 
   jmp forever
 .endproc
 
+; Background palette
 palette:
   .word RGB(15,23,31)
   .word RGB8(34, 32, 52)
