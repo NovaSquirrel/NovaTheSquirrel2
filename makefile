@@ -16,7 +16,7 @@ version = 0.01
 # Space-separated list of asm files without .s extension
 # (use a backslash to continue on the next line)
 objlist = \
-  snesheader init main player \
+  snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata
 objlistspc = \
   spcheader spcimage musicseq

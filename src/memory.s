@@ -20,6 +20,7 @@
 ; |||||||| ||||++++ - subpixels
 ; ++++++++ ++++------ actual pixels
 
+.include "memory.inc"
 
 .segment "ZEROPAGE"
   retraces: .res 1
@@ -31,15 +32,10 @@
   ScrollY:  .res 2
   LevelBlockPtr: .res 3
 
-  PlayerPXL:        .res 1 ; \ player X and Y positions
-  PlayerPXH:        .res 1 ;  \
-  PlayerPYL:        .res 1 ;  /
-  PlayerPYH:        .res 1 ; /
-
-  PlayerVXL:        .res 1 ; \
-  PlayerVXH:        .res 1 ;  \ player X and Y speeds
-  PlayerVYL:        .res 1 ;  /
-  PlayerVYH:        .res 1 ; /
+  PlayerPX:        .res 2 ; \ player X and Y positions
+  PlayerPY:        .res 2 ; /
+  PlayerVX:        .res 2 ; \
+  PlayerVY:        .res 2 ; /
 
   PlayerWasRunning: .res 1     ; was the player running when they jumped?
   PlayerDir:        .res 1     ; currently facing left?
@@ -56,12 +52,10 @@
   StartedLevelNumber:    .res 1 ; Level number that was picked from the level select (level select number)
   NeedLevelReload:       .res 1 ; If set, decode LevelNumber again
 
-  OamPtr:           .res 1
+  OamPtr:           .res 2 ;
   TempVal:          .res 4
   TempX:            .res 1 ; for saving the X register
   TempY:            .res 1 ; for saving the Y register
-
-
 
 .segment "BSS" ; First 8KB of RAM
   ObjectLen = 16
@@ -76,13 +70,24 @@
   ObjectIndexInLevel: .res ObjectLen*2 ; object's index in level list, prevents object from being respawned until it's despawned
   ObjectTimer: .res ObjectLen*2 ; when timer reaches 0, reset state
 
+  OAM:   .res 512
+  OAMHI: .res 512
+  ; OAMHI contains bit 8 of X (the horizontal position) and the size
+  ; bit for each sprite.  It's a bit wasteful of memory, as the
+  ; 512-byte OAMHI needs to be packed by software into 32 bytes before
+  ; being sent to the PPU, but it makes sprite drawing code much
+  ; simpler.
+
+  ; Video updates from scrolling
+  ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
+  ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
+  ColumnRowAddress:    .res 2     ; Address to upload to, or zero for none
+  ColumnRowBuffer:     .res 64*2  ; 64 tiles horizontally
+
 .segment "BSS7E"
 
 
 .segment "BSS7F"
-  LEVEL_WIDTH = 256
-  LEVEL_HEIGHT = 32	 
-  LEVEL_TILE_SIZE = 2
   LevelBuf: .res 256*32*2 ; 16KB
 
 

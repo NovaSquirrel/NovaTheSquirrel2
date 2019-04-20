@@ -66,7 +66,7 @@ PPUSTATUS2 = $213F
 
 OBSEL = $2101
 ; 76543210
-; |||||+++- Sprite main pattern table (0=$0000, 1=$2000, 2=$4000, 3=$6000, 4=$8000, 5=$A000, 6=$C000 7=$E000)
+; ||||| ++- Sprite main pattern table (0=$0000, 1=$4000, 2=$8000, 3=$C000)
 ; |||++---- Alt pattern table offset (0=$1000, 1=$2000, 2=$3000, 3=$4000)
 ; +++------ 0: 8/16; 1: 8/32; 2: 8/64; 3: 16/64; 4: 32/64; 5: 64/64
 ;           (all sprites are square and 2D-mapped)
