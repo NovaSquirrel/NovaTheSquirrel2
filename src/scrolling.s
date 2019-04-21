@@ -87,11 +87,11 @@ TargetY = 6
     jsr ToTiles
     bcs UpdateRight
   UpdateLeft:
-    sub #2
+    sub #2             ; Two tiles to the left
     jsr UpdateColumn
     bra NoUpdateColumn
   UpdateRight:
-    add #34
+    add #34            ; Two tiles past the end of the screen on the right
     jsr UpdateColumn
   NoUpdateColumn:
 
@@ -105,16 +105,17 @@ TargetY = 6
     jsr ToTiles
     bcs UpdateDown
   UpdateUp:
-    dec a
+    dec a              ; One tile above
     jsr UpdateRow
     bra NoUpdateRow
   UpdateDown:
-    add #29
+    add #29            ; Just past the screen height
     jsr UpdateRow
   NoUpdateRow:
 
   rtl
 
+; Convert a 12.4 scroll position to a number of tiles
 ToTiles:
   php
   lsr ; \ shift out the subpixels
@@ -138,7 +139,7 @@ YPos = 6
   ; (Always starts at the leftmost column
   ; and extends all the way to the right.)
   and #31
-  asl ; * 32 for rows
+  asl ; Multiply by 32, the number of words per row in a screen
   asl
   asl
   asl
@@ -146,7 +147,7 @@ YPos = 6
   ora #ForegroundBG>>1
   sta RowUpdateAddress
 
-  ; Temporarily blank out the line
+  ; (Temporary screen blanking used to make sure I was filling the whole visible part)
   ldx #0
   lda #1
 : sta RowUpdateBuffer,x
@@ -171,7 +172,8 @@ YPos = 6
   and #(64*2)-1
   tax
 
-  ; Use the Y scroll position in blocks
+  ; Take the Y position, rounded to blocks,
+  ; as the column of level data to read
   lda Temp
   and #<~1
   tay
