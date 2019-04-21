@@ -174,7 +174,6 @@ YPos = 6
   ; Use the Y scroll position in blocks
   lda Temp
   and #<~1
-  asl
   tay
 
   ; Generate the top or the bottom as needed

@@ -297,9 +297,10 @@ Loop:
   ply
 
   ; Next column
-  tya
+  lda LevelBlockPtr
   add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
-  tay
+  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
+  sta LevelBlockPtr
 
   ; Wrap around in the buffer
   txa
@@ -344,9 +345,10 @@ Loop:
   ply
 
   ; Next column
-  tya
+  lda LevelBlockPtr
   add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
-  tay
+  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
+  sta LevelBlockPtr
 
   ; Wrap around in the buffer
   txa
