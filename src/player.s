@@ -36,55 +36,53 @@
   rtl
 .endproc
 
+.a16
+.i16
 .proc HandlePlayer
-cur_keys = JOY1CUR+1
-  setaxy8
+cur_keys = JOY1CUR
+  lda cur_keys
+  and #KEY_RIGHT
+  beq :+
+    lda PlayerPX
+    add #16*4
+    sta PlayerPX
+  :
 
   lda cur_keys
-  and #>KEY_RIGHT
-  beq notRight
-    seta16
-    lda ScrollX
-    add #16
-    sta ScrollX
-    seta8
-  notRight:
+  and #KEY_LEFT
+  beq :+
+    lda PlayerPX
+    sub #16*4
+    sta PlayerPX
+    bcs :+
+      stz PlayerPX
+  :
 
   lda cur_keys
-  and #>KEY_LEFT
-  beq notLeft
-    seta16
-    lda ScrollX
-    sub #16
-    sta ScrollX
-    seta8
-  notLeft:
+  and #KEY_UP
+  beq :+
+    lda PlayerPY
+    sub #16*4
+    sta PlayerPY
+    bcs :+
+      stz PlayerPY
+  :
 
   lda cur_keys
-  and #>KEY_UP
-  beq notUp
-    seta16
-    lda ScrollY
-    sub #16
-    sta ScrollY
-    seta8
-  notUp:
-
-  lda cur_keys
-  and #>KEY_DOWN
-  beq notDown
-    seta16
-    lda ScrollY
-    add #16
-    sta ScrollY
-    seta8
-  notDown:
+  and #KEY_DOWN
+  beq :+
+    lda PlayerPY
+    add #16*4
+    sta PlayerPY
+  :
 
 
   setaxy16
   rts
 .endproc
 
+.a16
+.i16
 .proc DrawPlayer
 OAM_XPOS = OAM+0
 OAM_YPOS = OAM+1

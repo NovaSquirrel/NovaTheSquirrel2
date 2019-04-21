@@ -94,18 +94,58 @@
   jsl ppu_clear_nt
 
   lda #1
-  sta f:LevelBuf+(64*0)
-  sta f:LevelBuf+(64*1)+1
-  sta f:LevelBuf+(64*2)+2
-  sta f:LevelBuf+(64*3)+3
-  sta f:LevelBuf+(64*4)+4
-  lda #2
-  sta f:LevelBuf+(64*5)+6
-  sta f:LevelBuf+(64*6)+8
-  sta f:LevelBuf+(64*7)+10
-  sta f:LevelBuf+(64*8)+12
-  sta f:LevelBuf+(64*9)+14
-  sta f:LevelBuf+(64*10)+16
+  sta f:LevelBuf+(64*0)+0*2
+  sta f:LevelBuf+(64*1)+1*2
+  sta f:LevelBuf+(64*2)+2*2
+  sta f:LevelBuf+(64*3)+3*2
+  sta f:LevelBuf+(64*4)+4*2
+  inc a
+  sta f:LevelBuf+(64*5)+5*2
+  sta f:LevelBuf+(64*6)+6*2
+  sta f:LevelBuf+(64*7)+7*2
+  sta f:LevelBuf+(64*8)+8*2
+  sta f:LevelBuf+(64*9)+9*2
+  sta f:LevelBuf+(64*10)+10*2
+  sta f:LevelBuf+(64*11)+11*2
+  sta f:LevelBuf+(64*12)+12*2
+  inc a
+  sta f:LevelBuf+(64*13)+13*2
+  sta f:LevelBuf+(64*14)+14*2
+  sta f:LevelBuf+(64*15)+15*2
+  sta f:LevelBuf+(64*16)+16*2
+  sta f:LevelBuf+(64*17)+17*2
+  sta f:LevelBuf+(64*18)+18*2
+  sta f:LevelBuf+(64*19)+19*2
+  inc a
+  sta f:LevelBuf+(64*20)+20*2
+  sta f:LevelBuf+(64*21)+21*2
+  sta f:LevelBuf+(64*22)+22*2
+  sta f:LevelBuf+(64*23)+23*2
+  sta f:LevelBuf+(64*24)+24*2
+  sta f:LevelBuf+(64*25)+25*2
+  sta f:LevelBuf+(64*26)+26*2
+  inc a
+  sta f:LevelBuf+(64*27)+27*2
+  sta f:LevelBuf+(64*28)+28*2
+  sta f:LevelBuf+(64*29)+29*2
+  sta f:LevelBuf+(64*30)+30*2
+  sta f:LevelBuf+(64*31)+31*2
+
+  inc a
+  sta f:LevelBuf+(64*19)+20*2
+  sta f:LevelBuf+(64*20)+21*2
+  sta f:LevelBuf+(64*21)+22*2
+  sta f:LevelBuf+(64*22)+23*2
+  sta f:LevelBuf+(64*23)+24*2
+  sta f:LevelBuf+(64*24)+25*2
+  sta f:LevelBuf+(64*25)+26*2
+  sta f:LevelBuf+(64*26)+27*2
+  sta f:LevelBuf+(64*27)+28*2
+  sta f:LevelBuf+(64*28)+29*2
+  sta f:LevelBuf+(64*29)+30*2
+  sta f:LevelBuf+(64*30)+31*2
+
+
   jsl RenderLevelScreens
 
   phk

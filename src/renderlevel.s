@@ -55,6 +55,7 @@ YPos = 4
   lda ScrollY
   xba
   and #LEVEL_HEIGHT-1
+  asl
   sta YPos
 
 Loop:
@@ -69,9 +70,8 @@ Loop:
   lda BlockNum
   and #16
   beq :+
-    lda ColumnUpdateAddress
-    ora #2048>>1
-    sta ColumnUpdateAddress
+    lda #2048>>1
+    tsb ColumnUpdateAddress
   :
 
   ; Upload two columns
@@ -158,7 +158,7 @@ Loop:
 
   ; Reset the counters. Don't need to do DMAMODE again I assume?
   lda RowUpdateAddress
-  add #2048>>1
+  ora #2048>>1
   sta PPUADDR
   lda #RowUpdateBuffer+32*2
   sta DMAADDR
@@ -186,8 +186,13 @@ Loop:
   phk
   plb
 
-  ldx #0
+  tya
+  asl
+  and #(32*2)-1
+  tax
+  stx TempVal
 : lda [LevelBlockPtr],y ; Get the next level tile
+  iny
   iny
   phy
   asl ; Multiply by 2 because the table is 16-bit
@@ -203,8 +208,13 @@ Loop:
   inx
   ply
 
+  ; Wrap around in the buffer
+  txa
+  and #(32*2)-1
+  tax
+
   ; Stop after 32 tiles vertically
-  cpx #32*2
+  cpx TempVal
   bne :-
 
   plb
@@ -221,8 +231,13 @@ Loop:
   phk
   plb
 
-  ldx #0
+  tya
+  asl
+  and #(32*2)-1
+  tax
+  stx TempVal
 : lda [LevelBlockPtr],y ; Get the next level tile
+  iny
   iny
   phy
   asl ; Multiply by 2 because the table is 16-bit
@@ -238,8 +253,13 @@ Loop:
   inx
   ply
 
+  ; Wrap around in the buffer
+  txa
+  and #(32*2)-1
+  tax
+
   ; Stop after 32 tiles vertically
-  cpx #32*2
+  cpx TempVal
   bne :-
 
   plb
@@ -249,6 +269,7 @@ Loop:
 
 ; Render the left tile of a column of blocks
 ; (at LevelBlockPtr starting from index Y)
+; Initialize X with buffer position before calling.
 ; 16-bit accumulator and index
 .a16
 .i16
@@ -257,9 +278,10 @@ Loop:
   phk
   plb
 
-  ldx #0
+  lda #20
+  sta TempVal
+
 : lda [LevelBlockPtr],y ; Get the next level tile
-  iny
   phy
   asl ; Multiply by 2 because the table is 16-bit
   tay
@@ -275,12 +297,17 @@ Loop:
   ply
 
   ; Next column
-  lda LevelBlockPtr
+  tya
   add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
-  sta LevelBlockPtr
+  tay
+
+  ; Wrap around in the buffer
+  txa
+  and #(64*2)-1
+  tax
 
   ; Stop after 64 tiles horizontally
-  cpx #64*2
+  dec TempVal
   bne :-
 
   plb
@@ -289,6 +316,7 @@ Loop:
 
 ; Render the right tile of a column of blocks
 ; (at LevelBlockPtr starting from index Y)
+; Initialize X with buffer position before calling.
 ; 16-bit accumulator and index
 .a16
 .i16
@@ -297,7 +325,9 @@ Loop:
   phk
   plb
 
-  ldx #0
+  lda #20
+  sta TempVal
+
 : lda [LevelBlockPtr],y ; Get the next level tile
   phy
   asl ; Multiply by 2 because the table is 16-bit
@@ -314,15 +344,19 @@ Loop:
   ply
 
   ; Next column
-  lda LevelBlockPtr
+  tya
   add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
-  sta LevelBlockPtr
+  tay
+
+  ; Wrap around in the buffer
+  txa
+  and #(64*2)-1
+  tax
 
   ; Stop after 64 tiles horizontally
-  cpx #64*2
+  dec TempVal
   bne :-
 
   plb
   rtl
 .endproc
-
