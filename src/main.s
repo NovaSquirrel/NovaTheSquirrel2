@@ -93,6 +93,7 @@
   ldy #0
   jsl ppu_clear_nt
 
+.if 0
   lda #1
   sta f:LevelBuf+(64*0)+0*2
   sta f:LevelBuf+(64*1)+1*2
@@ -144,7 +145,27 @@
   sta f:LevelBuf+(64*28)+29*2
   sta f:LevelBuf+(64*29)+30*2
   sta f:LevelBuf+(64*30)+31*2
+  inc a
+  sta f:LevelBuf+(64*1)+10*2
+  sta f:LevelBuf+(64*1)+11*2
+  sta f:LevelBuf+(64*1)+12*2
+  sta f:LevelBuf+(64*1)+13*2
+  sta f:LevelBuf+(64*1)+14*2
+  sta f:LevelBuf+(64*1)+15*2
+  sta f:LevelBuf+(64*1)+16*2
+  sta f:LevelBuf+(64*1)+17*2
+  sta f:LevelBuf+(64*1)+18*2
+  sta f:LevelBuf+(64*1)+19*2
+  sta f:LevelBuf+(64*1)+20*2
+  sta f:LevelBuf+(64*1)+21*2
+.endif
 
+  ldx #0
+: lda PlaceholderLevel,x
+  sta f:LevelBuf,x
+  inx
+  cpx #PlaceholderLevelEnd-PlaceholderLevel
+  bne :-
 
   jsl RenderLevelScreens
 
@@ -285,3 +306,17 @@ palette:
   .word RGB8(217, 87, 99)
   .word RGB8(255, 0, 255)
 palette_size = * - palette
+
+
+PlaceholderLevel:
+.repeat 10
+  .repeat 4
+  .word 2, 2, 2, 2, 7, 7, 7, 7, 2, 2, 2, 2, 7, 7, 7, 7
+  .word 1, 1, 1, 1, 15, 15, 15, 15, 1, 1, 1, 1, 15, 15, 15, 15
+  .endrep
+  .repeat 4
+  .word 7, 7, 7, 7, 2, 2, 2, 2, 7, 7, 7, 7, 2, 2, 2, 2
+  .word 15,15,15,15, 1, 1, 1, 1, 15, 15, 15, 15, 1, 1, 1, 1
+  .endrep
+.endrep
+PlaceholderLevelEnd:

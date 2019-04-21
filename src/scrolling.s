@@ -98,7 +98,7 @@ TargetY = 6
   ; Is a row update required?
   lda ScrollY
   eor ScrollOldY
-  and #$80  
+  and #$80
   beq NoUpdateRow
     lda ScrollY
     cmp ScrollOldY
