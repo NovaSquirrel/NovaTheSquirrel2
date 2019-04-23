@@ -105,7 +105,6 @@ TargetY = 6
     jsr ToTiles
     bcs UpdateDown
   UpdateUp:
-    dec a              ; One tile above
     jsr UpdateRow
     bra NoUpdateRow
   UpdateDown:
