@@ -45,9 +45,9 @@ TargetY = 6
   sub #8*256  ; Pull back to center vertically
   bcs :+
     lda #0
-: cmp #256*16 ; Limit to two screens of vertical scrolling
+: cmp #(256+32)*16 ; Limit to two screens of vertical scrolling
   bcc :+
-  lda #256*16
+  lda #(256+32)*16
 : sta TargetY
 
   ; Move only a fraction of that
