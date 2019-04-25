@@ -18,7 +18,7 @@ version = 0.01
 objlist = \
   snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
-  scrolling
+  scrolling playergraphics
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

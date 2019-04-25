@@ -181,6 +181,17 @@
   ldy #palette_size
   jsl ppu_copy
 
+  ; Player palette
+  seta8
+  lda #$81
+  sta CGADDR
+  setaxy16
+  lda #DMAMODE_CGDATA
+  ldx #PlayerPalette & $FFFF
+  ldy #15*2
+  jsl ppu_copy
+
+
   ; Set up PPU registers
   seta8
   lda #1
@@ -246,6 +257,7 @@ forever:
     jsl RenderLevelRowUpload
     stz RowUpdateAddress
   :
+  jsl PlayerFrameUpload
 
   seta8
   lda #$0F
@@ -307,6 +319,19 @@ palette:
   .word RGB8(255, 0, 255)
 palette_size = * - palette
 
+PlayerPalette:
+  .word RGB8($ff, $ff, $ff)
+  .word RGB8($00, $00, $00)
+  .word RGB8($23, $55, $23)
+  .word RGB8($3f, $99, $3f)
+  .word RGB8($4a, $b5, $4a)
+  .word RGB8($5a, $d6, $5a)
+  .word RGB8($53, $76, $ff)
+  .word RGB8($44, $61, $d2)
+  .word RGB8($34, $4b, $a2)
+  .word RGB8($00, $00, $fc)
+  .word RGB8($f6, $79, $60)
+  .word 0, 0, 0, 0
 
 PlaceholderLevel:
 .repeat 10

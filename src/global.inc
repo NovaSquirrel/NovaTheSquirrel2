@@ -32,5 +32,6 @@ ExtraBG = $E000
 .global RenderLevelRowUpload
 .global RenderLevelRowTop
 .global RenderLevelRowBottom
+.global PlayerFrameUpload
 
 .global RunPlayer, AdjustCamera

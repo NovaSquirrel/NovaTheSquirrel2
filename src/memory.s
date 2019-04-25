@@ -36,6 +36,7 @@
   PlayerPY:        .res 2 ; /
   PlayerVX:        .res 2 ; \
   PlayerVY:        .res 2 ; /
+  PlayerFrame:     .res 1 ; Player animation frame
 
   PlayerWasRunning: .res 1     ; was the player running when they jumped?
   PlayerDir:        .res 1     ; currently facing left?

@@ -9,6 +9,8 @@
 .globalzp PlayerPY
 .globalzp PlayerVX
 .globalzp PlayerVY
+.globalzp PlayerFrame
+.globalzp PlayerDir
 .globalzp OamPtr
 .globalzp TempVal
 .globalzp TempX
