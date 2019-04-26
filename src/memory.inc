@@ -11,10 +11,13 @@
 .globalzp PlayerVY
 .globalzp PlayerFrame
 .globalzp PlayerDir
+.globalzp PlayerWasRunning
 .globalzp OamPtr
 .globalzp TempVal
 .globalzp TempX
 .globalzp TempY
+.global PlayerAccelSpeed
+.global PlayerDecelSpeed
 
 .global ColumnUpdateAddress
 .global ColumnUpdateBuffer

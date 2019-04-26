@@ -179,12 +179,12 @@ outfile.write(".proc BlockNothing\n  rts\n.endproc\n\n")
 interaction_types = ["Above", "Below", "Side", "InsideHead", "InsideBody", "EntityInside", "EntityTopBottom", "EntitySides"]
 for interaction in interaction_types:
 	outfile.write(".proc BlockInteraction%s\n" % interaction)
-	outfile.write('  .addr .loword(BlockNothing-1)\n') # Empty interaction set
+	outfile.write('  .dbyt .loword(BlockNothing-1)\n') # Empty interaction set
 	for b in all_interaction_sets:
 		if interaction in b:
-			outfile.write('  .addr .loword(%s-1)\n' % b[interaction])
+			outfile.write('  .dbyt .loword(%s-1)\n' % b[interaction])
 		else:
-			outfile.write('  .addr .loword(BlockNothing-1)\n')
+			outfile.write('  .dbyt .loword(BlockNothing-1)\n')
 	outfile.write(".endproc\n\n")
 
 

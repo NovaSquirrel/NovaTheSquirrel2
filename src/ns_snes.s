@@ -114,6 +114,18 @@ DJ_Label:
 @Skip:
 .endmacro
 
+.macro negw
+  eor #$ffff
+  inc a
+.endmacro
+
+.macro absw ; absolute value
+.local @Skip
+  bpl @Skip
+  negw
+@Skip:
+.endmacro
+
 .macro sex ; sign extend
 .local @Skip
   ora #$7F

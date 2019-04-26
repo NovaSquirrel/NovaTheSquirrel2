@@ -85,6 +85,9 @@
   RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
   RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
 
+  PlayerAccelSpeed: .res 2
+  PlayerDecelSpeed: .res 2
+
 .segment "BSS7E"
 
 

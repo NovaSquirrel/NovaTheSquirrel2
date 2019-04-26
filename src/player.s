@@ -80,69 +80,172 @@
   jsr DrawPlayer
 
   ; Automatically cycle through the walk animation
+
   seta8
-  lda retraces
-  lsr
-  lsr
-  and #7
-  inc a
-  sta PlayerFrame 
+  stz PlayerFrame
+
+  lda keydown+1
+  and #(KEY_LEFT|KEY_RIGHT)>>8
+  beq :+
+    lda retraces
+    lsr
+    lsr
+    and #7
+    inc a
+    sta PlayerFrame 
+  :
 
   plp
   rtl
 .endproc
 
+NOVA_WALK_SPEED = 2
+NOVA_RUN_SPEED = 4
+;AccelSpeeds: .byt 2,        4
+;DecelSpeeds: .byt 4,        8
+
 .a16
 .i16
 .proc HandlePlayer
-cur_keys = JOY1CUR
-  lda cur_keys
-  and #KEY_RIGHT
+Temp = 2
+MaxSpeedLeft = 10
+MaxSpeedRight = 12
+
+  ; Horizontal movement
+
+  ; Calculate max speed from whether they're running or not
+  ; (Updated only when on the ground)
+  seta8
+  lda PlayerWasRunning ; nonzero = B button, only updated when on ground
+  seta16
   beq :+
-    seta8
-    stz PlayerDir
-    seta16
+    lda #.loword(-(NOVA_RUN_SPEED*16))
+    sta MaxSpeedLeft
+    lda #NOVA_RUN_SPEED*16
+    sta MaxSpeedRight
+    bne NotWalkSpeed
+: lda #.loword(-(NOVA_WALK_SPEED*16))
+  sta MaxSpeedLeft
+  lda #NOVA_WALK_SPEED*16
+  sta MaxSpeedRight
+NotWalkSpeed:
 
-    lda PlayerPX
-    add #16*4
-    sta PlayerPX
-  :
 
-  lda cur_keys
+  ; Handle left and right
+  lda keydown
   and #KEY_LEFT
-  beq :+
+  beq NotLeft
     seta8
     lda #1
     sta PlayerDir
     seta16
+    lda PlayerVX
+    cmp MaxSpeedLeft ; can be either run speed or walk speed
+    beq NotLeft
+    cmp #.lobyte(-NOVA_RUN_SPEED*16)
+    beq NotLeft
+    sub #2 ; Acceleration speed
+    sta PlayerVX
+NotLeft:
 
-    lda PlayerPX
-    sub #16*4
-    sta PlayerPX
-    bcs :+
-      stz PlayerPX
-  :
+  lda keydown
+  and #KEY_RIGHT
+  beq NotRight
+    seta8
+    stz PlayerDir
+    seta16
+    lda PlayerVX
+    cmp MaxSpeedRight ; can be either run speed or walk speed
+    beq NotRight
+    cmp #NOVA_RUN_SPEED*16
+    beq NotRight
 
-  lda cur_keys
-  and #KEY_UP
+    add #2 ; Acceleration speed
+    sta PlayerVX
+NotRight:
+NotWalk:
+
+  ; Decelerate
+  lda #4
+  sta Temp
+  ; Adjust the deceleration speed if you're trying to turn around
+  lda keydown
+  and #KEY_LEFT
   beq :+
-    lda PlayerPY
-    sub #16*4
-    sta PlayerPY
-    bcs :+
-      stz PlayerPY
+    lda PlayerVX
+    bmi IsMoving
+    lsr Temp
   :
-
-  lda cur_keys
-  and #KEY_DOWN
+  lda keydown
+  and #KEY_RIGHT
   beq :+
+    lda PlayerVX
+    beq Stopped
+    bpl IsMoving
+    lsr Temp
+  :
+  lda PlayerVX
+  beq Stopped
+    ; If negative, make positive
+    php ; Save if it was negative
+    bpl :+
+      eor #$ffff
+      ina
+    :
+
+    sub Temp ; Deceleration speed
+    bpl :+
+      lda #0
+    :
+
+    ; If negative, make negative again
+    plp
+    bpl :+
+      eor #$ffff
+      ina
+    :
+
+    sta PlayerVX
+Stopped:
+IsMoving:
+
+  ; Apply speed
+  lda PlayerPX
+  add PlayerVX
+  sta PlayerPX
+
+  ; -------------------
+
+  ; Vertical movement
+  lda PlayerVY
+  bmi GravityAddOK
+  cmp #$60
+  bcs SkipGravity
+GravityAddOK:
+  add #4
+  sta PlayerVY
+SkipGravity:
+  add PlayerPY ; Apply the vertical speed
+  sta PlayerPY
+SkipApplyGravity:
+
+
+
+  ldy PlayerPY
+  lda PlayerPX
+  jsl GetLevelPtrXY
+  asl
+  tax
+  lda f:BlockFlags,x
+
+  bpl :+
+    stz PlayerVY
     lda PlayerPY
-    add #16*4
+    and #$ff00
     sta PlayerPY
   :
 
 
-  setaxy16
   rts
 .endproc
 
@@ -188,6 +291,7 @@ OAM_ATTR = OAM+3
   sta OAM_XPOS+(4*2),x
 
   lda 2
+  sub #16
   sta OAM_YPOS+(4*2),x
   sta OAM_YPOS+(4*3),x
   sub #16

@@ -24,7 +24,7 @@ ExtraBG = $E000
 .global spc_boot_apu
 
 ; Common
-.global GetLevelColumnPtr
+.global GetLevelColumnPtr, GetLevelPtrXY
 .global RenderLevelScreens
 .global RenderLevelColumnUpload
 .global RenderLevelColumnLeft
@@ -35,3 +35,4 @@ ExtraBG = $E000
 .global PlayerFrameUpload
 
 .global RunPlayer, AdjustCamera
+.global BlockFlags
