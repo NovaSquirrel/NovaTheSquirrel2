@@ -69,6 +69,8 @@
 
   seta8
   setxy16
+  phk
+  plb
 
   ; Clear the first 8KB of RAM
   ldx #8192-1
@@ -92,77 +94,22 @@
   ldx #$e000 >> 1
   ldy #0
   jsl ppu_clear_nt
+  setaxy16
 
-.if 0
-  lda #1
-  sta f:LevelBuf+(64*0)+0*2
-  sta f:LevelBuf+(64*1)+1*2
-  sta f:LevelBuf+(64*2)+2*2
-  sta f:LevelBuf+(64*3)+3*2
-  sta f:LevelBuf+(64*4)+4*2
-  inc a
-  sta f:LevelBuf+(64*5)+5*2
-  sta f:LevelBuf+(64*6)+6*2
-  sta f:LevelBuf+(64*7)+7*2
-  sta f:LevelBuf+(64*8)+8*2
-  sta f:LevelBuf+(64*9)+9*2
-  sta f:LevelBuf+(64*10)+10*2
-  sta f:LevelBuf+(64*11)+11*2
-  sta f:LevelBuf+(64*12)+12*2
-  inc a
-  sta f:LevelBuf+(64*13)+13*2
-  sta f:LevelBuf+(64*14)+14*2
-  sta f:LevelBuf+(64*15)+15*2
-  sta f:LevelBuf+(64*16)+16*2
-  sta f:LevelBuf+(64*17)+17*2
-  sta f:LevelBuf+(64*18)+18*2
-  sta f:LevelBuf+(64*19)+19*2
-  inc a
-  sta f:LevelBuf+(64*20)+20*2
-  sta f:LevelBuf+(64*21)+21*2
-  sta f:LevelBuf+(64*22)+22*2
-  sta f:LevelBuf+(64*23)+23*2
-  sta f:LevelBuf+(64*24)+24*2
-  sta f:LevelBuf+(64*25)+25*2
-  sta f:LevelBuf+(64*26)+26*2
-  inc a
-  sta f:LevelBuf+(64*27)+27*2
-  sta f:LevelBuf+(64*28)+28*2
-  sta f:LevelBuf+(64*29)+29*2
-  sta f:LevelBuf+(64*30)+30*2
-  sta f:LevelBuf+(64*31)+31*2
+  ; Clear level buffer
+  lda #0
+  tax
+: sta f:LevelBuf,x
+  inx
+  inx
+  cpx #256*32*2
+  bne :-
 
-  inc a
-  sta f:LevelBuf+(64*19)+20*2
-  sta f:LevelBuf+(64*20)+21*2
-  sta f:LevelBuf+(64*21)+22*2
-  sta f:LevelBuf+(64*22)+23*2
-  sta f:LevelBuf+(64*23)+24*2
-  sta f:LevelBuf+(64*24)+25*2
-  sta f:LevelBuf+(64*25)+26*2
-  sta f:LevelBuf+(64*26)+27*2
-  sta f:LevelBuf+(64*27)+28*2
-  sta f:LevelBuf+(64*28)+29*2
-  sta f:LevelBuf+(64*29)+30*2
-  sta f:LevelBuf+(64*30)+31*2
-  inc a
-  sta f:LevelBuf+(64*1)+10*2
-  sta f:LevelBuf+(64*1)+11*2
-  sta f:LevelBuf+(64*1)+12*2
-  sta f:LevelBuf+(64*1)+13*2
-  sta f:LevelBuf+(64*1)+14*2
-  sta f:LevelBuf+(64*1)+15*2
-  sta f:LevelBuf+(64*1)+16*2
-  sta f:LevelBuf+(64*1)+17*2
-  sta f:LevelBuf+(64*1)+18*2
-  sta f:LevelBuf+(64*1)+19*2
-  sta f:LevelBuf+(64*1)+20*2
-  sta f:LevelBuf+(64*1)+21*2
-.endif
-
+  ; Copy in a placeholder level
   ldx #0
 : lda PlaceholderLevel,x
   sta f:LevelBuf,x
+  inx
   inx
   cpx #PlaceholderLevelEnd-PlaceholderLevel
   bne :-
@@ -227,6 +174,17 @@
 forever:
   ; Draw the player to a display list in main memory
   setaxy16
+  ; Update keys
+  lda keydown
+  sta keylast
+  lda JOY1CUR
+  sta keydown
+  lda keylast
+  eor #$ffff
+  and keydown
+  sta keynew
+
+  ; Run stuff for this frame
   stz OamPtr
   jsl RunPlayer
   jsl AdjustCamera
@@ -334,14 +292,12 @@ PlayerPalette:
   .word 0, 0, 0, 0
 
 PlaceholderLevel:
-.repeat 10
-  .repeat 4
-  .word 2, 2, 2, 2, 7, 7, 7, 7, 2, 2, 2, 2, 7, 7, 7, 7
-  .word 1, 1, 1, 1, 15, 15, 15, 15, 1, 1, 1, 1, 15, 15, 15, 15
-  .endrep
-  .repeat 4
-  .word 7, 7, 7, 7, 2, 2, 2, 2, 7, 7, 7, 7, 2, 2, 2, 2
-  .word 15,15,15,15, 1, 1, 1, 1, 15, 15, 15, 15, 1, 1, 1, 1
-  .endrep
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3
+.repeat 20
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1
 .endrep
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3
 PlaceholderLevelEnd:
