@@ -24,6 +24,166 @@
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
 .export BlockSign, BlockSpikes, BlockSpring, BlockLadder
 
+; Export the interaction runners
+.export BlockRunInteractionAbove, BlockRunInteractionBelow
+.export BlockRunInteractionSide, BlockRunInteractionInsideHead
+.export BlockRunInteractionInsideBody, BlockRunInteractionEntityInside
+.export BlockRunInteractionEntityTopBottom, BlockRunInteractionEntitySide
+
+; .-------------------------------------
+; |Runners for interactions
+; '-------------------------------------
+
+.a16
+.i16
+.import BlockInteractionAbove
+.proc BlockRunInteractionAbove
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionAbove),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+.a16
+.i16
+.import BlockInteractionBelow
+.proc BlockRunInteractionBelow
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionBelow),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+.a16
+.i16
+.import BlockInteractionSide
+.proc BlockRunInteractionSide
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionSide),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+
+.a16
+.i16
+.import BlockInteractionInsideHead
+.proc BlockRunInteractionInsideHead
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionInsideHead),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+.a16
+.i16
+.import BlockInteractionInsideBody
+.proc BlockRunInteractionInsideBody
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionInsideBody),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+.a16
+.i16
+.import BlockInteractionEntityInside
+.proc BlockRunInteractionEntityInside
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionEntityInside),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+.a16
+.i16
+.import BlockInteractionEntityTopBottom
+.proc BlockRunInteractionEntityTopBottom
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionEntityTopBottom),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+.a16
+.i16
+.import BlockInteractionEntitySide
+.proc BlockRunInteractionEntitySide
+  and #255 ; Get the interaction set only
+  beq Skip
+
+  phb
+  phk ; Data bank = program bank
+  plb
+  asl
+  tax
+  jsr (.loword(BlockInteractionSide),x)
+  plb
+Skip:
+  rtl
+.endproc
+
+
+
+
+; -------------------------------------
+
 .proc BlockAutoItem
   rts
 .endproc

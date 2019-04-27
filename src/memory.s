@@ -30,7 +30,12 @@
 
   ScrollX:  .res 2
   ScrollY:  .res 2
-  LevelBlockPtr: .res 3
+
+  LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks
+  BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
+  BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr
+  BlockRealY:    .res 2 ; Real Y coordinate used to calculate LevelBlockPtr
+ 
 
   PlayerPX:        .res 2 ; \ player X and Y positions
   PlayerPY:        .res 2 ; /
@@ -42,7 +47,6 @@
   PlayerDir:        .res 1     ; currently facing left?
   PlayerJumping:    .res 1     ; true if jumping (not falling)
   PlayerOnGround:   .res 1     ; true if on ground
-  PlayerJumpCancelLock: .res 1 ; timer for the player being unable to cancel a jump
   PlayerWalkLock:   .res 1     ; timer for the player being unable to move left/right
   PlayerDownTimer:  .res 1     ; timer for how long the player has been holding down
                                ; (used for fallthrough platforms)
@@ -87,6 +91,9 @@
 
   PlayerAccelSpeed: .res 2
   PlayerDecelSpeed: .res 2
+  JumpGracePeriod: .res 1
+  PlayerJumpCancelLock: .res 1 ; timer for the player being unable to cancel a jump
+  PlayerJumpCancel: .res 1
 
 .segment "BSS7E"
 

@@ -176,15 +176,16 @@ outfile.write('.endproc\n\n')
 outfile.write(".proc BlockNothing\n  rts\n.endproc\n\n")
 
 # Write all interaction type tables corresponding to each interaction set
-interaction_types = ["Above", "Below", "Side", "InsideHead", "InsideBody", "EntityInside", "EntityTopBottom", "EntitySides"]
+interaction_types = ["Above", "Below", "Side", "InsideHead", "InsideBody", "EntityInside", "EntityTopBottom", "EntitySide"]
 for interaction in interaction_types:
+	outfile.write(".export BlockInteraction%s\n" % interaction)
 	outfile.write(".proc BlockInteraction%s\n" % interaction)
-	outfile.write('  .dbyt .loword(BlockNothing-1)\n') # Empty interaction set
+	outfile.write('  .addr .loword(BlockNothing)\n') # Empty interaction set
 	for b in all_interaction_sets:
 		if interaction in b:
-			outfile.write('  .dbyt .loword(%s-1)\n' % b[interaction])
+			outfile.write('  .addr .loword(%s)\n' % b[interaction])
 		else:
-			outfile.write('  .dbyt .loword(BlockNothing-1)\n')
+			outfile.write('  .addr .loword(BlockNothing)\n')
 	outfile.write(".endproc\n\n")
 
 

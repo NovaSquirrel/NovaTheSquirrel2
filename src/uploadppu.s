@@ -11,6 +11,7 @@
 ; @param X starting address of nametable in VRAM (16-bit)
 ; @param Y value to write (16-bit)
 .proc ppu_clear_nt
+  seta16
   sty $0000
   ldy #1024        ; number of bytes to clear
   

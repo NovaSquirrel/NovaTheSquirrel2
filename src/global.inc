@@ -24,7 +24,7 @@ ExtraBG = $E000
 .global spc_boot_apu
 
 ; Common
-.global GetLevelColumnPtr, GetLevelPtrXY
+.global GetLevelColumnPtr, GetLevelPtrXY, GetBlockFlag
 .global RenderLevelScreens
 .global RenderLevelColumnUpload
 .global RenderLevelColumnLeft

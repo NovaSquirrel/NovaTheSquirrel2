@@ -30,16 +30,16 @@
 .a16
 .i16
 .proc GetLevelPtrXY
+  ; Save the coordinates for later access
+  sta BlockRealX
+  sty BlockRealY
+
   ; X position * 64
-  xba
-  and #255
-  asl ; * 2
-  asl ; * 4
-  asl ; * 8
-  asl ; * 16
-  asl ; * 32
-  asl ; * 64
+  lsr
+  lsr
+  and #%0011111111000000
   sta LevelBlockPtr
+  ; 00xxxxxxxx000000
 
   ; Y position
   tya
@@ -47,7 +47,19 @@
   asl
   and #63
   tsb LevelBlockPtr
+  ; 00xxxxxxxxyyyyy0
 
   lda [LevelBlockPtr]
+  rtl
+.endproc
+
+; Get BlockFlag for the block ID in the accumulator
+.a16
+.i16
+.proc GetBlockFlag
+  asl
+  tax
+  lda f:BlockFlags,x
+  sta BlockFlag
   rtl
 .endproc

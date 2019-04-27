@@ -5,6 +5,10 @@
 .globalzp ScrollX
 .globalzp ScrollY
 .globalzp LevelBlockPtr
+.globalzp BlockFlag
+.globalzp BlockRealX
+.globalzp BlockRealY
+
 .globalzp PlayerPX
 .globalzp PlayerPY
 .globalzp PlayerVX
@@ -12,12 +16,21 @@
 .globalzp PlayerFrame
 .globalzp PlayerDir
 .globalzp PlayerWasRunning
+.globalzp PlayerOnGround
+.globalzp PlayerHealth
+.globalzp PlayerWalkLock
+.globalzp PlayerDownTimer
+.globalzp PlayerJumping
 .globalzp OamPtr
 .globalzp TempVal
 .globalzp TempX
 .globalzp TempY
+
+.global PlayerJumpCancel
+.global PlayerJumpCancelLock
 .global PlayerAccelSpeed
 .global PlayerDecelSpeed
+.global JumpGracePeriod
 
 .global ColumnUpdateAddress
 .global ColumnUpdateBuffer

@@ -18,6 +18,10 @@
 .include "global.inc"
 .smart
 
+.import BlockRunInteractionAbove, BlockRunInteractionBelow
+.import BlockRunInteractionSide,  BlockRunInteractionInsideHead
+.import BlockRunInteractionInsideBody
+
 .segment "ZEROPAGE"
 
 .segment "Player"
@@ -108,6 +112,8 @@ NOVA_RUN_SPEED = 4
 .i16
 .proc HandlePlayer
 Temp = 2
+SideXPos = 8
+BottomCmp = 8
 MaxSpeedLeft = 10
 MaxSpeedRight = 12
 
@@ -116,6 +122,9 @@ MaxSpeedRight = 12
   ; Calculate max speed from whether they're running or not
   ; (Updated only when on the ground)
   seta8
+  stz PlayerOnGround
+  countdown JumpGracePeriod
+
   lda PlayerWasRunning ; nonzero = B button, only updated when on ground
   seta16
   beq :+
@@ -123,7 +132,7 @@ MaxSpeedRight = 12
     sta MaxSpeedLeft
     lda #NOVA_RUN_SPEED*16
     sta MaxSpeedRight
-    bne NotWalkSpeed
+    bra NotWalkSpeed
 : lda #.loword(-(NOVA_WALK_SPEED*16))
   sta MaxSpeedLeft
   lda #NOVA_WALK_SPEED*16
@@ -214,6 +223,36 @@ IsMoving:
   add PlayerVX
   sta PlayerPX
 
+  ; Boundary on the left
+  lda PlayerPX
+  cmp #16*16
+  bcs :+
+    lda #16*16
+    sta PlayerPX
+  :
+
+  ; Check for moving into a wall
+  lda PlayerPX
+  add #8*16
+  bit PlayerVX
+  bpl :+
+    sub #8*16*2 ; Subtract off the 8*16 and subtract it again
+  :
+  sta SideXPos
+
+  ; Left middle
+  lda PlayerPY
+  sub #16*16
+  tay
+  lda SideXPos
+  jsr TrySideInteraction
+  ; Right head
+  lda PlayerPY
+  sub #32*16
+  tay
+  lda SideXPos
+  jsr TrySideInteraction
+
   ; -------------------
 
   ; Vertical movement
@@ -230,24 +269,152 @@ SkipGravity:
 SkipApplyGravity:
 
 
+  ; Allow canceling a jump
+  lda PlayerVY
+  bpl :+
+    seta8
+    lda PlayerJumpCancel
+    bne :+
+    lda keydown+1
+    and #(KEY_B>>8)
+    bne :+
+      lda PlayerJumpCancelLock
+      bne :+
+        inc PlayerJumpCancel
 
+        ; Reduce the jump to a small upward boost
+        ; (unless the upward movement is already less than that)
+        seta16
+        lda PlayerVY
+        cmp #.loword(-$20)
+        bcs :+
+        lda #.loword(-$20)
+        sta PlayerVY
+  :
+
+  ; Cancel the jump cancel
+  seta8
+  lda PlayerJumpCancel
+  beq :+
+    lda PlayerVY+1
+    sta PlayerJumpCancel
+  :
+  seta16
+
+  ; Collide with the ground
+  ; (Determine if solid all must be set, or solid top)
+  lda #$8000
+  sta BottomCmp
+  lda PlayerVY
+  bmi :+
+    seta8
+    stz PlayerJumping
+    seta16
+    lda #$4000
+    sta BottomCmp
+  :
+
+  ; Left foot
   ldy PlayerPY
   lda PlayerPX
-  jsl GetLevelPtrXY
-  asl
-  tax
-  lda f:BlockFlags,x
+  sub #4*16
+  jsr TryAboveInteraction
+  ; Right foot
+  ldy PlayerPY
+  lda PlayerPX
+  add #4*16
+  jsr TryAboveInteraction
 
-  bpl :+
-    stz PlayerVY
-    lda PlayerPY
-    and #$ff00
-    sta PlayerPY
+  seta8
+  lda PlayerOnGround
+  bne :+
+  lda JumpGracePeriod
+  beq :+
+    seta16
+    jsr OfferJumpFromGracePeriod
   :
+  seta16
+
+  ; -------------------
 
 
   rts
+
+TryAboveInteraction:
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  jsl BlockRunInteractionAbove
+  ; Solid?
+  lda BlockFlag
+  cmp BottomCmp
+  bcc :+
+    stz PlayerVY
+    lda #$00ff
+    trb PlayerPY
+
+    jsr OfferJump
+
+    seta8
+    inc PlayerOnGround
+
+    ; Update run status
+    lda keydown
+    and #KEY_R|KEY_L
+    sta PlayerWasRunning
+    seta16
+  :
+  rts
+
+TrySideInteraction:
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  jsl BlockRunInteractionSide
+  ; Solid?
+  lda BlockFlag
+  bpl @NotSolid
+    stz PlayerVX
+
+    lda SideXPos
+    cmp PlayerPX
+    bcs :+
+      lda PlayerPX
+;      add #16*16
+      and #$ff00
+      add #8*16
+      sta PlayerPX
+      rts
+    :
+
+    lda PlayerPX
+    sub #8*16
+    and #$ff00
+    add #8*16
+    sta PlayerPX
+  @NotSolid:
+  rts
+
 .endproc
+
+.a16
+OfferJump:
+  seta8
+  lda #7 ;JUMP_GRACE_PERIOD_LENGTH
+  sta JumpGracePeriod
+  seta16
+OfferJumpFromGracePeriod:
+  lda keynew
+  and #KEY_B
+  beq :+
+    seta8
+    ;stz PlayerOnLadder
+    stz JumpGracePeriod
+    inc PlayerJumping
+    seta16
+    lda #.loword(-$50)
+    sta PlayerVY
+  :
+  rts
+
 
 .a16
 .i16
