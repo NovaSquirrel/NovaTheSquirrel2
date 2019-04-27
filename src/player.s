@@ -128,12 +128,12 @@ MaxSpeedRight = 12
   lda PlayerWasRunning ; nonzero = B button, only updated when on ground
   seta16
   beq :+
-    lda #.loword(-(NOVA_RUN_SPEED*16))
+    lda #.loword(-(NOVA_RUN_SPEED*16)-1)
     sta MaxSpeedLeft
     lda #NOVA_RUN_SPEED*16
     sta MaxSpeedRight
     bra NotWalkSpeed
-: lda #.loword(-(NOVA_WALK_SPEED*16))
+: lda #.loword(-(NOVA_WALK_SPEED*16)-1)
   sta MaxSpeedLeft
   lda #NOVA_WALK_SPEED*16
   sta MaxSpeedRight
@@ -149,11 +149,12 @@ NotWalkSpeed:
     sta PlayerDir
     seta16
     lda PlayerVX
+    bpl :+
     cmp MaxSpeedLeft ; can be either run speed or walk speed
-    beq NotLeft
-    cmp #.lobyte(-NOVA_RUN_SPEED*16)
-    beq NotLeft
-    sub #2 ; Acceleration speed
+    bcc NotLeft
+    cmp #.lobyte(-NOVA_RUN_SPEED*16-1)
+    bcc NotLeft
+:   sub #2 ; Acceleration speed
     sta PlayerVX
 NotLeft:
 
@@ -164,12 +165,12 @@ NotLeft:
     stz PlayerDir
     seta16
     lda PlayerVX
+    bmi :+
     cmp MaxSpeedRight ; can be either run speed or walk speed
-    beq NotRight
+    bcs NotRight
     cmp #NOVA_RUN_SPEED*16
-    beq NotRight
-
-    add #2 ; Acceleration speed
+    bcs NotRight
+:   add #2 ; Acceleration speed
     sta PlayerVX
 NotRight:
 NotWalk:
@@ -242,7 +243,7 @@ IsMoving:
 
   ; Left middle
   lda PlayerPY
-  sub #16*16
+  sub #12*16
   tay
   lda SideXPos
   jsr TrySideInteraction
@@ -363,6 +364,11 @@ TryBelowInteraction:
   lda BlockFlag
   bpl @NotSolid
     stz PlayerVY
+
+    lda PlayerPY
+    and #$ff00
+    ora #14*16
+    sta PlayerPY
   @NotSolid:
   rts
 
@@ -413,9 +419,8 @@ TrySideInteraction:
     :
 
     lda PlayerPX
-    sub #12*16
     and #$ff00
-    add #12*16
+    add #12*16 ; should be 13*16 but that's not working
     sta PlayerPX
   @NotSolid:
   rts
