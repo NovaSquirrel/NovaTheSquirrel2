@@ -31,7 +31,7 @@
 .export BlockRunInteractionEntityTopBottom, BlockRunInteractionEntitySide
 
 ; .-------------------------------------
-; |Runners for interactions
+; | Runners for interactions
 ; '-------------------------------------
 
 .a16
@@ -217,6 +217,8 @@ Skip:
 .endproc
 
 .proc BlockBricks
+  lda #0
+  sta [LevelBlockPtr]
   rts
 .endproc
 

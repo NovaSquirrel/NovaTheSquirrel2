@@ -233,10 +233,10 @@ IsMoving:
 
   ; Check for moving into a wall
   lda PlayerPX
-  add #8*16
+  add #3*16
   bit PlayerVX
   bpl :+
-    sub #8*16*2 ; Subtract off the 8*16 and subtract it again
+    sub #3*16+4*16 ; Subtract off the right and subtract again
   :
   sta SideXPos
 
@@ -248,7 +248,7 @@ IsMoving:
   jsr TrySideInteraction
   ; Right head
   lda PlayerPY
-  sub #32*16
+  sub #16*16+14*16 ; Top of the head
   tay
   lda SideXPos
   jsr TrySideInteraction
@@ -322,7 +322,7 @@ SkipApplyGravity:
   ; Right foot
   ldy PlayerPY
   lda PlayerPX
-  add #4*16
+  add #3*16
   jsr TryAboveInteraction
 
   seta8
@@ -335,10 +335,37 @@ SkipApplyGravity:
   :
   seta16
 
+
+  ; Left above
+  lda PlayerPY
+  sub #16*16+14*16 ; Top of the head
+  tay
+  phy
+  lda PlayerPX
+  sub #4*16
+  jsr TryBelowInteraction
+  ; Right above
+  ply
+  lda PlayerPX
+  add #3*16
+  jsr TryBelowInteraction
+
   ; -------------------
 
 
   rts
+
+TryBelowInteraction:
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  jsl BlockRunInteractionBelow
+
+  lda BlockFlag
+  bpl @NotSolid
+    stz PlayerVY
+  @NotSolid:
+  rts
+
 
 TryAboveInteraction:
   jsl GetLevelPtrXY
@@ -380,15 +407,15 @@ TrySideInteraction:
       lda PlayerPX
 ;      add #16*16
       and #$ff00
-      add #8*16
+      add #4*16
       sta PlayerPX
       rts
     :
 
     lda PlayerPX
-    sub #8*16
+    sub #12*16
     and #$ff00
-    add #8*16
+    add #12*16
     sta PlayerPX
   @NotSolid:
   rts

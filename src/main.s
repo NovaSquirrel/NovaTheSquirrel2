@@ -96,6 +96,11 @@
   jsl ppu_clear_nt
   setaxy16
 
+
+  lda #4*256
+  sta PlayerPX
+  sta PlayerPY
+
   ; Clear level buffer
   lda #0
   tax
@@ -292,8 +297,14 @@ PlayerPalette:
   .word 0, 0, 0, 0
 
 PlaceholderLevel:
+.repeat 3
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3
+.endrep
+.repeat 8
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 1, 1, 1
+.endrep
 .repeat 20
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1
