@@ -219,6 +219,26 @@ NotWalk:
 Stopped:
 IsMoving:
 
+   ; Another deceleration check; apply if you're moving faster than the max speed
+   lda PlayerVX
+   php
+   bpl :+
+     eor #$ffff
+     ina
+   :
+   cmp MaxSpeedRight
+   beq NoFixWalkSpeed ; If at or less than the max speed, don't fix
+   bcc NoFixWalkSpeed
+   sub #4
+NoFixWalkSpeed:
+   plp
+   bpl :+
+     eor #$ffff
+     ina
+   :
+   sta PlayerVX
+
+
   ; Apply speed
   lda PlayerPX
   add PlayerVX
@@ -249,7 +269,7 @@ IsMoving:
   jsr TrySideInteraction
   ; Right head
   lda PlayerPY
-  sub #16*16+14*16 ; Top of the head
+  sub #16*23 ;#16*16+14*16 ; Top of the head
   tay
   lda SideXPos
   jsr TrySideInteraction
@@ -315,6 +335,8 @@ SkipApplyGravity:
     sta BottomCmp
   :
 
+  lda PlayerVY
+  bmi :+
   ; Left foot
   ldy PlayerPY
   lda PlayerPX
@@ -325,6 +347,7 @@ SkipApplyGravity:
   lda PlayerPX
   add #3*16
   jsr TryAboveInteraction
+:
 
   seta8
   lda PlayerOnGround
@@ -341,15 +364,15 @@ SkipApplyGravity:
   lda PlayerPY
   sub #16*16+14*16 ; Top of the head
   tay
-  phy
+;  phy
   lda PlayerPX
-  sub #4*16
+;  sub #4*16
   jsr TryBelowInteraction
   ; Right above
-  ply
-  lda PlayerPX
-  add #3*16
-  jsr TryBelowInteraction
+;  ply
+;  lda PlayerPX
+;  add #3*16
+;  jsr TryBelowInteraction
 
   ; -------------------
 
@@ -405,23 +428,24 @@ TrySideInteraction:
   ; Solid?
   lda BlockFlag
   bpl @NotSolid
-    stz PlayerVX
-
     lda SideXPos
     cmp PlayerPX
     bcs :+
       lda PlayerPX
-;      add #16*16
-      and #$ff00
-      add #4*16
+      sub PlayerVX ; Undo the horizontal movement
+      and #$ff00   ; Snap to the block
+      add #4*16    ; Add to the offset to press against the block
       sta PlayerPX
+      stz PlayerVX ; Stop moving horizontally
       rts
     :
 
     lda PlayerPX
-    and #$ff00
-    add #12*16 ; should be 13*16 but that's not working
+    sub PlayerVX  ; Undo the horizontal movement
+    and #$ff00    ; Snap to the block
+    add #12*16+12 ; Add the offset to press against the block
     sta PlayerPX
+    stz PlayerVX  ; Stop moving horizontally
   @NotSolid:
   rts
 
