@@ -417,6 +417,9 @@ TryAboveInteraction:
     lda keydown
     and #KEY_R|KEY_L
     sta PlayerWasRunning
+    lda keydown+1
+    and #KEY_Y>>8
+    tsb PlayerWasRunning
     seta16
   :
   rts
