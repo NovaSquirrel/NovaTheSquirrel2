@@ -86,37 +86,125 @@ loop2:
 .a16
 .i16
 .proc ChangeBlock
+Temp = 0
   phx
-  ply
+  phy
   php
   setaxy16
-  ; Find a free index first
+  sta [LevelBlockPtr] ; Make the change in the level buffer itself
+
+  ; Find a free index in the block update queue
   ldy #(BLOCK_UPDATE_COUNT-1)*2
 FindIndex:
-  ldx BlockUpdateAddressT,y ; Test for zero
+  ldx BlockUpdateAddress,y ; Test for zero (exact value not used)
   beq Found
+  dey                      ; Next index
   dey
-  dey
-  bpl FindIndex
-  bra Exit
-
+  bpl FindIndex            ; Give up if all slots full
+  jmp Exit
 Found:
-  ; Store the block number
-  asl
-  tax
+  ; From this point on in the routine, Y = free update queue index
 
-  ; Copy the four words in
+  ; Save block number in X specifically, for 24-bit Absolute Indexed
+  tax
+  ; Now the accumulator is free to do other things
+
+  ; -----------------------------------
+
+  ; First, make sure the block is actually onscreen (Horizontally)
+  lda LevelBlockPtr ; Get level column
+  asl
+  asl
+  xba
+  seta8
+  sta Temp ; Store column so it can be compared against
+
+  lda ScrollX+1
+  sub #1
+  bcc @FineLeft
+  cmp Temp
+  bcc @FineLeft
+  jmp Exit
+@FineLeft:
+
+  lda ScrollX+1
+  add #16+1
+  bcs @FineRight
+  cmp Temp
+  bcs @FineRight
+  jmp Exit
+@FineRight:
+  seta16
+
+  ; -----------------------------------
+
+  ; Second, make sure the block is actually onscreen (Vertically)
+  lda LevelBlockPtr ; Get level row
+  lsr
+  and #31
+  seta8
+  sta Temp ; Store row so it can be compared against
+
+  lda ScrollY+1
+  sub #1
+  bcc @FineUp
+  cmp Temp
+  bcc @FineUp
+  jmp Exit
+@FineUp:
+
+  lda ScrollY+1
+  add #16+1
+  bcs @FineDown
+  cmp Temp
+  bcs @FineDown
+  jmp Exit
+@FineDown:
+  seta16
+
+  ; -----------------------------------
+
+  ; Copy the block appearance into the update buffer
   lda f:BlockTopLeft,x
   sta BlockUpdateDataTL,y
-  lda f:BlockTopLeft,x
+  lda f:BlockTopRight,x
   sta BlockUpdateDataTR,y
   lda f:BlockBottomLeft,x
   sta BlockUpdateDataBL,y
   lda f:BlockBottomRight,x
-  sta BlockUpdateDataBL,y
+  sta BlockUpdateDataBR,y
 
-;ForegroundBG>>1
-;2048>>1
+  ; Now calculate the PPU address
+  ; LevelBlockPtr is 00xxxxxxxxyyyyy0
+  ; Needs to become  0....pyyyyyxxxxx
+  lda LevelBlockPtr
+  and #%11110 ; Grab Y & 15
+  asl
+  asl
+  asl
+  asl
+  asl
+  ora #ForegroundBG>>1
+  sta BlockUpdateAddress,y
+
+  ; Add in X
+  lda LevelBlockPtr
+  asl
+  asl
+  xba
+  and #15
+  asl
+  ora BlockUpdateAddress,y
+  sta BlockUpdateAddress,y
+
+  ; Choose second screen if needed
+  lda LevelBlockPtr
+  and #%0000010000000000
+  beq :+
+    lda BlockUpdateAddress,y
+    ora #2048>>1
+    sta BlockUpdateAddress,y
+  :
 
   ; Restore registers
 Exit:

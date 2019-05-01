@@ -31,7 +31,7 @@
   ScrollX:  .res 2
   ScrollY:  .res 2
 
-  LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks
+  LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks. 00xxxxxxxxyyyyy0
   BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
   BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr
   BlockRealY:    .res 2 ; Real Y coordinate used to calculate LevelBlockPtr
@@ -89,8 +89,7 @@
   RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
   RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
 
-  BlockUpdateAddressT: .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateAddressB: .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2

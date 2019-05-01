@@ -16,6 +16,7 @@
 ;
 .include "snes.inc"
 .include "global.inc"
+.include "blockenum.s"
 .smart
 
 .segment "BlockInteraction"
@@ -212,7 +213,10 @@ Skip:
   rts
 .endproc
 
+.a16
 .proc BlockPrize
+  lda #Block::UsedPrize*2
+  jsl ChangeBlock
   rts
 .endproc
 

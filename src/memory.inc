@@ -38,8 +38,7 @@
 .global RowUpdateBuffer
 
 BLOCK_UPDATE_COUNT = 4
-.global BlockUpdateAddressT
-.global BlockUpdateAddressB
+.global BlockUpdateAddress
 .global BlockUpdateDataTL
 .global BlockUpdateDataTR
 .global BlockUpdateDataBL

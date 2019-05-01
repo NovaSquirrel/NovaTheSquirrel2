@@ -224,7 +224,7 @@ forever:
   ; Do block updates
   ldx #(BLOCK_UPDATE_COUNT-1)*2
 BlockUpdateLoop:
-  lda BlockUpdateAddressT,x
+  lda BlockUpdateAddress,x
   beq SkipBlock
   sta PPUADDR
   lda BlockUpdateDataTL,x
@@ -232,14 +232,15 @@ BlockUpdateLoop:
   lda BlockUpdateDataTR,x
   sta PPUDATA
 
-  lda BlockUpdateAddressB,x
+  lda BlockUpdateAddress,x ; Move down a row
+  add #(32*2)>>1
   sta PPUADDR
   lda BlockUpdateDataBL,x
   sta PPUDATA
   lda BlockUpdateDataBR,x
   sta PPUDATA
 
-  stz BlockUpdateAddressT,x ; Cancel out the block now that it's been written
+  stz BlockUpdateAddress,x ; Cancel out the block now that it's been written
 SkipBlock:
   dex
   dex
