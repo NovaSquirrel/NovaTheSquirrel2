@@ -89,6 +89,14 @@
   RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
   RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
 
+  BlockUpdateAddressT: .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateAddressB: .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
+
+
   PlayerAccelSpeed: .res 2
   PlayerDecelSpeed: .res 2
   JumpGracePeriod: .res 1

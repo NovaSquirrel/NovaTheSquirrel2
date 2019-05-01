@@ -1,6 +1,7 @@
 .include "snes.inc"
 .include "global.inc"
 .smart
+.import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
 
 .code
 
@@ -57,9 +58,77 @@
 .a16
 .i16
 .proc GetBlockFlag
-  asl
   tax
   lda f:BlockFlags,x
   sta BlockFlag
+  rtl
+.endproc
+
+; Wait for a Vblank using WAI instead of a busy loop
+.proc WaitVblank
+  php
+  seta8
+loop1:
+  bit VBLSTATUS  ; Wait for leaving previous vblank
+  bmi loop1
+  wai
+loop2:
+  bit VBLSTATUS  ; Wait for start of this vblank
+  bpl loop2
+  plp
+  rtl
+.endproc
+
+
+; Changes a block in the level immediately and queues a PPU update.
+; input: A (new block), LevelBlockPtr (block to change)
+; locals: 0
+.a16
+.i16
+.proc ChangeBlock
+  phx
+  ply
+  php
+  setaxy16
+  ; Find a free index first
+  ldy #(BLOCK_UPDATE_COUNT-1)*2
+FindIndex:
+  ldx BlockUpdateAddressT,y ; Test for zero
+  beq Found
+  dey
+  dey
+  bpl FindIndex
+  bra Exit
+
+Found:
+  ; Store the block number
+  asl
+  tax
+
+  ; Copy the four words in
+  lda f:BlockTopLeft,x
+  sta BlockUpdateDataTL,y
+  lda f:BlockTopLeft,x
+  sta BlockUpdateDataTR,y
+  lda f:BlockBottomLeft,x
+  sta BlockUpdateDataBL,y
+  lda f:BlockBottomRight,x
+  sta BlockUpdateDataBL,y
+
+;ForegroundBG>>1
+;2048>>1
+
+  ; Restore registers
+Exit:
+  plp
+  ply
+  plx
+  rtl
+.endproc
+
+; To write
+.a16
+.i16
+.proc DelayChangeBlock
   rtl
 .endproc

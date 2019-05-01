@@ -195,7 +195,6 @@ Loop:
   iny
   iny
   phy
-  asl ; Multiply by 2 because the table is 16-bit
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
@@ -240,7 +239,6 @@ Loop:
   iny
   iny
   phy
-  asl ; Multiply by 2 because the table is 16-bit
   tay
   ; Write the two tiles in
   lda BlockTopRight,y
@@ -283,7 +281,6 @@ Loop:
 
 : lda [LevelBlockPtr],y ; Get the next level tile
   phy
-  asl ; Multiply by 2 because the table is 16-bit
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
@@ -331,7 +328,6 @@ Loop:
 
 : lda [LevelBlockPtr],y ; Get the next level tile
   phy
-  asl ; Multiply by 2 because the table is 16-bit
   tay
   ; Write the two tiles in
   lda BlockBottomLeft,y

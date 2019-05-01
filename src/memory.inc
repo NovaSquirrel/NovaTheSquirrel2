@@ -36,6 +36,15 @@
 .global ColumnUpdateBuffer
 .global RowUpdateAddress
 .global RowUpdateBuffer
+
+BLOCK_UPDATE_COUNT = 4
+.global BlockUpdateAddressT
+.global BlockUpdateAddressB
+.global BlockUpdateDataTL
+.global BlockUpdateDataTR
+.global BlockUpdateDataBL
+.global BlockUpdateDataBR
+
 .global LevelBuf
 .global OAM
 .global OAMHI

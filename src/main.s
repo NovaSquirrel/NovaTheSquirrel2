@@ -206,7 +206,7 @@ forever:
 
   ; Backgrounds and OAM can be modified only during vertical blanking.
   ; Wait for vertical blanking and copy prepared data to OAM.
-  jsl ppu_vsync
+  jsl WaitVblank
   jsl ppu_copy_oam
 
   ; Do row/column updates if required
@@ -220,6 +220,33 @@ forever:
     jsl RenderLevelRowUpload
     stz RowUpdateAddress
   :
+  ; -----------------------------------
+  ; Do block updates
+  ldx #(BLOCK_UPDATE_COUNT-1)*2
+BlockUpdateLoop:
+  lda BlockUpdateAddressT,x
+  beq SkipBlock
+  sta PPUADDR
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  lda BlockUpdateDataTR,x
+  sta PPUDATA
+
+  lda BlockUpdateAddressB,x
+  sta PPUADDR
+  lda BlockUpdateDataBL,x
+  sta PPUDATA
+  lda BlockUpdateDataBR,x
+  sta PPUDATA
+
+  stz BlockUpdateAddressT,x ; Cancel out the block now that it's been written
+SkipBlock:
+  dex
+  dex
+  bpl BlockUpdateLoop
+
+
+  ; -----------------------------------
   jsl PlayerFrameUpload
 
   seta8
@@ -299,16 +326,30 @@ PlayerPalette:
 PlaceholderLevel:
 .repeat 3
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
 .endrep
 .repeat 8
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 1, 1, 1
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 2, 2, 2
 .endrep
-.repeat 20
+.repeat 10
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
 .endrep
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
+.repeat 10
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
+.endrep
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
 PlaceholderLevelEnd:

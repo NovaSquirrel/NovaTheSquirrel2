@@ -17,7 +17,7 @@ ExtraBG = $E000
 
 ; uploadppu.s
 .global ppu_copy_oam, ppu_pack_oamhi, ppu_clear_oam
-.global ppu_copy, ppu_clear_nt, ppu_vsync
+.global ppu_copy, ppu_clear_nt, ppu_vsync, WaitVblank
 .global DoGraphicUpload
 
 ; blarggapu.s
@@ -36,3 +36,5 @@ ExtraBG = $E000
 
 .global RunPlayer, AdjustCamera
 .global BlockFlags
+
+.global ChangeBlock, DelayChangeBlock
