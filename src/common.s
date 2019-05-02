@@ -220,3 +220,24 @@ Exit:
 .proc DelayChangeBlock
   rtl
 .endproc
+
+
+; Gets the column number of LevelBlockPtr
+.a16
+.proc GetBlockX
+  lda LevelBlockPtr ; Get level column
+  asl
+  asl
+  xba
+  and #255
+  rtl
+.endproc
+
+; Get the row number of LevelBlockPtr
+.a16
+.proc GetBlockY
+  lda LevelBlockPtr ; Get level row
+  lsr
+  and #31
+  rtl
+.endproc

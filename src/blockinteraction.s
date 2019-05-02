@@ -221,8 +221,8 @@ Skip:
 .endproc
 
 .proc BlockBricks
-  lda #0
-  sta [LevelBlockPtr]
+  lda #Block::Empty*2
+  jsl ChangeBlock
   rts
 .endproc
 

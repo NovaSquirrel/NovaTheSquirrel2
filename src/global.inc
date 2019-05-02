@@ -38,3 +38,4 @@ ExtraBG = $E000
 .global BlockFlags
 
 .global ChangeBlock, DelayChangeBlock
+.global GetBlockX, GetBlockY
