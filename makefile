@@ -18,7 +18,7 @@ version = 0.01
 objlist = \
   snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
-  scrolling playergraphics blockinteraction
+  scrolling playergraphics blockinteraction palettedata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -99,6 +99,7 @@ objlistospc = $(foreach o,$(objlistspc),$(objdir)/$(o).o)
 brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
+palettes := $(wildcard palettes/*.png)
 
 map.txt $(title).sfc: lorom1024k.cfg $(objlisto)
 	$(LD65) -o $(title).sfc -m map.txt -C $^
@@ -124,6 +125,9 @@ $(objdir)/spcimage.o: $(brrlisto)
 # Block data relies on the enum
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 
+# Main relies on palette indexes
+$(objdir)/main.o: $(srcdir)/paletteenum.s
+
 # Automatically insert graphics into the ROM
 $(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
 	$(PY) tools/insertthegfx.py
@@ -132,6 +136,8 @@ $(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
 $(srcdir)/blockdata.s: tools/blocks.txt
 $(srcdir)/blockenum.s: tools/blocks.txt
 	$(PY) tools/makeblocks.py
+$(srcdir)/palettedata.s: $(palettes)
+	$(PY) tools/encodepalettes.py
 
 #$(objdir)/graphics.o: $(chr2all) $(chr4all)
 

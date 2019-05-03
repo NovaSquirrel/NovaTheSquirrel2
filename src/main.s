@@ -20,6 +20,7 @@
 .smart
 .export main, nmi_handler
 .include "graphicsenum.s"
+.include "paletteenum.s"
 
 .segment "ZEROPAGE"
 .segment "BSS"
@@ -124,25 +125,17 @@
   phk
   plb
 
-  ; Upload palette
-  seta8
+  ; Upload palettes
   stz CGADDR
-  setaxy16
-  lda #DMAMODE_CGDATA
-  ldx #palette & $FFFF
-  ldy #palette_size
-  jsl ppu_copy
-
-  ; Player palette
-  seta8
-  lda #$81
-  sta CGADDR
-  setaxy16
-  lda #DMAMODE_CGDATA
-  ldx #PlayerPalette & $FFFF
-  ldy #15*2
-  jsl ppu_copy
-
+  lda #RGB(15,23,31)
+  sta CGDATA
+  ; ---
+  lda #Palette::FGCommon
+  ldy #0
+  jsl DoPaletteUpload
+  lda #Palette::SPNova
+  ldy #8
+  jsl DoPaletteUpload
 
   ; Set up PPU registers
   seta8
@@ -289,40 +282,6 @@ padwait:
 
   jmp forever
 .endproc
-
-; Background palette
-palette:
-  .word RGB(15,23,31)
-  .word RGB8(34, 32, 52)
-  .word RGB8(89, 86, 82)
-  .word RGB8(132, 126, 135)
-  .word RGB8(155, 173, 183)
-  .word RGB8(203, 219, 252)
-  .word RGB8(255, 255, 255)
-  .word RGB8(102, 57, 49)
-  .word RGB8(143, 86, 59)
-  .word RGB8(217, 160, 102)
-  .word RGB8(238, 195, 154)
-  .word RGB8(91, 110, 225)
-  .word RGB8(99, 155, 255)
-  .word RGB8(172, 50, 50)
-  .word RGB8(217, 87, 99)
-  .word RGB8(255, 0, 255)
-palette_size = * - palette
-
-PlayerPalette:
-  .word RGB8($ff, $ff, $ff)
-  .word RGB8($00, $00, $00)
-  .word RGB8($23, $55, $23)
-  .word RGB8($3f, $99, $3f)
-  .word RGB8($4a, $b5, $4a)
-  .word RGB8($5a, $d6, $5a)
-  .word RGB8($53, $76, $ff)
-  .word RGB8($44, $61, $d2)
-  .word RGB8($34, $4b, $a2)
-  .word RGB8($00, $00, $fc)
-  .word RGB8($f6, $79, $60)
-  .word 0, 0, 0, 0
 
 PlaceholderLevel:
 .repeat 3

@@ -143,11 +143,11 @@ loop2:
   rtl
 .endproc
 
-.import GraphicsDirectory
 
 ;;
 ; Uploads a specific graphic asset to VRAM
 ; @param A graphic number (0-255)
+.import GraphicsDirectory
 .proc DoGraphicUpload
   phx
   php
@@ -196,3 +196,57 @@ loop2:
   rtl
 .endproc
 
+;;
+; Uploads a specific palette asset to CGRAM
+; locals: 0, 1
+; @param A palette number (0-255)
+; @param Y palette to upload to (0-15)
+.import PaletteList
+.proc DoPaletteUpload
+  php
+  setaxy16
+
+  ; Calculate the address of the 
+  and #255
+  ; Multiply by 30
+  sta 0
+  asl
+  asl
+  asl
+  asl
+  sub 0
+  asl
+  add #PaletteList & $ffff
+  ; Source address
+  sta DMAADDR
+
+  ; Upload to CGRAM
+  lda #DMAMODE_CGDATA
+  sta DMAMODE
+
+  ; Size
+  lda #15*2
+  sta DMALEN
+
+  ; Source bank
+  seta8
+  lda #^PaletteList
+  sta DMAADDRBANK
+
+  ; Destination address
+  tya
+  ; Multiply by 16 and add 1
+  asl
+  asl
+  asl
+  sec
+  rol
+  sta CGADDR
+
+  ; Initiate the transfer
+  lda #%00000001
+  sta COPYSTART
+
+  plp
+  rtl
+.endproc

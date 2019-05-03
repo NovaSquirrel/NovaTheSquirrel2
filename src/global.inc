@@ -18,7 +18,7 @@ ExtraBG = $E000
 ; uploadppu.s
 .global ppu_copy_oam, ppu_pack_oamhi, ppu_clear_oam
 .global ppu_copy, ppu_clear_nt, ppu_vsync, WaitVblank
-.global DoGraphicUpload
+.global DoGraphicUpload, DoPaletteUpload
 
 ; blarggapu.s
 .global spc_boot_apu
