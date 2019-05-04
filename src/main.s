@@ -84,6 +84,12 @@
   jsl DoGraphicUpload
   lda #GraphicsUpload::FGTropicalWood
   jsl DoGraphicUpload
+  lda #GraphicsUpload::SPCommon
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::SPWalker
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::SPCannon
+  jsl DoGraphicUpload
 
   ; Clear three screens
   ldx #$c000 >> 1
@@ -136,6 +142,16 @@
   lda #Palette::SPNova
   ldy #8
   jsl DoPaletteUpload
+  lda #Palette::FGCommon
+  ldy #9
+  jsl DoPaletteUpload
+  lda #Palette::SPWalker
+  ldy #15
+  jsl DoPaletteUpload
+  lda #Palette::SPCannon
+  ldy #14
+  jsl DoPaletteUpload
+
 
   ; Set up PPU registers
   seta8

@@ -1,2 +1,5 @@
 0000 FGCommon
 1000 FGTropicalWood
+8800 SPCommon
+A000 SPWalker
+A800 SPCannon

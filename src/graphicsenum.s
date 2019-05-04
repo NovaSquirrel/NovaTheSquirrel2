@@ -2,5 +2,8 @@
 .enum GraphicsUpload
   FGCommon
   FGTropicalWood
+  SPCommon
+  SPWalker
+  SPCannon
 .endenum
 
