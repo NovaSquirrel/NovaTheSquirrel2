@@ -1,0 +1,99 @@
+# This is the list of entities in the game, automatically inserted and formatted.
+# The "Empty" entity type is created automatically, no need to specify here.
+
++Plodder
+flag AutoRemove AutoReset GetShot WaitUntilNear
+pal SPWalker
+gfx SPWalker
+run RunPlodder
+draw DrawPlodder
+size 16x16
+
++Sneaker
+flag AutoRemove AutoReset GetShot
+pal SPWalker
+gfx SPWalker
+run RunSneaker
+draw DrawSneaker
+size 16x16
+
++Owl
+flag AutoRemove AutoReset GetShot
+pal SPWalker
+gfx SPWalker
+run RunOwl
+draw DrawOwl
+size 16x16
+
++MovingPlatformHoriz
+essential
+run RunMovingPlatformH
+draw DrawMovingPlatform
+size 32x8
+
++MovingPlatformLine
+essential
+run RunMovingPlatformLine
+draw DrawMovingPlatform
+size 32x8
+
++MovingPlatformPush
+essential
+run RunMovingPlatformPush
+draw DrawMovingPlatform
+size 32x8
+
++Checkpoint
+essential
+flag AutoRemove
+run RunCheckpoint
+draw DrawCheckpoint
+size 16x16
+
+# ---------- cannon stuff ----------
++Burger
+flag AutoRemove GetShot
+gfx SPCannon
+pal SPCannon
+run RunBurger
+draw DrawBurger
+size 16x16
+
++BurgerCannonH
+flag AutoRemove
+gfx SPCannon
+pal SPCannon
+run RunBurgerCannonH
+draw DrawCannonH
+size 16x16
+
++BurgerCannonV
+flag AutoRemove
+gfx SPCannon
+pal SPCannon
+run RunBurgerCannonV
+draw DrawCannonV
+size 16x16
+
++AnyCannonH
+flag AutoRemove
+gfx SPCannon
+pal SPCannon
+run RunAnyCannonH
+draw DrawCannonH
+size 16x16
+
++AnyCannonV
+flag AutoRemove
+gfx SPCannon
+pal SPCannon
+run RunAnyCannonH
+draw DrawCannonV
+size 16x16
+
+# ---------- particles ----------
++Poof
+particle
+run RunPoof
+draw DrawPoof
+

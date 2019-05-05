@@ -53,9 +53,11 @@
   PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
   PlayerHealth:     .res 1     ; current health, measured in half hearts
 
-  LevelNumber:           .res 1 ; Current level number (actual map number from the game)
-  StartedLevelNumber:    .res 1 ; Level number that was picked from the level select (level select number)
+  LevelNumber:           .res 2 ; Current level number (actual map number from the game)
+  StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
   NeedLevelReload:       .res 1 ; If set, decode LevelNumber again
+
+  SpriteTileBase:   .res 2 ; Detected tile base for the current entity (includes palette index)
 
   OamPtr:           .res 2 ;
   TempVal:          .res 4
@@ -63,17 +65,37 @@
   TempY:            .res 1 ; for saving the Y register
 
 .segment "BSS" ; First 8KB of RAM
-  ObjectLen = 16
-  ObjectPX:    .res ObjectLen*2 ; Positions
-  ObjectPY:    .res ObjectLen*2 ;
-  ObjectVX:    .res ObjectLen*2 ; Speeds
-  ObjectVY:    .res ObjectLen*2 ;
-  ObjectF1:    .res ObjectLen*2 ; TTTTTTTD SSSSSSSS, Type, Direction, State
-  ObjectF2:    .res ObjectLen*2 ; 
-  ObjectF3:    .res ObjectLen*2 ; 
-  ObjectF4:    .res ObjectLen*2 ; 
-  ObjectIndexInLevel: .res ObjectLen*2 ; object's index in level list, prevents object from being respawned until it's despawned
-  ObjectTimer: .res ObjectLen*2 ; when timer reaches 0, reset state
+  ObjectSize = 10*2
+  ObjectStart: .res ObjectLen*ObjectSize
+  ObjectEnd:
+
+  ObjectType         = 0 ; Entity type number
+  ObjectPX           = 2 ; Positions
+  ObjectPY           = 4 ;
+  ObjectVX           = 6 ; Speeds
+  ObjectVY           = 8 ;
+  ObjectF2           = 10 ; 
+  ObjectF3           = 12 ; 
+  ObjectF4           = 14 ; 
+  ObjectIndexInLevel = 16 ; object's index in level list, prevents object from being respawned until it's despawned
+  ObjectTimer        = 18 ; when timer reaches 0, reset state
+
+  ; For less important, light entities
+  ParticleSize = 6*2
+  ParticleStart: .res ParticleLen*ParticleSize
+  ParticleEnd:
+
+  ParticleType       = 0
+  ParticlePX         = 2
+  ParticlePY         = 4
+  ParticleVX         = 6
+  ParticleVY         = 8
+  ParticleTimer      = 10
+
+  ; For automatically detecting which tile slot or palette has the right data
+  SpriteTileSlots: .res 2*8
+  SpritePaletteSlots: .res 2*4
+
 
   OAM:   .res 512
   OAMHI: .res 512

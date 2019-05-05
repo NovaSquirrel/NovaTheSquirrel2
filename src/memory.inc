@@ -9,6 +9,8 @@
 .globalzp BlockRealX
 .globalzp BlockRealY
 
+.globalzp SpriteTileBase
+
 .globalzp PlayerPX
 .globalzp PlayerPY
 .globalzp PlayerVX
@@ -48,4 +50,35 @@ BLOCK_UPDATE_COUNT = 4
 .global OAM
 .global OAMHI
 
+ObjectLen = 20
+.global ObjectStart
+.globalzp ObjectSize
+.global ObjectEnd
+.globalzp ObjectType
+.globalzp ObjectPX
+.globalzp ObjectPY
+.globalzp ObjectVX
+.globalzp ObjectVY
+.globalzp ObjectF2
+.globalzp ObjectF3
+.globalzp ObjectF4
+.globalzp ObjectIndexInLevel
+.globalzp ObjectTimer
 
+ParticleLen = 16
+.global ParticleStart
+.globalzp ParticleSize
+.global ParticleEnd
+.globalzp ParticleType
+.globalzp ParticlePX
+.globalzp ParticlePY
+.globalzp ParticleVX
+.globalzp ParticleVY
+.globalzp ParticleTimer
+
+.global SpriteTileSlots
+.global SpritePaletteSlots
+
+.globalzp LevelNumber
+.globalzp StartedLevelNumber
+.globalzp NeedLevelReload

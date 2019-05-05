@@ -73,36 +73,6 @@
   rtl
 .endproc
 
-.a16
-.i16
-.proc RunPlayer
-  php
-  phk
-  plb
-
-  jsr HandlePlayer
-  jsr DrawPlayer
-
-  ; Automatically cycle through the walk animation
-
-  seta8
-  stz PlayerFrame
-
-  lda keydown+1
-  and #(KEY_LEFT|KEY_RIGHT)>>8
-  beq :+
-    lda retraces
-    lsr
-    lsr
-    and #7
-    inc a
-    sta PlayerFrame 
-  :
-
-  plp
-  rtl
-.endproc
-
 NOVA_WALK_SPEED = 2
 NOVA_RUN_SPEED = 4
 ;AccelSpeeds: .byt 2,        4
@@ -110,7 +80,7 @@ NOVA_RUN_SPEED = 4
 
 .a16
 .i16
-.proc HandlePlayer
+.proc RunPlayer
 Temp = 2
 SideXPos = 8
 BottomCmp = 8
@@ -377,7 +347,7 @@ SkipApplyGravity:
   ; -------------------
 
 
-  rts
+  rtl
 
 TryBelowInteraction:
   jsl GetLevelPtrXY
@@ -562,5 +532,23 @@ OAM_ATTR = OAM+3
   clc
   adc #4*4
   sta OamPtr
-  rts
+
+  ; -----------------------------------
+
+  ; Automatically cycle through the walk animation
+  seta8
+  stz PlayerFrame
+
+  lda keydown+1
+  and #(KEY_LEFT|KEY_RIGHT)>>8
+  beq :+
+    lda retraces
+    lsr
+    lsr
+    and #7
+    inc a
+    sta PlayerFrame 
+  :
+  setaxy16
+  rtl
 .endproc

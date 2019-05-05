@@ -19,11 +19,7 @@
 .include "global.inc"
 .smart
 .export main, nmi_handler
-.include "graphicsenum.s"
-.include "paletteenum.s"
-
-.segment "ZEROPAGE"
-.segment "BSS"
+.import RunAllObjects
 
 .segment "CODE"
 ;;
@@ -79,18 +75,6 @@
   dex
   bpl :-
 
-  ; Upload graphics
-  lda #GraphicsUpload::FGCommon
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::FGTropicalWood
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPCommon
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPWalker
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPCannon
-  jsl DoGraphicUpload
-
   ; Clear three screens
   ldx #$c000 >> 1
   ldy #$15
@@ -103,88 +87,14 @@
   jsl ppu_clear_nt
   setaxy16
 
-
-  lda #4*256
-  sta PlayerPX
-  sta PlayerPY
-
-  ; Clear level buffer
   lda #0
-  tax
-: sta f:LevelBuf,x
-  inx
-  inx
-  cpx #256*32*2
-  bne :-
+  jml StartLevel
+.endproc
 
-  ; Copy in a placeholder level
-  ldx #0
-: lda PlaceholderLevel,x
-  sta f:LevelBuf,x
-  inx
-  inx
-  cpx #PlaceholderLevelEnd-PlaceholderLevel
-  bne :-
-
-  jsl RenderLevelScreens
-
+.export GameMainLoop
+.proc GameMainLoop
   phk
   plb
-
-  ; Upload palettes
-  stz CGADDR
-  lda #RGB(15,23,31)
-  sta CGDATA
-  ; ---
-  lda #Palette::FGCommon
-  ldy #0
-  jsl DoPaletteUpload
-  lda #Palette::SPNova
-  ldy #8
-  jsl DoPaletteUpload
-  lda #Palette::FGCommon
-  ldy #9
-  jsl DoPaletteUpload
-  lda #Palette::SPWalker
-  ldy #15
-  jsl DoPaletteUpload
-  lda #Palette::SPCannon
-  ldy #14
-  jsl DoPaletteUpload
-
-
-  ; Set up PPU registers
-  seta8
-  lda #1
-  sta BGMODE       ; mode 1
-
-  stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
-  lda #$e>>1
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
-
-  lda #$8000 >> 14
-  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
-
-  lda #1 | ($c000 >> 9)
-  sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
-  lda #1 | ($d000 >> 9)
-  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens wide
-  lda #0 | ($e000 >> 9)
-  sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
-
-  ; set up plane 0's scroll
-  stz BGSCROLLX+0
-  stz BGSCROLLX+0
-  lda #$FF
-  sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
-  sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
-
-  stz PPURES
-  lda #%00010001  ; enable sprites and plane 0
-  sta BLENDMAIN
-  lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
-  sta PPUNMI
-
 forever:
   ; Draw the player to a display list in main memory
   setaxy16
@@ -202,6 +112,8 @@ forever:
   stz OamPtr
   jsl RunPlayer
   jsl AdjustCamera
+  jsl DrawPlayer
+  jsl RunAllObjects
 
   ; Mark remaining sprites as offscreen, then convert sprite size
   ; data from the convenient-to-manipulate format described by
@@ -298,34 +210,3 @@ padwait:
 
   jmp forever
 .endproc
-
-PlaceholderLevel:
-.repeat 3
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
-.endrep
-.repeat 8
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 2, 2, 2
-.endrep
-.repeat 10
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
-.endrep
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
-.repeat 10
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
-.endrep
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
-PlaceholderLevelEnd:

@@ -34,8 +34,22 @@ ExtraBG = $E000
 .global RenderLevelRowBottom
 .global PlayerFrameUpload
 
-.global RunPlayer, AdjustCamera
+.global RunPlayer, DrawPlayer, AdjustCamera
 .global BlockFlags
 
 .global ChangeBlock, DelayChangeBlock
 .global GetBlockX, GetBlockY
+
+.global StartLevel, DecompressLevel
+
+; Flags
+.enum ObjectFlag
+  AutoRemove    = 1
+  GetShot       = 2
+  AutoReset     = 4
+  WaitUntilNear = 8
+  Priority      = %1100000000000000 ; Priority bits
+  Essential     = %1000000000000000 
+  Primary       = %0100000000000000
+  Secondary     = %0000000000000000
+.endenum

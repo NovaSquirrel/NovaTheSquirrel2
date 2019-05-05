@@ -18,7 +18,8 @@ version = 0.01
 objlist = \
   snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
-  scrolling playergraphics blockinteraction palettedata
+  scrolling playergraphics blockinteraction palettedata \
+  levelload actordata actorcode
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -125,8 +126,8 @@ $(objdir)/spcimage.o: $(brrlisto)
 # Block data relies on the enum
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 
-# Main relies on palette indexes and graphic directory
-$(objdir)/main.o: $(srcdir)/paletteenum.s $(srcdir)/graphics.s
+# Level loading relies on palette indexes and graphic directory
+$(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphics.s
 
 # Automatically insert graphics into the ROM
 $(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
@@ -139,6 +140,10 @@ $(srcdir)/blockenum.s: tools/blocks.txt
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py
+$(srcdir)/actordata.s: $(srcdir)/actorenum.s
+$(srcdir)/actorenum.s: tools/actors.txt
+	$(PY) tools/makeactor.py
+
 
 #$(objdir)/graphics.o: $(chr2all) $(chr4all)
 
