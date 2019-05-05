@@ -65,7 +65,7 @@
   TempY:            .res 1 ; for saving the Y register
 
 .segment "BSS" ; First 8KB of RAM
-  ObjectSize = 10*2
+  ObjectSize = 10*2+2
   ObjectStart: .res ObjectLen*ObjectSize
   ObjectEnd:
 
@@ -74,11 +74,13 @@
   ObjectPY           = 4 ;
   ObjectVX           = 6 ; Speeds
   ObjectVY           = 8 ;
-  ObjectF2           = 10 ; 
-  ObjectF3           = 12 ; 
-  ObjectF4           = 14 ; 
+  ObjectVarA         = 10 ; 
+  ObjectVarB         = 12 ; 
+  ObjectVarC         = 14 ; 
   ObjectIndexInLevel = 16 ; object's index in level list, prevents object from being respawned until it's despawned
   ObjectTimer        = 18 ; when timer reaches 0, reset state
+  ObjectDirection    = 20 ; 0 (Right) or 1 (Left). Other bits may be used later.
+  ObjectState        = 21 ; Nonzero usually means stunned
 
   ; For less important, light entities
   ParticleSize = 6*2

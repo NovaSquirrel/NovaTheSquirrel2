@@ -134,6 +134,14 @@ DJ_Label:
 @Skip:
 .endmacro
 
+.macro sexw
+.local @Skip
+  ora #$7FFF
+  bmi @Skip
+  lda #0
+@Skip:
+.endmacro
+
 .macro neg16 lo, hi
   sec             ;Ensure carry is set
   lda #0          ;Load constant zero

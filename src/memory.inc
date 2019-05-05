@@ -59,11 +59,13 @@ ObjectLen = 20
 .globalzp ObjectPY
 .globalzp ObjectVX
 .globalzp ObjectVY
-.globalzp ObjectF2
-.globalzp ObjectF3
-.globalzp ObjectF4
+.globalzp ObjectVarA
+.globalzp ObjectVarB
+.globalzp ObjectVarC
+.globalzp ObjectDirection
 .globalzp ObjectIndexInLevel
 .globalzp ObjectTimer
+.globalzp ObjectState
 
 ParticleLen = 16
 .global ParticleStart

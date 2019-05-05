@@ -19,7 +19,7 @@ objlist = \
   snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
-  levelload actordata actorcode
+  levelload actordata actorcode object
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

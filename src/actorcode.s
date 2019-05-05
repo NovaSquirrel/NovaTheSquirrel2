@@ -17,73 +17,9 @@
 
 .include "snes.inc"
 .include "global.inc"
-.import ObjectRun, ObjectDraw, ObjectFlags, ObjectWidth, ObjectHeight, ObjectBank
 .smart
 
 .segment "ActorData"
-
-.export RunAllObjects
-.proc RunAllObjects
-  setaxy16
-
-  ; Load X with the actual pointer
-  ldx #ObjectStart
-Loop:
-  lda ObjectType,x
-  beq SkipEntity   ; Skip if empty
-
-  ; Call the run and draw routines
-  pha
-  jsl CallRun
-  pla
-  jsl CallDraw
-
-  ; TODO: call the opt-in routines
-
-SkipEntity:
-
-  ; Next entity
-  txa
-  add #ObjectSize
-  tax
-  cpx #ObjectEnd
-  bne Loop
-  rtl
-
-; Call the object run code
-CallRun:
-  phx
-  tax
-  seta8
-  lda f:ObjectBank+0,x
-  pha
-  plb ; Use code bank as data bank
-  sta 2
-  seta16
-  lda f:ObjectRun,x
-  sta 0
-  plx
-
-  ; Jump to it and return with an RTL
-  jml [0]
-
-; Call the object draw code
-CallDraw:
-  phx
-  tax
-  seta8
-  lda f:ObjectBank+1,x
-  pha
-  plb ; Use code bank as data bank
-  sta 2
-  seta16
-  lda f:ObjectDraw,x
-  sta 0
-  plx
-
-  ; Jump to it and return with an RTL
-  jml [0]
-.endproc
 
 ; -------------------------------------
 

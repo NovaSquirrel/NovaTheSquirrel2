@@ -53,3 +53,5 @@ ExtraBG = $E000
   Primary       = %0100000000000000
   Secondary     = %0000000000000000
 .endenum
+
+.global FindFreeObjectX, FindFreeObjectY
