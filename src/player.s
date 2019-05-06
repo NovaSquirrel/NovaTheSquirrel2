@@ -448,10 +448,6 @@ OfferJumpFromGracePeriod:
 .a16
 .i16
 .proc DrawPlayer
-OAM_XPOS = OAM+0
-OAM_YPOS = OAM+1
-OAM_TILE = OAM+2
-OAM_ATTR = OAM+3
   ldx OamPtr
 
   ; X coordinate to pixels

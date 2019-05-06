@@ -35,7 +35,7 @@
   BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
   BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr
   BlockRealY:    .res 2 ; Real Y coordinate used to calculate LevelBlockPtr
- 
+  BlockTemp:     .res 4 ; Temporary bytes for block interaction routines specifically
 
   PlayerPX:        .res 2 ; \ player X and Y positions
   PlayerPY:        .res 2 ; /

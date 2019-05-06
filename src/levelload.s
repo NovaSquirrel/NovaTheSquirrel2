@@ -50,6 +50,15 @@
   cpx #ParticleEnd
   bne :-
 
+
+  lda #8*2
+  sta ObjectStart+ObjectType
+  lda #4*256
+  sta ObjectStart+ObjectPX
+  lda #20*256
+  sta ObjectStart+ObjectPY
+
+
   ; Init player
   lda #4*256
   sta PlayerPX
@@ -120,9 +129,9 @@
 
   sta SpritePaletteSlots+0
   sta SpritePaletteSlots+2
-  lda #Palette::SPWalker
-  sta SpritePaletteSlots+4
   lda #Palette::SPCannon
+  sta SpritePaletteSlots+4
+  lda #Palette::SPWalker
   sta SpritePaletteSlots+6
 
   lda #GraphicsUpload::SPWalker

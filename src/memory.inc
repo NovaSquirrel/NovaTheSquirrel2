@@ -8,6 +8,7 @@
 .globalzp BlockFlag
 .globalzp BlockRealX
 .globalzp BlockRealY
+.globalzp BlockTemp
 
 .globalzp SpriteTileBase
 
@@ -49,6 +50,10 @@ BLOCK_UPDATE_COUNT = 4
 .global LevelBuf
 .global OAM
 .global OAMHI
+OAM_XPOS = OAM+0
+OAM_YPOS = OAM+1
+OAM_TILE = OAM+2
+OAM_ATTR = OAM+3
 
 ObjectLen = 20
 .global ObjectStart

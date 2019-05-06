@@ -21,12 +21,16 @@
 
 .segment "ActorData"
 
+.import DispObject16x16
+
 ; -------------------------------------
 
 .a16
 .i16
 .export DrawBurger
 .proc DrawBurger
+  lda #0
+  jsl DispObject16x16
   rtl
 .endproc
 

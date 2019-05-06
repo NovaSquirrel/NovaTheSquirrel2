@@ -144,6 +144,7 @@ Skip:
   rtl
 .endproc
 
+; Pass in a block flag word and it will run the interaction
 .a16
 .i16
 .import BlockInteractionEntityTopBottom
@@ -155,13 +156,19 @@ Skip:
   phk ; Data bank = program bank
   plb
   asl
-  tax
-  jsr (.loword(BlockInteractionEntityTopBottom),x)
+  tay
+  lda BlockInteractionEntityTopBottom,y
+  jsr Call
   plb
 Skip:
   rtl
+
+Call: ; Could use the RTS trick here instead
+  sta TempVal
+  jmp (TempVal)
 .endproc
 
+; Pass in a block flag word and it will run the interaction
 .a16
 .i16
 .import BlockInteractionEntitySide
@@ -173,8 +180,9 @@ Skip:
   phk ; Data bank = program bank
   plb
   asl
-  tax
-  jsr (.loword(BlockInteractionSide),x)
+  tay
+  lda BlockInteractionEntitySide,y
+  jsr BlockRunInteractionEntityTopBottom::Call
   plb
 Skip:
   rtl

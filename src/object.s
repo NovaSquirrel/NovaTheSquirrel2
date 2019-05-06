@@ -17,7 +17,7 @@
 
 .include "snes.inc"
 .include "global.inc"
-.import ObjectRun, ObjectDraw, ObjectFlags, ObjectWidth, ObjectHeight, ObjectBank
+.import ObjectRun, ObjectDraw, ObjectFlags, ObjectWidth, ObjectHeight, ObjectBank, ObjectGraphic, ObjectPalette
 .smart
 
 .segment "ActorData"
@@ -51,6 +51,7 @@ SkipEntity:
   rtl
 
 ; Call the object run code
+.a16
 CallRun:
   phx
   tax
@@ -68,6 +69,7 @@ CallRun:
   jml [0]
 
 ; Call the object draw code
+.a16
 CallDraw:
   phx
   tax
@@ -79,9 +81,82 @@ CallDraw:
   seta16
   lda f:ObjectDraw,x
   sta 0
-  plx
+
+  ; Get the desired tileset
+  lda f:ObjectGraphic,x
+
+  ; Detect the correct tile base
+  ; using an unrolled loop
+  cmp SpriteTileSlots+2*0
+  bne :+
+    lda #$100
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*1
+  bne :+
+    lda #$120
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*2
+  bne :+
+    lda #$140
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*3
+  bne :+
+    lda #$160
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*4
+  bne :+
+    lda #$180
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*5
+  bne :+
+    lda #$1A0
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*6
+  bne :+
+    lda #$1C0
+    bra FoundTileset
+  :
+  cmp SpriteTileSlots+2*7
+  bne :+
+    lda #$1E0
+  :
+FoundTileset:
+  sta SpriteTileBase
+
+  ; Detect the correct palette
+  ; using an unrolled loop again
+  lda f:ObjectPalette,x
+  cmp SpritePaletteSlots+2*0
+  bne :+
+    lda #%1000<<8
+    bra FoundPalette
+  :
+  cmp SpritePaletteSlots+2*1
+  bne :+
+    lda #%1010<<8
+    bra FoundPalette
+  :
+  cmp SpritePaletteSlots+2*2
+  bne :+
+    lda #%1100<<8
+    bra FoundPalette
+  :
+  cmp SpritePaletteSlots+2*3
+  bne :+
+    lda #%1110<<8
+  :
+FoundPalette:
+  tsb SpriteTileBase
+
 
   ; Jump to it and return with an RTL
+  plx
   jml [0]
 .endproc
 
@@ -200,38 +275,12 @@ Wavy:
   .byt <-2, <-1, <-0, <-0
 .endproc
 
-; Limits horizontal speed to 3 pixels/frame
-; Currently private for LakituMovement
-.a16
-.proc ObjectSpeedLimit
-  ; Limit speed
-  lda ObjectVX,x
-  php
-  bpl :+
-    eor #$ffff
-    inc a
-  :
-
-  cmp #$0030
-  bcs :+
-    lda #$0030
-  :
-
-  plp
-  bpl :+
-    eor #$ffff
-    inc a
-  :
-  sta ObjectVX,x
-  rts
-.endproc
-
 ; Causes the enemy to move back and forth horizontally,
 ; seeking the player
 .export LakituMovement
 .a16
 .proc LakituMovement
-  jsl ObjectApplyVelocity
+  jsl ObjectApplyXVelocity
 
 ;  lda ObjectPXL,x
 ;  add #$80
@@ -252,8 +301,6 @@ Wavy:
     stz ObjectVX,x
   :
 
-  stz ObjectVY,x ; the "bounce" effect gives vertical velocity, so don't let it
-
   ; Change direction to face the player
   jsl ObjectLookAtPlayer
 
@@ -262,13 +309,32 @@ Wavy:
   sub PlayerPX
   absw
   cmp #$300
-  bcc :+
+  bcc TooClose
   lda #4
   jsl ObjectNegIfLeft
   add ObjectVX,x
+
+  ; Limit speed to 3 pixels/frame
+  php ; Take absolute value and negate it back if it was negative
+  ; Flags are still from the previous add
+  bpl :+
+    eor #$ffff
+    inc a
+  :
+
+  cmp #$0030
+  bcs :+
+    lda #$0030
+  :
+
+  plp
+  bpl :+
+    eor #$ffff
+    inc a
+  :
+
   sta ObjectVX,x
-  jsr ObjectSpeedLimit
-:
+TooClose:
 
   rtl
 .endproc
@@ -282,10 +348,10 @@ Wavy:
   lsr
   bcs Left
 Right:
-  pla
+  pla ; No change
   rtl
 Left:
-  pla
+  pla ; Negate
   negw
   rtl
 .endproc
@@ -294,9 +360,302 @@ Left:
   lda ObjectPX,x
   add ObjectVX,x
   sta ObjectPX,x
-
+YOnly:
   lda ObjectPY,x
   add ObjectVY,x
   sta ObjectPY,x
   rtl
 .endproc
+ObjectApplyYVelocity = ObjectApplyVelocity::YOnly
+
+.proc ObjectApplyXVelocity
+  lda ObjectPX,x
+  add ObjectVX,x
+  sta ObjectPX,x
+  rtl
+.endproc
+
+
+; Walks forward, and turns around if walking farther
+; would cause the object to fall off the edge of a platform
+; input: A (walk speed), X (object slot)
+.export ObjectWalkOnPlatform
+.proc ObjectWalkOnPlatform
+  jsl ObjectWalk
+  jsl ObjectAutoBump
+.endproc
+; fallthrough
+.a16
+.export ObjectStayOnPlatform
+.proc ObjectStayOnPlatform
+  ; Check forward a bit
+  ldy ObjectPY,x
+  lda #8*16
+  jsl ObjectNegIfLeft
+  add ObjectPX,x
+  jsl ObjectTryVertInteraction
+
+  cmp #$4000 ; Test for solid on top
+  bcs :+
+    jsl ObjectTurnAround
+  :
+  rtl
+.endproc
+
+; Look up the block at a coordinate and 
+.export ObjectTryVertInteraction
+.import BlockRunInteractionEntityTopBottom
+.proc ObjectTryVertInteraction
+  jsl GetLevelPtrXY
+  phx
+  tax
+  lda f:BlockFlags,x
+  sta BlockFlag
+  plx
+  jsl BlockRunInteractionEntityTopBottom
+  lda BlockFlag
+  rtl
+.endproc
+
+.export ObjectTrySideInteraction
+.import BlockRunInteractionEntitySide
+.proc ObjectTrySideInteraction
+  jsl GetLevelPtrXY
+  phx
+  tax
+  lda f:BlockFlags,x
+  sta BlockFlag
+  plx
+  jsl BlockRunInteractionEntitySide
+  lda BlockFlag
+  rtl
+.endproc
+
+.a16
+.export ObjectWalk
+.proc ObjectWalk
+WalkDistance = 0
+  jsl ObjectNegIfLeft
+  sta WalkDistance
+
+  ; Don't walk if the state is nonzero
+  lda ObjectState,x
+  and #255
+  beq :+
+    clc
+    rtl
+  :
+
+  ; Look up if the wall is solid
+  lda ObjectPY,x
+  sub #1<<8
+  tay
+  lda ObjectPX,x
+  add WalkDistance
+  jsl ObjectTrySideInteraction
+  bpl NotSolid
+  Solid:
+     sec
+     rtl
+  NotSolid:
+
+  ; Apply the walk
+  lda ObjectPX,x
+  add WalkDistance
+  sta ObjectPX,x
+  clc
+  rtl
+.endproc
+
+.a16
+.export ObjectGravity
+.proc ObjectGravity
+  lda ObjectVY,x
+  bmi OK
+  cmp #$60
+  bcs Skip
+OK:
+  add #4
+  sta ObjectVY,x
+Skip:
+  jmp ObjectApplyYVelocity
+.endproc
+
+; Calls ObjectGravity and then fixes things if they land on a solid block
+; input: X (object pointer)
+; output: carry (standing on platform)
+.a16
+.export ObjectFall
+.proc ObjectFall
+  jsl ObjectGravity
+
+  ; Remove if too far off the bottom
+  lda ObjectPY,x
+  bmi :+
+    cmp #32*256
+    bcc :+
+    cmp #$ffff - 2*256
+    bcs :+
+      stz ObjectType,x
+      rtl
+  :
+
+  jsl ObjectCheckStandingOnSolid
+  beq :+
+    lda ObjectPY,x
+    and #$ff00
+    sta ObjectPY,x
+    sec
+  :
+  clc
+  rtl
+.endproc
+
+
+; Checks if an object is on top of a solid block
+; input: X (object slot)
+; output: Zero flag (not zero if on top of a solid block)
+; locals: 0, 1
+.a16
+.export ObjectCheckStandingOnSolid
+.proc ObjectCheckStandingOnSolid
+  stz 0
+  lda ObjectVY,x
+  bpl :+
+    lda #0
+    rtl
+  :
+
+  ; Maybe add checks for the sides
+  ldy ObjectPY,x
+  lda ObjectPX,x
+  jsl ObjectTryVertInteraction
+  asl
+  rol 0
+
+  lda 0
+  rtl
+.endproc
+
+; Automatically turn around when bumping
+; into something during ObjectWalk
+.a16
+.export ObjectAutoBump
+.proc ObjectAutoBump
+  bcc NoBump
+  jmp ObjectTurnAround
+NoBump:
+  rtl
+.endproc
+
+; Automatically removes an object if they're too far away from the camera
+.a16
+.export ObjectAutoRemove
+.proc ObjectAutoRemove
+  lda ObjectPX
+  sub ScrollX
+  cmp #.loword(-8*256)
+  bcs Good
+  cmp #32*256
+  bcc Good
+  stz ObjectType,x
+Good:
+  rtl
+.endproc
+
+; Automatically removes an object if they're too far away from the camera
+; (Bigger range)
+.a16
+.export ObjectAutoRemoveFar
+.proc ObjectAutoRemoveFar
+  lda ObjectPX
+  sub ScrollX
+  cmp #.loword(-24*256)
+  bcs Good
+  cmp #40*256
+  bcc Good
+  stz ObjectType,x
+Good:
+  rtl
+.endproc
+
+; TODO
+.a16
+.proc ObjectBecomePoof
+  stz ObjectType,x
+  rtl
+.endproc
+
+
+; Calculate the position of the object on-screen
+; and whether it's visible in the first place
+.a16
+.proc ObjectDrawPosition
+  lda ObjectPX,x
+  sub ScrollX
+  cmp #.loword(-1*256)
+  bcs :+
+  cmp #16*256
+  bcs Invalid
+: lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+
+  lda ObjectPY,x
+  sub ScrollY
+  ; TODO: properly allow sprites to be partially offscreen on the top
+;  cmp #.loword(-1*256)
+;  bcs :+
+  cmp #15*256
+  bcs Invalid
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 2
+
+  sec
+  rts
+Invalid:
+  clc
+  rts
+.endproc
+
+; A = tile to draw
+.a16
+.export DispObject16x16
+.proc DispObject16x16
+  sta 4
+  ldy OamPtr
+
+  jsr ObjectDrawPosition
+  bcs :+
+    rtl
+  :  
+
+  lda 4
+  ora SpriteTileBase
+  sta OAM_TILE,y ; 16-bit, combined with attribute
+
+  seta8
+  lda 0
+  sta OAM_XPOS,y
+  lda 2
+  sta OAM_YPOS,y
+
+  ; Get the high bit of the calculated position and plug it in
+  lda 1
+  cmp #%00001000
+  lda #1 ; 16x16 sprites
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  tya
+  add #4
+  sta OamPtr
+  rtl
+.endproc
+
