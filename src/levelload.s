@@ -86,6 +86,8 @@
   ; Upload graphics
   lda #GraphicsUpload::FGCommon
   jsl DoGraphicUpload
+  lda #GraphicsUpload::FGGrassy
+  jsl DoGraphicUpload
   lda #GraphicsUpload::FGTropicalWood
   jsl DoGraphicUpload
   lda #GraphicsUpload::SPCommon
@@ -102,6 +104,9 @@
   ; ---
   lda #Palette::FGCommon
   ldy #0
+  jsl DoPaletteUpload
+  lda #Palette::FGGrassy
+  ldy #1
   jsl DoPaletteUpload
   lda #Palette::SPNova
   ldy #8

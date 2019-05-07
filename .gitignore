@@ -31,3 +31,4 @@ src/paletteenum.s
 src/palettedata.s
 src/actorenum.s
 src/actordata.s
+src/graphicsenum.s
