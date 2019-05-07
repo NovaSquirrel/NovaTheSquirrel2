@@ -19,6 +19,7 @@
 .include "global.inc"
 .include "graphicsenum.s"
 .include "paletteenum.s"
+.include "blockenum.s"
 .smart
 .import GameMainLoop
 
@@ -198,6 +199,33 @@ PlaceholderLevel:
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
 .endrep
+
+.repeat 5
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+.endrep
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+
+.repeat 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+.endrep
+
 .repeat 8
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 2, 2, 2

@@ -2,9 +2,10 @@
 # this will be ignored
 
 alias common $0000
-alias wood $1000
+alias terrain $1000
+alias wood $1800
 alias global_palette 0
-
+alias terrain_palette 1
 
 # Global tile stuff
 base common
@@ -136,3 +137,151 @@ q 8,2
 solid
 q 10,2
 
+
+# Terrain
+base terrain
+palette terrain_palette
+
++Ledge
+solid_top
+t 1,2 1,2
+t 1,3 1,3
+
++LedgeLeft
+solid_top
+t 0,2 1,2
+t 0,3 1,3
+
++LedgeRight
+solid_top
+t 1,2 0,2
+t 1,3 0,3
+
++LedgeSolidLeft
+solid
+t 4,3 1,2
+t 6,2 7,2
+
++LedgeSolidRight
+solid
+t 1,2 5,3
+t 8,2 9,2
+
++LedgeMiddle
+t 3,3 3,3
+t 3,3 3,3
+
++LedgeLeftSide
+t 0,3 3,3
+t 0,3 3,3
+
++LedgeRightSide
+t 3,3 2,3
+t 3,3 2,3
+
++LedgeSolidLeftSide
+solid
+t 6,2 7,3
+t 6,2 7,3
+
++LedgeSolidRightSide
+solid
+t 8,3 9,2
+t 8,3 9,2
+
++LedgeSolidLeftSideCorner
+solid
+t 6,3 7,3
+t 3,3 3,3
+
++LedgeSolidRightSideCorner
+solid
+t 8,3 9,3
+t 3,3 3,3
+
+# Terrain (slopes)
++MedSlopeL_DL
+t 2,1 3,1
+t 3,3 3,3
+
++MedSlopeL_UL
+t 0:0 0:0
+t 2,0 3,0
+
++MedSlopeL_UR
+q 2,0
+
++MedSlopeR_DR
+t 4,1 5,1
+t 3,3 3,3
+
++MedSlopeR_UR
+t 0:0 0:0
+t 4,0 5,0
+
++MedSlopeR_UL
+q 4,0
+
++SteepSlopeL_U
+t 0:0 0,0
+t 0,0 0,1
+
++SteepSlopeL_D
+t 0,1 3,3
+t 3,3 3,3
+
++SteepSlopeR_U
+t 1,0 0:0
+t 1,1 1,0
+
++SteepSlopeR_D
+t 3,3 1,1
+t 3,3 3,3
+
++GradualSlopeL_U1
+t 0:0 0:0
+t 6,0 7,0
+
++GradualSlopeL_U2
+t 0:0 0:0
+t 8,0 9,0
+
++GradualSlopeL_U3
+t 6,1 7,1
+t 3,3 3,3
+
++GradualSlopeL_U4
+t 8,1 9,1
+t 3,3 3,3
+
++GradualSlopeL_D1
+t 6,1 7,1
+t 3,3 3,3
+
++GradualSlopeL_D2
+t 8,1 9,1
+t 3,3 3,3
+
++GradualSlopeR_U1
+t 10,1 11,1
+t 3,3 3,3
+
++GradualSlopeR_U2
+t 12,1 13,1
+t 3,3 3,3
+
++GradualSlopeR_U3
+t 0:0 0:0
+t 10,0 11,0
+
++GradualSlopeR_U4
+t 0:0 0:0
+t 12,0 13,0
+
++GradualSlopeR_D3
+t 10,1 11,1
+t 3,3 3,3
+
++GradualSlopeR_D4
+t 12,1 13,1
+t 3,3 3,3

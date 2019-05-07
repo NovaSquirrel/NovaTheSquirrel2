@@ -40,14 +40,14 @@ def parseTile(tile):
 	if priority:
 		value |= 0x2000
 	# Palette
-	value |= default_palette << 9
+	value |= default_palette << 10
 
 	# Read the tile number in the format of x,y starting from the specified base
 	if tile.find(",") >= 0:
 		split = [parseNumber(s) for s in tile.split(",")]
 		value += split[0]+split[1]*16
 	else:
-		print("???")
+		value += parseNumber(tile)
 	return value
 
 
