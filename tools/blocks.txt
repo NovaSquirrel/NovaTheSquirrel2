@@ -7,7 +7,9 @@ alias wood $1800
 alias global_palette 0
 alias terrain_palette 1
 
+#######################################
 # Global tile stuff
+#######################################
 base common
 palette global_palette
 
@@ -137,8 +139,9 @@ q 8,2
 solid
 q 10,2
 
-
+#######################################
 # Terrain
+#######################################
 base terrain
 palette terrain_palette
 
@@ -199,11 +202,47 @@ solid
 t 8,3 9,3
 t 3,3 3,3
 
-# Terrain (slopes)
+#######################################
+# Terrain (slopes) - fully solid
+#######################################
 +MedSlopeL_DL
+solid
 t 2,1 3,1
 t 3,3 3,3
 
++MedSlopeR_DR
+t 4,1 5,1
+t 3,3 3,3
+
++GradualSlopeL_D1
+t 6,1 7,1
+t 3,3 3,3
+
++GradualSlopeL_D2
+t 8,1 9,1
+t 3,3 3,3
+
++GradualSlopeR_D3
+t 10,1 11,1
+t 3,3 3,3
+
++GradualSlopeR_D4
+t 12,1 13,1
+t 3,3 3,3
+
++SteepSlopeL_D
+t 0,1 3,3
+t 3,3 3,3
+
++SteepSlopeR_D
+t 3,3 1,1
+t 3,3 3,3
+
+#######################################
+# Terrain (slopes) - partially solid
+#######################################
+
+# Goes up every 2
 +MedSlopeL_UL
 t 0:0 0:0
 t 2,0 3,0
@@ -211,33 +250,23 @@ t 2,0 3,0
 +MedSlopeL_UR
 q 2,0
 
-+MedSlopeR_DR
-t 4,1 5,1
-t 3,3 3,3
++MedSlopeR_UL
+q 4,0
 
 +MedSlopeR_UR
 t 0:0 0:0
 t 4,0 5,0
 
-+MedSlopeR_UL
-q 4,0
-
+# Goes up every 1
 +SteepSlopeL_U
 t 0:0 0,0
 t 0,0 0,1
-
-+SteepSlopeL_D
-t 0,1 3,3
-t 3,3 3,3
 
 +SteepSlopeR_U
 t 1,0 0:0
 t 1,1 1,0
 
-+SteepSlopeR_D
-t 3,3 1,1
-t 3,3 3,3
-
+# Goes up every 4
 +GradualSlopeL_U1
 t 0:0 0:0
 t 6,0 7,0
@@ -251,14 +280,6 @@ t 6,1 7,1
 t 3,3 3,3
 
 +GradualSlopeL_U4
-t 8,1 9,1
-t 3,3 3,3
-
-+GradualSlopeL_D1
-t 6,1 7,1
-t 3,3 3,3
-
-+GradualSlopeL_D2
 t 8,1 9,1
 t 3,3 3,3
 
@@ -278,10 +299,3 @@ t 10,0 11,0
 t 0:0 0:0
 t 12,0 13,0
 
-+GradualSlopeR_D3
-t 10,1 11,1
-t 3,3 3,3
-
-+GradualSlopeR_D4
-t 12,1 13,1
-t 3,3 3,3

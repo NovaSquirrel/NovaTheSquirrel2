@@ -126,6 +126,10 @@ $(objdir)/spcimage.o: $(brrlisto)
 # Block data relies on the enum
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 
+# Reliance on the block enum
+$(objdir)/player.o: $(srcdir)/blockenum.s
+$(objdir)/object.o: $(srcdir)/blockenum.s
+
 # Level loading relies on palette indexes and graphic directory
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphics.s
 

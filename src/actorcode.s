@@ -22,6 +22,7 @@
 .segment "ActorData"
 
 .import DispObject16x16
+.import ObjectWalk
 
 ; -------------------------------------
 
@@ -38,6 +39,9 @@
 .i16
 .export RunBurger
 .proc RunBurger
+  lda #3
+  jsl ObjectWalk
+
   rtl
 .endproc
 

@@ -16,6 +16,7 @@
 ;
 .include "snes.inc"
 .include "global.inc"
+.include "blockenum.s"
 .smart
 
 .import BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -86,6 +87,8 @@ SideXPos = 8
 BottomCmp = 8
 MaxSpeedLeft = 10
 MaxSpeedRight = 12
+  phk
+  plb
 
   ; Horizontal movement
 
@@ -244,7 +247,51 @@ NoFixWalkSpeed:
   lda SideXPos
   jsr TrySideInteraction
 
+
+
   ; -------------------
+
+  ; Slope interaction
+  ; Move up a pixel
+SlopeUnderFeet:
+  lda PlayerPY
+  sub #$10
+  tay
+  lda PlayerPX
+  jsl GetLevelPtrXY
+  jsr IsSlope
+  bcc :+
+    lda SlopeHeightTable,y
+    beq SlopeAbove
+
+    lda PlayerPY
+    and #$ff00
+    ora SlopeHeightTable,y
+    sub #$10
+    sta PlayerPY
+    stz PlayerVY
+  :
+  bra SlopeEnd
+
+SlopeAbove:
+  dec LevelBlockPtr
+  dec LevelBlockPtr
+  lda [LevelBlockPtr]
+  jsr IsSlope
+  bcc :+
+    lda PlayerPY
+    sub #$0100
+    and #$ff00
+    ora SlopeHeightTable,y
+    sub #$10
+    sta PlayerPY
+
+    stz PlayerVY
+  :
+
+SlopeEnd:
+
+  ; -------------------  
 
   ; Vertical movement
   lda PlayerVY
@@ -346,7 +393,6 @@ SkipApplyGravity:
 
   ; -------------------
 
-
   rtl
 
 TryBelowInteraction:
@@ -422,6 +468,35 @@ TrySideInteraction:
   @NotSolid:
   rts
 
+.a16
+IsSlope:
+  cmp #Block::MedSlopeL_DL*2
+  bcc :+
+  cmp #Block::GradualSlopeR_U4*2+1
+  bcs :+
+  sub #Block::MedSlopeL_DL*2
+  ; Now we have the block ID times 2
+
+  ; Multiply by 16 to get the index into the slope table
+  asl
+  asl
+  asl
+  asl
+  sta 0
+
+  ; Select the column
+  lda PlayerPX
+  and #$f0 ; Get the pixels within a block
+  lsr
+  lsr
+  lsr
+  ora 0
+  tay
+
+  sec ; Success
+  rts
+: clc ; Failure
+  rts
 .endproc
 
 .a16
@@ -547,4 +622,95 @@ OfferJumpFromGracePeriod:
   :
   setaxy16
   rtl
+.endproc
+
+.export SlopeHeightTable
+.proc SlopeHeightTable
+; MedSlopeL_DL
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; MedSlopeR_DR
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; GradualSlopeL_D1
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; GradualSlopeL_D2
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; GradualSlopeR_D3
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; GradualSlopeR_D4
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; SteepSlopeL_D
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+; SteepSlopeR_D
+.word $00, $00, $00, $00, $00, $00, $00, $00
+.word $00, $00, $00, $00, $00, $00, $00, $00
+
+;MedSlopeL_UL
+.word $f0, $f0, $e0, $e0, $d0, $d0, $c0, $c0
+.word $b0, $b0, $a0, $a0, $90, $90, $80, $80
+
+;MedSlopeL_UR
+.word $70, $70, $60, $60, $50, $50, $40, $40
+.word $30, $30, $20, $20, $10, $10, $00, $00
+
+;MedSlopeR_UL
+.word $00, $00, $10, $10, $20, $20, $30, $30
+.word $40, $40, $50, $50, $60, $60, $70, $70
+
+;MedSlopeR_UR
+.word $80, $80, $90, $90, $a0, $a0, $b0, $b0
+.word $c0, $c0, $d0, $d0, $e0, $e0, $f0, $f0
+
+;SteepSlopeL_U
+.word $f0, $e0, $d0, $c0, $b0, $a0, $90, $80
+.word $70, $60, $50, $40, $30, $20, $10, $00
+
+;SteepSlopeR_U
+.word $00, $10, $20, $30, $40, $50, $60, $70
+.word $80, $90, $a0, $b0, $c0, $d0, $e0, $f0
+
+;GradualSlopeL_U1
+.word $f0, $f0, $f0, $f0, $e0, $e0, $e0, $e0
+.word $d0, $d0, $d0, $d0, $c0, $c0, $c0, $c0
+
+;GradualSlopeL_U2
+.word $b0, $b0, $b0, $b0, $a0, $a0, $a0, $a0
+.word $90, $90, $90, $90, $80, $80, $80, $80
+
+;GradualSlopeL_U3
+.word $70, $70, $70, $70, $60, $60, $60, $60
+.word $50, $50, $50, $50, $40, $40, $40, $40
+
+;GradualSlopeL_U4
+.word $30, $30, $30, $30, $20, $20, $20, $20
+.word $10, $10, $10, $10, $00, $00, $00, $00
+
+;GradualSlopeR_U1
+.word $00, $00, $00, $00, $10, $10, $10, $10
+.word $20, $20, $20, $20, $30, $30, $30, $30
+
+;GradualSlopeR_U2
+.word $40, $40, $40, $40, $50, $50, $50, $50
+.word $60, $60, $60, $60, $70, $70, $70, $70
+
+;GradualSlopeR_U3
+.word $80, $80, $80, $80, $90, $90, $90, $90
+.word $a0, $a0, $a0, $a0, $b0, $b0, $b0, $b0
+
+;GradualSlopeR_U4
+.word $c0, $c0, $c0, $c0, $d0, $d0, $d0, $d0
+.word $e0, $e0, $e0, $e0, $f0, $f0, $f0, $f0
 .endproc
