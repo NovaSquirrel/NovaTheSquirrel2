@@ -85,6 +85,7 @@ NOVA_RUN_SPEED = 4
 Temp = 2
 SideXPos = 8
 BottomCmp = 8
+SlopeHeight = 8
 MaxSpeedLeft = 10
 MaxSpeedRight = 12
   phk
@@ -252,44 +253,15 @@ NoFixWalkSpeed:
   ; -------------------
 
   ; Slope interaction
-  ; Move up a pixel
-SlopeUnderFeet:
-  lda PlayerPY
-  sub #$10
-  tay
-  lda PlayerPX
-  jsl GetLevelPtrXY
-  jsr IsSlope
+  jsr GetSlopeHeight
   bcc :+
-    lda SlopeHeightTable,y
-    beq SlopeAbove
-
-    lda PlayerPY
-    and #$ff00
-    ora SlopeHeightTable,y
-    sub #$10
-    sta PlayerPY
-    stz PlayerVY
-  :
-  bra SlopeEnd
-
-SlopeAbove:
-  dec LevelBlockPtr
-  dec LevelBlockPtr
-  lda [LevelBlockPtr]
-  jsr IsSlope
-  bcc :+
-    lda PlayerPY
-    sub #$0100
-    and #$ff00
-    ora SlopeHeightTable,y
-    sub #$10
+    lda SlopeHeight
+    sub #$0010
     sta PlayerPY
 
     stz PlayerVY
   :
 
-SlopeEnd:
 
   ; -------------------  
 
@@ -466,6 +438,37 @@ TrySideInteraction:
     sta PlayerPX
     stz PlayerVX  ; Stop moving horizontally
   @NotSolid:
+  rts
+
+.a16
+GetSlopeHeight:
+  ldy PlayerPY
+  lda PlayerPX
+  jsl GetLevelPtrXY
+  jsr IsSlope
+  bcc NotSlope
+    lda PlayerPY
+    and #$ff00
+    ora SlopeHeightTable,y
+    sta SlopeHeight
+
+    lda SlopeHeightTable,y
+    bne :+
+      ; Move the level pointer up and reread
+      dec LevelBlockPtr
+      dec LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr IsSlope
+      bcc :+
+        lda PlayerPY
+        sbc #$0100 ; Carry already set
+        ora SlopeHeightTable,y
+        sta SlopeHeight
+    :
+  sec
+  rts
+NotSlope:
+  clc
   rts
 
 .a16
