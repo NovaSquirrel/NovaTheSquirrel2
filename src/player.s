@@ -26,6 +26,9 @@
 .segment "ZEROPAGE"
 
 .segment "Player"
+; Two comparisons to make to determine if something is a slope
+SlopeBCC = Block::MedSlopeL_DL*2
+SlopeBCS = Block::GradualSlopeR_U4*2+1
 
 .a16
 .i16
@@ -85,7 +88,7 @@ NOVA_RUN_SPEED = 4
 Temp = 2
 SideXPos = 8
 BottomCmp = 8
-SlopeHeight = 8
+SlopeY = 8
 MaxSpeedLeft = 10
 MaxSpeedRight = 12
   phk
@@ -213,6 +216,53 @@ NoFixWalkSpeed:
    sta PlayerVX
 
 
+  ; Apply downward slope compensation before applying X speed
+  lda PlayerVX     ; No compesnation if not moving
+  beq NoSlopeDown
+  ldy PlayerPY     ; Check the tile the player is on
+  lda PlayerPX
+  jsl GetLevelPtrXY
+  ; Verify that it's a slope first
+  cmp #SlopeBCC
+  bcc NoSlopeDown
+  cmp #SlopeBCS
+  bcs NoSlopeDown
+    sub #SlopeBCC
+    tay
+    ; Make sure the sign of PlayerVX differs from the sign of SlopeDirectionTable
+    lda SlopeDirectionTable,y
+    eor PlayerVX
+    bmi NoSlopeDown
+      ; Compensate for slope movement
+      lda SlopeVacuumIndex,y
+      sta 0
+
+      ; Select the column
+      lda PlayerPX
+      and #$f0 ; Get the pixels within a block
+      lsr
+      lsr
+      lsr
+      ora 0
+      tay
+
+      lda PlayerVX
+      absw
+      lsr
+      lsr
+      lsr
+      beq NoSlopeDown
+      tax
+
+    : lda SlopeVacuumTable,y
+      add PlayerPY
+      sta PlayerPY
+      iny
+      iny
+      dex
+      bne :-
+  NoSlopeDown:
+
   ; Apply speed
   lda PlayerPX
   add PlayerVX
@@ -255,7 +305,7 @@ NoFixWalkSpeed:
   ; Slope interaction
   jsr GetSlopeHeight
   bcc :+
-    lda SlopeHeight
+    lda SlopeY
     sub #$0010
     sta PlayerPY
 
@@ -440,6 +490,7 @@ TrySideInteraction:
   @NotSolid:
   rts
 
+
 .a16
 GetSlopeHeight:
   ldy PlayerPY
@@ -450,7 +501,7 @@ GetSlopeHeight:
     lda PlayerPY
     and #$ff00
     ora SlopeHeightTable,y
-    sta SlopeHeight
+    sta SlopeY
 
     lda SlopeHeightTable,y
     bne :+
@@ -463,7 +514,7 @@ GetSlopeHeight:
         lda PlayerPY
         sbc #$0100 ; Carry already set
         ora SlopeHeightTable,y
-        sta SlopeHeight
+        sta SlopeY
     :
   sec
   rts
@@ -473,11 +524,11 @@ NotSlope:
 
 .a16
 IsSlope:
-  cmp #Block::MedSlopeL_DL*2
+  cmp #SlopeBCC
   bcc :+
-  cmp #Block::GradualSlopeR_U4*2+1
+  cmp #SlopeBCS
   bcs :+
-  sub #Block::MedSlopeL_DL*2
+  sub #SlopeBCC
   ; Now we have the block ID times 2
 
   ; Multiply by 16 to get the index into the slope table
@@ -716,4 +767,122 @@ OfferJumpFromGracePeriod:
 ;GradualSlopeR_U4
 .word $c0, $c0, $c0, $c0, $d0, $d0, $d0, $d0
 .word $e0, $e0, $e0, $e0, $f0, $f0, $f0, $f0
+.endproc
+
+.proc SlopeVacuumIndex
+None = (16*2*2)*0
+Steep = (16*2*2)*1
+Medium = (16*2*2)*2
+Gradual = (16*2*2)*3
+
+; MedSlopeL_DL
+.word None
+; MedSlopeR_DR
+.word None
+; GradualSlopeL_D1
+.word None
+; GradualSlopeL_D2
+.word None
+; GradualSlopeR_D3
+.word None
+; GradualSlopeR_D4
+.word None
+; SteepSlopeL_D
+.word None
+; SteepSlopeR_D
+.word None
+;MedSlopeL_UL
+.word Medium
+;MedSlopeL_UR
+.word Medium
+;MedSlopeR_UL
+.word Medium
+;MedSlopeR_UR
+.word Medium
+;SteepSlopeL_U
+.word Steep
+;SteepSlopeR_U
+.word Steep
+;GradualSlopeL_U1
+.word Gradual
+;GradualSlopeL_U2
+.word Gradual
+;GradualSlopeL_U3
+.word Gradual
+;GradualSlopeL_U4
+.word Gradual
+;GradualSlopeR_U1
+.word Gradual
+;GradualSlopeR_U2
+.word Gradual
+;GradualSlopeR_U3
+.word Gradual
+;GradualSlopeR_U4
+.word Gradual
+.endproc
+
+.proc SlopeVacuumTable
+; None
+.repeat 8
+  .word $00, $00, $00, $00
+.endrep
+; Steep
+.repeat 8
+  .word $10, $10, $10, $10
+.endrep
+; Medium
+.repeat 8
+  .word $10, $00, $10, $00
+.endrep
+; Gradual
+.repeat 8
+  .word $10, $00, $00, $00
+.endrep
+.endproc
+
+.proc SlopeDirectionTable
+; MedSlopeL_DL
+.word $8000
+; MedSlopeR_DR
+.word $0000
+; GradualSlopeL_D1
+.word $8000
+; GradualSlopeL_D2
+.word $8000
+; GradualSlopeR_D3
+.word $0000
+; GradualSlopeR_D4
+.word $0000
+; SteepSlopeL_D
+.word $8000
+; SteepSlopeR_D
+.word $0000
+;MedSlopeL_UL
+.word $8000
+;MedSlopeL_UR
+.word $8000
+;MedSlopeR_UL
+.word $0000
+;MedSlopeR_UR
+.word $0000
+;SteepSlopeL_U
+.word $8000
+;SteepSlopeR_U
+.word $0000
+;GradualSlopeL_U1
+.word $8000
+;GradualSlopeL_U2
+.word $8000
+;GradualSlopeL_U3
+.word $8000
+;GradualSlopeL_U4
+.word $8000
+;GradualSlopeR_U1
+.word $0000
+;GradualSlopeR_U2
+.word $0000
+;GradualSlopeR_U3
+.word $0000
+;GradualSlopeR_U4
+.word $0000
 .endproc
