@@ -250,7 +250,7 @@ NoFixWalkSpeed:
       lda PlayerPY
       and #$ff00
       ora SlopeHeightTable,y
-      sub #$10
+;      sub #$10
       sta PlayerPY
 
       bra AlreadyAppliedVX
@@ -266,7 +266,7 @@ NoFixWalkSpeed:
       add #$0100
       and #$ff00
       ora SlopeHeightTable,y
-      sub #$10
+;      sub #$10
       sta PlayerPY
 
       bra AlreadyAppliedVX
@@ -317,10 +317,18 @@ NoFixWalkSpeed:
   jsr GetSlopeYPos
   bcc :+
     lda SlopeY
-    sub #$0010
+    cmp PlayerPY
+    bcs :+
+;    sub #$0010
     sta PlayerPY
 
     stz PlayerVY
+
+    jsr OfferJump
+
+    seta8
+    inc PlayerOnGround
+    seta16
   :
 
 
