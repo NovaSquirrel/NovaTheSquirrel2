@@ -223,10 +223,16 @@ NoFixWalkSpeed:
   lda PlayerPX
   jsl GetLevelPtrXY
   ; Verify that it's a slope first
-  cmp #SlopeBCC
+  sta 2
+  jsr GetSlopeYPosCustom
   bcc NoSlopeDown
-  cmp #SlopeBCS
-  bcs NoSlopeDown
+;    ; Actually on the slope?
+;    lda SlopeY
+;    cmp PlayerPY
+;    bcs NoSlopeDown
+
+    ; Get the block ID again
+    lda 2
     sub #SlopeBCC
     tay
 
@@ -250,7 +256,6 @@ NoFixWalkSpeed:
       lda PlayerPY
       and #$ff00
       ora SlopeHeightTable,y
-;      sub #$10
       sta PlayerPY
 
       bra AlreadyAppliedVX
@@ -266,7 +271,6 @@ NoFixWalkSpeed:
       add #$0100
       and #$ff00
       ora SlopeHeightTable,y
-;      sub #$10
       sta PlayerPY
 
       bra AlreadyAppliedVX
@@ -319,16 +323,10 @@ NoFixWalkSpeed:
     lda SlopeY
     cmp PlayerPY
     bcs :+
-;    sub #$0010
     sta PlayerPY
-
     stz PlayerVY
 
-    jsr OfferJump
-
-    seta8
-    inc PlayerOnGround
-    seta16
+    jsr OnGroundCommon
   :
 
 
@@ -465,6 +463,7 @@ TryAboveInteraction:
     lda #$00ff
     trb PlayerPY
 
+OnGroundCommon:
     jsr OfferJump
 
     seta8
@@ -515,6 +514,7 @@ GetSlopeYPos:
   ldy PlayerPY
   lda PlayerPX
   jsl GetLevelPtrXY
+GetSlopeYPosCustom:
   jsr IsSlope
   bcc NotSlope
     lda PlayerPY
