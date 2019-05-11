@@ -216,7 +216,7 @@ PlaceholderLevel:
 
 .repeat 5
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 .endrep
 
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -249,12 +249,9 @@ PlaceholderLevel:
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 .endif
 
-  
-.repeat 2
+.repeat 4
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 .endrep
 
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0

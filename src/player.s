@@ -216,8 +216,8 @@ NoFixWalkSpeed:
    sta PlayerVX
 
 
-  ; Apply downward slope compensation before applying X speed
-  lda PlayerVX     ; No compesnation if not moving
+  ; Apply downward slope compensation before applying X velocity
+  lda PlayerVX     ; No compensation if not moving
   beq NoSlopeDown
   ldy PlayerPY     ; Check the tile the player is on
   lda PlayerPX
@@ -229,44 +229,55 @@ NoFixWalkSpeed:
   bcs NoSlopeDown
     sub #SlopeBCC
     tay
+
+    ; Apply X velocity
+    lda PlayerPX
+    add PlayerVX
+    sta PlayerPX
+
     ; Make sure the sign of PlayerVX differs from the sign of SlopeDirectionTable
     lda SlopeDirectionTable,y
     eor PlayerVX
-    bmi NoSlopeDown
-      ; Compensate for slope movement
-      lda SlopeVacuumIndex,y
-      sta 0
-
-      ; Select the column
+    bmi AlreadyAppliedVX
+      ; Pull the player down to the slope
+      ldy PlayerPY
       lda PlayerPX
-      and #$f0 ; Get the pixels within a block
-      lsr
-      lsr
-      lsr
-      ora 0
-      tay
-
-      lda PlayerVX
-      absw
-      lsr
-      lsr
-      lsr
-      beq NoSlopeDown
-      tax
-
-    : lda SlopeVacuumTable,y
-      add PlayerPY
+      add PlayerVX
+      jsl GetLevelPtrXY
+      jsr IsSlope
+      bcc @TryBelow
+   @TryAbove:
+      lda PlayerPY
+      and #$ff00
+      ora SlopeHeightTable,y
+      sub #$10
       sta PlayerPY
-      iny
-      iny
-      dex
-      bne :-
+
+      bra AlreadyAppliedVX
+   @TryBelow:
+      ; Is there a slope below?
+      inc LevelBlockPtr
+      inc LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr IsSlope
+      bcc AlreadyAppliedVX
+
+      lda PlayerPY
+      add #$0100
+      and #$ff00
+      ora SlopeHeightTable,y
+      sub #$10
+      sta PlayerPY
+
+      bra AlreadyAppliedVX
   NoSlopeDown:
+
 
   ; Apply speed
   lda PlayerPX
   add PlayerVX
   sta PlayerPX
+  AlreadyAppliedVX:
 
   ; Boundary on the left
   lda PlayerPX
@@ -303,7 +314,7 @@ NoFixWalkSpeed:
   ; -------------------
 
   ; Slope interaction
-  jsr GetSlopeHeight
+  jsr GetSlopeYPos
   bcc :+
     lda SlopeY
     sub #$0010
@@ -492,7 +503,7 @@ TrySideInteraction:
 
 
 .a16
-GetSlopeHeight:
+GetSlopeYPos:
   ldy PlayerPY
   lda PlayerPX
   jsl GetLevelPtrXY
@@ -767,77 +778,6 @@ OfferJumpFromGracePeriod:
 ;GradualSlopeR_U4
 .word $c0, $c0, $c0, $c0, $d0, $d0, $d0, $d0
 .word $e0, $e0, $e0, $e0, $f0, $f0, $f0, $f0
-.endproc
-
-.proc SlopeVacuumIndex
-None = (16*2*2)*0
-Steep = (16*2*2)*1
-Medium = (16*2*2)*2
-Gradual = (16*2*2)*3
-
-; MedSlopeL_DL
-.word None
-; MedSlopeR_DR
-.word None
-; GradualSlopeL_D1
-.word None
-; GradualSlopeL_D2
-.word None
-; GradualSlopeR_D3
-.word None
-; GradualSlopeR_D4
-.word None
-; SteepSlopeL_D
-.word None
-; SteepSlopeR_D
-.word None
-;MedSlopeL_UL
-.word Medium
-;MedSlopeL_UR
-.word Medium
-;MedSlopeR_UL
-.word Medium
-;MedSlopeR_UR
-.word Medium
-;SteepSlopeL_U
-.word Steep
-;SteepSlopeR_U
-.word Steep
-;GradualSlopeL_U1
-.word Gradual
-;GradualSlopeL_U2
-.word Gradual
-;GradualSlopeL_U3
-.word Gradual
-;GradualSlopeL_U4
-.word Gradual
-;GradualSlopeR_U1
-.word Gradual
-;GradualSlopeR_U2
-.word Gradual
-;GradualSlopeR_U3
-.word Gradual
-;GradualSlopeR_U4
-.word Gradual
-.endproc
-
-.proc SlopeVacuumTable
-; None
-.repeat 8
-  .word $00, $00, $00, $00
-.endrep
-; Steep
-.repeat 8
-  .word $10, $10, $10, $10
-.endrep
-; Medium
-.repeat 8
-  .word $10, $00, $10, $00
-.endrep
-; Gradual
-.repeat 8
-  .word $10, $00, $00, $00
-.endrep
 .endproc
 
 .proc SlopeDirectionTable
