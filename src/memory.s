@@ -47,6 +47,7 @@
   PlayerDir:        .res 1     ; currently facing left?
   PlayerJumping:    .res 1     ; true if jumping (not falling)
   PlayerOnGround:   .res 1     ; true if on ground
+  PlayerWasOnGround:   .res 1  ; true if on ground last frame
   PlayerWalkLock:   .res 1     ; timer for the player being unable to move left/right
   PlayerDownTimer:  .res 1     ; timer for how long the player has been holding down
                                ; (used for fallthrough platforms)

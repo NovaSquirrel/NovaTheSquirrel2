@@ -88,7 +88,7 @@ NOVA_RUN_SPEED = 4
 Temp = 2
 SideXPos = 8
 BottomCmp = 8
-SlopeY = 8
+SlopeY = 6
 MaxSpeedLeft = 10
 MaxSpeedRight = 12
   phk
@@ -99,6 +99,8 @@ MaxSpeedRight = 12
   ; Calculate max speed from whether they're running or not
   ; (Updated only when on the ground)
   seta8
+  lda PlayerOnGround
+  sta PlayerWasOnGround
   stz PlayerOnGround
   countdown JumpGracePeriod
 
@@ -216,7 +218,17 @@ NoFixWalkSpeed:
    sta PlayerVX
 
 
-  ; Apply downward slope compensation before applying X velocity
+  ; Apply speed
+  lda PlayerPX
+  add PlayerVX
+  sta PlayerPX
+
+
+  ; Going downhill requires special help
+  seta8
+  lda PlayerWasOnGround
+  seta16
+  beq NoSlopeDown
   lda PlayerVX     ; No compensation if not moving
   beq NoSlopeDown
   ldy PlayerPY     ; Check the tile the player is on
@@ -226,64 +238,12 @@ NoFixWalkSpeed:
   sta 2
   jsr GetSlopeYPosCustom
   bcc NoSlopeDown
-;    ; Actually on the slope?
-;    lda SlopeY
-;    cmp PlayerPY
-;    bcs NoSlopeDown
-
-    ; Get the block ID again
-    lda 2
-    sub #SlopeBCC
-    tay
-
-    ; Apply X velocity
-    lda PlayerPX
-    add PlayerVX
-    sta PlayerPX
-
-    ; Make sure the sign of PlayerVX differs from the sign of SlopeDirectionTable
-    lda SlopeDirectionTable,y
-    eor PlayerVX
-    bmi AlreadyAppliedVX
-      ; Pull the player down to the slope
-      ldy PlayerPY
-      lda PlayerPX
-      add PlayerVX
-      jsl GetLevelPtrXY
-      jsr IsSlope
-      bcc @TryBelow
-   @TryAbove:
-      lda PlayerPY
-      and #$ff00
-      ora SlopeHeightTable,y
-      sta PlayerPY
-
-      bra AlreadyAppliedVX
-   @TryBelow:
-      ; Is there a slope below?
-      inc LevelBlockPtr
-      inc LevelBlockPtr
-      lda [LevelBlockPtr]
-      jsr IsSlope
-      bcc AlreadyAppliedVX
-
-      lda PlayerPY
-      add #$0100
-      and #$ff00
-      ora SlopeHeightTable,y
-      sta PlayerPY
-
-      bra AlreadyAppliedVX
+    ; To do
   NoSlopeDown:
 
 
-  ; Apply speed
-  lda PlayerPX
-  add PlayerVX
-  sta PlayerPX
-  AlreadyAppliedVX:
 
-  ; Boundary on the left
+  ; Boundary on the left of the world
   lda PlayerPX
   cmp #16*16
   bcs :+
@@ -312,23 +272,6 @@ NoFixWalkSpeed:
   tay
   lda SideXPos
   jsr TrySideInteraction
-
-
-
-  ; -------------------
-
-  ; Slope interaction
-  jsr GetSlopeYPos
-  bcc :+
-    lda SlopeY
-    cmp PlayerPY
-    bcs :+
-    sta PlayerPY
-    stz PlayerVY
-
-    jsr OnGroundCommon
-  :
-
 
   ; -------------------  
 
@@ -391,6 +334,22 @@ SkipApplyGravity:
     sta BottomCmp
   :
 
+  ; Slope interaction
+  jsr GetSlopeYPos
+  bcc :+
+    lda SlopeY
+    cmp PlayerPY
+    bcs :+
+    sta PlayerPY
+    stz PlayerVY
+
+    seta8
+    inc PlayerOnGround
+    seta16
+    ; Don't do the normal ground check
+    bra SkipGroundCheck
+  :
+
   lda PlayerVY
   bmi :+
   ; Left foot
@@ -404,7 +363,18 @@ SkipApplyGravity:
   add #3*16
   jsr TryAboveInteraction
 :
+SkipGroundCheck:
 
+  ; Above
+  lda PlayerPY
+  sub #16*16+14*16 ; Top of the head
+  tay
+  lda PlayerPX
+  jsr TryBelowInteraction
+
+  ; -------------------
+
+  ; Offer a jump if not on ground and the grace period is still active
   seta8
   lda PlayerOnGround
   bne :+
@@ -415,22 +385,23 @@ SkipApplyGravity:
   :
   seta16
 
+  ; If on the ground, offer a jump
+  seta8
+  lda PlayerOnGround
+  seta16
+  beq :+
+    jsr OfferJump
 
-  ; Left above
-  lda PlayerPY
-  sub #16*16+14*16 ; Top of the head
-  tay
-;  phy
-  lda PlayerPX
-;  sub #4*16
-  jsr TryBelowInteraction
-  ; Right above
-;  ply
-;  lda PlayerPX
-;  add #3*16
-;  jsr TryBelowInteraction
-
-  ; -------------------
+    ; Update run status
+    seta8
+    lda keydown
+    and #KEY_R|KEY_L
+    sta PlayerWasRunning
+    lda keydown+1
+    and #KEY_Y>>8
+    tsb PlayerWasRunning
+    seta16
+  :
 
   rtl
 
@@ -450,7 +421,6 @@ TryBelowInteraction:
   @NotSolid:
   rts
 
-
 TryAboveInteraction:
   jsl GetLevelPtrXY
   jsl GetBlockFlag
@@ -463,19 +433,8 @@ TryAboveInteraction:
     lda #$00ff
     trb PlayerPY
 
-OnGroundCommon:
-    jsr OfferJump
-
     seta8
     inc PlayerOnGround
-
-    ; Update run status
-    lda keydown
-    and #KEY_R|KEY_L
-    sta PlayerWasRunning
-    lda keydown+1
-    and #KEY_Y>>8
-    tsb PlayerWasRunning
     seta16
   :
   rts
@@ -508,8 +467,9 @@ TrySideInteraction:
   @NotSolid:
   rts
 
-
 .a16
+; Get the Y position of the slope under the player's hotspot (SlopeY)
+; and also return if they're on a slope at all (carry)
 GetSlopeYPos:
   ldy PlayerPY
   lda PlayerPX
@@ -542,6 +502,8 @@ NotSlope:
   rts
 
 .a16
+; Determine if it's a slope (carry),
+; but also determine the index into the height table (Y)
 IsSlope:
   cmp #SlopeBCC
   bcc :+
@@ -570,8 +532,8 @@ IsSlope:
   rts
 : clc ; Failure
   rts
-.endproc
 
+; Let the player jump if they press the button
 .a16
 OfferJump:
   seta8
@@ -583,7 +545,6 @@ OfferJumpFromGracePeriod:
   and #KEY_B
   beq :+
     seta8
-    ;stz PlayerOnLadder
     stz JumpGracePeriod
     inc PlayerJumping
     seta16
@@ -591,7 +552,7 @@ OfferJumpFromGracePeriod:
     sta PlayerVY
   :
   rts
-
+.endproc
 
 .a16
 .i16
