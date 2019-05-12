@@ -103,6 +103,14 @@ MaxSpeedRight = 12
   sta PlayerWasOnGround
   stz PlayerOnGround
   countdown JumpGracePeriod
+  countdown PlayerWantsToJump
+
+  lda keynew+1
+  and #(KEY_B>>8)
+  beq :+
+    lda #3
+    sta PlayerWantsToJump
+  :
 
   lda PlayerWasRunning ; nonzero = B button, only updated when on ground
   seta16
@@ -226,20 +234,31 @@ NoFixWalkSpeed:
 
   ; Going downhill requires special help
   seta8
-  lda PlayerWasOnGround
-  seta16
+  lda PlayerWasOnGround ; Need to have been on ground last frame
   beq NoSlopeDown
+  lda PlayerWantsToJump
+  bne NoSlopeDown
+  seta16
   lda PlayerVX     ; No compensation if not moving
   beq NoSlopeDown
-  ldy PlayerPY     ; Check the tile the player is on
-  lda PlayerPX
-  jsl GetLevelPtrXY
-  ; Verify that it's a slope first
-  sta 2
-  jsr GetSlopeYPosCustom
-  bcc NoSlopeDown
-    ; To do
+    jsr GetSlopeYPos
+    bcs :+
+      ; Try again one block below
+      inc LevelBlockPtr
+      inc LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr GetSlopeYPosBelow
+      bcc NoSlopeDown
+    :
+
+    lda SlopeY
+    sta PlayerPY
+    stz PlayerVY
+
+    seta8
+    inc PlayerOnGround
   NoSlopeDown:
+  seta16
 
 
 
@@ -502,6 +521,32 @@ NotSlope:
   rts
 
 .a16
+; Similar but for checking one block below
+GetSlopeYPosBelow:
+  jsr IsSlope
+  bcc NotSlope
+    lda PlayerPY
+    add #$0100
+    and #$ff00
+    ora SlopeHeightTable,y
+    sta SlopeY
+
+    lda SlopeHeightTable,y
+    bne :+
+      ; Move the level pointer up and reread
+      dec LevelBlockPtr
+      dec LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr IsSlope
+      bcc :+
+        lda PlayerPY
+        ora SlopeHeightTable,y
+        sta SlopeY
+    :
+  sec
+  rts
+
+.a16
 ; Determine if it's a slope (carry),
 ; but also determine the index into the height table (Y)
 IsSlope:
@@ -541,7 +586,12 @@ OfferJump:
   sta JumpGracePeriod
   seta16
 OfferJumpFromGracePeriod:
-  lda keynew
+  ; Newly pressed jump, either now or a few frames before
+  lda PlayerWantsToJump
+  and #255
+  beq :+
+  ; Still pressing the jump button
+  lda keydown
   and #KEY_B
   beq :+
     seta8

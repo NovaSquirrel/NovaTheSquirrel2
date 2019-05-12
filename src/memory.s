@@ -126,6 +126,7 @@
   JumpGracePeriod: .res 1
   PlayerJumpCancelLock: .res 1 ; timer for the player being unable to cancel a jump
   PlayerJumpCancel: .res 1
+  PlayerWantsToJump: .res 1    ; true if player pressed the jump button
 
 .segment "BSS7E"
 

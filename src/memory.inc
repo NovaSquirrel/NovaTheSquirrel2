@@ -32,6 +32,7 @@
 
 .global PlayerJumpCancel
 .global PlayerJumpCancelLock
+.global PlayerWantsToJump
 .global PlayerAccelSpeed
 .global PlayerDecelSpeed
 .global JumpGracePeriod
