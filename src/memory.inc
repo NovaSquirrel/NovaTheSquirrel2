@@ -20,7 +20,6 @@
 .globalzp PlayerDir
 .globalzp PlayerWasRunning
 .globalzp PlayerOnGround
-.globalzp PlayerWasOnGround
 .globalzp PlayerHealth
 .globalzp PlayerWalkLock
 .globalzp PlayerDownTimer

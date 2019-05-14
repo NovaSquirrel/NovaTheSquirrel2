@@ -99,9 +99,6 @@ MaxSpeedRight = 12
   ; Calculate max speed from whether they're running or not
   ; (Updated only when on the ground)
   seta8
-  lda PlayerOnGround
-  sta PlayerWasOnGround
-  stz PlayerOnGround
   countdown JumpGracePeriod
   countdown PlayerWantsToJump
 
@@ -234,7 +231,7 @@ NoFixWalkSpeed:
 
   ; Going downhill requires special help
   seta8
-  lda PlayerWasOnGround ; Need to have been on ground last frame
+  lda PlayerOnGround ; Need to have been on ground last frame
   beq NoSlopeDown
   lda PlayerWantsToJump
   bne NoSlopeDown
@@ -259,8 +256,6 @@ NoFixWalkSpeed:
     inc PlayerOnGround
   NoSlopeDown:
   seta16
-
-
 
   ; Boundary on the left of the world
   lda PlayerPX
@@ -333,6 +328,7 @@ SkipApplyGravity:
 
   ; Cancel the jump cancel
   seta8
+  stz PlayerOnGround
   lda PlayerJumpCancel
   beq :+
     lda PlayerVY+1
