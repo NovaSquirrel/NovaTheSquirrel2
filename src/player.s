@@ -26,9 +26,7 @@
 .segment "ZEROPAGE"
 
 .segment "Player"
-; Two comparisons to make to determine if something is a slope
-SlopeBCC = Block::MedSlopeL_DL*2
-SlopeBCS = Block::GradualSlopeR_U4*2+1
+.import SlopeBCC, SlopeBCS, SlopeHeightTable
 
 .a16
 .i16
@@ -494,10 +492,10 @@ GetSlopeYPosCustom:
   bcc NotSlope
     lda PlayerPY
     and #$ff00
-    ora SlopeHeightTable,y
+    ora f:SlopeHeightTable,x
     sta SlopeY
 
-    lda SlopeHeightTable,y
+    lda f:SlopeHeightTable,x
     bne :+
       ; Move the level pointer up and reread
       dec LevelBlockPtr
@@ -507,7 +505,7 @@ GetSlopeYPosCustom:
       bcc :+
         lda PlayerPY
         sbc #$0100 ; Carry already set
-        ora SlopeHeightTable,y
+        ora f:SlopeHeightTable,x
         sta SlopeY
     :
   sec
@@ -524,10 +522,10 @@ GetSlopeYPosBelow:
     lda PlayerPY
     add #$0100
     and #$ff00
-    ora SlopeHeightTable,y
+    ora f:SlopeHeightTable,x
     sta SlopeY
 
-    lda SlopeHeightTable,y
+    lda f:SlopeHeightTable,x
     bne :+
       ; Move the level pointer up and reread
       dec LevelBlockPtr
@@ -536,7 +534,7 @@ GetSlopeYPosBelow:
       jsr IsSlope
       bcc :+
         lda PlayerPY
-        ora SlopeHeightTable,y
+        ora f:SlopeHeightTable,x
         sta SlopeY
     :
   sec
@@ -567,7 +565,7 @@ IsSlope:
   lsr
   lsr
   ora 0
-  tay
+  tax
 
   sec ; Success
   rts
@@ -704,140 +702,3 @@ OfferJumpFromGracePeriod:
   rtl
 .endproc
 
-.export SlopeHeightTable
-.proc SlopeHeightTable
-; MedSlopeL_DL
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; MedSlopeR_DR
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; GradualSlopeL_D1
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; GradualSlopeL_D2
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; GradualSlopeR_D3
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; GradualSlopeR_D4
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; SteepSlopeL_D
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-; SteepSlopeR_D
-.word $00, $00, $00, $00, $00, $00, $00, $00
-.word $00, $00, $00, $00, $00, $00, $00, $00
-
-;MedSlopeL_UL
-.word $f0, $f0, $e0, $e0, $d0, $d0, $c0, $c0
-.word $b0, $b0, $a0, $a0, $90, $90, $80, $80
-
-;MedSlopeL_UR
-.word $70, $70, $60, $60, $50, $50, $40, $40
-.word $30, $30, $20, $20, $10, $10, $00, $00
-
-;MedSlopeR_UL
-.word $00, $00, $10, $10, $20, $20, $30, $30
-.word $40, $40, $50, $50, $60, $60, $70, $70
-
-;MedSlopeR_UR
-.word $80, $80, $90, $90, $a0, $a0, $b0, $b0
-.word $c0, $c0, $d0, $d0, $e0, $e0, $f0, $f0
-
-;SteepSlopeL_U
-.word $f0, $e0, $d0, $c0, $b0, $a0, $90, $80
-.word $70, $60, $50, $40, $30, $20, $10, $00
-
-;SteepSlopeR_U
-.word $00, $10, $20, $30, $40, $50, $60, $70
-.word $80, $90, $a0, $b0, $c0, $d0, $e0, $f0
-
-;GradualSlopeL_U1
-.word $f0, $f0, $f0, $f0, $e0, $e0, $e0, $e0
-.word $d0, $d0, $d0, $d0, $c0, $c0, $c0, $c0
-
-;GradualSlopeL_U2
-.word $b0, $b0, $b0, $b0, $a0, $a0, $a0, $a0
-.word $90, $90, $90, $90, $80, $80, $80, $80
-
-;GradualSlopeL_U3
-.word $70, $70, $70, $70, $60, $60, $60, $60
-.word $50, $50, $50, $50, $40, $40, $40, $40
-
-;GradualSlopeL_U4
-.word $30, $30, $30, $30, $20, $20, $20, $20
-.word $10, $10, $10, $10, $00, $00, $00, $00
-
-;GradualSlopeR_U1
-.word $00, $00, $00, $00, $10, $10, $10, $10
-.word $20, $20, $20, $20, $30, $30, $30, $30
-
-;GradualSlopeR_U2
-.word $40, $40, $40, $40, $50, $50, $50, $50
-.word $60, $60, $60, $60, $70, $70, $70, $70
-
-;GradualSlopeR_U3
-.word $80, $80, $80, $80, $90, $90, $90, $90
-.word $a0, $a0, $a0, $a0, $b0, $b0, $b0, $b0
-
-;GradualSlopeR_U4
-.word $c0, $c0, $c0, $c0, $d0, $d0, $d0, $d0
-.word $e0, $e0, $e0, $e0, $f0, $f0, $f0, $f0
-.endproc
-
-.proc SlopeDirectionTable
-; MedSlopeL_DL
-.word $8000
-; MedSlopeR_DR
-.word $0000
-; GradualSlopeL_D1
-.word $8000
-; GradualSlopeL_D2
-.word $8000
-; GradualSlopeR_D3
-.word $0000
-; GradualSlopeR_D4
-.word $0000
-; SteepSlopeL_D
-.word $8000
-; SteepSlopeR_D
-.word $0000
-;MedSlopeL_UL
-.word $8000
-;MedSlopeL_UR
-.word $8000
-;MedSlopeR_UL
-.word $0000
-;MedSlopeR_UR
-.word $0000
-;SteepSlopeL_U
-.word $8000
-;SteepSlopeR_U
-.word $0000
-;GradualSlopeL_U1
-.word $8000
-;GradualSlopeL_U2
-.word $8000
-;GradualSlopeL_U3
-.word $8000
-;GradualSlopeL_U4
-.word $8000
-;GradualSlopeR_U1
-.word $0000
-;GradualSlopeR_U2
-.word $0000
-;GradualSlopeR_U3
-.word $0000
-;GradualSlopeR_U4
-.word $0000
-.endproc
