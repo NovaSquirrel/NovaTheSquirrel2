@@ -27,6 +27,7 @@
 SlopeBCC = Block::MedSlopeL_DL*2
 SlopeBCS = Block::GradualSlopeR_U4*2+1
 .export SlopeBCC, SlopeBCS
+SlopeY = 2
 
 .export RunAllObjects
 .proc RunAllObjects
@@ -469,6 +470,36 @@ WalkDistance = 0
   lda ObjectPX,x
   add WalkDistance
   sta ObjectPX,x
+  ; Fall into ObjectDownhillFix
+.endproc
+.a16
+.proc ObjectDownhillFix
+
+  ; Going downhill requires special help
+  seta8
+  lda ObjectOnGround,x ; Need to have been on ground last frame
+  beq NoSlopeDown
+  lda ObjectVY+1,x
+  bmi NoSlopeDown
+  seta16
+    jsr ObjectGetSlopeYPos
+    bcs :+
+      ; Try again one block below
+      inc LevelBlockPtr
+      inc LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr ObjectGetSlopeYPosBelow
+      bcc NoSlopeDown
+    :
+
+    lda SlopeY
+    sta ObjectPY,x
+    stz ObjectVY,x
+  NoSlopeDown:
+  seta16
+
+  ; Reset carry to indicate not bumping into something
+  ; because ObjectWalk falls into this
   clc
   rtl
 .endproc
@@ -506,15 +537,7 @@ Skip:
       rtl
   :
 
-  jsl ObjectCheckStandingOnSolid
-  beq :+
-    lda ObjectPY,x
-    and #$ff00
-    sta ObjectPY,x
-    sec
-  :
-  clc
-  rtl
+  jmp ObjectCheckStandingOnSolid
 .endproc
 
 
@@ -525,6 +548,11 @@ Skip:
 .a16
 .export ObjectCheckStandingOnSolid
 .proc ObjectCheckStandingOnSolid
+  seta8
+  stz ObjectOnGround,x
+  seta16
+
+  ; If going upwards, don't check (for now)
   stz 0
   lda ObjectVY,x
   bpl :+
@@ -532,15 +560,137 @@ Skip:
     rtl
   :
 
+  ; Check for slope interaction
+  jsr ObjectGetSlopeYPos
+  bcc :+
+    lda SlopeY
+;    cmp ObjectPY,x
+;    bcs :+
+    sta ObjectPY,x
+    stz ObjectVY,x
+
+    seta8
+    inc ObjectOnGround,x
+    seta16
+    ; Don't do the normal ground check
+    sec
+    rtl
+  :
+
   ; Maybe add checks for the sides
   ldy ObjectPY,x
   lda ObjectPX,x
   jsl ObjectTryVertInteraction
-  asl
+  cmp #$4000
   rol 0
 
   lda 0
+  seta8
+  sta ObjectOnGround,x
+  ; React to touching the ground
+  beq :+
+    stz ObjectPY,x ; Clear the low byte
+    seta16
+    stz ObjectVY,x
+    sec
+    rtl
+  :
+  seta16
+  clc
   rtl
+.endproc
+
+; Get the Y position of the slope under the player's hotspot (SlopeY)
+; and also return if they're on a slope at all (carry)
+.a16
+.proc ObjectGetSlopeYPos
+  ldy ObjectPY,x
+  lda ObjectPX,x
+  jsl GetLevelPtrXY
+  jsr ObjectIsSlope
+  bcc NotSlope
+    phk
+    plb
+    lda ObjectPY,x
+    and #$ff00
+    ora SlopeHeightTable,y
+    sta SlopeY
+
+    lda SlopeHeightTable,y
+    bne :+
+      ; Move the level pointer up and reread
+      dec LevelBlockPtr
+      dec LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr ObjectIsSlope
+      bcc :+
+        lda ObjectPY,x
+        sbc #$0100 ; Carry already set
+        ora SlopeHeightTable,y
+        sta SlopeY
+    :
+  sec
+NotSlope:
+  rts
+.endproc
+
+.a16
+; Similar but for checking one block below
+.proc ObjectGetSlopeYPosBelow
+  jsr ObjectIsSlope
+  bcc NotSlope
+    lda ObjectPY,x
+    add #$0100
+    and #$ff00
+    ora SlopeHeightTable,y
+    sta SlopeY
+
+    lda SlopeHeightTable,y
+    bne :+
+      ; Move the level pointer up and reread
+      dec LevelBlockPtr
+      dec LevelBlockPtr
+      lda [LevelBlockPtr]
+      jsr ObjectIsSlope
+      bcc :+
+        lda ObjectPY,x
+        ora SlopeHeightTable,y
+        sta SlopeY
+    :
+  sec
+NotSlope:
+  rts
+.endproc
+
+.a16
+.proc ObjectIsSlope
+  cmp #SlopeBCC
+  bcc :+
+  cmp #SlopeBCS
+  bcs :+
+  sub #SlopeBCC
+  ; Now we have the block ID times 2
+
+  ; Multiply by 16 to get the index into the slope table
+  asl
+  asl
+  asl
+  asl
+  sta 0
+
+  ; Select the column
+  lda ObjectPX,x
+  and #$f0 ; Get the pixels within a block
+  lsr
+  lsr
+  lsr
+  ora 0
+  tay
+
+  sec ; Success
+  rts
+: clc ; Failure
+  rts
 .endproc
 
 ; Automatically turn around when bumping
@@ -607,6 +757,7 @@ Good:
   lsr
   lsr
   lsr
+  sub #8
   sta 0
 
   lda ObjectPY,x
@@ -620,6 +771,7 @@ Good:
   lsr
   lsr
   lsr
+  sub #16
   sta 2
 
   sec
@@ -634,6 +786,15 @@ Invalid:
 .export DispObject16x16
 .proc DispObject16x16
   sta 4
+
+  ; If facing left, set the X flip bit
+  lda ObjectDirection,x ; Ignore high byte
+  lsr
+  bcc :+
+    lda #OAM_XFLIP
+    tsb 4
+  :
+
   ldy OamPtr
 
   jsr ObjectDrawPosition

@@ -26,7 +26,8 @@
 .segment "ZEROPAGE"
 
 .segment "Player"
-.import SlopeBCC, SlopeBCS, SlopeHeightTable
+.importzp SlopeBCC, SlopeBCS
+.import SlopeHeightTable
 
 .a16
 .i16
@@ -249,9 +250,6 @@ NoFixWalkSpeed:
     lda SlopeY
     sta PlayerPY
     stz PlayerVY
-
-    seta8
-    inc PlayerOnGround
   NoSlopeDown:
   seta16
 
@@ -487,7 +485,6 @@ GetSlopeYPos:
   ldy PlayerPY
   lda PlayerPX
   jsl GetLevelPtrXY
-GetSlopeYPosCustom:
   jsr IsSlope
   bcc NotSlope
     lda PlayerPY
@@ -509,9 +506,7 @@ GetSlopeYPosCustom:
         sta SlopeY
     :
   sec
-  rts
 NotSlope:
-  clc
   rts
 
 .a16

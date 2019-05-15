@@ -72,6 +72,7 @@ ObjectLen = 20
 .globalzp ObjectIndexInLevel
 .globalzp ObjectTimer
 .globalzp ObjectState
+.globalzp ObjectOnGround
 
 ParticleLen = 16
 .global ParticleStart
