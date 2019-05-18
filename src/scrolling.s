@@ -51,7 +51,6 @@ TargetY = 6
 : sta TargetY
 
   ; Move only a fraction of that
-  ; TODO: probably limit speed like in NtS 1?
   lda TargetX
   sub ScrollX
   cmp #$8000
@@ -70,10 +69,12 @@ TargetY = 6
 
   ; Apply the scroll distance
   lda TargetX
+  jsr SpeedLimit
   add ScrollX
   sta ScrollX
 
   lda TargetY
+  jsr SpeedLimit
   add ScrollY
   sta ScrollY
 
@@ -126,6 +127,26 @@ ToTiles:
   lsr ;  | shift out 8 pixels
   lsr ; /
   plp
+  rts
+
+SpeedLimit:
+  ; Take absolute value
+  php
+  bpl :+
+    eor #$ffff
+    inc a
+  :
+  ; Cap it at 8 pixels
+  cmp #$0080
+  bcc :+
+    lda #$0080
+  :
+  ; Undo absolute value
+  plp
+  bpl :+
+    eor #$ffff
+    inc a
+  :
   rts
 .endproc
 
