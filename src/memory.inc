@@ -49,6 +49,8 @@ BLOCK_UPDATE_COUNT = 4
 .global BlockUpdateDataBR
 
 .global LevelBuf
+.global ParallaxTilemap
+
 .global OAM
 .global OAMHI
 OAM_XPOS = OAM+0

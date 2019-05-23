@@ -52,17 +52,21 @@
   bne :-
 
 
-  lda #8*2
+;  lda #8*2
+  lda #1*2
   sta ObjectStart+ObjectType
-  lda #4*256
+  lda #0*256
   sta ObjectStart+ObjectPX
   lda #20*256
   sta ObjectStart+ObjectPY
-
+  lda #0
+  sta ObjectStart+ObjectVX
+  sta ObjectStart+ObjectVY
 
   ; Init player
   lda #4*256
   sta PlayerPX
+  lda #13*256
   sta PlayerPY
 
   ; Clear level buffer
@@ -98,6 +102,14 @@
   lda #GraphicsUpload::SPCannon
   jsl DoGraphicUpload
 
+  lda #GraphicsUpload::BGForest
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::MapBGForest
+  jsl DoGraphicUpload
+  lda #Palette::BGForest
+  ldy #7
+  jsl DoPaletteUpload
+
   ; Upload palettes
   stz CGADDR
   lda #RGB(15,23,31)
@@ -109,6 +121,7 @@
   lda #Palette::FGGrassy
   ldy #1
   jsl DoPaletteUpload
+
   lda #Palette::SPNova
   ldy #8
   jsl DoPaletteUpload
@@ -161,8 +174,8 @@
 
   lda #1 | ($c000 >> 9)
   sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
-  lda #1 | ($d000 >> 9)
-  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens wide
+  lda #2 | ($d000 >> 9)
+  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens tall
   lda #0 | ($e000 >> 9)
   sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
 
@@ -174,7 +187,7 @@
   sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
 
   stz PPURES
-  lda #%00010001  ; enable sprites and plane 0
+  lda #%00010011  ; enable sprites, plane 0 and 1
   sta BLENDMAIN
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
@@ -201,96 +214,127 @@ PlaceholderLevel:
 .endrep
 
 .repeat 5
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2
 .endrep
 
   ; Steep
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 
 .repeat 5
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 .endrep
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2
 
 .repeat 5
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2
 .endrep
 
   ; Medium
 .if 1
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 .endif
 
 .repeat 4
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 .endrep
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
 
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
+  .word 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2
 
 
 .repeat 8
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 2
 .endrep
 .repeat 10
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2
 .endrep
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2
 .repeat 10
+  .word 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
+  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2
 .endrep
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6

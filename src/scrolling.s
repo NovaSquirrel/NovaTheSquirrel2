@@ -167,15 +167,6 @@ YPos = 6
   ora #ForegroundBG>>1
   sta RowUpdateAddress
 
-  ; (Temporary screen blanking used to make sure I was filling the whole visible part)
-  ldx #0
-  lda #1
-: sta RowUpdateBuffer,x
-  inx
-  inx
-  cpx #64*2
-  bne :-
-
   ; Get level pointer address
   ; (Always starts at the leftmost column of the screen)
   lda ScrollX

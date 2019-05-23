@@ -4,3 +4,5 @@
 8800 SPCommon
 A000 SPWalker
 A800 SPCannon
+6000 BGForest
+D000 MapBGForest

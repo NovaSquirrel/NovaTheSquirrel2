@@ -133,5 +133,5 @@
 
 .segment "BSS7F"
   LevelBuf: .res 256*32*2 ; 16KB
-
-
+  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
+  ; 40KB left

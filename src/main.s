@@ -208,5 +208,23 @@ padwait:
   lda 3
   sta BGSCROLLY
 
+  ; Background layer
+  seta16
+  lsr 0
+  lsr 2
+
+  lda 2
+  add #128
+  sta 2
+  seta8
+  lda 0
+  sta BGSCROLLX+2
+  lda 1
+  sta BGSCROLLX+2
+  lda 2
+  sta BGSCROLLY+2
+  lda 3
+  sta BGSCROLLY+2
+
   jmp forever
 .endproc

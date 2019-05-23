@@ -32,6 +32,7 @@ objdir := obj/snes
 srcdir := src
 imgdir4 := tilesets4
 imgdir2 := tilesets2
+bgdir := backgrounds
 
 # If it's not bsnes, it's just BS.  But I acknowledge that being
 # stuck on an old Atom laptop is BS.  Atom N450 can't run bsnes at
@@ -102,6 +103,11 @@ chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 palettes := $(wildcard palettes/*.png)
 
+# Background conversion
+# (nametable conversion is implied)
+backgrounds := $(wildcard backgrounds/*.png)
+chr4allbackground := $(patsubst %.png,%.chrsfc,$(wildcard backgrounds/*.png))
+
 map.txt $(title).sfc: lorom1024k.cfg $(objlisto)
 	$(LD65) -o $(title).sfc -m map.txt -C $^
 	$(PY) tools/fixchecksum.py $(title).sfc
@@ -134,13 +140,14 @@ $(objdir)/object.o: $(srcdir)/blockenum.s
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphics.s
 
 # Automatically insert graphics into the ROM
-$(srcdir)/graphics.s: $(chr2all) $(chr4all) tools/gfxlist.txt
+$(srcdir)/graphics.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
 $(srcdir)/blockdata.s: tools/blocks.txt
 $(srcdir)/blockenum.s: tools/blocks.txt
 	$(PY) tools/makeblocks.py
+$(objdir)/uploadppu.o: $(palettes)
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py
@@ -166,6 +173,9 @@ $(imgdir2)/%.chrgb: $(imgdir2)/%.png
 	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
 $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+$(bgdir)/%.chrsfc: $(bgdir)/%.png
+	$(PY) tools/makebackground.py $<
+
 
 
 # Rules for audio

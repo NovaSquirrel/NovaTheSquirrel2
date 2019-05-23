@@ -24,7 +24,7 @@ for line in text:
 
 	# Look to see if the resource exists as a 2bpp or 4bpp image
 	filename = ""
-	for tryfile in ["tilesets4/%s.chrsfc", "tilesets2/%s.chrgb"]:
+	for tryfile in ["tilesets4/%s.chrsfc", "tilesets2/%s.chrgb", "backgrounds/%s.chrsfc", "backgrounds/%s.namsfc"]:
 		if os.path.isfile(tryfile % name):
 			if len(filename):
 				print("Error: graphic %s exists in more than one format")

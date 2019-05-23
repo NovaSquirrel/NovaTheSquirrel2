@@ -6,5 +6,7 @@
   SPCommon
   SPWalker
   SPCannon
+  BGForest
+  MapBGForest
 .endenum
 
