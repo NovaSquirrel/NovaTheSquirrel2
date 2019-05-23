@@ -48,7 +48,7 @@ endif
 SPCPLAY := gmeplay
 
 ifdef COMSPEC
-PY := py.exe
+PY := py.exe -3 
 else
 PY :=
 endif
