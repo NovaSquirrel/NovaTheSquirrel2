@@ -48,7 +48,10 @@ BLOCK_UPDATE_COUNT = 4
 .global BlockUpdateDataBL
 .global BlockUpdateDataBR
 
+.globalzp LevelColumnSize
+.global GetLevelPtrXY_Ptr
 .global LevelBuf
+.global LevelBufAlt
 .global ParallaxTilemap
 
 .global OAM

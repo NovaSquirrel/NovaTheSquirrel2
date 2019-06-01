@@ -1,5 +1,6 @@
+; Probably use LevelColumnSize instead of these
 LEVEL_WIDTH = 256
-LEVEL_HEIGHT = 32	 
+LEVEL_HEIGHT = 32
 LEVEL_TILE_SIZE = 2
 
 ForegroundBG = $C000

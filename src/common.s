@@ -31,9 +31,14 @@
 .a16
 .i16
 .proc GetLevelPtrXY
+  jmp (GetLevelPtrXY_Ptr)
+.endproc
+
+.export GetLevelPtrXY_Horizontal
+.proc GetLevelPtrXY_Horizontal
   ; Save the coordinates for later access
-  sta BlockRealX
-  sty BlockRealY
+;  sta BlockRealX
+;  sty BlockRealY
 
   ; X position * 64
   lsr

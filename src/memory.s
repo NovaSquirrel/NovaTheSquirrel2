@@ -64,6 +64,8 @@
   TempX:            .res 1 ; for saving the X register
   TempY:            .res 1 ; for saving the Y register
 
+  LevelColumnSize:      .res 2 ; for moving left and right in a level buffer
+
 .segment "BSS" ; First 8KB of RAM
   ObjectSize = 10*2+3
   ObjectStart: .res ObjectLen*ObjectSize
@@ -120,6 +122,7 @@
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
 
+  GetLevelPtrXY_Ptr: .res 2 ; Pointer for how to handle getting a pointer from an X and Y position
 
   PlayerAccelSpeed: .res 2
   PlayerDecelSpeed: .res 2
@@ -132,6 +135,7 @@
 
 
 .segment "BSS7F"
-  LevelBuf: .res 256*32*2 ; 16KB
+  LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
+  LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
   ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   ; 40KB left

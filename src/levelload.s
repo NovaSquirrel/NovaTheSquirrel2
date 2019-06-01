@@ -22,6 +22,7 @@
 .include "blockenum.s"
 .smart
 .import GameMainLoop
+.import GetLevelPtrXY_Horizontal
 
 .segment "CODE"
 
@@ -52,6 +53,15 @@
   bne :-
 
 
+  ; Load the level
+  ; Set defaults for horizontal levels
+  lda #.loword(GetLevelPtrXY_Horizontal)
+  sta GetLevelPtrXY_Ptr
+  lda #32*2 ; 32 blocks tall
+  sta LevelColumnSize
+
+
+  ; Placeholder information:
 ;  lda #8*2
   lda #1*2
   sta ObjectStart+ObjectType
@@ -73,6 +83,7 @@
   lda #0
   tax
 : sta f:LevelBuf,x
+  sta f:LevelBufAlt,x
   inx
   inx
   cpx #256*32*2
