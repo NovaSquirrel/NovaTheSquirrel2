@@ -36,6 +36,41 @@
   phk
   plb
 
+  jsl DecompressLevel
+
+  lda #Palette::SPNova
+  ldy #8
+  jsl DoPaletteUpload
+
+  lda #GraphicsUpload::MapBGForest
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::SPCommon
+  jsl DoGraphicUpload
+
+  ; Copy in a placeholder level
+  ldx #0
+: lda PlaceholderLevel,x
+  sta f:LevelBuf,x
+  inx
+  inx
+  cpx #PlaceholderLevelEnd-PlaceholderLevel
+  bne :-
+
+  ; -----------------------------------
+
+  jsl RenderLevelScreens
+
+  jml GameMainLoop
+.endproc
+
+; Accumulator = level number
+.a16
+.i16
+.proc DecompressLevel
+  sta LevelNumber
+
+  ; Clear out some buffers before the level loads stuff into them
+
   ; Init entities
   ldx #ObjectStart
 : stz 0,x
@@ -52,126 +87,166 @@
   cpx #ParticleEnd
   bne :-
 
+  ; Clear level buffer
+  lda #0
+  ldx #256*32*2-2
+: sta f:LevelBuf,x
+  sta f:LevelBufAlt,x
+  dex
+  dex
+  bpl :-
 
-  ; Load the level
+  ; Clear ColumnBytes
+  ; lda #0 <--- not needed, still zero
+  ldx #256-2
+: sta f:ColumnBytes,x
+  dex
+  dex
+  bpl :-
+
   ; Set defaults for horizontal levels
   lda #.loword(GetLevelPtrXY_Horizontal)
   sta GetLevelPtrXY_Ptr
   lda #32*2 ; 32 blocks tall
   sta LevelColumnSize
 
-
-  ; Placeholder information:
-;  lda #8*2
-  lda #1*2
-  sta ObjectStart+ObjectType
-  lda #0*256
-  sta ObjectStart+ObjectPX
-  lda #20*256
-  sta ObjectStart+ObjectPY
-  lda #0
-  sta ObjectStart+ObjectVX
-  sta ObjectStart+ObjectVY
-
-  ; Init player
-  lda #4*256
-  sta PlayerPX
-  lda #13*256
-  sta PlayerPY
-
-  ; Clear level buffer
-  lda #0
-  tax
-: sta f:LevelBuf,x
-  sta f:LevelBufAlt,x
-  inx
-  inx
-  cpx #256*32*2
-  bne :-
-
-  ; Copy in a placeholder level
-  ldx #0
-: lda PlaceholderLevel,x
-  sta f:LevelBuf,x
-  inx
-  inx
-  cpx #PlaceholderLevelEnd-PlaceholderLevel
-  bne :-
-
-
-  ; Upload graphics
-  lda #GraphicsUpload::FGCommon
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::FGGrassy
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::FGTropicalWood
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPCommon
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPWalker
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPCannon
-  jsl DoGraphicUpload
-
-  lda #GraphicsUpload::BGForest
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::MapBGForest
-  jsl DoGraphicUpload
-  lda #Palette::BGForest
-  ldy #7
-  jsl DoPaletteUpload
-
-  ; Upload palettes
-  stz CGADDR
-  lda #RGB(15,23,31)
-  sta CGDATA
-  ; ---
-  lda #Palette::FGCommon
-  ldy #0
-  jsl DoPaletteUpload
-  lda #Palette::FGGrassy
-  ldy #1
-  jsl DoPaletteUpload
-
-  lda #Palette::SPNova
-  ldy #8
-  jsl DoPaletteUpload
-  lda #Palette::FGCommon
-  ldy #9
-  jsl DoPaletteUpload
-  lda #Palette::SPWalker
-  ldy #15
-  jsl DoPaletteUpload
-  lda #Palette::SPCannon
-  ldy #14
-  jsl DoPaletteUpload
-
-  ; Write this information to the slot tables
-  lda #$ffff
-  sta SpriteTileSlots
-  sta SpriteTileSlots+2
-  sta SpriteTileSlots+4
-  sta SpriteTileSlots+6
-  sta SpriteTileSlots+8
-  sta SpriteTileSlots+10
-  sta SpriteTileSlots+12
-  sta SpriteTileSlots+14
-
-  sta SpritePaletteSlots+0
-  sta SpritePaletteSlots+2
-  lda #Palette::SPCannon
-  sta SpritePaletteSlots+4
-  lda #Palette::SPWalker
-  sta SpritePaletteSlots+6
-
-  lda #GraphicsUpload::SPWalker
-  sta SpriteTileSlots+0
-  lda #GraphicsUpload::SPCannon
-  sta SpriteTileSlots+4
+  seta8
+  ; Clear a bunch of stuff in one go that's in contiguous space in memory
+  ldx #LevelZeroWhenLoad_End-LevelZeroWhenLoad_Start-1
+: stz LevelZeroWhenLoad_Start,x
+  dex
+  bpl :-
 
   ; -----------------------------------
 
+  ; Parse the level header
+  ; (Replace with a lookup later)
+  lda #<SampleLevelHeader
+  sta DecodePointer+0
+  lda #>SampleLevelHeader
+  sta DecodePointer+1
+  lda #^SampleLevelHeader
+  sta DecodePointer+2
+
+  ; Music and starting player direction
+  lda [DecodePointer]
+  and #128
+  sta PlayerDir
+
+  ldy #1
+  ; Starting X position
+  lda [DecodePointer],y
+  sta PlayerPX+1
+  stz PlayerPX+0
+
+  iny ; Y = 2
+  ; Starting Y position
+  lda [DecodePointer],y
+  and #31
+  sta PlayerPY+1
+  stz PlayerPY+0
+
+  ; Vertical scrolling and layer 2 flags
+  iny ; Y = 3
+  ; (Don't do anything with yet)
+
+  ; Background color
+  iny ; Y = 4
+  stz CGADDR
+  lda [DecodePointer],y
+  sta LevelBackgroundColor+0
+  sta CGDATA
+  iny ; Y = 5
+  lda [DecodePointer],y
+  sta LevelBackgroundColor+1
+  sta CGDATA
+
+  iny ; Y = 6
+  ; Background, two bytes
+  ; (Don't do anything with yet)
+  iny ; Y = 7
+  ; Unused background byte
+
+  ; Sprite data pointer
+  iny ; Y = 8
+  lda [DecodePointer],y
+  sta LevelSpritePointer+0
+  iny ; Y = 9
+  lda [DecodePointer],y
+  sta LevelSpritePointer+1
+  lda DecodePointer+2
+  sta LevelSpritePointer+2
+
+  ; Scroll barriers
+  ; Convert from bit array to byte array for easier access
+  lda #1
+  sta ScreenFlags+0    ; first screen has left boundary
+  sta ScreenFlagsDummy ; last screen has right boundary
+  iny ; Y = 10
+  ldx #0
+  lda [DecodePointer],y
+: asl
+  rol ScreenFlags+1,x
+  inx
+  cpx #8 ; move onto the next byte after we're done with the first
+  bne :+
+    iny ; Y = 11
+    lda [DecodePointer],y
+  :
+  cpx #15
+  beq :+
+  bne :--
+:
+
+  iny ; Y = 12
+  ; Sprite graphic slots
+  ldx #0
+: lda [DecodePointer],y
+  iny
+  sta SpriteTileSlots+0,x
+  stz SpriteTileSlots+1,x
+  cmp #255
+  beq :+
+    jsl DoGraphicUpload
+  : 
+  inx
+  inx
+  cpx #8*2
+  bne :--
+
+  ; Background palettes
+  ldx #0
+: lda [DecodePointer],y
+  iny
+  phy
+  txy
+  jsl DoPaletteUpload
+  ply
+  inx
+  cpx #8
+  bne :-
+
+  ; Graphical assets
+: lda [DecodePointer],y
+  iny
+  cmp #255
+  beq :+
+  jsl DoGraphicUpload
+  bra :-
+:
+
+  ; Level data pointer
+  lda [DecodePointer],y
+  pha
+  iny
+  lda [DecodePointer],y
+  sta DecodePointer+1
+  pla
+  sta DecodePointer+0
+
+  ; -----------------------------------
   ; Set up PPU registers
+  ; (Is this the appropriate place for this?)
   seta8
   lda #1
   sta BGMODE       ; mode 1
@@ -204,18 +279,52 @@
   sta PPUNMI
   setaxy16
 
-  jsl RenderLevelScreens
-
-  jml GameMainLoop
-.endproc
-
-; Accumulator = level number
-.a16
-.i16
-.proc DecompressLevel
-  sta LevelNumber
   rtl
 .endproc
+
+
+
+SampleLevelHeader:
+  .byt 0   ; No music, and facing right
+  .byt 5   ; start at X position 5
+  .byt 13  ; start at Y position 13 
+  .byt $40 ; vertical scrolling allowed
+  .word RGB(15,23,31) ; background color
+  .word 1  ; background
+  .addr SampleLevelSprite
+  .word 0  ; No scroll barriers
+  ; Eight sprite graphic slots
+  .byt GraphicsUpload::SPWalker
+  .byt GraphicsUpload::SPCannon
+  .byt 255
+  .byt 255
+  .byt 255
+  .byt 255
+  .byt 255
+  .byt 255
+  ; Eight background palette slots
+  .byt Palette::FGCommon
+  .byt Palette::FGGrassy
+  .byt 255
+  .byt 255
+  .byt 255
+  .byt 255
+  .byt 255
+  .byt Palette::BGForest 
+  ; Level graphic assets
+  .byt GraphicsUpload::FGCommon
+  .byt GraphicsUpload::FGGrassy
+  .byt GraphicsUpload::FGTropicalWood
+  .byt GraphicsUpload::BGForest
+  .byt 255
+  ; Pointer to the level foreground data
+  .addr SampleLevelData
+
+SampleLevelData:
+  .byt $f0
+
+SampleLevelSprite:
+  .byt $ff
 
 
 PlaceholderLevel:

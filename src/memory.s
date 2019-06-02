@@ -64,7 +64,9 @@
   TempX:            .res 1 ; for saving the X register
   TempY:            .res 1 ; for saving the Y register
 
-  LevelColumnSize:      .res 2 ; for moving left and right in a level buffer
+  LevelColumnSize:  .res 2 ; for moving left and right in a level buffer
+  DecodePointer:    .res 3 ; multipurpose 24-bit pointer
+  LevelSpritePointer: .res 3
 
 .segment "BSS" ; First 8KB of RAM
   ObjectSize = 10*2+3
@@ -131,11 +133,27 @@
   PlayerJumpCancel: .res 1
   PlayerWantsToJump: .res 1    ; true if player pressed the jump button
 
+  LevelBackgroundColor:   .res 2
+
+
+; All of these are cleared in one go at the start of level decompression
+LevelZeroWhenLoad_Start:
+  ScreenFlags:            .res 16
+  ScreenFlagsDummy:       .res 1
+
+  ; For speeding up actor spawning
+  ; (keeps track of which actor index is the first one on a particular screen)
+  ; Multiply by 4 to use it.
+  FirstActorOnScreen:     .res 16
+LevelZeroWhenLoad_End:
+
 .segment "BSS7E"
 
 
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
   LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
+  ColumnBytes: .res 256
+
   ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
-  ; 40KB left
+

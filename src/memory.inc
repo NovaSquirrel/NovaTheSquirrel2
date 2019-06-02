@@ -28,6 +28,7 @@
 .globalzp TempVal
 .globalzp TempX
 .globalzp TempY
+.globalzp DecodePointer
 
 .global PlayerJumpCancel
 .global PlayerJumpCancelLock
@@ -52,7 +53,12 @@ BLOCK_UPDATE_COUNT = 4
 .global GetLevelPtrXY_Ptr
 .global LevelBuf
 .global LevelBufAlt
+.global ColumnBytes
 .global ParallaxTilemap
+.global LevelActorList
+.global FirstActorOnScreen
+
+
 
 .global OAM
 .global OAMHI
@@ -96,3 +102,15 @@ ParticleLen = 16
 .globalzp LevelNumber
 .globalzp StartedLevelNumber
 .globalzp NeedLevelReload
+
+; ScreenFlags stores flags for each screen in the level; so far there's just one flag:
+SCREEN_BOUNDARY = 1 ; boundary on left side of screen
+
+.global LevelZeroWhenLoad_Start
+.global LevelZeroWhenLoad_End
+
+.global ScreenFlags
+.global ScreenFlagsDummy
+.global LevelBackgroundColor
+.globalzp LevelSpritePointer
+
