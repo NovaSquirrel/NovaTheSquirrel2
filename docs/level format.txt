@@ -1,0 +1,110 @@
+.---------------------------------------
+| Level header
+'---------------------------------------
+
+0        1        2        3
+DMMMMMMM XXXXXXXX ...YYYYY VvLI.... 
+D = If 1, player starts facing left
+M = Background music
+X = Starting X position (or Y position, for vertical levels)
+Y = Starting Y position (or X position, for vertical levels)
+V = Vertical level
+v = Enable vertical scrolling (or horizontal scrolling, for vertical levels)
+L = Layer 2 level
+I = Layer 2 interaction
+Room for more flags
+
+4        5
+gggrrrrr .bbbbbgg
+RGB Level background color
+
+6       7
+BBBBBBBB ........
+B = Background ID (or 255 for no background)
+Room for more flags
+
+8        9       
+ssssssss SSSSSSSS
+s = Low byte of sprite list pointer
+S = High byte of sprite list pointer
+
+10       11
+abcdefgh ijklmno.
+Insert vertical scroll barriers between screens:
+Bits:     a b c d e f g h i j k l m n o
+Screens: 0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F
+
+12 13 14 15 16 17 18 19
+Eight 8-bit sprite graphic slot values
+
+20 21 22 23 24 25 26 27
+Eight 8-bit background palette values
+
+28+
+gggggggg
+g = 8-bit graphical asset list, mostly tiles
+
+??
+11111111
+End of graphic asset list
+
+??
+llllllll LLLLLLLL
+l = Low byte of level data pointer
+L = High byte of level data pointer
+
+.---------------------------------------
+| Background settings
+'---------------------------------------
+0        1
+TWvvvhhh ........
+T = If 1, background is two screens tall
+W = If 1, background is two screens wide
+v = Vertical speed of background (index into same, but also controls )
+h = Horizontal speed of background (index into 1:1, 1:2, 1:4, 1:8, 1:16, 1:32 or 1:64)
+Room for some more flags
+
+After this is a compressed tilemap. Tileset is listed in the per-level tileset.
+
+.---------------------------------------
+| Level data
+'---------------------------------------
+Level data:
+TTTTTTTY YYYYXXXX [SSSSSSSS]
+T - Object type (0-119)
+Y - Y position absolute (0-31)
+X - X position relative (0-15)
+S - Settings byte, if needed
+    (may be more than one byte)
+
+.---------------------------------------
+| Level data (commands)
+'---------------------------------------
+Level commands
+1111TTTT [SSSSSSSS]
+T - 0 level is over, stop processing
+    1 set X to S
+    2 write 1 column byte at current column
+    3 write 2 column bytes starting at this column
+    4 write 3 column bytes starting at this column
+    5 current X -= 16
+    6 current X += 16
+    7 special command (S selects which one, and additional parameters are taken)
+    8-F: Reserved
+
+Special commands:
+(Numbers not assigned)
+Switch to filling in the alternate level
+Layer 3 effects
+Per-level assembly routine
+
+.---------------------------------------
+| Sprite/actor data
+'---------------------------------------
+XXXXXXXX D..YYYYY tttttttt abcdTTTT
+tT - Sprite number (T is higher bits)
+D - direction (1 is left)
+abcd - misc sprite information
+X - X position (0-255) (or Y position for vertical levels)
+Y - Y position (0-31)  (or X position for vertical levels)
+List ends in $ff (so you can't put anything on the rightmost column)

@@ -33,8 +33,8 @@
 
   LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks. 00xxxxxxxxyyyyy0
   BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
-  BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr
-  BlockRealY:    .res 2 ; Real Y coordinate used to calculate LevelBlockPtr
+  BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr (Unused)
+  BlockRealY:    .res 2 ; Real Y coordinate used to calculate LevelBlockPtr (Unused)
   BlockTemp:     .res 4 ; Temporary bytes for block interaction routines specifically
 
   PlayerPX:        .res 2 ; \ player X and Y positions
@@ -140,6 +140,7 @@
 LevelZeroWhenLoad_Start:
   ScreenFlags:            .res 16
   ScreenFlagsDummy:       .res 1
+  VerticalLevelFlag:      .res 1
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)

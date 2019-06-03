@@ -298,9 +298,3 @@ t 10,0 11,0
 +GradualSlopeR_U4
 t 0:0 0:0
 t 12,0 13,0
-
-+LedgeSlopeAdjacent
-when Above, BlockSlopeAdjacent
-solid_top
-t 1,2 1,2
-t 1,3 1,3

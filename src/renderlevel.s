@@ -295,8 +295,8 @@ Loop:
 
   ; Next column
   lda LevelBlockPtr
-  add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
-  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
+  add LevelColumnSize
+  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
   sta LevelBlockPtr
 
   ; Wrap around in the buffer
@@ -342,8 +342,8 @@ Loop:
 
   ; Next column
   lda LevelBlockPtr
-  add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
-  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
+  add LevelColumnSize
+  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
   sta LevelBlockPtr
 
   ; Wrap around in the buffer

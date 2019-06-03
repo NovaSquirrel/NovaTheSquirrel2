@@ -13,6 +13,8 @@
 .proc GetLevelColumnPtr
   ; Multiply by 32 (level height) and then once more for 16-bit values
   and #255
+  bit VerticalLevelFlag-1 ; Check high bit
+  bmi :+
   asl ; * 2
   asl ; * 4
   asl ; * 8
@@ -20,6 +22,15 @@
   asl ; * 32
   asl ; * 64
   sta LevelBlockPtr
+
+  lda [LevelBlockPtr],y
+  rtl
+
+: ; For vertical levels, a column is 512 bytes instead
+  xba ; * 256
+  asl ; * 512
+  sta LevelBlockPtr
+
   lda [LevelBlockPtr],y
   rtl
 .endproc
@@ -31,6 +42,8 @@
 .a16
 .i16
 .proc GetLevelPtrXY
+  ; Maybe alternatively branch on VerticalLevelFlag,
+  ; but an indirect jump is 5 cycles and that's hard to beat
   jmp (GetLevelPtrXY_Ptr)
 .endproc
 
@@ -54,6 +67,26 @@
   and #63
   tsb LevelBlockPtr
   ; 00xxxxxxxxyyyyy0
+
+  lda [LevelBlockPtr]
+  rtl
+.endproc
+
+.export GetLevelPtrXY_Vertical
+.proc GetLevelPtrXY_Vertical
+  ; X position * 512
+  asl
+  and #%0011111000000000
+  sta LevelBlockPtr
+  ; 00xxxxx000000000
+
+  ; Y position
+  tya
+  xba
+  asl
+  and #511
+  tsb LevelBlockPtr
+  ; 00xxxxxyyyyyyyy0
 
   lda [LevelBlockPtr]
   rtl

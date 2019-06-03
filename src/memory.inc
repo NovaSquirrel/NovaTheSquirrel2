@@ -113,4 +113,4 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global ScreenFlagsDummy
 .global LevelBackgroundColor
 .globalzp LevelSpritePointer
-
+.global VerticalLevelFlag

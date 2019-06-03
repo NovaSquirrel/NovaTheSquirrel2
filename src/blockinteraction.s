@@ -23,7 +23,7 @@
 
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
-.export BlockSign, BlockSpikes, BlockSpring, BlockLadder, BlockSlopeAdjacent
+.export BlockSign, BlockSpikes, BlockSpring, BlockLadder
 
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -250,13 +250,3 @@ Skip:
   rts
 .endproc
 
-.a16
-.proc BlockSlopeAdjacent
-  ; Check block under hotspot
-  lda PlayerPX
-  ldy PlayerPY
-  jsl GetLevelPtrXY
-  ; Use the flags for the block under the hotspot instead
-  jsl GetBlockFlag
-  rts
-.endproc

@@ -20,9 +20,10 @@
 .include "graphicsenum.s"
 .include "paletteenum.s"
 .include "blockenum.s"
+.include "leveldata.inc"
 .smart
 .import GameMainLoop
-.import GetLevelPtrXY_Horizontal
+.import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
 
 .segment "CODE"
 
@@ -33,6 +34,8 @@
   setaxy16
   sta StartedLevelNumber
 
+  ; Will access the level data with 24-bit pointers.
+  ; Set data bank to this bank for lookup tables.
   phk
   plb
 
@@ -47,22 +50,14 @@
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
 
-  ; Copy in a placeholder level
-  ldx #0
-: lda PlaceholderLevel,x
-  sta f:LevelBuf,x
-  inx
-  inx
-  cpx #PlaceholderLevelEnd-PlaceholderLevel
-  bne :-
-
-  ; -----------------------------------
-
   jsl RenderLevelScreens
 
   jml GameMainLoop
 .endproc
 
+; .----------------------------------------------------------------------------
+; | Header parsing
+; '----------------------------------------------------------------------------
 ; Accumulator = level number
 .a16
 .i16
@@ -148,7 +143,31 @@
 
   ; Vertical scrolling and layer 2 flags
   iny ; Y = 3
-  ; (Don't do anything with yet)
+  lda [DecodePointer],y
+  bpl :+
+    ; (Is a vertical level)
+    ; Swap starting X and Y positions
+    lda PlayerPX+1
+    pha
+    lda PlayerPY+1
+    sta PlayerPX+1
+    pla
+    sta PlayerPX+1
+
+    lda #<GetLevelPtrXY_Vertical
+    sta GetLevelPtrXY_Ptr+0
+    lda #>GetLevelPtrXY_Vertical
+    sta GetLevelPtrXY_Ptr+1
+
+    ; In vertical levels, columns are 256 blocks tall, multiplied by 2 bytes
+    stz LevelColumnSize+0
+    lda #2
+    sta LevelColumnSize+1
+
+    dec VerticalLevelFlag ; Set it to 255
+  :
+  ; (TODO: use the other flags)
+
 
   ; Background color
   iny ; Y = 4
@@ -279,11 +298,160 @@
   sta PPUNMI
   setaxy16
 
+  ; -----------------------------------
+
+  ; Now use the new DecodePointer to decompress the level data
   rtl
 .endproc
 
+; .----------------------------------------------------------------------------
+; | Level command templates
+; '----------------------------------------------------------------------------
+.enum
+  SPECIAL_ROUTINE      = 0   ; ??
+  BLOCK_SINGLE         = 2   ; TT XY
+  BLOCK_RECTANGLE      = 4   ; TT XY WH
+  BLOCK_WIDE_FROM_LIST = 6   ; TT XY Wm
+  BLOCK_TALL_FROM_LIST = 8   ; TT XY Hm
+  BLOCK_RECT_FROM_LIST = 10  ; TT XY Hm WW
+.endenum
 
 
+; Make sure to keep synchronized with the LO enum in leveldata.inc
+; Maxes out at 120 commands? Last 8 correspond to special commands.
+.proc LevelCommands
+  .word $ffff&CustomBlockSingle,    0
+  .word $ffff&CustomBlockRectangle, 0
+
+  .word $ffff&BlockWideList,        32*0
+  .word $ffff&BlockTallList,        32*0
+  .word $ffff&BlockRectList,        32*0
+  .word $ffff&BlockWideList,        32*1
+  .word $ffff&BlockTallList,        32*1
+  .word $ffff&BlockRectList,        32*1
+  .word $ffff&BlockWideList,        32*2
+  .word $ffff&BlockTallList,        32*2
+  .word $ffff&BlockRectList,        32*2
+
+  .word $ffff&BlockRectangle,       Block::Empty
+  .word $ffff&BlockRectangle,       Block::Bricks
+  .word $ffff&BlockRectangle,       Block::SolidBlock
+  .word $ffff&BlockRectangle,       Block::Ice
+  .word $ffff&BlockRectangle,       Block::LedgeMiddle
+  .word $ffff&BlockSingle,          Block::Bricks
+  .word $ffff&BlockSingle,          Block::Prize
+  .word $ffff&BlockSingle,          Block::SolidBlock
+  .word $ffff&BlockSingle,          Block::PickupBlock
+  .word $ffff&BlockSingle,          Block::PushBlock
+  .word $ffff&BlockSingle,          Block::Heart
+  .word $ffff&BlockSingle,          Block::SmallHeart
+  .word $ffff&BlockSingle,          Block::Sign
+  .word $ffff&BlockSingle,          Block::Money
+  .word $ffff&BlockSingle,          Block::Spring
+  .word $ffff&BlockSingle,          Block::Rock
+  .word $ffff&BlockSingle,          Block::LedgeLeft
+  .word $ffff&BlockSingle,          Block::LedgeRight
+  .word $ffff&BlockSingle,          Block::LedgeSolidLeft
+  .word $ffff&BlockSingle,          Block::LedgeSolidRight
+.assert (* - LevelCommands) < 120*4, error, "Too many level commands defined"
+.endproc
+
+; Used with BlockWideList, BlockTallList and BlockRectList
+.proc NybbleTypesList
+; Set 1
+  .word Block::Empty
+  .word Block::Ladder
+  .word Block::SpikesUp
+  .word Block::SpikesDown
+  .word Block::Ledge
+  .word Block::Money
+  .word Block::PickupBlock
+  .word Block::PushBlock
+  .word Block::LedgeMiddle
+  .word Block::Prize
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+; Set 2
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+; Set 3
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+.endproc
+
+; .----------------------------------------------------------------------------
+; | Actual handlers for the command templates
+; '----------------------------------------------------------------------------
+.a8
+.proc BlockSingle
+  rts
+.endproc
+
+.a8
+.proc BlockRectangle
+  rts
+.endproc
+
+.a8
+.proc CustomBlockSingle
+  rts
+.endproc
+
+.a8
+.proc CustomBlockRectangle
+  rts
+.endproc
+
+.a8
+.proc BlockWideList
+  rts
+.endproc
+
+.a8
+.proc BlockTallList
+  rts
+.endproc
+
+.a8
+.proc BlockRectList
+  rts
+.endproc
+
+; .----------------------------------------------------------------------------
+; | Sample level while there isn't a level directory yet
+; '----------------------------------------------------------------------------
 SampleLevelHeader:
   .byt 0   ; No music, and facing right
   .byt 5   ; start at X position 5
@@ -321,141 +489,12 @@ SampleLevelHeader:
   .addr SampleLevelData
 
 SampleLevelData:
-  .byt $f0
+  LObjN LO::R_SolidBlock,   0, 30,    15, 1
+  LObj  LO::S_Spring,       4, 29
+  LObj  LO::S_PickupBlock,  1, 29
+  LObj  LO::S_PushBlock,    1, 29
+  LObjN LO::R_Ice,          1, 25,    4, 4
+  LFinished
 
 SampleLevelSprite:
   .byt $ff
-
-
-PlaceholderLevel:
-.repeat 3
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
-.endrep
-
-.repeat 5
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2
-.endrep
-
-  ; Steep
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeL_U*2, Block::SteepSlopeL_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-.repeat 5
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-.endrep
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::SteepSlopeR_U*2, Block::SteepSlopeR_D*2, Block::LedgeMiddle*2
-
-.repeat 5
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::Ledge*2, Block::LedgeMiddle*2
-.endrep
-
-  ; Medium
-.if 1
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UL*2, Block::MedSlopeL_DL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeL_UR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-.endif
-
-.repeat 4
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::LedgeSlopeAdjacent*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-.endrep
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UL*2, Block::LedgeMiddle*2, Block::LedgeMiddle*2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Block::MedSlopeR_UR*2, Block::MedSlopeR_DR*2, Block::LedgeMiddle*2
-
-
-.repeat 8
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 2, 2
-.endrep
-.repeat 10
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2
-.endrep
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2
-.repeat 10
-  .word 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2
-.endrep
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6
-PlaceholderLevelEnd:
