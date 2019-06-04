@@ -96,6 +96,13 @@
   dex
   bpl :-
 
+  ; Clear sprite palette slots
+  lda #$ffff
+  sta SpritePaletteSlots+2*0
+  sta SpritePaletteSlots+2*1
+  sta SpritePaletteSlots+2*2
+  sta SpritePaletteSlots+2*3
+
   ; Clear ColumnBytes
   ; lda #0 <--- not needed, still zero
   ldx #256-2
@@ -333,8 +340,6 @@ DecodeValue  = 6 ; and 7
 .a8
 .i16
 .proc LevelDecodeCommand
-  wdm 0
-
   jsr NextLevelByte
   sta DecodeType
   cmp #$f0
@@ -447,10 +452,11 @@ Horizontal:
 .endproc
 
 ; Get a byte and step the pointer
+.a8
 .proc NextLevelByte
   lda [DecodePointer]
   inc DecodePointer+0
-  beq :+
+  bne :+
   inc DecodePointer+1
 : rts
 .endproc
@@ -557,7 +563,7 @@ Horizontal:
 ; | Actual handlers for the command templates
 ; '----------------------------------------------------------------------------
 .a8
-.proc BlockSingle
+.proc BlockSingle ; XY
   jsr XYLevelByte
   lda LevelCommands+2,x
   sta [LevelBlockPtr],y
@@ -568,18 +574,18 @@ Horizontal:
 .endproc
 
 .a8
-.proc BlockRectangle
+.proc BlockRectangle ; XY WH
   jsr XYLevelByte
-  jsr NextLevelByte
+  lda LevelCommands+2,x
   sta DecodeValue+0
-  iny
-  jsr NextLevelByte
+  lda LevelCommands+3,x
   sta DecodeValue+1
+  jsr NextLevelByte
   jmp DecodeWriteRectangleConvert
 .endproc
 
 .a8
-.proc CustomBlockSingle
+.proc CustomBlockSingle ; XY TT TT
   jsr XYLevelByte
   jsr NextLevelByte
   sta [LevelBlockPtr],y
@@ -590,12 +596,14 @@ Horizontal:
 .endproc
 
 .a8
-.proc CustomBlockRectangle
+.proc CustomBlockRectangle ; XY TT TT WH
   jsr XYLevelByte
+  jsr NextLevelByte
   lda LevelCommands+2,x
-  sta DecodeValue+0
+  jsr NextLevelByte
   lda LevelCommands+3,x
   sta DecodeValue+1
+  jsr NextLevelByte
   jmp DecodeWriteRectangleConvert
 .endproc
 
@@ -613,7 +621,7 @@ Horizontal:
 .endproc
 
 .a8
-.proc BlockWideList
+.proc BlockWideList ; XY WT
   jsr XYLevelByte
   jsr NextLevelByte
   stz DecodeHeight
@@ -629,7 +637,7 @@ Horizontal:
 .endproc
 
 .a8
-.proc BlockTallList
+.proc BlockTallList ; XY HT
   jsr XYLevelByte
   jsr NextLevelByte
   stz DecodeWidth
@@ -645,7 +653,7 @@ Horizontal:
 .endproc
 
 .a8
-.proc BlockRectList
+.proc BlockRectList ; XY HT WW
   jsr XYLevelByte
   jsr NextLevelByte
   pha
@@ -711,8 +719,8 @@ RowLoop:
 ; '----------------------------------------------------------------------------
 SampleLevelHeader:
   .byt 0   ; No music, and facing right
-  .byt 5   ; start at X position 5
-  .byt 13  ; start at Y position 13 
+  .byt 3   ; start at X position 3
+  .byt 13  ; start at Y position 13
   .byt $40 ; vertical scrolling allowed
   .word RGB(15,23,31) ; background color
   .word 1  ; background
@@ -746,12 +754,22 @@ SampleLevelHeader:
   .addr SampleLevelData
 
 SampleLevelData:
-  LFinished
-  LObj  LO::S_Spring,       4, 29
-;  LObjN LO::R_SolidBlock,   0, 30,    15, 1
+  LObjN LO::R_SolidBlock,   0,  30,    15, 1
+  LObjN LO::R_Ice,          4,  28,     1, 1
+  LObjN LO::R_Ice,          12, 28,     1, 1
+
+
+
 ;  LObj  LO::S_PickupBlock,  1, 29
 ;  LObj  LO::S_PushBlock,    1, 29
 ;  LObjN LO::R_Ice,          1, 25,    4, 4
+;  LObj  LO::S_Bricks,    1, 29
+;  LObj  LO::S_Bricks,    1, 28
+;  LObj  LO::S_Bricks,    1, 27
+;  LObj  LO::S_Bricks,    1, 26
+;  LObj  LO::S_PushBlock,    1, 29
+;  LObj  LO::S_Spring,       4, 29
+  LFinished
 
 SampleLevelSprite:
   .byt $ff

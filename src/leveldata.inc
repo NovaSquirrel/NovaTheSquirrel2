@@ -70,7 +70,7 @@
 .macro LObj Type, XPos, YPos, Extra1, Extra2
   .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
   .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
-  .byt (Type<<1) | (YPos>>5)
+  .byt (Type<<1) | (YPos>>4)
   .byt (XPos<<4) | (YPos&15)
   .ifnblank Extra1
     .byt Extra1
