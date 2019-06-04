@@ -168,6 +168,17 @@ SkipBlock:
   bpl BlockUpdateLoop
 
 
+  ; Handle palette requests
+  lda PaletteRequestIndex
+  and #255
+  beq :+
+    tay
+    lda PaletteRequestValue ; Do 16-bit read anyway because DoPaletteUpload will mask off the high byte
+    jsl DoPaletteUpload
+    stz PaletteRequestIndex ; Also clears the value since it's the next byte
+  :
+
+
   ; -----------------------------------
   jsl PlayerFrameUpload
 

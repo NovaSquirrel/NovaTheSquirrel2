@@ -100,8 +100,10 @@
   ParticleTimer      = 10
 
   ; For automatically detecting which tile slot or palette has the right data
-  SpriteTileSlots: .res 2*8
-  SpritePaletteSlots: .res 2*4
+  SpriteTileSlots:     .res 2*8
+  SpritePaletteSlots:  .res 2*4
+
+
 
   OAM:   .res 512
   OAMHI: .res 512
@@ -140,6 +142,13 @@ LevelZeroWhenLoad_Start:
   ScreenFlags:            .res 16
   ScreenFlagsDummy:       .res 1
   VerticalLevelFlag:      .res 1
+
+  ; How many objects use each of the four palette slots, for detecting when one is free
+  PaletteInUse:        .res 4
+  PaletteInUseLast:    .res 4
+  ; Dynamically uploading sprite palettes
+  PaletteRequestIndex: .res 1
+  PaletteRequestValue: .res 1
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)

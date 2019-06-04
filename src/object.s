@@ -33,6 +33,12 @@ SlopeY = 2
 .proc RunAllObjects
   setaxy16
 
+  ; Prepare for the loop
+  lda PaletteInUse+0
+  sta PaletteInUseLast+0
+  lda PaletteInUse+2
+  sta PaletteInUseLast+2
+
   ; Load X with the actual pointer
   ldx #ObjectStart
 Loop:
@@ -141,29 +147,85 @@ FoundTileset:
   lda f:ObjectPalette,x
   cmp SpritePaletteSlots+2*0
   bne :+
+    inc PaletteInUse+0
     lda #%1000<<8
     bra FoundPalette
   :
   cmp SpritePaletteSlots+2*1
   bne :+
+    inc PaletteInUse+1
     lda #%1010<<8
     bra FoundPalette
   :
   cmp SpritePaletteSlots+2*2
   bne :+
+    inc PaletteInUse+2
     lda #%1100<<8
     bra FoundPalette
   :
   cmp SpritePaletteSlots+2*3
   bne :+
+    inc PaletteInUse+3
     lda #%1110<<8
+    bra FoundPalette
   :
+
+  ; -----------------------------------
+  ; Palette not found, so request it!
+  lda PaletteRequestIndex
+  bne PaletteNotFound ; Unless a palette is already being requested, then wait for next frame
+
+  ; Prefer unassigned palette slots first
+  ldy #4*2-2
+  lda #$ffff
+: cmp SpritePaletteSlots,y
+  beq FoundPaletteRequestIndex
+  dey
+  dey
+  bpl :-
+
+  ; No unassigned ones? Just look for one that wasn't used last frame
+  seta8
+  ldy #4-1
+: lda PaletteInUseLast,y
+  beq FoundPaletteRequestIndex2 ; No objects using this palette
+  dey
+  bpl :-
+  ; No suitable slots found, so give up for this frame
+  seta16
+  bra PaletteNotFound
+
+FoundPaletteRequestIndex2:
+  ; Convert the index since PaletteInUseLast is 8-bit while SpritePaletteSlots is 16-bit
+  seta16
+  tya
+  asl
+  tay
+FoundPaletteRequestIndex:
+  ; Write the desired palette into the list of active palettes
+  lda f:ObjectPalette,x
+  sta SpritePaletteSlots,y
+
+  seta8
+  ; And also that's the palette we need to request
+  sta PaletteRequestValue
+
+  ; Calculate index to upload it to
+  tya
+  lsr
+  ora #8+4 ; Last four sprite palettes
+  sta PaletteRequestIndex
+  seta16
+
+PaletteNotFound:
+  ; Probably exit without drawing it, instead of drawing with the wrong colors
+  lda #0
 FoundPalette:
   tsb SpriteTileBase
 
 
   ; Jump to it and return with an RTL
-  plx
+  plx ; X now equals the object index base again
   jml [0]
 .endproc
 

@@ -98,6 +98,11 @@ ParticleLen = 16
 
 .global SpriteTileSlots
 .global SpritePaletteSlots
+.global PaletteInUse        ; For dynamically allocating palette slots
+.global PaletteInUseLast
+.global PaletteRequestIndex
+.global PaletteRequestValue
+
 
 .globalzp LevelNumber
 .globalzp StartedLevelNumber

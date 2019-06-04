@@ -206,7 +206,7 @@ loop2:
   php
   setaxy16
 
-  ; Calculate the address of the 
+  ; Calculate the address of the palette data
   and #255
   ; Multiply by 30
   sta 0
