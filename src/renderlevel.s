@@ -26,12 +26,6 @@
 .a16
 .i16
 .proc RenderLevelScreens
-  ; Set the high byte of the pointer
-  seta8
-  lda #^LevelBuf
-  sta LevelBlockPtr+2
-
-  setaxy16
   ; Set the correct scroll value
   lda PlayerPX
   sub #(8*256)

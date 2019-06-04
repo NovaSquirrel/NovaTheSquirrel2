@@ -34,12 +34,17 @@
   setaxy16
   sta StartedLevelNumber
 
-  ; Will access the level data with 24-bit pointers.
-  ; Set data bank to this bank for lookup tables.
-  phk
-  plb
-
   jsl DecompressLevel
+
+  lda #1*2
+  sta ObjectStart+ObjectType
+  lda #0*256
+  sta ObjectStart+ObjectPX
+  lda #20*256
+  sta ObjectStart+ObjectPY
+  lda #0
+  sta ObjectStart+ObjectVX
+  sta ObjectStart+ObjectVY
 
   lda #Palette::SPNova
   ldy #8
@@ -111,6 +116,11 @@
 : stz LevelZeroWhenLoad_Start,x
   dex
   bpl :-
+
+  ; Set the high byte of the level pointer
+  ; so later accesses work correctly.
+  lda #^LevelBuf
+  sta LevelBlockPtr+2
 
   ; -----------------------------------
 
@@ -296,26 +306,158 @@
   sta BLENDMAIN
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
-  setaxy16
 
   ; -----------------------------------
 
   ; Now use the new DecodePointer to decompress the level data
+  phk
+  plb
+  stz DecodeColumn
+  jsr LevelDecodeLoop
+
+  ; Put the registers back in their expected sizes
+  setaxy16
   rtl
+.endproc
+
+.proc LevelDecodeLoop
+: jsr LevelDecodeCommand
+  bra :-
+.endproc
+
+DecodeType   = 2
+DecodeWidth  = 3
+DecodeHeight = 4
+DecodeColumn = 5 ; Current column to write to
+DecodeValue  = 6 ; and 7
+.a8
+.i16
+.proc LevelDecodeCommand
+  wdm 0
+
+  jsr NextLevelByte
+  sta DecodeType
+  cmp #$f0
+  bcs SpecialCommand
+
+  seta16
+  and #<~1 ; Already effectively multiplied by 2
+  asl      ; so multiply by 4 now
+  tax
+  seta8
+
+  jmp (.loword(LevelCommands),x)
+
+SpecialCommand:
+  seta16
+  and #$0f
+  asl
+  tax
+  seta8
+  jmp (.loword(SpecialCommandTable),x)
+
+SpecialCommandTable:
+  .addr SpecialFinished
+  .addr SpecialSetX
+  .addr SpecialWrite1Column
+  .addr SpecialWrite2Column
+  .addr SpecialWrite3Column
+  .addr SpecialXMinus16
+  .addr SpecialXPlus16
+  .addr SpecialConfig
+
+SpecialFinished:
+  plx ; Pop two bytes
+  rts
+SpecialSetX:
+  jsr NextLevelByte
+  sta DecodeColumn
+  rts
+SpecialWrite3Column:
+  rts
+SpecialWrite2Column:
+  rts
+SpecialWrite1Column:
+  rts
+SpecialXMinus16:
+  lda DecodeColumn
+  sub #16
+  sta DecodeColumn
+  rts
+SpecialXPlus16:
+  lda DecodeColumn
+  add #16
+  sta DecodeColumn
+  rts
+SpecialConfig:
+  jsr NextLevelByte
+  ; Call additional table
+  rts
+.endproc
+
+; Get the position byte and calculate a level pointer using that
+.a8
+.i16
+.proc XYLevelByte
+  jsr NextLevelByte
+
+  pha
+  ; Add the X offset
+  lsr
+  lsr
+  lsr
+  lsr
+  add DecodeColumn
+  sta DecodeColumn
+
+  ; Get the Y position
+  pla ; XY byte
+  and #15
+  lsr DecodeType ; Destructively read the least significant bit
+  bcc :+
+    ora #16
+  :
+  sta 0 ; Y position (0-31)
+
+
+  bit VerticalLevelFlag
+  bpl Horizontal
+; In vertical levels, X and Y values are swapped
+Vertical:
+  ; Use "Y" position as column instead
+  seta16
+  jsl GetLevelColumnPtr
+  ; Y is the current row times two
+  lda DecodeColumn
+Common:
+  asl
+  tay
+  seta8
+  rts
+
+; In horizontal levels, things are normal
+Horizontal:
+  lda DecodeColumn
+  seta16
+  jsl GetLevelColumnPtr
+  ; Set Y to the height * 2
+  lda 0
+  and #255
+  bra Common
+.endproc
+
+; Get a byte and step the pointer
+.proc NextLevelByte
+  lda [DecodePointer]
+  inc DecodePointer+0
+  beq :+
+  inc DecodePointer+1
+: rts
 .endproc
 
 ; .----------------------------------------------------------------------------
 ; | Level command templates
 ; '----------------------------------------------------------------------------
-.enum
-  SPECIAL_ROUTINE      = 0   ; ??
-  BLOCK_SINGLE         = 2   ; TT XY
-  BLOCK_RECTANGLE      = 4   ; TT XY WH
-  BLOCK_WIDE_FROM_LIST = 6   ; TT XY Wm
-  BLOCK_TALL_FROM_LIST = 8   ; TT XY Hm
-  BLOCK_RECT_FROM_LIST = 10  ; TT XY Hm WW
-.endenum
-
 
 ; Make sure to keep synchronized with the LO enum in leveldata.inc
 ; Maxes out at 120 commands? Last 8 correspond to special commands.
@@ -333,82 +475,82 @@
   .word $ffff&BlockTallList,        32*2
   .word $ffff&BlockRectList,        32*2
 
-  .word $ffff&BlockRectangle,       Block::Empty
-  .word $ffff&BlockRectangle,       Block::Bricks
-  .word $ffff&BlockRectangle,       Block::SolidBlock
-  .word $ffff&BlockRectangle,       Block::Ice
-  .word $ffff&BlockRectangle,       Block::LedgeMiddle
-  .word $ffff&BlockSingle,          Block::Bricks
-  .word $ffff&BlockSingle,          Block::Prize
-  .word $ffff&BlockSingle,          Block::SolidBlock
-  .word $ffff&BlockSingle,          Block::PickupBlock
-  .word $ffff&BlockSingle,          Block::PushBlock
-  .word $ffff&BlockSingle,          Block::Heart
-  .word $ffff&BlockSingle,          Block::SmallHeart
-  .word $ffff&BlockSingle,          Block::Sign
-  .word $ffff&BlockSingle,          Block::Money
-  .word $ffff&BlockSingle,          Block::Spring
-  .word $ffff&BlockSingle,          Block::Rock
-  .word $ffff&BlockSingle,          Block::LedgeLeft
-  .word $ffff&BlockSingle,          Block::LedgeRight
-  .word $ffff&BlockSingle,          Block::LedgeSolidLeft
-  .word $ffff&BlockSingle,          Block::LedgeSolidRight
+  .word $ffff&BlockRectangle,       2*Block::Empty
+  .word $ffff&BlockRectangle,       2*Block::Bricks
+  .word $ffff&BlockRectangle,       2*Block::SolidBlock
+  .word $ffff&BlockRectangle,       2*Block::Ice
+  .word $ffff&BlockRectangle,       2*Block::LedgeMiddle
+  .word $ffff&BlockSingle,          2*Block::Bricks
+  .word $ffff&BlockSingle,          2*Block::Prize
+  .word $ffff&BlockSingle,          2*Block::SolidBlock
+  .word $ffff&BlockSingle,          2*Block::PickupBlock
+  .word $ffff&BlockSingle,          2*Block::PushBlock
+  .word $ffff&BlockSingle,          2*Block::Heart
+  .word $ffff&BlockSingle,          2*Block::SmallHeart
+  .word $ffff&BlockSingle,          2*Block::Sign
+  .word $ffff&BlockSingle,          2*Block::Money
+  .word $ffff&BlockSingle,          2*Block::Spring
+  .word $ffff&BlockSingle,          2*Block::Rock
+  .word $ffff&BlockSingle,          2*Block::LedgeLeft
+  .word $ffff&BlockSingle,          2*Block::LedgeRight
+  .word $ffff&BlockSingle,          2*Block::LedgeSolidLeft
+  .word $ffff&BlockSingle,          2*Block::LedgeSolidRight
 .assert (* - LevelCommands) < 120*4, error, "Too many level commands defined"
 .endproc
 
 ; Used with BlockWideList, BlockTallList and BlockRectList
 .proc NybbleTypesList
 ; Set 1
-  .word Block::Empty
-  .word Block::Ladder
-  .word Block::SpikesUp
-  .word Block::SpikesDown
-  .word Block::Ledge
-  .word Block::Money
-  .word Block::PickupBlock
-  .word Block::PushBlock
-  .word Block::LedgeMiddle
-  .word Block::Prize
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::Empty*2
+  .word Block::Ladder*2
+  .word Block::SpikesUp*2
+  .word Block::SpikesDown*2
+  .word Block::Ledge*2
+  .word Block::Money*2
+  .word Block::PickupBlock*2
+  .word Block::PushBlock*2
+  .word Block::LedgeMiddle*2
+  .word Block::Prize*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
 ; Set 2
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
 ; Set 3
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
+  .word Block::Empty*2
 .endproc
 
 ; .----------------------------------------------------------------------------
@@ -416,36 +558,151 @@
 ; '----------------------------------------------------------------------------
 .a8
 .proc BlockSingle
+  jsr XYLevelByte
+  lda LevelCommands+2,x
+  sta [LevelBlockPtr],y
+  iny
+  lda LevelCommands+3,x
+  sta [LevelBlockPtr],y
   rts
 .endproc
 
 .a8
 .proc BlockRectangle
-  rts
+  jsr XYLevelByte
+  jsr NextLevelByte
+  sta DecodeValue+0
+  iny
+  jsr NextLevelByte
+  sta DecodeValue+1
+  jmp DecodeWriteRectangleConvert
 .endproc
 
 .a8
 .proc CustomBlockSingle
+  jsr XYLevelByte
+  jsr NextLevelByte
+  sta [LevelBlockPtr],y
+  iny
+  jsr NextLevelByte
+  sta [LevelBlockPtr],y
   rts
 .endproc
 
 .a8
 .proc CustomBlockRectangle
+  jsr XYLevelByte
+  lda LevelCommands+2,x
+  sta DecodeValue+0
+  lda LevelCommands+3,x
+  sta DecodeValue+1
+  jmp DecodeWriteRectangleConvert
+.endproc
+
+; Select a block type from NybbleTypesList
+.proc UseNybbleTable
+  seta16
+  and #15
+  asl
+  ora LevelCommands+2,x
+  tax
+  lda NybbleTypesList,x
+  sta DecodeValue
+  seta8
   rts
 .endproc
 
 .a8
 .proc BlockWideList
-  rts
+  jsr XYLevelByte
+  jsr NextLevelByte
+  stz DecodeHeight
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  sta DecodeWidth
+  pla
+  jsr UseNybbleTable
+  jmp DecodeWriteRectangle
 .endproc
 
 .a8
 .proc BlockTallList
-  rts
+  jsr XYLevelByte
+  jsr NextLevelByte
+  stz DecodeWidth
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  sta DecodeHeight
+  pla
+  jsr UseNybbleTable
+  jmp DecodeWriteRectangle
 .endproc
 
 .a8
 .proc BlockRectList
+  jsr XYLevelByte
+  jsr NextLevelByte
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  sta DecodeHeight
+  pla
+  jsr UseNybbleTable
+  jsr NextLevelByte
+  sta DecodeWidth
+  jmp DecodeWriteRectangle
+.endproc
+
+.a8
+DecodeWriteRectangleConvert:
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  sta DecodeWidth
+  pla
+  and #15
+  sta DecodeHeight
+; Writes a rectangle to the level buffer
+; locals: 0
+.a8
+.proc DecodeWriteRectangle
+  inc DecodeWidth  ; Increase width and height by 1
+  inc DecodeHeight ; So that 0 is 1 and 15 is 16
+ColumnLoop:
+  lda DecodeHeight ; Save height
+  sta 0
+
+  phy
+RowLoop:
+  lda DecodeValue+0
+  sta [LevelBlockPtr],y
+  iny
+  lda DecodeValue+1
+  sta [LevelBlockPtr],y
+  iny
+  dec 0
+  bne RowLoop
+  ply
+
+  ; Next column
+  seta16
+  lda LevelBlockPtr
+  add LevelColumnSize
+  sta LevelBlockPtr
+  seta8
+
+  dec DecodeWidth
+  bne ColumnLoop
   rts
 .endproc
 
@@ -489,12 +746,12 @@ SampleLevelHeader:
   .addr SampleLevelData
 
 SampleLevelData:
-  LObjN LO::R_SolidBlock,   0, 30,    15, 1
-  LObj  LO::S_Spring,       4, 29
-  LObj  LO::S_PickupBlock,  1, 29
-  LObj  LO::S_PushBlock,    1, 29
-  LObjN LO::R_Ice,          1, 25,    4, 4
   LFinished
+  LObj  LO::S_Spring,       4, 29
+;  LObjN LO::R_SolidBlock,   0, 30,    15, 1
+;  LObj  LO::S_PickupBlock,  1, 29
+;  LObj  LO::S_PushBlock,    1, 29
+;  LObjN LO::R_Ice,          1, 25,    4, 4
 
 SampleLevelSprite:
   .byt $ff

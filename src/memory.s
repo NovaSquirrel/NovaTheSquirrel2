@@ -103,7 +103,6 @@
   SpriteTileSlots: .res 2*8
   SpritePaletteSlots: .res 2*4
 
-
   OAM:   .res 512
   OAMHI: .res 512
   ; OAMHI contains bit 8 of X (the horizontal position) and the size
