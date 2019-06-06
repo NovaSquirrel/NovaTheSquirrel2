@@ -51,7 +51,54 @@ Loop:
   pla
   jsl CallDraw
 
-  ; TODO: call the opt-in routines
+  ; Call the common routines
+  lda ObjectType,x
+  beq SkipEntity
+  phx
+  tax
+  lda f:ObjectFlags,x
+  plx
+
+  lsr ; AutoRemove
+  bcc NotAutoRemove
+    ; Remove entity if too far away from the player
+    pha
+    lda ObjectPX,x
+    sub PlayerPX
+    absw
+    cmp #$2000 ; How about two screens of distance does it?
+    bcc :+
+      pla
+      stz ObjectType,x ; Zero the type
+      bra SkipEntity   ; Skip doing anything else with this entity since it no longer exists
+    :
+    pla
+  NotAutoRemove:
+
+  lsr ; GetShot
+  bcc NotGetShot
+
+  NotGetShot:
+
+  lsr ; AutoReset
+  bcc NotAutoReset
+    pha
+    lda ObjectTimer,x
+    beq :+
+    dec ObjectTimer,x
+    bne :+
+      ; Zero the state, keep the variable that ends up in the high byte
+      lda ObjectState,x
+      and #$ff00
+      sta ObjectState,x
+    :
+    pla
+  NotAutoReset:
+
+  lsr ; WaitUntilNear
+  bcc NotWaitUntilNear
+
+  NotWaitUntilNear:
 
 SkipEntity:
 
