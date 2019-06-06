@@ -217,14 +217,20 @@ FoundPaletteRequestIndex:
   sta PaletteRequestIndex
   seta16
 
+  ; Use the new palette index,
+  ; since it will be there by the time we do OAM DMA
+  tya              ; ........ .....pp.
+  xba              ; .....pp. ........
+  ora #OAM_COLOR_4 ; ....1pp. ........
+  bra FoundPalette ; yxPPpppt tttttttt
+
 PaletteNotFound:
   ; Probably exit without drawing it, instead of drawing with the wrong colors
   lda #0
 FoundPalette:
   tsb SpriteTileBase
 
-
-  ; Jump to it and return with an RTL
+  ; Jump to the per-object routine and return with an RTL
   plx ; X now equals the object index base again
   jml [0]
 .endproc
