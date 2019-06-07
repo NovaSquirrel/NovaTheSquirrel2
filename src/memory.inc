@@ -1,4 +1,5 @@
 .globalzp retraces
+.globalzp framecount
 .globalzp keydown
 .globalzp keylast
 .globalzp keynew

@@ -23,7 +23,9 @@
 .include "memory.inc"
 
 .segment "ZEROPAGE"
-  retraces: .res 1
+  retraces: .res 2
+  framecount: .res 2  ; Only increases every iteration of the main loop
+
   keydown:  .res 2
   keylast:  .res 2
   keynew:   .res 2

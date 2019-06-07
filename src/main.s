@@ -37,8 +37,9 @@
   phk
   plb
 
-  seta8
+  seta16
   inc a:retraces   ; Increase NMI count to notify main thread
+  seta8
   bit a:NMISTATUS  ; Acknowledge NMI
 
   ; And restore the previous data bank value.
@@ -98,6 +99,8 @@
 forever:
   ; Draw the player to a display list in main memory
   setaxy16
+  inc framecount
+
   ; Update keys
   lda keydown
   sta keylast
