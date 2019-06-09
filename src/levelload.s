@@ -400,67 +400,6 @@ SpecialConfig:
   rts
 .endproc
 
-; Get the position byte and calculate a level pointer using that
-.a8
-.i16
-.proc XYLevelByte
-  jsr NextLevelByte
-
-  pha
-  ; Add the X offset
-  lsr
-  lsr
-  lsr
-  lsr
-  add DecodeColumn
-  sta DecodeColumn
-
-  ; Get the Y position
-  pla ; XY byte
-  and #15
-  lsr DecodeType ; Destructively read the least significant bit
-  bcc :+
-    ora #16
-  :
-  sta 0 ; Y position (0-31)
-
-
-  bit VerticalLevelFlag
-  bpl Horizontal
-; In vertical levels, X and Y values are swapped
-Vertical:
-  ; Use "Y" position as column instead
-  seta16
-  jsl GetLevelColumnPtr
-  ; Y is the current row times two
-  lda DecodeColumn
-Common:
-  asl
-  tay
-  seta8
-  rts
-
-; In horizontal levels, things are normal
-Horizontal:
-  lda DecodeColumn
-  seta16
-  jsl GetLevelColumnPtr
-  ; Set Y to the height * 2
-  lda 0
-  and #255
-  bra Common
-.endproc
-
-; Get a byte and step the pointer
-.a8
-.proc NextLevelByte
-  lda [DecodePointer]
-  inc DecodePointer+0
-  bne :+
-  inc DecodePointer+1
-: rts
-.endproc
-
 ; .----------------------------------------------------------------------------
 ; | Level command templates
 ; '----------------------------------------------------------------------------
@@ -501,6 +440,13 @@ Horizontal:
   .word $ffff&BlockSingle,          2*Block::LedgeRight
   .word $ffff&BlockSingle,          2*Block::LedgeSolidLeft
   .word $ffff&BlockSingle,          2*Block::LedgeSolidRight
+
+  .word $ffff&SlopeLGradual,        0
+  .word $ffff&SlopeLMedium,         0
+  .word $ffff&SlopeLSteep,          0
+  .word $ffff&SlopeRGradual,        0
+  .word $ffff&SlopeRMedium,         0
+  .word $ffff&SlopeRSteep,          0
 .assert (* - LevelCommands) < 120*4, error, "Too many level commands defined"
 .endproc
 
@@ -580,8 +526,7 @@ Horizontal:
   sta DecodeValue+0
   lda LevelCommands+3,x
   sta DecodeValue+1
-  jsr NextLevelByte
-  jmp DecodeWriteRectangleConvert
+  jmp HasRectangleParameter
 .endproc
 
 .a8
@@ -603,21 +548,7 @@ Horizontal:
   jsr NextLevelByte
   lda LevelCommands+3,x
   sta DecodeValue+1
-  jsr NextLevelByte
-  jmp DecodeWriteRectangleConvert
-.endproc
-
-; Select a block type from NybbleTypesList
-.proc UseNybbleTable
-  seta16
-  and #15
-  asl
-  ora LevelCommands+2,x
-  tax
-  lda NybbleTypesList,x
-  sta DecodeValue
-  seta8
-  rts
+  jmp HasRectangleParameter
 .endproc
 
 .a8
@@ -670,16 +601,310 @@ Horizontal:
 .endproc
 
 .a8
-DecodeWriteRectangleConvert:
+.proc SlopeLGradual ; XY WH
+  jsr GetXYWidthHeight_WidthInX
+  .a16
+
+Loop:
+  phy
+  phy
+  phy
+  phy
+  lda #2*Block::GradualSlopeL_U1
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::GradualSlopeL_D1
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #2*Block::GradualSlopeL_U2
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::GradualSlopeL_D2
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #2*Block::GradualSlopeL_U3
+  sta [LevelBlockPtr],y
+  inc DecodeHeight
+  jsr SlopeDirtColumn
+
+  ply
+  lda #2*Block::GradualSlopeL_U4
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+
+  dey
+  dey
+
+  dex
+  bpl Loop
+
+  seta8
+  rts
+.endproc
+
+.a8
+.proc SlopeLMedium ; XY WH
+  jsr GetXYWidthHeight_WidthInX
+  .a16
+
+Loop:
+  phy
+  phy
+  lda #2*Block::MedSlopeL_UL
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::MedSlopeL_DL
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+  lda #2*Block::MedSlopeL_UR
+  sta [LevelBlockPtr],y
+  inc DecodeHeight
+  jsr SlopeDirtColumn
+  ply
+
+  dey
+  dey
+
+  dex
+  bpl Loop
+
+  seta8
+  rts
+.endproc
+
+.a8
+.proc SlopeLSteep ; XY WH
+  jsr GetXYWidthHeight_WidthInX
+  .a16
+
+Loop:
+  phy
+  lda #2*Block::SteepSlopeL_U
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::SteepSlopeL_D
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+
+  dey
+  dey
+  inc DecodeHeight
+
+  dex
+  bpl Loop
+
+  seta8
+  rts
+.endproc
+
+.a8
+.proc SlopeRGradual ; XY WH
+  jsr GetXYWidthHeight_WidthInX
+  jsr DownhillSlope
+  .a16
+
+Loop:
+  phy
+  phy
+  phy
+  phy
+  lda #2*Block::GradualSlopeR_U1
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::LedgeMiddle
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #2*Block::GradualSlopeR_U2
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::LedgeMiddle
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #2*Block::GradualSlopeR_U3
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::GradualSlopeR_D3
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #2*Block::GradualSlopeR_U4
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::GradualSlopeR_D4
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+  seta8
+  dec DecodeHeight
+  seta16
+  iny
+  iny
+
+  dex
+  bpl Loop
+
+  seta8
+  rts
+.endproc
+
+.a8
+.proc SlopeRMedium ; XY WH
+  jsr GetXYWidthHeight_WidthInX
+  jsr DownhillSlope
+  .a16
+
+Loop:
+  phy
+  phy
+  lda #2*Block::MedSlopeR_UL
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::LedgeMiddle
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+  lda #2*Block::MedSlopeR_UR
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #2*Block::MedSlopeR_DR
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+
+  seta8
+  dec DecodeHeight
+  seta16
+  iny
+  iny
+
+  dex
+  bpl Loop
+
+  seta8
+  rts
+.endproc
+
+.a8
+.proc SlopeRSteep ; XY WH
+  jsr GetXYWidthHeight_WidthInX
+  jsr DownhillSlope
+  .a16
+Loop:
+  lda #2*Block::SteepSlopeR_U
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  phy
+  lda #2*Block::SteepSlopeR_D
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+  ply
+
+  seta8
+  dec DecodeHeight
+  seta16
+
+  dex
+  bpl Loop
+
+  seta8
+  rts
+.endproc
+
+
+; .----------------------------------------------------------------------------
+; | Level comand helpers
+; '----------------------------------------------------------------------------
+; Get the position byte and calculate a level pointer using that
+.a8
+.i16
+.proc XYLevelByte
+  jsr NextLevelByte
+
   pha
+  ; Add the X offset
   lsr
   lsr
   lsr
   lsr
-  sta DecodeWidth
-  pla
+  add DecodeColumn
+  sta DecodeColumn
+
+  ; Get the Y position
+  pla ; XY byte
   and #15
-  sta DecodeHeight
+  lsr DecodeType ; Destructively read the least significant bit
+  bcc :+
+    ora #16
+  :
+  sta 0 ; Y position (0-31)
+
+
+  bit VerticalLevelFlag
+  bpl Horizontal
+; In vertical levels, X and Y values are swapped
+Vertical:
+  ; Use "Y" position as column instead
+  seta16
+  jsl GetLevelColumnPtr
+  ; Y is the current row times two
+  lda DecodeColumn
+Common:
+  asl
+  tay
+  seta8
+  rts
+
+; In horizontal levels, things are normal
+Horizontal:
+  lda DecodeColumn
+  seta16
+  jsl GetLevelColumnPtr
+  ; Set Y to the height * 2
+  lda 0
+  and #255
+  bra Common
+.endproc
+
+; -------------------------------------
+
+; Get a byte and step the pointer
+.a8
+.proc NextLevelByte
+  lda [DecodePointer]
+  inc DecodePointer+0
+  bne :+
+  inc DecodePointer+1
+: rts
+.endproc
+
+; -------------------------------------
+
+; Get the width and height byte, separate it, and then fall into the rectangle writer
+HasRectangleParameter:
+  jsr GetWidthHeight
 ; Writes a rectangle to the level buffer
 ; locals: 0
 .a8
@@ -711,6 +936,101 @@ RowLoop:
 
   dec DecodeWidth
   bne ColumnLoop
+  rts
+.endproc
+
+; -------------------------------------
+
+; Select a block type from NybbleTypesList
+.proc UseNybbleTable
+  seta16
+  and #15
+  asl
+  ora LevelCommands+2,x
+  tax
+  lda NybbleTypesList,x
+  sta DecodeValue
+  seta8
+  rts
+.endproc
+
+; -------------------------------------
+
+; Helper routine for slopes
+.a16
+.proc SlopeDirtColumn
+  phx
+  iny
+  iny
+
+  ; Use X as a counter
+  lda DecodeHeight
+  and #255
+  ina
+  tax
+
+  ; Fill in dirt
+  lda #2*Block::LedgeMiddle
+: dex
+  beq :+
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  bra :-
+:
+  
+  ; Next column
+  lda LevelBlockPtr
+  add LevelColumnSize
+  sta LevelBlockPtr
+  plx
+  rts
+.endproc
+
+; -------------------------------------
+
+; Get the width hand height byte and separate the nybbles
+GetXYWidthHeight:
+  jsr XYLevelByte
+GetWidthHeight:
+  jsr NextLevelByte
+.a8
+; Separates a WH byte into a separate DecodeWidth and DecodeHeight
+.proc SeparateWidthHeight
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  sta DecodeWidth
+  pla
+  and #15
+  sta DecodeHeight
+  rts
+.endproc
+
+; -------------------------------------
+
+; Like the above but puts the width in X for loop use.
+; Slope helper routine. Leaves the accumulator 16-bit.
+.proc GetXYWidthHeight_WidthInX
+  jsr GetXYWidthHeight
+  seta16
+  lda DecodeWidth
+  and #255
+  tax
+  rts
+.endproc
+
+; -------------------------------------
+
+; Initializes the starting height appropriately
+.proc DownhillSlope
+  seta8
+  lda DecodeWidth
+  add DecodeHeight
+  sta DecodeHeight
+  seta16
   rts
 .endproc
 
@@ -756,9 +1076,15 @@ SampleLevelHeader:
 SampleLevelData:
   LObjN LO::R_SolidBlock,   0,  30,    15, 1
   LObjN LO::R_Ice,          4,  28,     1, 1
-  LObjN LO::R_Ice,          12, 28,     1, 1
+;  LObjN LO::R_Ice,          12, 28,     1, 1
 
-
+  LObjN LO::SlopeL_Steep,     4,  29,    5, 1
+  LObjN LO::SlopeR_Steep,     6,  24,    5, 1
+  LObjN LO::SlopeL_Medium,    6,  29,    5, 1
+  LObjN LO::SlopeR_Medium,   12,  24,    5, 1
+  LObjN LO::SlopeL_Gradual,  12,  29,    5, 1
+  LXPlus16
+  LObjN LO::SlopeR_Gradual,   8,  24,    5, 1
 
 ;  LObj  LO::S_PickupBlock,  1, 29
 ;  LObj  LO::S_PushBlock,    1, 29

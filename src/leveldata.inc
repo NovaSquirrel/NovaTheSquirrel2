@@ -30,6 +30,12 @@
   S_LedgeRight
   S_LedgeSolidLeft
   S_LedgeSolidRight
+  SlopeL_Gradual
+  SlopeL_Medium
+  SlopeL_Steep
+  SlopeR_Gradual
+  SlopeR_Medium
+  SlopeR_Steep
 .endenum
 
 .enum LN1
