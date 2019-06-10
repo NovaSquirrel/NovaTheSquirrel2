@@ -4,3 +4,5 @@
 PlayerGraphics:
 .incbin "../tilesets4/NovaIdle.chrsfc"
 .incbin "../tilesets4/NovaWalk.chrsfc"
+.incbin "../tilesets4/NovaJump.chrsfc"
+.incbin "../tilesets4/NovaFall.chrsfc"

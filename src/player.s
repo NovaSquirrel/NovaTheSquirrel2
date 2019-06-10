@@ -253,14 +253,6 @@ NoFixWalkSpeed:
   NoSlopeDown:
   seta16
 
-  ; Boundary on the left of the world
-  lda PlayerPX
-  cmp #16*16
-  bcs :+
-    lda #16*16
-    sta PlayerPX
-  :
-
   ; Check for moving into a wall
   lda PlayerPX
   add #3*16
@@ -593,19 +585,50 @@ OfferJumpFromGracePeriod:
   rts
 .endproc
 
+.enum PlayerFrame
+  IDLE
+  WALK1
+  WALK2
+  WALK3
+  WALK4
+  WALK5
+  WALK6
+  WALK7
+  WALK8
+  JUMP
+  FALL
+.endenum
+
 .a16
 .i16
 .proc DrawPlayer
   ldx OamPtr
 
-  ; X coordinate to pixels
-  lda PlayerPX
-  sub ScrollX
-  lsr
-  lsr
-  lsr
-  lsr
-  sta 0
+  jsr XToPixels
+
+  ; Keep the player within bounds horizontally
+  lda 0
+  cmp #$10
+  bcs :+
+    stz PlayerVX
+    seta8
+    lda #$00
+    sta PlayerPX+0
+    inc PlayerPX+1
+    seta16
+    jsr XToPixels
+  :
+  lda 0
+  cmp #$f0
+  bcc :+
+    stz PlayerVX
+    seta8
+    dec PlayerPX+1
+    lda #$ff
+    sta PlayerPX+0
+    seta16
+    jsr XToPixels
+  :
 
   ; Y coordinate to pixels
   lda PlayerPY
@@ -686,14 +709,35 @@ OfferJumpFromGracePeriod:
   lda keydown+1
   and #(KEY_LEFT|KEY_RIGHT)>>8
   beq :+
-    lda retraces
+    lda framecount
     lsr
     lsr
     and #7
     inc a
     sta PlayerFrame 
   :
+
+  lda PlayerOnGround
+  bne OnGround
+    lda #PlayerFrame::FALL
+    sta PlayerFrame
+
+    lda PlayerJumping
+    beq OnGround
+      dec PlayerFrame
+  OnGround:
   setaxy16
   rtl
+
+XToPixels:
+  ; X coordinate to pixels
+  lda PlayerPX
+  sub ScrollX
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+  rts
 .endproc
 

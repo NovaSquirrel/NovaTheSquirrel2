@@ -78,6 +78,67 @@ TargetY = 6
   add ScrollY
   sta ScrollY
 
+  ; -----------------------------------
+
+  bit VerticalLevelFlag-1
+  bmi IsVerticalLevel
+
+; .---------------------------------------
+; |SCROLL BARRIERS (left)
+; '---------------------------------------
+
+  lda ScrollX
+  eor ScrollOldX
+  and #%00010000 << 8
+  beq NoScreenChangeLeft
+  cmp #$80
+  bcc NoScreenChangeLeft
+  ; See if we're scrolling past a barrier
+  xba
+  lsr
+  lsr
+  lsr
+  lsr
+  and #15
+  tay
+  lda ScreenFlags,y
+  lsr
+  bcc NoScreenChangeLeft
+  lda ScrollOldX
+  and #$f000
+  sta ScrollX
+NoScreenChangeLeft:
+
+; .---------------------------------------
+; | SCROLL BARRIERS (right)
+; '---------------------------------------  
+  lda ScrollX
+  bit #$0f00
+  bne NoScreenChangeRight
+  bit #$00f0
+  beq NoScreenChangeRight
+  ; Check the next screen and see if it's got a barrier
+  xba
+  lsr
+  lsr
+  lsr
+  lsr
+  and #15
+  tay
+  lda ScreenFlags+1,y
+  lsr
+  bcc NoScreenChangeRight
+  seta8
+  lda #$0f
+  sta ScrollX+0
+  seta16
+NoScreenChangeRight:
+
+  IsVerticalLevel:
+
+  ; -----------------------------------
+
+
   ; Is a column update required?
   lda ScrollX
   eor ScrollOldX
