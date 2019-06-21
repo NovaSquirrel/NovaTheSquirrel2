@@ -595,6 +595,14 @@ OfferJumpFromGracePeriod:
   WALK6
   WALK7
   WALK8
+  RUN1
+  RUN2
+  RUN3
+  RUN4
+  RUN5
+  RUN6
+  RUN7
+  RUN8
   JUMP
   FALL
 .endenum
@@ -709,6 +717,17 @@ OfferJumpFromGracePeriod:
   lda keydown+1
   and #(KEY_LEFT|KEY_RIGHT)>>8
   beq :+
+    lda PlayerWasRunning
+    beq @NotRunning
+      lda framecount
+      lsr
+      and #7
+      add #8
+      inc a
+      sta PlayerFrame 
+      bra :+
+    @NotRunning:
+
     lda framecount
     lsr
     lsr
