@@ -123,6 +123,7 @@ when InsideBody, BlockLadder
 q 0,0
 
 +Ladder
+autotile AutotileLadder
 when InsideBody, BlockLadder
 t 0,1 1,1
 t 0,1 1,1
@@ -146,6 +147,7 @@ base terrain
 palette terrain_palette
 
 +Ledge
+autotile AutotileLedge
 solid_top
 t 1,2 1,2
 t 1,3 1,3
@@ -157,20 +159,23 @@ t 0,3 1,3
 
 +LedgeRight
 solid_top
-t 1,2 0,2
-t 1,3 0,3
+t 1,2 2,2
+t 1,3 2,3
 
 +LedgeSolidLeft
+autotile AutotileLedgeSolidLeft
 solid
 t 4,3 1,2
 t 6,2 7,2
 
 +LedgeSolidRight
+autotile AutotileLedgeSolidRight
 solid
 t 1,2 5,3
 t 8,2 9,2
 
 +LedgeMiddle
+autotile AutotileExpandDirt
 t 3,3 3,3
 t 3,3 3,3
 
@@ -206,35 +211,43 @@ t 3,3 3,3
 # Terrain (slopes) - fully solid
 #######################################
 +MedSlopeL_DL
+autotile AutotileExpandDirt
 solid
 t 2,1 3,1
 t 3,3 3,3
 
 +MedSlopeR_DR
+autotile AutotileExpandDirt
 t 4,1 5,1
 t 3,3 3,3
 
 +GradualSlopeL_D1
+autotile AutotileExpandDirt
 t 6,1 7,1
 t 3,3 3,3
 
 +GradualSlopeL_D2
+autotile AutotileExpandDirt
 t 8,1 9,1
 t 3,3 3,3
 
 +GradualSlopeR_D3
+autotile AutotileExpandDirt
 t 10,1 11,1
 t 3,3 3,3
 
 +GradualSlopeR_D4
+autotile AutotileExpandDirt
 t 12,1 13,1
 t 3,3 3,3
 
 +SteepSlopeL_D
+autotile AutotileExpandDirt
 t 0,1 3,3
 t 3,3 3,3
 
 +SteepSlopeR_D
+autotile AutotileExpandDirt
 t 3,3 1,1
 t 3,3 3,3
 

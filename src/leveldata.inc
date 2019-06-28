@@ -49,6 +49,7 @@
   PushBlock
   LedgeMiddle
   Prize
+  SolidBlock
 .endenum
 
 .enum LN2
@@ -95,6 +96,23 @@
   .ifnblank Extra
     .byt Extra
   .endif
+.endmacro
+
+.macro LSCustom Type, XPos, YPos
+  .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
+  .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
+  LObj LO::S_Custom, XPos, YPos
+  .word Type*2
+.endmacro
+
+.macro LRCustom Type, XPos, YPos, Width, Height
+  .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
+  .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
+  .assert Width >= 0 && Width <= 15, error, "Invalid width"
+  .assert Height >= 0 && Height <= 15, error, "Invalid height"
+  LObj LO::R_Custom, XPos, YPos
+  .word Type*2
+  .byt (Width<<4)|Height
 .endmacro
 
 .macro LFinished

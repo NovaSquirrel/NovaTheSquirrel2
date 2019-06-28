@@ -95,7 +95,7 @@ for line in text:
 		# Reset to prepare for the new block
 		priority = False
 		block = {"name": line[1:], "solid": False, "solid_top": False, \
-		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
+		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None", "autotile": None}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -122,6 +122,10 @@ for line in text:
 		for i in arg[0]:
 			block["interaction"][i] = arg[1]
 		all_interaction_procs.add(arg[1])
+	elif word == "autotile":
+		block["autotile"] = arg
+		all_interaction_procs.add(arg)
+
 	elif word == "class":
 		block["class"] = arg
 		all_classes.add(arg)
@@ -188,7 +192,17 @@ for interaction in interaction_types:
 			outfile.write('  .addr .loword(BlockNothing)\n')
 	outfile.write(".endproc\n\n")
 
+# Write all the autotile settings
+outfile.write('.segment "LevelDecompress"\n\n')
 
+outfile.write('.export BlockAutotile\n')
+outfile.write('.proc BlockAutotile\n')
+for b in all_blocks:
+	if b['autotile']:
+		outfile.write('  .addr .loword(%s - 1)\n' % b['autotile'])
+	else:
+		outfile.write('  .addr 0\n')
+outfile.write('.endproc\n\n')
 
 outfile.close()
 

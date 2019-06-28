@@ -22,10 +22,10 @@
 .include "blockenum.s"
 .include "leveldata.inc"
 .smart
-.import GameMainLoop
+.import GameMainLoop, AutotileLevel
 .import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
 
-.segment "CODE"
+.segment "LevelDecompress"
 
 ; Accumulator = level number
 .a16
@@ -35,6 +35,7 @@
   sta StartedLevelNumber
 
   jsl DecompressLevel
+  jsl AutotileLevel
 
   lda #1*2
   sta ObjectStart+ObjectType
@@ -54,6 +55,7 @@
   jsl DoGraphicUpload
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
+
 
   jsl RenderLevelScreens
 
@@ -463,7 +465,7 @@ SpecialConfig:
   .word Block::PushBlock*2
   .word Block::LedgeMiddle*2
   .word Block::Prize*2
-  .word Block::Empty*2
+  .word Block::SolidBlock*2
   .word Block::Empty*2
   .word Block::Empty*2
   .word Block::Empty*2
@@ -544,9 +546,8 @@ SpecialConfig:
 .proc CustomBlockRectangle ; XY TT TT WH
   jsr XYLevelByte
   jsr NextLevelByte
-  lda LevelCommands+2,x
+  sta DecodeValue+0
   jsr NextLevelByte
-  lda LevelCommands+3,x
   sta DecodeValue+1
   jmp HasRectangleParameter
 .endproc
@@ -1045,7 +1046,7 @@ SampleLevelHeader:
   .word RGB(15,23,31) ; background color
   .word 1  ; background
   .addr SampleLevelSprite
-  .word 0  ; No scroll barriers
+  .byt %00000000, %00000000  ; No scroll barriers
   ; Eight sprite graphic slots
   .byt GraphicsUpload::SPWalker
   .byt GraphicsUpload::SPCannon
@@ -1074,27 +1075,34 @@ SampleLevelHeader:
   .addr SampleLevelData
 
 SampleLevelData:
-  LObjN LO::R_SolidBlock,   0,  30,    15, 1
-  LObjN LO::R_Ice,          4,  28,     1, 1
-;  LObjN LO::R_Ice,          12, 28,     1, 1
-
-  LObjN LO::SlopeL_Steep,     4,  29,    5, 1
-  LObjN LO::SlopeR_Steep,     6,  24,    5, 1
-  LObjN LO::SlopeL_Medium,    6,  29,    5, 1
-  LObjN LO::SlopeR_Medium,   12,  24,    5, 1
-  LObjN LO::SlopeL_Gradual,  12,  29,    5, 1
-  LXPlus16
-  LObjN LO::SlopeR_Gradual,   8,  24,    5, 1
-
-;  LObj  LO::S_PickupBlock,  1, 29
-;  LObj  LO::S_PushBlock,    1, 29
-;  LObjN LO::R_Ice,          1, 25,    4, 4
-;  LObj  LO::S_Bricks,    1, 29
-;  LObj  LO::S_Bricks,    1, 28
-;  LObj  LO::S_Bricks,    1, 27
-;  LObj  LO::S_Bricks,    1, 26
-;  LObj  LO::S_PushBlock,    1, 29
-;  LObj  LO::S_Spring,       4, 29
+  LObjN LO::Rect1, 0, 30, 0, LN1::Ledge, 17
+  LObjN LO::Wide1, 2, 26, 4, LN1::Prize
+  LObjN LO::Tall1, 7, 24, 5, LN1::Ladder
+  LObjN LO::Wide1, 1, 24, 5, LN1::Ledge
+  LObjN LO::Rect1, 0, 21, 1, LN1::Money, 1
+  LObjN LO::Wide1, 2, 21, 5, LN1::Ledge
+  LObjN LO::Rect1, 0, 18, 1, LN1::Money, 1
+  LObjN LO::R_Bricks, 2, 17, 2, 0
+  LObjN LO::SlopeL_Gradual, 4, 29, 0, 0
+  LObjN LO::SlopeL_Medium, 4, 28, 1, 1
+  LObjN LO::SlopeL_Steep, 4, 26, 3, 3
+  LObjN LO::SlopeL_Medium, 4, 22, 1, 1
+  LObjN LO::SlopeL_Gradual, 4, 20, 0, 0
+  LObjN LO::Wide1, 4, 20, 6, LN1::Ledge
+  LObjN LO::Wide1, 1, 18, 4, LN1::Money
+  LObjN LO::SlopeR_Gradual, 6, 20, 0, 0
+  LObjN LO::SlopeR_Medium, 4, 21, 1, 1
+  LObjN LO::SlopeR_Steep, 4, 23, 3, 3
+  LObjN LO::SlopeR_Medium, 4, 27, 1, 1
+  LObjN LO::SlopeR_Gradual, 4, 29, 0, 0
+  LObjN LO::Wide1, 4, 30, 1, LN1::Ledge
+  LObj  LO::S_Spring, 1, 29
+  LRCustom Block::LedgeSolidLeft, 1, 26, 0, 4
+  LObjN LO::Wide1, 1, 26, 5, LN1::Ledge
+  LObj  LO::S_Spring, 5, 25
+  LRCustom Block::LedgeSolidLeft, 1, 22, 0, 4
+  LObjN LO::Wide1, 1, 22, 3, LN1::Ledge
+  LRCustom Block::LedgeSolidRight, 4, 22, 0, 9
   LFinished
 
 SampleLevelSprite:
