@@ -210,6 +210,8 @@ Skip:
 .endproc
 
 .proc BlockMoney
+  lda #Block::Empty
+  jsl ChangeBlock
   rts
 .endproc
 
@@ -223,13 +225,13 @@ Skip:
 
 .a16
 .proc BlockPrize
-  lda #Block::UsedPrize*2
+  lda #Block::UsedPrize
   jsl ChangeBlock
   rts
 .endproc
 
 .proc BlockBricks
-  lda #Block::Empty*2
+  lda #Block::Empty
   jsl ChangeBlock
   rts
 .endproc

@@ -24,8 +24,8 @@
 .segment "ActorData"
 
 ; Two comparisons to make to determine if something is a slope
-SlopeBCC = Block::MedSlopeL_DL*2
-SlopeBCS = Block::GradualSlopeR_U4*2+1
+SlopeBCC = Block::MedSlopeL_DL
+SlopeBCS = Block::GradualSlopeR_U4+1
 .export SlopeBCC, SlopeBCS
 SlopeY = 2
 

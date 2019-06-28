@@ -422,26 +422,26 @@ SpecialConfig:
   .word $ffff&BlockTallList,        32*2
   .word $ffff&BlockRectList,        32*2
 
-  .word $ffff&BlockRectangle,       2*Block::Empty
-  .word $ffff&BlockRectangle,       2*Block::Bricks
-  .word $ffff&BlockRectangle,       2*Block::SolidBlock
-  .word $ffff&BlockRectangle,       2*Block::Ice
-  .word $ffff&BlockRectangle,       2*Block::LedgeMiddle
-  .word $ffff&BlockSingle,          2*Block::Bricks
-  .word $ffff&BlockSingle,          2*Block::Prize
-  .word $ffff&BlockSingle,          2*Block::SolidBlock
-  .word $ffff&BlockSingle,          2*Block::PickupBlock
-  .word $ffff&BlockSingle,          2*Block::PushBlock
-  .word $ffff&BlockSingle,          2*Block::Heart
-  .word $ffff&BlockSingle,          2*Block::SmallHeart
-  .word $ffff&BlockSingle,          2*Block::Sign
-  .word $ffff&BlockSingle,          2*Block::Money
-  .word $ffff&BlockSingle,          2*Block::Spring
-  .word $ffff&BlockSingle,          2*Block::Rock
-  .word $ffff&BlockSingle,          2*Block::LedgeLeft
-  .word $ffff&BlockSingle,          2*Block::LedgeRight
-  .word $ffff&BlockSingle,          2*Block::LedgeSolidLeft
-  .word $ffff&BlockSingle,          2*Block::LedgeSolidRight
+  .word $ffff&BlockRectangle,       Block::Empty
+  .word $ffff&BlockRectangle,       Block::Bricks
+  .word $ffff&BlockRectangle,       Block::SolidBlock
+  .word $ffff&BlockRectangle,       Block::Ice
+  .word $ffff&BlockRectangle,       Block::LedgeMiddle
+  .word $ffff&BlockSingle,          Block::Bricks
+  .word $ffff&BlockSingle,          Block::Prize
+  .word $ffff&BlockSingle,          Block::SolidBlock
+  .word $ffff&BlockSingle,          Block::PickupBlock
+  .word $ffff&BlockSingle,          Block::PushBlock
+  .word $ffff&BlockSingle,          Block::Heart
+  .word $ffff&BlockSingle,          Block::SmallHeart
+  .word $ffff&BlockSingle,          Block::Sign
+  .word $ffff&BlockSingle,          Block::Money
+  .word $ffff&BlockSingle,          Block::Spring
+  .word $ffff&BlockSingle,          Block::Rock
+  .word $ffff&BlockSingle,          Block::LedgeLeft
+  .word $ffff&BlockSingle,          Block::LedgeRight
+  .word $ffff&BlockSingle,          Block::LedgeSolidLeft
+  .word $ffff&BlockSingle,          Block::LedgeSolidRight
 
   .word $ffff&SlopeLGradual,        0
   .word $ffff&SlopeLMedium,         0
@@ -455,56 +455,56 @@ SpecialConfig:
 ; Used with BlockWideList, BlockTallList and BlockRectList
 .proc NybbleTypesList
 ; Set 1
-  .word Block::Empty*2
-  .word Block::Ladder*2
-  .word Block::SpikesUp*2
-  .word Block::SpikesDown*2
-  .word Block::Ledge*2
-  .word Block::Money*2
-  .word Block::PickupBlock*2
-  .word Block::PushBlock*2
-  .word Block::LedgeMiddle*2
-  .word Block::Prize*2
-  .word Block::SolidBlock*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
+  .word Block::Empty
+  .word Block::Ladder
+  .word Block::SpikesUp
+  .word Block::SpikesDown
+  .word Block::Ledge
+  .word Block::Money
+  .word Block::PickupBlock
+  .word Block::PushBlock
+  .word Block::LedgeMiddle
+  .word Block::Prize
+  .word Block::SolidBlock
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
 ; Set 2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
 ; Set 3
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
-  .word Block::Empty*2
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
 .endproc
 
 ; .----------------------------------------------------------------------------
@@ -611,31 +611,31 @@ Loop:
   phy
   phy
   phy
-  lda #2*Block::GradualSlopeL_U1
+  lda #Block::GradualSlopeL_U1
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::GradualSlopeL_D1
-  sta [LevelBlockPtr],y
-  jsr SlopeDirtColumn
-
-  ply
-  lda #2*Block::GradualSlopeL_U2
-  sta [LevelBlockPtr],y
-  iny
-  iny
-  lda #2*Block::GradualSlopeL_D2
+  lda #Block::GradualSlopeL_D1
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
 
   ply
-  lda #2*Block::GradualSlopeL_U3
+  lda #Block::GradualSlopeL_U2
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #Block::GradualSlopeL_D2
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #Block::GradualSlopeL_U3
   sta [LevelBlockPtr],y
   inc DecodeHeight
   jsr SlopeDirtColumn
 
   ply
-  lda #2*Block::GradualSlopeL_U4
+  lda #Block::GradualSlopeL_U4
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
@@ -658,15 +658,15 @@ Loop:
 Loop:
   phy
   phy
-  lda #2*Block::MedSlopeL_UL
+  lda #Block::MedSlopeL_UL
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::MedSlopeL_DL
+  lda #Block::MedSlopeL_DL
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
-  lda #2*Block::MedSlopeL_UR
+  lda #Block::MedSlopeL_UR
   sta [LevelBlockPtr],y
   inc DecodeHeight
   jsr SlopeDirtColumn
@@ -689,11 +689,11 @@ Loop:
 
 Loop:
   phy
-  lda #2*Block::SteepSlopeL_U
+  lda #Block::SteepSlopeL_U
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::SteepSlopeL_D
+  lda #Block::SteepSlopeL_D
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
@@ -720,38 +720,38 @@ Loop:
   phy
   phy
   phy
-  lda #2*Block::GradualSlopeR_U1
+  lda #Block::GradualSlopeR_U1
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::LedgeMiddle
-  sta [LevelBlockPtr],y
-  jsr SlopeDirtColumn
-
-  ply
-  lda #2*Block::GradualSlopeR_U2
-  sta [LevelBlockPtr],y
-  iny
-  iny
-  lda #2*Block::LedgeMiddle
+  lda #Block::LedgeMiddle
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
 
   ply
-  lda #2*Block::GradualSlopeR_U3
+  lda #Block::GradualSlopeR_U2
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::GradualSlopeR_D3
+  lda #Block::LedgeMiddle
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
 
   ply
-  lda #2*Block::GradualSlopeR_U4
+  lda #Block::GradualSlopeR_U3
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::GradualSlopeR_D4
+  lda #Block::GradualSlopeR_D3
+  sta [LevelBlockPtr],y
+  jsr SlopeDirtColumn
+
+  ply
+  lda #Block::GradualSlopeR_U4
+  sta [LevelBlockPtr],y
+  iny
+  iny
+  lda #Block::GradualSlopeR_D4
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
@@ -777,19 +777,19 @@ Loop:
 Loop:
   phy
   phy
-  lda #2*Block::MedSlopeR_UL
+  lda #Block::MedSlopeR_UL
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::LedgeMiddle
+  lda #Block::LedgeMiddle
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
-  lda #2*Block::MedSlopeR_UR
+  lda #Block::MedSlopeR_UR
   sta [LevelBlockPtr],y
   iny
   iny
-  lda #2*Block::MedSlopeR_DR
+  lda #Block::MedSlopeR_DR
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
@@ -813,12 +813,12 @@ Loop:
   jsr DownhillSlope
   .a16
 Loop:
-  lda #2*Block::SteepSlopeR_U
+  lda #Block::SteepSlopeR_U
   sta [LevelBlockPtr],y
   iny
   iny
   phy
-  lda #2*Block::SteepSlopeR_D
+  lda #Block::SteepSlopeR_D
   sta [LevelBlockPtr],y
   jsr SlopeDirtColumn
   ply
@@ -971,7 +971,7 @@ RowLoop:
   tax
 
   ; Fill in dirt
-  lda #2*Block::LedgeMiddle
+  lda #Block::LedgeMiddle
 : dex
   beq :+
   sta [LevelBlockPtr],y

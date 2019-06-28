@@ -105,20 +105,20 @@ Loop:
   lda [MidPointer],y
   iny
   iny
-  cmp #Block::Ladder * 2
+  cmp #Block::Ladder
   beq No
-  cmp #Block::LadderTop * 2
+  cmp #Block::LadderTop
   beq No
-  lda #Block::LadderTop * 2
+  lda #Block::LadderTop
   sta [MidPointer],y
 No:
   rts
 .endproc
 
 .proc IsLedgeTile
-  cmp #Block::GradualSlopeR_U4*2+1
+  cmp #Block::GradualSlopeR_U4+1
   bcs No
-  cmp #Block::Ledge*2
+  cmp #Block::Ledge
   bcc No
 Yes:
   sec
@@ -146,21 +146,21 @@ No:
   bra AutotileExpandOther
 
 Table:
-  .word Block::Ledge*2
-  .word Block::LedgeLeft*2
-  .word Block::LedgeRight*2
-  .word Block::Ledge*2
+  .word Block::Ledge
+  .word Block::LedgeLeft
+  .word Block::LedgeRight
+  .word Block::Ledge
 ExpandWith:
-  .word Block::LedgeMiddle*2
-  .word Block::LedgeLeftSide*2
-  .word Block::LedgeRightSide*2
-  .word Block::LedgeMiddle*2
+  .word Block::LedgeMiddle
+  .word Block::LedgeLeftSide
+  .word Block::LedgeRightSide
+  .word Block::LedgeMiddle
 .endproc
 
 .export AutotileExpandDirt
 .proc AutotileExpandDirt
   ; 0 = Block to store
-  lda #Block::LedgeMiddle*2
+  lda #Block::LedgeMiddle
 ExpandOther:
   sta 0
 
@@ -199,9 +199,9 @@ Loop:
   iny
   iny
   lda [MidPointer],y
-  cmp #Block::LedgeSolidLeft*2
+  cmp #Block::LedgeSolidLeft
   bne Nope
-  lda #Block::LedgeSolidLeftSide*2
+  lda #Block::LedgeSolidLeftSide
   sta [MidPointer],y
   bra Loop
 
@@ -209,9 +209,9 @@ Nope:
   dey
   dey
   lda [LeftPointer],y
-  cmp #Block::Ledge*2
+  cmp #Block::Ledge
   bne :+
-    lda #Block::LedgeSolidLeftSideCorner*2
+    lda #Block::LedgeSolidLeftSideCorner
     sta [MidPointer],y
     jmp AutotileExpandDirt
   :
@@ -224,9 +224,9 @@ Loop:
   iny
   iny
   lda [MidPointer],y
-  cmp #Block::LedgeSolidRight*2
+  cmp #Block::LedgeSolidRight
   bne Nope
-  lda #Block::LedgeSolidRightSide*2
+  lda #Block::LedgeSolidRightSide
   sta [MidPointer],y
   bra Loop
 
@@ -234,9 +234,9 @@ Nope:
   dey
   dey
   lda [LeftPointer],y
-  cmp #Block::Ledge*2
+  cmp #Block::Ledge
   bne :+
-    lda #Block::LedgeSolidRightSideCorner*2
+    lda #Block::LedgeSolidRightSideCorner
     sta [MidPointer],y
     jmp AutotileExpandDirt
   :

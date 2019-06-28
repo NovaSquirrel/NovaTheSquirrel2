@@ -102,7 +102,7 @@
   .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
   .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
   LObj LO::S_Custom, XPos, YPos
-  .word Type*2
+  .word Type
 .endmacro
 
 .macro LRCustom Type, XPos, YPos, Width, Height
@@ -111,7 +111,7 @@
   .assert Width >= 0 && Width <= 15, error, "Invalid width"
   .assert Height >= 0 && Height <= 15, error, "Invalid height"
   LObj LO::R_Custom, XPos, YPos
-  .word Type*2
+  .word Type
   .byt (Width<<4)|Height
 .endmacro
 

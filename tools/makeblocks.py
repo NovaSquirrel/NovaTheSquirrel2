@@ -210,8 +210,10 @@ outfile.close()
 outfile = open("src/blockenum.s", "w")
 outfile.write('; This is automatically generated. Edit "blocks.txt" instead\n')
 outfile.write('.enum Block\n')
+block_counter = 0
 for b in all_blocks:
-	outfile.write('  %s\n' % b['name'])
+	outfile.write('  %s = %d\n' % (b['name'], block_counter*2))
+	block_counter += 1
 outfile.write('.endenum\n\n')
 
 # Generate the class enum
