@@ -293,9 +293,150 @@ YPos = 6
   ; Generate the top or bottom as needed
   lda Temp
   lsr
-  bcs :+
+  bcc :+
+  jsl RenderLevelColumnRight
+  rts
+:
+
+  ; If it's the left column, also scan for actors to introduce into the level
+  lda Temp
+  pha ; Don't rely on this routine not overwriting this variable
   jsl RenderLevelColumnLeft
-  rts
-: jsl RenderLevelColumnRight
-  rts
+  pla
+ScanForSprites:
+CheckColumn = Temp + 0
+CheckScreen = Temp + 1
+  lsr
+  setaxy8
+  sta CheckColumn
+  and #$f0
+  sta CheckScreen
+  lsr
+  lsr
+  lsr
+  lsr ; Screen number
+  tay
+  lda FirstActorOnScreen,y
+  cmp #255 ; No sprites on screen
+  beq Exit
+
+  setaxy16
+  and #$00ff ; Clear high byte
+  asl        ; Multiply by 4
+  asl
+  tay
+
+  seta8
+Loop:
+  lda [LevelSpritePointer],y
+  cmp #255
+  beq Exit ; Exit since the sprite data is over
+  pha
+  and #$f0
+  cmp CheckScreen
+  bne Exit_PLA ; Exit since the sprite data is on a different screen now
+  pla
+  cmp CheckColumn
+  bne :+
+    jsl TryMakeSprite
+  :
+  ; Next sprite
+  iny
+  iny
+  iny
+  iny
+  bra Loop
+
+Exit_PLA:
+  pla
+Exit:
+  setaxy16
+  rts 
 .endproc
+
+; Try to make a sprite from the level sprite list
+; inputs: Y (sprite index)
+; preserves Y
+.a8
+.i16
+.export TryMakeSprite
+.proc TryMakeSprite
+Index = 0
+  sty Index
+  phy
+  php
+  setaxy16
+  
+  ; Ensure the sprite has not already been spawned
+  ldx #ObjectStart
+CheckExistsLoop:
+  lda ObjectType,x ; Ignore ObjectIndexInLevel if there is no object there
+  beq :+
+    lda ObjectIndexInLevel,x ; Already exists
+    cmp Index
+    beq Exit
+  :
+  ; Next sprite
+  txa
+  add #ObjectSize
+  tax
+  cpx #ObjectEnd
+  bne CheckExistsLoop
+
+  ; -----------------------------------
+  ; Spawn in the sprite
+  jsl FindFreeObjectX
+  bcc Exit
+
+  ; X now points at a free slot
+  stz ObjectVX,x
+  stz ObjectVY,x
+  stz ObjectVarB,x
+  stz ObjectVarC,x
+  stz ObjectTimer,x
+  stz ObjectState,x
+
+  ; Sprite list organized as XXXXXXXX D..YYYYY tttttttt abcdTTTT
+  seta8
+  lda [LevelSpritePointer],y ; X position
+  sta ObjectPX+1,x
+  lda #$80                   ; Center it
+  sta ObjectPX+0,x
+  iny
+  lda [LevelSpritePointer],y ; Y position, and two unused bits
+  asl
+  php
+  lsr
+  and #31
+  sta ObjectPY+1,x
+  lda #$ff
+  sta ObjectPY+0,x
+  ; Copy the most significant bit of the Y position to the least significant bit of the direction
+  plp
+  lda #0
+  rol
+  sta ObjectDirection,x
+  iny
+
+  seta16
+  lda [LevelSpritePointer],y ; Object type and flags
+  and #$fff
+  asl
+  sta ObjectType,x
+
+  ; Store the flags into object generic variable A
+  lda [LevelSpritePointer],y
+  xba
+  lsr
+  lsr
+  lsr
+  lsr
+  and #15
+  sta ObjectVarA,x
+
+Exit:
+  plp
+  ply
+  rtl
+.endproc
+

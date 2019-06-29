@@ -64,13 +64,13 @@
 .macro LSpr Type, Direction, XPos, YPos, Extra
   .byt XPos
   .byt (Direction<<7)|YPos
-  .byt >Type
+  .byt <Type
   ; Last byte combines extra bits with four extra sprite type bits.
   ; May be completely overboard
   .ifnblank Extra
-    .byt (Extra<<4)|(<Type)
+    .byt (Extra<<4)|(>Type)
   .else
-    .byt <Type
+    .byt >Type
   .endif
 .endmacro
 

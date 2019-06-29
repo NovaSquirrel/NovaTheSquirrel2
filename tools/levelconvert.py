@@ -1,5 +1,4 @@
-import json
-import glob
+import json, glob, os
 
 # -------------------------------------
 # Parse the level data definition file
@@ -165,13 +164,24 @@ def convert_layer(layer):
 		else:
 			print("Unhandled rectangle: %s" % r)
 
-	for l in output:
-		print(l)
+	return output, byte_count
 
-	return output
 
+outfile = open("src/leveldata.s", "w")
+outfile.write('; This is automatically generated. Edit level JSON files instead\n')
+outfile.write('.include "snes.inc"\n')
+outfile.write('.include "actorenum.s"\n')
+outfile.write('.include "graphicsenum.s"\n')
+outfile.write('.include "paletteenum.s"\n')
+outfile.write('.include "blockenum.s"\n')
+outfile.write('.include "leveldata.inc"\n\n')
+outfile.write('.segment "LevelBank1"\n\n')
 
 for f in glob.glob("levels/*.json"):
+	plain_name = os.path.splitext(os.path.basename(f))[0]
+	outfile.write(".export level_%s\n" % plain_name)
+	outfile.write("level_%s:\n" % plain_name)
+
 	level_file = open(f)
 	level_text = level_file.read()
 	level_file.close()
@@ -185,7 +195,84 @@ for f in glob.glob("levels/*.json"):
 	sprites = [Rect(x) for x in level_json["Layers"][1]["Data"]]
 	control = [Rect(x) for x in level_json["Layers"][2]["Data"]]
 
-	convert_layer(foreground)
+	# ---------------------------------
+	player_x, player_y, player_dir = 5, 5, False
+	total_level_size = 33
 
-	print(foreground)
+	boundaries = 0;
+	def set_boundary_at(screen):
+		if screen < 1:
+			return
+		if screen > 16:
+			return;
+		bit = 1 << 16-screen;
+		boundaries |= bit;
 
+	# Apply some control commands
+	for r in control:
+		if r.type == 'PLAYER_START_R' or r.type == 'PLAYER_START_L':
+			player_x = r.x
+			player_y = r.y
+			player_dir = r.type[-1] == 'L'
+		if r.type == 'SCROLL_LOCK':
+			screen = (r.x//16);
+			if r.x&15 == 15:
+				set_boundary_at(screen+1);
+			else:
+				set_boundary_at(screen);
+
+    # Write the header
+	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction
+	outfile.write('  .byt %d\n' % player_x)
+	outfile.write('  .byt %d\n' % player_y)
+	outfile.write('  .byt 0\n') # flags
+	outfile.write('  .word %s\n' % level_json["Header"]["BGColor"])
+	if level_json["Header"]["Background"]:
+		outfile.write('  .word %s\n' % level_json["Header"]["Background"])
+	else:
+		outfile.write('  .word $ffff\n')
+	outfile.write('  .addr .loword(level_%s_sp)\n' % plain_name)
+	outfile.write('  .dbyt %d\n\n' % boundaries)
+	for i in range(8):
+		if (len(level_json["Header"]["SpriteGFX"]) > i) and level_json["Header"]["SpriteGFX"][i]:
+			outfile.write('  .byt GraphicsUpload::%s\n' % level_json["Header"]["SpriteGFX"][i])
+		else:
+			outfile.write('  .byt 255\n')
+	outfile.write('\n')
+
+	for i in range(8):
+		if (len(level_json["Header"]["BGPalette"]) > i) and level_json["Header"]["BGPalette"][i]:
+			outfile.write('  .byt Palette::%s\n' % level_json["Header"]["BGPalette"][i])
+		else:
+			outfile.write('  .byt 255\n')
+	outfile.write('\n')
+
+	for i in level_json["Header"]["GFXUpload"]:
+		outfile.write('  .byt GraphicsUpload::%s\n' % i)
+		total_level_size += 1
+	outfile.write('  .byt 255\n')
+
+	outfile.write('  .addr .loword(level_%s_fg)\n\n' % plain_name)
+
+	# Write the foreground data
+	fg_data, fg_size = convert_layer(foreground)
+	total_level_size += fg_size
+	outfile.write("level_%s_fg:\n" % plain_name)
+	for line in fg_data:
+		outfile.write("  %s\n" % line)
+	outfile.write("  LFinished\n\n")
+
+	# Write the sprite data
+	sprites = sorted(sprites, key=lambda r: r.x)
+	outfile.write("level_%s_sp:\n" % plain_name)
+	for sprite in sprites:
+		if len(sprite.extra):
+			outfile.write("  LSpr Object::%s, %d, %d, %d, %s\n" % (sprite.type, (1 if sprite.xflip else 0), sprite.x, sprite.y, sprite.extra))
+		else:
+			outfile.write("  LSpr Object::%s, %d, %d, %d\n" % (sprite.type, (1 if sprite.xflip else 0), sprite.x, sprite.y))
+		total_level_size += 4
+	outfile.write("  .byt 255\n\n")
+
+	outfile.write("\n")
+	print("Total size: %d" % total_level_size)
+outfile.close()

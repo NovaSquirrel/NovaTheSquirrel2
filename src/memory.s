@@ -68,7 +68,7 @@
 
   LevelColumnSize:  .res 2 ; for moving left and right in a level buffer
   DecodePointer:    .res 3 ; multipurpose 24-bit pointer
-  LevelSpritePointer: .res 3
+  LevelSpritePointer: .res 3 ; sprite pointer for this level
 
 .segment "BSS" ; First 8KB of RAM
   ObjectSize = 10*2+3
@@ -151,12 +151,12 @@ LevelZeroWhenLoad_Start:
   ; Dynamically uploading sprite palettes
   PaletteRequestIndex: .res 1
   PaletteRequestValue: .res 1
+LevelZeroWhenLoad_End:
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)
   ; Multiply by 4 to use it.
   FirstActorOnScreen:     .res 16
-LevelZeroWhenLoad_End:
 
 .segment "BSS7E"
 

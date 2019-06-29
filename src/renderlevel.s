@@ -35,6 +35,66 @@
 
   ; -------------------
 
+  ; Init entities
+  ldx #ObjectStart
+: stz 0,x
+  inx
+  inx
+  cpx #ObjectEnd
+  bne :-
+
+  ; Init particles
+  ldx #ParticleStart
+: stz 0,x
+  inx
+  inx
+  cpx #ParticleEnd
+  bne :-
+
+
+  seta8
+  Low = 4
+  High = 5
+  ; Try to spawn actors.
+  ; First find the minimum and maximum columns to check.
+  lda ScrollX+1
+  sub #4
+  bcs :+
+    lda #0
+  :
+  sta Low
+  ; - get high column
+  lda ScrollX+1
+  add #25
+  bcc :+
+    lda #255
+  :
+  sta High
+  ; Now look through the list
+  ldy #0
+EnemyLoop:
+  lda [LevelSpritePointer],y
+  cmp #255
+  beq Exit
+  cmp Low
+  bcc Nope
+  cmp High
+  bcs Nope
+  .import TryMakeSprite
+  jsl TryMakeSprite
+Nope:
+  iny
+  iny
+  iny
+  iny
+  bne EnemyLoop
+Exit:
+  seta16
+
+
+
+  ; -------------------
+
 BlockNum = 0
 BlocksLeft = 2
 YPos = 4

@@ -37,16 +37,6 @@
   jsl DecompressLevel
   jsl AutotileLevel
 
-  lda #1*2
-  sta ObjectStart+ObjectType
-  lda #0*256
-  sta ObjectStart+ObjectPX
-  lda #20*256
-  sta ObjectStart+ObjectPY
-  lda #0
-  sta ObjectStart+ObjectVX
-  sta ObjectStart+ObjectVY
-
   lda #Palette::SPNova
   ldy #8
   jsl DoPaletteUpload
@@ -73,21 +63,7 @@
 
   ; Clear out some buffers before the level loads stuff into them
 
-  ; Init entities
-  ldx #ObjectStart
-: stz 0,x
-  inx
-  inx
-  cpx #ObjectEnd
-  bne :-
-
-  ; Init particles
-  ldx #ParticleStart
-: stz 0,x
-  inx
-  inx
-  cpx #ParticleEnd
-  bne :-
+  ; Don't clear any sprites, that'll be done when rendering
 
   ; Clear level buffer
   lda #0
@@ -126,6 +102,13 @@
   dex
   bpl :-
 
+  ; Clear FirstActorOnScreen list too
+  ldy #15
+  lda #255
+: sta FirstActorOnScreen,y
+  dey
+  bpl :-
+
   ; Set the high byte of the level pointer
   ; so later accesses work correctly.
   lda #^LevelBuf
@@ -135,11 +118,12 @@
 
   ; Parse the level header
   ; (Replace with a lookup later)
-  lda #<SampleLevelHeader
+  .import level_demo
+  lda #<level_demo
   sta DecodePointer+0
-  lda #>SampleLevelHeader
+  lda #>level_demo
   sta DecodePointer+1
-  lda #^SampleLevelHeader
+  lda #^level_demo
   sta DecodePointer+2
 
   ; Music and starting player direction
@@ -317,6 +301,7 @@
   sta PPUNMI
 
   ; -----------------------------------
+  jsr IndexSpriteList
 
   ; Now use the new DecodePointer to decompress the level data
   phk
@@ -328,6 +313,46 @@
   setaxy16
   rtl
 .endproc
+
+.a8
+.i16
+.proc IndexSpriteList
+  setaxy8
+  ldy #0
+@Loop:
+  lda [LevelSpritePointer],y
+  cmp #255 ; 255 marks the end of the list
+  beq @Exit
+  ; Get screen number
+  lsr
+  lsr
+  lsr
+  lsr
+  tax
+  ; Write sprite number to the list, if the
+  ; screen doesn't already have a sprite set for it
+  lda FirstActorOnScreen,x
+  cmp #255
+  bne :+
+  seta16
+  tya
+  ; Divide by 4 to fit a bigger range into 255 bytes
+  lsr
+  lsr
+  seta8
+  sta FirstActorOnScreen,x
+:
+  ; Actors entries are four bytes long
+  iny
+  iny
+  iny
+  iny
+  bra @Loop
+@Exit:
+  setxy16
+  rts
+.endproc
+
 
 .proc LevelDecodeLoop
 : jsr LevelDecodeCommand
@@ -1034,76 +1059,3 @@ GetWidthHeight:
   seta16
   rts
 .endproc
-
-; .----------------------------------------------------------------------------
-; | Sample level while there isn't a level directory yet
-; '----------------------------------------------------------------------------
-SampleLevelHeader:
-  .byt 0   ; No music, and facing right
-  .byt 3   ; start at X position 3
-  .byt 13  ; start at Y position 13
-  .byt $40 ; vertical scrolling allowed
-  .word RGB(15,23,31) ; background color
-  .word 1  ; background
-  .addr SampleLevelSprite
-  .byt %00000000, %00000000  ; No scroll barriers
-  ; Eight sprite graphic slots
-  .byt GraphicsUpload::SPWalker
-  .byt GraphicsUpload::SPCannon
-  .byt 255
-  .byt 255
-  .byt 255
-  .byt 255
-  .byt 255
-  .byt 255
-  ; Eight background palette slots
-  .byt Palette::FGCommon
-  .byt Palette::FGGrassy
-  .byt 255
-  .byt 255
-  .byt 255
-  .byt 255
-  .byt 255
-  .byt Palette::BGForest 
-  ; Level graphic assets
-  .byt GraphicsUpload::FGCommon
-  .byt GraphicsUpload::FGGrassy
-  .byt GraphicsUpload::FGTropicalWood
-  .byt GraphicsUpload::BGForest
-  .byt 255
-  ; Pointer to the level foreground data
-  .addr SampleLevelData
-
-SampleLevelData:
-  LObjN LO::Rect1, 0, 30, 0, LN1::Ledge, 17
-  LObjN LO::Wide1, 2, 26, 4, LN1::Prize
-  LObjN LO::Tall1, 7, 24, 5, LN1::Ladder
-  LObjN LO::Wide1, 1, 24, 5, LN1::Ledge
-  LObjN LO::Rect1, 0, 21, 1, LN1::Money, 1
-  LObjN LO::Wide1, 2, 21, 5, LN1::Ledge
-  LObjN LO::Rect1, 0, 18, 1, LN1::Money, 1
-  LObjN LO::R_Bricks, 2, 17, 2, 0
-  LObjN LO::SlopeL_Gradual, 4, 29, 0, 0
-  LObjN LO::SlopeL_Medium, 4, 28, 1, 1
-  LObjN LO::SlopeL_Steep, 4, 26, 3, 3
-  LObjN LO::SlopeL_Medium, 4, 22, 1, 1
-  LObjN LO::SlopeL_Gradual, 4, 20, 0, 0
-  LObjN LO::Wide1, 4, 20, 6, LN1::Ledge
-  LObjN LO::Wide1, 1, 18, 4, LN1::Money
-  LObjN LO::SlopeR_Gradual, 6, 20, 0, 0
-  LObjN LO::SlopeR_Medium, 4, 21, 1, 1
-  LObjN LO::SlopeR_Steep, 4, 23, 3, 3
-  LObjN LO::SlopeR_Medium, 4, 27, 1, 1
-  LObjN LO::SlopeR_Gradual, 4, 29, 0, 0
-  LObjN LO::Wide1, 4, 30, 1, LN1::Ledge
-  LObj  LO::S_Spring, 1, 29
-  LRCustom Block::LedgeSolidLeft, 1, 26, 0, 4
-  LObjN LO::Wide1, 1, 26, 5, LN1::Ledge
-  LObj  LO::S_Spring, 5, 25
-  LRCustom Block::LedgeSolidLeft, 1, 22, 0, 4
-  LObjN LO::Wide1, 1, 22, 3, LN1::Ledge
-  LRCustom Block::LedgeSolidRight, 4, 22, 0, 9
-  LFinished
-
-SampleLevelSprite:
-  .byt $ff

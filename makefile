@@ -19,7 +19,7 @@ objlist = \
   snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
-  levelload levelautotile actordata actorcode object
+  levelload levelautotile leveldata actordata actorcode object
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -102,6 +102,7 @@ brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 palettes := $(wildcard palettes/*.png)
+levels := $(wildcard levels/*.json)
 
 # Background conversion
 # (nametable conversion is implied)
@@ -154,6 +155,8 @@ $(srcdir)/paletteenum.s: $(palettes)
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(srcdir)/actorenum.s: tools/actors.txt
 	$(PY) tools/makeactor.py
+$(srcdir)/leveldata.s: $(levels)
+	$(PY) tools/levelconvert.py
 
 
 #$(objdir)/graphics.o: $(chr2all) $(chr4all)
