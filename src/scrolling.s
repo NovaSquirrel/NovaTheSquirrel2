@@ -394,7 +394,8 @@ CheckExistsLoop:
   stz ObjectVarB,x
   stz ObjectVarC,x
   stz ObjectTimer,x
-  stz ObjectState,x
+  lda #ObjectStateValue::Init
+  sta ObjectState,x
 
   ; Sprite list organized as XXXXXXXX D..YYYYY tttttttt abcdTTTT
   seta8

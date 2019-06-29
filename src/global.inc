@@ -55,4 +55,12 @@ ExtraBG = $E000
   Secondary     = %0000000000000000
 .endenum
 
+.enum ObjectStateValue
+  None    = 0
+  Paused  = 128|1
+  Stunned = 128|2
+  Active  = 128|3
+  Init    = 128|4
+.endenum
+
 .global FindFreeObjectX, FindFreeObjectY

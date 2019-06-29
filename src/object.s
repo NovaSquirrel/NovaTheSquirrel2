@@ -100,6 +100,14 @@ Loop:
 
   NotWaitUntilNear:
 
+  ; Reset the "init" state
+  seta8
+  lda ObjectState,x
+  cmp #ObjectStateValue::Init
+  bne :+
+    stz ObjectState,x
+  :
+  seta16
 SkipEntity:
 
   ; Next entity
