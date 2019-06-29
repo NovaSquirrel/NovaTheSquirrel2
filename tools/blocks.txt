@@ -3,7 +3,7 @@
 
 alias common $0000
 alias terrain $1000
-alias wood $1800
+alias wood $2000
 alias global_palette 0
 alias terrain_palette 1
 
