@@ -25,7 +25,7 @@
 
 ; Two comparisons to make to determine if something is a slope
 SlopeBCC = Block::MedSlopeL_DL
-SlopeBCS = Block::GradualSlopeR_U4+1
+SlopeBCS = Block::GradualSlopeR_U4_Dirt+1
 .export SlopeBCC, SlopeBCS
 SlopeY = 2
 
@@ -984,6 +984,7 @@ Invalid:
 .word $00, $00, $00, $00, $00, $00, $00, $00
 .word $00, $00, $00, $00, $00, $00, $00, $00
 
+.repeat 2
 ;MedSlopeL_UL
 .word $f0, $f0, $e0, $e0, $d0, $d0, $c0, $c0
 .word $b0, $b0, $a0, $a0, $90, $90, $80, $80
@@ -1039,4 +1040,5 @@ Invalid:
 ;GradualSlopeR_U4
 .word $c0, $c0, $c0, $c0, $d0, $d0, $d0, $d0
 .word $e0, $e0, $e0, $e0, $f0, $f0, $f0, $f0
+.endrep
 .endproc

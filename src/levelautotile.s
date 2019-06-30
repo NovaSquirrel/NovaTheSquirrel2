@@ -116,13 +116,17 @@ No:
 .endproc
 
 .proc IsLedgeTile
-  cmp #Block::GradualSlopeR_U4+1
+  cmp #Block::LedgeMiddle
+  beq No
+  cmp #Block::GradualSlopeR_U4_Dirt+1
   bcs No
   cmp #Block::Ledge
   bcc No
 Yes:
   sec
+  rts
 No:
+  clc
   rts
 .endproc
 
@@ -187,6 +191,31 @@ Yes:
   sta [MidPointer],y
   bra Loop
 No:
+
+  ; If filling with dirt, check for tiles to autotile below
+;  lda 0
+;  cmp #Block::LedgeMiddle
+;  bne NotFillDirt
+    lda [MidPointer],y
+    cmp #Block::LedgeLeft
+    bcc @NotLedge
+    cmp #Block::LedgeSolidRight+1
+    bcs @NotLedge
+       adc #4*2
+       sta [MidPointer],y
+       bra NotFillDirt
+    @NotLedge:
+
+    cmp #Block::MedSlopeL_UL
+    bcc @NotSlope
+    cmp #Block::GradualSlopeR_U4+1
+    bcs @NotSlope
+       adc #14*2
+       sta [MidPointer],y
+	@NotSlope:
+
+  NotFillDirt:
+
   dey
   dey
   rts

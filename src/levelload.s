@@ -119,6 +119,7 @@
   ; Parse the level header
   ; (Replace with a lookup later)
   .import level_demo
+  .import level_autodirttest
   lda #<level_demo
   sta DecodePointer+0
   lda #>level_demo
@@ -985,6 +986,22 @@ RowLoop:
 ; Helper routine for slopes
 .a16
 .proc SlopeDirtColumn
+.if 0
+  ; Smaller version that doesn't actually fill the column,
+  ; for some tests with overlapping slopes
+  iny
+  iny
+  lda [LevelBlockPtr],y
+  bne :+
+    lda #Block::LedgeMiddle
+    sta [LevelBlockPtr],y
+  :
+  lda LevelBlockPtr
+  add LevelColumnSize
+  sta LevelBlockPtr
+  rts
+.endif
+
   phx
   iny
   iny

@@ -33,3 +33,4 @@ src/actorenum.s
 src/actordata.s
 src/graphicsenum.s
 *.driveupload
+src/leveldata.s
