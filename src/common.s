@@ -120,11 +120,11 @@ loop2:
 
 ; Changes a block in the level immediately and queues a PPU update.
 ; input: A (new block), LevelBlockPtr (block to change)
-; locals: 0
+; locals: BlockTemp
 .a16
 .i16
 .proc ChangeBlock
-Temp = 0
+Temp = BlockTemp
   phx
   phy
   php
@@ -252,10 +252,36 @@ Exit:
   rtl
 .endproc
 
-; To write
+; Changes a block, in the future!
+; input: A (new block), LevelBlockPtr (block to change), BlockTemp (Time amount)
 .a16
 .i16
 .proc DelayChangeBlock
+  phx
+  phy
+
+  ; Find an unused slot
+  ldx #(MaxDelayedBlockEdits-1)*2
+DelayedBlockLoop:
+  ldy DelayedBlockEditTime,x ; Load Y to set flags only
+  beq Found                  ; Found an empty slot!
+  dex
+  dex
+  bpl DelayedBlockLoop
+  bra Exit ; Fail
+
+Found:
+  sta DelayedBlockEditType,x
+
+  lda BlockTemp
+  sta DelayedBlockEditTime,x
+
+  lda LevelBlockPtr
+  sta DelayedBlockEditAddr,x
+
+Exit:
+  ply
+  plx
   rtl
 .endproc
 

@@ -111,6 +111,24 @@ forever:
   and keydown
   sta keynew
 
+  ; Handle delayed block changes
+  ldx #(MaxDelayedBlockEdits-1)*2
+DelayedBlockLoop:
+  ; Count down the timer, if there is a timer
+  lda DelayedBlockEditTime,x
+  beq @NoBlock
+    dec DelayedBlockEditTime,x
+    bne @NoBlock
+    ; Hit zero? Make the change
+    lda DelayedBlockEditAddr,x
+    sta LevelBlockPtr
+    lda DelayedBlockEditType,x
+    jsl ChangeBlock
+  @NoBlock:
+  dex
+  dex
+  bpl DelayedBlockLoop
+
   ; Run stuff for this frame
   stz OamPtr
   jsl RunPlayer

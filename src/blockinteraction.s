@@ -225,8 +225,18 @@ Skip:
 
 .a16
 .proc BlockPrize
-  lda #Block::UsedPrize
+  lda #Block::PrizeAnimation1
   jsl ChangeBlock
+
+  lda #5
+  sta BlockTemp
+  lda #Block::PrizeAnimation2
+  jsl DelayChangeBlock
+
+  lda #10
+  sta BlockTemp
+  lda #Block::UsedPrize
+  jsl DelayChangeBlock
   rts
 .endproc
 
@@ -245,6 +255,22 @@ Skip:
 .endproc
 
 .proc BlockSpring
+  lda #.loword(-$70)
+  sta PlayerVY
+
+  seta8
+  lda #30
+  sta PlayerJumpCancelLock
+  sta PlayerJumping
+  seta16
+
+  ; Animate the spring changing
+  lda #5
+  sta BlockTemp
+  lda #Block::Spring
+  jsl DelayChangeBlock
+  lda #Block::SpringPressed
+  jsl ChangeBlock
   rts
 .endproc
 

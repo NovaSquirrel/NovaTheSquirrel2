@@ -50,6 +50,12 @@ BLOCK_UPDATE_COUNT = 4
 .global BlockUpdateDataBL
 .global BlockUpdateDataBR
 
+MaxDelayedBlockEdits = 15
+.global DelayedBlockEditType
+.global DelayedBlockEditTime
+.global DelayedBlockEditAddr
+
+
 .globalzp LevelColumnSize
 .global GetLevelPtrXY_Ptr
 .global LevelBuf

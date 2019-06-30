@@ -100,6 +100,7 @@ MaxSpeedRight = 12
   seta8
   countdown JumpGracePeriod
   countdown PlayerWantsToJump
+  countdown PlayerJumpCancelLock
 
   lda keynew+1
   and #(KEY_B>>8)
@@ -343,6 +344,7 @@ SkipApplyGravity:
     lda SlopeY
     cmp PlayerPY
     bcs :+
+    
     sta PlayerPY
     stz PlayerVY
 
@@ -374,6 +376,18 @@ SkipGroundCheck:
   tay
   lda PlayerPX
   jsr TryBelowInteraction
+
+  ; Inside
+  lda PlayerPY
+  sub #8*16
+  tay
+  lda PlayerPX
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  jsl BlockRunInteractionInsideBody
+
+
+
 
   ; -------------------
 

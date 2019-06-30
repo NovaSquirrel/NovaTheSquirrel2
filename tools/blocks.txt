@@ -35,6 +35,16 @@ solid
 t 2,2 2,2h
 t 2,3 2,3h
 
++PrizeAnimation1
+solid
+t 8,1 8,1h
+t 8,2 8,2h
+
++PrizeAnimation2
+solid
+t 9,1 9,1h
+t 9,2 9,2h
+
 +UsedPrize
 solid
 t 3,2 3,2h
@@ -174,6 +184,28 @@ solid
 t 1,2 5,3
 t 8,2 9,2
 
++LedgeLeft_Dirt
+solid_top
+t 3,5 1,2
+t 0,3 1,3
+
++LedgeRight_Dirt
+solid_top
+t 1,2 4,5
+t 1,3 2,3
+
++LedgeSolidLeft_Dirt
+autotile AutotileLedgeSolidLeft
+solid
+t 9,5 1,2
+t 6,2 7,2
+
++LedgeSolidRight_Dirt
+autotile AutotileLedgeSolidRight
+solid
+t 1,2 10,5
+t 8,2 9,2
+
 +LedgeMiddle
 autotile AutotileExpandDirt
 t 3,3 3,3
@@ -311,3 +343,66 @@ t 10,0 11,0
 +GradualSlopeR_U4
 t 0:0 0:0
 t 12,0 13,0
+
+#######################################
+# Terrain (slopes) - partially solid (with dirt behind)
+#######################################
+
+# Goes up every 2
++MedSlopeL_UL_Dirt
+t 3,3 3,3
+t 2,4 3,4
+
++MedSlopeL_UR_Dirt
+t 2,4 3,4
+t 2,1 3,1
+
++MedSlopeR_UL_Dirt
+t 4,4 5,4
+t 4,1 5,1
+
++MedSlopeR_UR_Dirt
+t 3,3 3,3
+t 4,4 5,4
+
+# Goes up every 1
++SteepSlopeL_U_Dirt
+t 3,3 0,4
+t 0,4 0,1
+
++SteepSlopeR_U_Dirt
+t 1,4 3,3
+t 1,1 1,4
+
+# Goes up every 4
++GradualSlopeL_U1_Dirt
+t 3,3 3,3
+t 6,4 7,4
+
++GradualSlopeL_U2_Dirt
+t 3,3 3,3
+t 8,4 9,4
+
++GradualSlopeL_U3_Dirt
+t 6,4 7,4
+t 6,1 7,1
+
++GradualSlopeL_U4_Dirt
+t 8,4 9,4
+t 8,1 9,1
+
++GradualSlopeR_U1_Dirt
+t 10,4 11,4
+t 10,1 11,1
+
++GradualSlopeR_U2_Dirt
+t 12,4 13,4
+t 12,1 13,1
+
++GradualSlopeR_U3_Dirt
+t 3,3 3,3
+t 10,4 11,4
+
++GradualSlopeR_U4_Dirt
+t 3,3 3,3
+t 12,4 13,4

@@ -127,6 +127,10 @@
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
 
+  DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in
+  DelayedBlockEditAddr: .res MaxDelayedBlockEdits*2 ; Address to put the block at
+; DelayedBlockEditTime: ; Declared elsewhere. Time left until the change
+
   GetLevelPtrXY_Ptr: .res 2 ; Pointer for how to handle getting a pointer from an X and Y position
 
   PlayerAccelSpeed: .res 2
@@ -151,6 +155,8 @@ LevelZeroWhenLoad_Start:
   ; Dynamically uploading sprite palettes
   PaletteRequestIndex: .res 1
   PaletteRequestValue: .res 1
+
+  DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the edit
 LevelZeroWhenLoad_End:
 
   ; For speeding up actor spawning
