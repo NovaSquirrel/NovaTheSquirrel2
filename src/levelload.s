@@ -37,8 +37,11 @@
   jsl DecompressLevel
   jsl AutotileLevel
 
-  lda #Palette::SPNova
+  lda #Palette::FGCommon
   ldy #8
+  jsl DoPaletteUpload
+  lda #Palette::SPNova
+  ldy #9
   jsl DoPaletteUpload
 
   lda #GraphicsUpload::MapBGForest

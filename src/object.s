@@ -19,6 +19,7 @@
 .include "global.inc"
 .include "blockenum.s"
 .import ObjectRun, ObjectDraw, ObjectFlags, ObjectWidth, ObjectHeight, ObjectBank, ObjectGraphic, ObjectPalette
+.import ParticleRun, ParticleDraw
 .smart
 
 .segment "ActorData"
@@ -116,7 +117,8 @@ SkipEntity:
   tax
   cpx #ObjectEnd
   bne Loop
-  rtl
+
+  jmp RunAllParticles
 
 ; Call the object run code
 .a16
@@ -290,6 +292,44 @@ FoundPalette:
   jml [0]
 .endproc
 
+.a16
+.i16
+.proc RunAllParticles
+  phk
+  plb
+
+  ldx #ParticleStart
+Loop:
+  lda ParticleType,x
+  beq SkipEntity   ; Skip if empty
+
+  ; Call the run and draw routines
+  asl
+  pha
+  jsr CallRun
+  pla
+  jsr CallDraw
+
+SkipEntity:
+  ; Next particle
+  txa
+  add #ParticleSize
+  tax
+  cpx #ParticleEnd
+  bne Loop
+  rtl
+
+CallRun:
+  tay
+  lda ParticleRun,y
+  pha
+  rts
+CallDraw:
+  tay
+  lda ParticleDraw,y
+  pha
+  rts
+.endproc
 
 
 .a16
@@ -334,6 +374,29 @@ Found:
   rtl
 .endproc
 
+
+.a16
+.i16
+.proc FindFreeParticleY
+  ldy #ParticleStart
+Loop:
+  lda ParticleType,y
+  beq Found
+  tya
+  add #ParticleSize
+  tay
+  cpy #ParticleEnd
+  bne Loop
+  clc
+  rtl
+Found:
+  lda #0
+  sta ParticleTimer,y
+  sta ParticleVX,y
+  sta ParticleVY,y
+  sec
+  rtl
+.endproc
 
 ; Just flip the LSB of ObjectDirection
 .export ObjectTurnAround
@@ -532,7 +595,7 @@ ObjectApplyYVelocity = ObjectApplyVelocity::YOnly
   rtl
 .endproc
 
-; Look up the block at a coordinate and 
+; Look up the block at a coordinate and run the interaction routine it has, if applicable
 .export ObjectTryVertInteraction
 .import BlockRunInteractionEntityTopBottom
 .proc ObjectTryVertInteraction
@@ -949,6 +1012,71 @@ Invalid:
   rtl
 .endproc
 
+
+.a16
+.proc ParticleDrawPosition
+  lda ParticlePX,x
+  sub ScrollX
+  cmp #.loword(-1*256)
+  bcs :+
+  cmp #16*256
+  bcs Invalid
+: lsr
+  lsr
+  lsr
+  lsr
+  sub #4
+  sta 0
+
+  lda ParticlePY,x
+  sub ScrollY
+  cmp #15*256
+  bcs Invalid
+  lsr
+  lsr
+  lsr
+  lsr
+  sub #4
+  sta 2
+
+  sec
+  rts
+Invalid:
+  clc
+  rts
+.endproc
+
+; A = tile to draw
+.a16
+.export DispParticle8x8
+.proc DispParticle8x8
+  ldy OamPtr
+  sta OAM_TILE,y ; 16-bit, combined with attribute
+
+  jsr ParticleDrawPosition
+  bcs :+
+    rtl
+  :  
+
+  seta8
+  lda 0
+  sta OAM_XPOS,y
+  lda 2
+  sta OAM_YPOS,y
+
+  ; Get the high bit of the calculated position and plug it in
+  lda 1
+  cmp #%00001000
+  lda #0 ; 8x8 sprites
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  tya
+  add #4
+  sta OamPtr
+  rtl
+.endproc
 
 .export SlopeHeightTable
 .proc SlopeHeightTable

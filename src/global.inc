@@ -63,4 +63,4 @@ ExtraBG = $E000
   Init    = 128|4
 .endenum
 
-.global FindFreeObjectX, FindFreeObjectY
+.global FindFreeObjectX, FindFreeObjectY, FindFreeParticleY

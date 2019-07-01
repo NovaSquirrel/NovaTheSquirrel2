@@ -98,6 +98,7 @@ outfile.write('.endproc\n\n')
 
 # no-operation routine
 outfile.write(".proc ActorNothing\n  rtl\n.endproc\n\n")
+outfile.write(".proc ParticleNothing\n  rts\n.endproc\n\n")
 
 # Objects
 outfile.write('.proc ObjectDraw\n  .addr .loword(ActorNothing)\n')
@@ -142,14 +143,14 @@ for b in all_objects:
 outfile.write('.endproc\n\n')
 
 # Particles
-outfile.write('.proc ParticleDraw\n  .addr .loword(ActorNothing)\n')
+outfile.write('.proc ParticleDraw\n  .addr .loword(ParticleNothing-1)\n')
 for b in all_particles:
-	outfile.write('  .addr .loword(%s)\n' % b["draw"])
+	outfile.write('  .addr .loword(%s-1)\n' % b["draw"])
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ParticleRun\n  .addr .loword(ActorNothing)\n')
+outfile.write('.proc ParticleRun\n  .addr .loword(ParticleNothing-1)\n')
 for b in all_particles:
-	outfile.write('  .addr .loword(%s)\n' % b["run"])
+	outfile.write('  .addr .loword(%s-1)\n' % b["run"])
 outfile.write('.endproc\n\n')
 
 

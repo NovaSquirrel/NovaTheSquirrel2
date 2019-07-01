@@ -17,6 +17,7 @@
 .include "snes.inc"
 .include "global.inc"
 .include "blockenum.s"
+.include "actorenum.s"
 .smart
 
 .import BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -317,6 +318,8 @@ SkipApplyGravity:
 
   ; Cancel the jump cancel
   seta8
+  lda PlayerOnGround
+  sta PlayerOnGroundLast
   stz PlayerOnGround
   lda PlayerJumpCancel
   beq :+
@@ -390,6 +393,43 @@ SkipGroundCheck:
 
 
   ; -------------------
+  lda PlayerWasRunning
+  and #255
+  beq :+
+    lda retraces
+    and #7
+    bne :+
+    jsl FindFreeParticleY
+    bcc :+
+    lda #Particle::LandingParticle
+    sta ParticleType,y
+    lda PlayerPX
+    sta ParticlePX,y
+    lda PlayerPY
+    sta ParticlePY,y
+  :
+  
+
+.if 1
+  ; Particle effect if on the ground but wasn't last frame
+  seta8
+  lda PlayerOnGround
+  beq :+
+  cmp PlayerOnGroundLast
+  beq :+
+    seta16
+    jsl FindFreeParticleY
+    bcc :+
+    lda #Particle::LandingParticle
+    sta ParticleType,y
+    lda PlayerPX
+    sta ParticlePX,y
+    lda PlayerPY
+    sta ParticlePY,y
+  :
+  ; Don't change back, will be changed back by the seta8
+.endif
+
 
   ; Offer a jump if not on ground and the grace period is still active
   seta8
@@ -709,7 +749,7 @@ OfferJumpFromGracePeriod:
 
     lda #%01000000
   :
-  ora #%00100000 ; priority
+  ora #>(OAM_PRIORITY_2|OAM_COLOR_1) ; priority
   sta OAM_ATTR+(4*0),x
   sta OAM_ATTR+(4*1),x
   sta OAM_ATTR+(4*2),x

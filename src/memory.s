@@ -49,6 +49,7 @@
   PlayerDir:        .res 1     ; currently facing left?
   PlayerJumping:    .res 1     ; true if jumping (not falling)
   PlayerOnGround:   .res 1     ; true if on ground
+  PlayerOnGroundLast: .res 1     ; true if on ground last frame
   PlayerWalkLock:   .res 1     ; timer for the player being unable to move left/right
   PlayerDownTimer:  .res 1     ; timer for how long the player has been holding down
                                ; (used for fallthrough platforms)
@@ -90,7 +91,7 @@
   ObjectOnGround     = 22 ; Nonzero means on ground
 
   ; For less important, light entities
-  ParticleSize = 6*2
+  ParticleSize = 7*2
   ParticleStart: .res ParticleLen*ParticleSize
   ParticleEnd:
 
@@ -100,6 +101,7 @@
   ParticleVX         = 6
   ParticleVY         = 8
   ParticleTimer      = 10
+  ParticleVariable   = 12
 
   ; For automatically detecting which tile slot or palette has the right data
   SpriteTileSlots:     .res 2*8

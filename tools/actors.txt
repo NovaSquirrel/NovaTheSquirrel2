@@ -97,3 +97,12 @@ particle
 run RunPoof
 draw DrawPoof
 
++LandingParticle
+particle
+run RunLandingParticle
+draw DrawLandingParticle
+
++PrizeParticle
+particle
+run RunPrizeParticle
+draw DrawPrizeParticle

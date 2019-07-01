@@ -20,9 +20,10 @@
 .smart
 
 .segment "ActorData"
+CommonTileBase = $40
 
-.import DispObject16x16
-.import ObjectWalk
+.import DispObject16x16, DispParticle8x8
+.import ObjectWalk, ObjectFall, ObjectAutoBump
 
 ; -------------------------------------
 
@@ -30,19 +31,23 @@
 .i16
 .export DrawBurger
 .proc DrawBurger
+;  lda PlayerOnGround
+;  and #255
   lda #0
-  jsl DispObject16x16
-  rtl
+  jml DispObject16x16
 .endproc
 
 .a16
 .i16
 .export RunBurger
 .proc RunBurger
+;  lda PlayerPX
+;  sta ObjectPX,x
+;  lda PlayerPY
+;  sub #$400
+;  sta ObjectPY,x
   lda #3
-  jsl ObjectWalk
-
-  rtl
+  jml ObjectWalk
 .endproc
 
 .a16
@@ -119,28 +124,40 @@
 .i16
 .export DrawPlodder
 .proc DrawPlodder
-  rtl
+  lda retraces
+  lsr
+  and #2
+  ora #OAM_PRIORITY_2
+  jml DispObject16x16
 .endproc
 
 .a16
 .i16
 .export RunPlodder
 .proc RunPlodder
-  rtl
+  jml ObjectFall
 .endproc
 
 .a16
 .i16
 .export DrawSneaker
 .proc DrawSneaker
-  rtl
+  lda retraces
+  lsr
+  and #2
+  ora #OAM_PRIORITY_2
+  jml DispObject16x16
 .endproc
 
 .a16
 .i16
 .export RunSneaker
 .proc RunSneaker
-  rtl
+  lda #$40
+  jsl ObjectWalk
+  jsl ObjectAutoBump
+
+  jml ObjectFall
 .endproc
 
 .a16
@@ -176,12 +193,52 @@
 .i16
 .export DrawPoof
 .proc DrawPoof
-  rtl
+  rts
 .endproc
 
 .a16
 .i16
 .export RunPoof
 .proc RunPoof
-  rtl
+  rts
+.endproc
+
+.a16
+.i16
+.export DrawLandingParticle
+.proc DrawLandingParticle
+  lda ParticleTimer,x
+  lsr
+  lsr
+  lsr
+  add #CommonTileBase+$38+OAM_PRIORITY_2
+  jsl DispParticle8x8
+  rts
+.endproc
+
+.a16
+.i16
+.export RunLandingParticle
+.proc RunLandingParticle
+  inc ParticleTimer,x
+  lda ParticleTimer,x
+  cmp #8*2
+  bne :+
+    stz ParticleType,x
+  :
+  rts
+.endproc
+
+.a16
+.i16
+.export DrawPrizeParticle
+.proc DrawPrizeParticle
+  rts
+.endproc
+
+.a16
+.i16
+.export RunPrizeParticle
+.proc RunPrizeParticle
+  rts
 .endproc

@@ -17,6 +17,7 @@
 .include "snes.inc"
 .include "global.inc"
 .include "blockenum.s"
+.include "actorenum.s"
 .smart
 
 .segment "BlockInteraction"
@@ -237,6 +238,13 @@ Skip:
   sta BlockTemp
   lda #Block::UsedPrize
   jsl DelayChangeBlock
+
+  jsl FindFreeParticleY
+  bcc :+
+    lda #Particle::PrizeParticle
+    sta ParticleType,y
+    jmp ParticleAtBlock
+  :
   rts
 .endproc
 
@@ -278,3 +286,16 @@ Skip:
   rts
 .endproc
 
+.a16
+.proc ParticleAtBlock
+  jsl GetBlockX
+  xba
+  ora #$80
+  sta ParticlePX,y
+
+  jsl GetBlockY
+  xba
+  ora #$80
+  sta ParticlePY,y
+  rts
+.endproc
