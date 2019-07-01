@@ -409,14 +409,12 @@ SkipGroundCheck:
     sta ParticlePY,y
   :
   
-
-.if 1
   ; Particle effect if on the ground but wasn't last frame
   seta8
   lda PlayerOnGround
   beq :+
-  cmp PlayerOnGroundLast
-  beq :+
+  lda PlayerOnGroundLast
+  bne :+
     seta16
     jsl FindFreeParticleY
     bcc :+
@@ -428,7 +426,7 @@ SkipGroundCheck:
     sta ParticlePY,y
   :
   ; Don't change back, will be changed back by the seta8
-.endif
+
 
 
   ; Offer a jump if not on ground and the grace period is still active
