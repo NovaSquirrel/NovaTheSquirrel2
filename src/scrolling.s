@@ -303,7 +303,7 @@ YPos = 6
   pha ; Don't rely on this routine not overwriting this variable
   jsl RenderLevelColumnLeft
   pla
-ScanForSprites:
+ScanForActors:
 CheckColumn = Temp + 0
 CheckScreen = Temp + 1
   lsr
@@ -317,7 +317,7 @@ CheckScreen = Temp + 1
   lsr ; Screen number
   tay
   lda FirstActorOnScreen,y
-  cmp #255 ; No sprites on screen
+  cmp #255 ; No actors on screen
   beq Exit
 
   setaxy16
@@ -328,19 +328,19 @@ CheckScreen = Temp + 1
 
   seta8
 Loop:
-  lda [LevelSpritePointer],y
+  lda [LevelActorPointer],y
   cmp #255
-  beq Exit ; Exit since the sprite data is over
+  beq Exit ; Exit since the actor data is over
   pha
   and #$f0
   cmp CheckScreen
-  bne Exit_PLA ; Exit since the sprite data is on a different screen now
+  bne Exit_PLA ; Exit since the actor data is on a different screen now
   pla
   cmp CheckColumn
   bne :+
-    jsl TryMakeSprite
+    jsl TryMakeActor
   :
-  ; Next sprite
+  ; Next actor
   iny
   iny
   iny
@@ -354,86 +354,86 @@ Exit:
   rts 
 .endproc
 
-; Try to make a sprite from the level sprite list
-; inputs: Y (sprite index)
+; Try to make an actor from the level actor list
+; inputs: Y (actor index)
 ; preserves Y
 .a8
 .i16
-.export TryMakeSprite
-.proc TryMakeSprite
+.export TryMakeActor
+.proc TryMakeActor
 Index = 0
   sty Index
   phy
   php
   setaxy16
   
-  ; Ensure the sprite has not already been spawned
-  ldx #ObjectStart
+  ; Ensure the actor has not already been spawned
+  ldx #ActorStart
 CheckExistsLoop:
-  lda ObjectType,x ; Ignore ObjectIndexInLevel if there is no object there
+  lda ActorType,x ; Ignore ActorIndexInLevel if there is no Actor there
   beq :+
-    lda ObjectIndexInLevel,x ; Already exists
+    lda ActorIndexInLevel,x ; Already exists
     cmp Index
     beq Exit
   :
-  ; Next sprite
+  ; Next actor
   txa
-  add #ObjectSize
+  add #ActorSize
   tax
-  cpx #ObjectEnd
+  cpx #ActorEnd
   bne CheckExistsLoop
 
   ; -----------------------------------
-  ; Spawn in the sprite
-  jsl FindFreeObjectX
+  ; Spawn in the actor
+  jsl FindFreeActorX
   bcc Exit
 
   ; X now points at a free slot
-  stz ObjectVX,x
-  stz ObjectVY,x
-  stz ObjectVarB,x
-  stz ObjectVarC,x
-  stz ObjectTimer,x
-  lda #ObjectStateValue::Init
-  sta ObjectState,x
+  stz ActorVX,x
+  stz ActorVY,x
+  stz ActorVarB,x
+  stz ActorVarC,x
+  stz ActorTimer,x
+  lda #ActorStateValue::Init
+  sta ActorState,x
 
-  ; Sprite list organized as XXXXXXXX D..YYYYY tttttttt abcdTTTT
+  ; Actor list organized as XXXXXXXX D..YYYYY tttttttt abcdTTTT
   seta8
-  lda [LevelSpritePointer],y ; X position
-  sta ObjectPX+1,x
+  lda [LevelActorPointer],y ; X position
+  sta ActorPX+1,x
   lda #$80                   ; Center it
-  sta ObjectPX+0,x
+  sta ActorPX+0,x
   iny
-  lda [LevelSpritePointer],y ; Y position, and two unused bits
+  lda [LevelActorPointer],y ; Y position, and two unused bits
   asl
   php
   lsr
   and #31
-  sta ObjectPY+1,x
+  sta ActorPY+1,x
   lda #$ff
-  sta ObjectPY+0,x
+  sta ActorPY+0,x
   ; Copy the most significant bit of the Y position to the least significant bit of the direction
   plp
   lda #0
   rol
-  sta ObjectDirection,x
+  sta ActorDirection,x
   iny
 
   seta16
-  lda [LevelSpritePointer],y ; Object type and flags
+  lda [LevelActorPointer],y ; Actor type and flags
   and #$fff
   asl
-  sta ObjectType,x
+  sta ActorType,x
 
-  ; Store the flags into object generic variable A
-  lda [LevelSpritePointer],y
+  ; Store the flags into Actor generic variable A
+  lda [LevelActorPointer],y
   xba
   lsr
   lsr
   lsr
   lsr
   and #15
-  sta ObjectVarA,x
+  sta ActorVarA,x
 
 Exit:
   plp

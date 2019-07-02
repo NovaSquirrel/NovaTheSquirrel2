@@ -22,8 +22,8 @@
 .segment "ActorData"
 CommonTileBase = $40
 
-.import DispObject16x16, DispParticle8x8
-.import ObjectWalk, ObjectFall, ObjectAutoBump
+.import DispActor16x16, DispParticle8x8
+.import ActorWalk, ActorFall, ActorAutoBump
 
 ; -------------------------------------
 
@@ -34,7 +34,7 @@ CommonTileBase = $40
 ;  lda PlayerOnGround
 ;  and #255
   lda #0
-  jml DispObject16x16
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -42,12 +42,12 @@ CommonTileBase = $40
 .export RunBurger
 .proc RunBurger
 ;  lda PlayerPX
-;  sta ObjectPX,x
+;  sta ActorPX,x
 ;  lda PlayerPY
 ;  sub #$400
-;  sta ObjectPY,x
+;  sta ActorPY,x
   lda #3
-  jml ObjectWalk
+  jml ActorWalk
 .endproc
 
 .a16
@@ -128,14 +128,14 @@ CommonTileBase = $40
   lsr
   and #2
   ora #OAM_PRIORITY_2
-  jml DispObject16x16
+  jml DispActor16x16
 .endproc
 
 .a16
 .i16
 .export RunPlodder
 .proc RunPlodder
-  jml ObjectFall
+  jml ActorFall
 .endproc
 
 .a16
@@ -146,7 +146,7 @@ CommonTileBase = $40
   lsr
   and #2
   ora #OAM_PRIORITY_2
-  jml DispObject16x16
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -154,10 +154,10 @@ CommonTileBase = $40
 .export RunSneaker
 .proc RunSneaker
   lda #$40
-  jsl ObjectWalk
-  jsl ObjectAutoBump
+  jsl ActorWalk
+  jsl ActorAutoBump
 
-  jml ObjectFall
+  jml ActorFall
 .endproc
 
 .a16

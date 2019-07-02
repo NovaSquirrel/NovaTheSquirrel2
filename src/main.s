@@ -19,7 +19,7 @@
 .include "global.inc"
 .smart
 .export main, nmi_handler
-.import RunAllObjects
+.import RunAllActors
 
 .segment "CODE"
 ;;
@@ -134,7 +134,7 @@ DelayedBlockLoop:
   jsl RunPlayer
   jsl AdjustCamera
   jsl DrawPlayer
-  jsl RunAllObjects
+  jsl RunAllActors
 
   ; Mark remaining sprites as offscreen, then convert sprite size
   ; data from the convenient-to-manipulate format described by

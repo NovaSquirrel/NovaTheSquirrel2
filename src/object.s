@@ -18,7 +18,7 @@
 .include "snes.inc"
 .include "global.inc"
 .include "blockenum.s"
-.import ObjectRun, ObjectDraw, ObjectFlags, ObjectWidth, ObjectHeight, ObjectBank, ObjectGraphic, ObjectPalette
+.import ActorRun, ActorDraw, ActorFlags, ActorWidth, ActorHeight, ActorBank, ActorGraphic, ActorPalette
 .import ParticleRun, ParticleDraw
 .smart
 
@@ -30,8 +30,8 @@ SlopeBCS = Block::GradualSlopeR_U4_Dirt+1
 .export SlopeBCC, SlopeBCS
 SlopeY = 2
 
-.export RunAllObjects
-.proc RunAllObjects
+.export RunAllActors
+.proc RunAllActors
   setaxy16
 
   ; Prepare for the loop
@@ -41,9 +41,9 @@ SlopeY = 2
   sta PaletteInUseLast+2
 
   ; Load X with the actual pointer
-  ldx #ObjectStart
+  ldx #ActorStart
 Loop:
-  lda ObjectType,x
+  lda ActorType,x
   beq SkipEntity   ; Skip if empty
 
   ; Call the run and draw routines
@@ -53,24 +53,24 @@ Loop:
   jsl CallDraw
 
   ; Call the common routines
-  lda ObjectType,x
+  lda ActorType,x
   beq SkipEntity
   phx
   tax
-  lda f:ObjectFlags,x
+  lda f:ActorFlags,x
   plx
 
   lsr ; AutoRemove
   bcc NotAutoRemove
     ; Remove entity if too far away from the player
     pha
-    lda ObjectPX,x
+    lda ActorPX,x
     sub PlayerPX
     absw
     cmp #$2000 ; How about two screens of distance does it?
     bcc :+
       pla
-      stz ObjectType,x ; Zero the type
+      stz ActorType,x ; Zero the type
       bra SkipEntity   ; Skip doing anything else with this entity since it no longer exists
     :
     pla
@@ -84,14 +84,14 @@ Loop:
   lsr ; AutoReset
   bcc NotAutoReset
     pha
-    lda ObjectTimer,x
+    lda ActorTimer,x
     beq :+
-    dec ObjectTimer,x
+    dec ActorTimer,x
     bne :+
       ; Zero the state, keep the variable that ends up in the high byte
-      lda ObjectState,x
+      lda ActorState,x
       and #$ff00
-      sta ObjectState,x
+      sta ActorState,x
     :
     pla
   NotAutoReset:
@@ -103,57 +103,57 @@ Loop:
 
   ; Reset the "init" state
   seta8
-  lda ObjectState,x
-  cmp #ObjectStateValue::Init
+  lda ActorState,x
+  cmp #ActorStateValue::Init
   bne :+
-    stz ObjectState,x
+    stz ActorState,x
   :
   seta16
 SkipEntity:
 
   ; Next entity
   txa
-  add #ObjectSize
+  add #ActorSize
   tax
-  cpx #ObjectEnd
+  cpx #ActorEnd
   bne Loop
 
   jmp RunAllParticles
 
-; Call the object run code
+; Call the Actor run code
 .a16
 CallRun:
   phx
   tax
   seta8
-  lda f:ObjectBank+0,x
+  lda f:ActorBank+0,x
   pha
   plb ; Use code bank as data bank
   sta 2
   seta16
-  lda f:ObjectRun,x
+  lda f:ActorRun,x
   sta 0
   plx
 
   ; Jump to it and return with an RTL
   jml [0]
 
-; Call the object draw code
+; Call the Actor draw code
 .a16
 CallDraw:
   phx
   tax
   seta8
-  lda f:ObjectBank+1,x
+  lda f:ActorBank+1,x
   pha
   plb ; Use code bank as data bank
   sta 2
   seta16
-  lda f:ObjectDraw,x
+  lda f:ActorDraw,x
   sta 0
 
   ; Get the desired tileset
-  lda f:ObjectGraphic,x
+  lda f:ActorGraphic,x
 
   ; Detect the correct tile base
   ; using an unrolled loop
@@ -201,7 +201,7 @@ FoundTileset:
 
   ; Detect the correct palette
   ; using an unrolled loop again
-  lda f:ObjectPalette,x
+  lda f:ActorPalette,x
   cmp SpritePaletteSlots+2*0
   bne :+
     inc PaletteInUse+0
@@ -245,7 +245,7 @@ FoundTileset:
   seta8
   ldy #4-1
 : lda PaletteInUseLast,y
-  beq FoundPaletteRequestIndex2 ; No objects using this palette
+  beq FoundPaletteRequestIndex2 ; No Actors using this palette
   dey
   bpl :-
   ; No suitable slots found, so give up for this frame
@@ -260,7 +260,7 @@ FoundPaletteRequestIndex2:
   tay
 FoundPaletteRequestIndex:
   ; Write the desired palette into the list of active palettes
-  lda f:ObjectPalette,x
+  lda f:ActorPalette,x
   sta SpritePaletteSlots,y
 
   seta8
@@ -287,8 +287,8 @@ PaletteNotFound:
 FoundPalette:
   tsb SpriteTileBase
 
-  ; Jump to the per-object routine and return with an RTL
-  plx ; X now equals the object index base again
+  ; Jump to the per-Actor routine and return with an RTL
+  plx ; X now equals the Actor index base again
   jml [0]
 .endproc
 
@@ -334,42 +334,42 @@ CallDraw:
 
 .a16
 .i16
-.proc FindFreeObjectX
-  ldx #ObjectStart
+.proc FindFreeActorX
+  ldx #ActorStart
 Loop:
-  lda ObjectType,x
+  lda ActorType,x
   beq Found
   txa
-  add #ObjectSize
+  add #ActorSize
   tax
-  cpx #ObjectEnd
+  cpx #ActorEnd
   bne Loop
   clc
   rtl
 Found:
   lda #$ffff
-  sta ObjectIndexInLevel,x
+  sta ActorIndexInLevel,x
   sec
   rtl
 .endproc
 
 .a16
 .i16
-.proc FindFreeObjectY
-  ldy #ObjectStart
+.proc FindFreeActorY
+  ldy #ActorStart
 Loop:
-  lda ObjectType,y
+  lda ActorType,y
   beq Found
   tya
-  add #ObjectSize
+  add #ActorSize
   tay
-  cpy #ObjectEnd
+  cpy #ActorEnd
   bne Loop
   clc
   rtl
 Found:
   lda #$ffff
-  sta ObjectIndexInLevel,y
+  sta ActorIndexInLevel,y
   sec
   rtl
 .endproc
@@ -398,58 +398,58 @@ Found:
   rtl
 .endproc
 
-; Just flip the LSB of ObjectDirection
-.export ObjectTurnAround
+; Just flip the LSB of ActorDirection
+.export ActorTurnAround
 .a16
-.proc ObjectTurnAround
+.proc ActorTurnAround
   ; No harm in using it as a 16-bit value here, it's just written back
-  lda ObjectDirection,x ; a 0 marks an empty slot
+  lda ActorDirection,x ; a 0 marks an empty slot
   eor #1
-  sta ObjectDirection,x
+  sta ActorDirection,x
   rtl
 .endproc
 
-.export ObjectLookAtPlayer
+.export ActorLookAtPlayer
 .a16
-.proc ObjectLookAtPlayer
-  lda ObjectPX,x
+.proc ActorLookAtPlayer
+  lda ActorPX,x
   cmp PlayerPX
 
   ; No harm in using it as a 16-bit value here, it's just written back
-  lda ObjectDirection,x
+  lda ActorDirection,x
   and #$fffe
   adc #0
-  sta ObjectDirection,x
+  sta ActorDirection,x
 
   rtl
 .endproc
 
-; Causes the object to hover in place
-; takes over ObjectVarC and uses it for hover position
-.export ObjectHover
+; Causes the Actor to hover in place
+; takes over ActorVarC and uses it for hover position
+.export ActorHover
 .a16
-.proc ObjectHover
+.proc ActorHover
   phb
   phk ; To access the table at the end
   plb
-  ldy ObjectVarC,x
+  ldy ActorVarC,x
 
   seta8
   lda Wavy,y
   sex
   sta 0
 
-  lda ObjectPY+0,x
+  lda ActorPY+0,x
   add Wavy,y
-  sta ObjectPY+0,x
-  lda ObjectPY+1,x
+  sta ActorPY+0,x
+  lda ActorPY+1,x
   adc 0
-  sta ObjectPY+1,x
+  sta ActorPY+1,x
 
-  inc ObjectVarC,x
-  lda ObjectVarC,x
+  inc ActorVarC,x
+  lda ActorVarC,x
   and #63
-  sta ObjectVarC,x
+  sta ActorVarC,x
   seta16
 
   plb
@@ -473,39 +473,39 @@ Wavy:
 .export LakituMovement
 .a16
 .proc LakituMovement
-  jsl ObjectApplyXVelocity
+  jsl ActorApplyXVelocity
 
-;  lda ObjectPXL,x
+;  lda ActorPXL,x
 ;  add #$80
-;  lda ObjectPXH,x
+;  lda ActorPXH,x
 ;  adc #0
-;  ldy ObjectPYH,x
+;  ldy ActorPYH,x
 ;  jsr GetLevelColumnPtr
 ;  cmp #Metatiles::ENEMY_BARRIER
 ;  bne :+
-;    neg16x ObjectVXL, ObjectVXH
+;    neg16x ActorVXL, ActorVXH
 ;    rts
 ;  :
 
   ; Stop if stunned
-  lda ObjectState,x ; Ignore high byte
+  lda ActorState,x ; Ignore high byte
   and #255
   beq :+
-    stz ObjectVX,x
+    stz ActorVX,x
   :
 
   ; Change direction to face the player
-  jsl ObjectLookAtPlayer
+  jsl ActorLookAtPlayer
 
   ; Only speed up if not around player
-  lda ObjectPX,x
+  lda ActorPX,x
   sub PlayerPX
   absw
   cmp #$300
   bcc TooClose
   lda #4
-  jsl ObjectNegIfLeft
-  add ObjectVX,x
+  jsl ActorNegIfLeft
+  add ActorVX,x
 
   ; Limit speed to 3 pixels/frame
   php ; Take absolute value and negate it back if it was negative
@@ -526,18 +526,18 @@ Wavy:
     inc a
   :
 
-  sta ObjectVX,x
+  sta ActorVX,x
 TooClose:
 
   rtl
 .endproc
 
-; Takes a speed in the accumulator, and negates it if object facing left
+; Takes a speed in the accumulator, and negates it if Actor facing left
 .a16
-.export ObjectNegIfLeft
-.proc ObjectNegIfLeft
+.export ActorNegIfLeft
+.proc ActorNegIfLeft
   pha
-  lda ObjectDirection,x ; Ignore high byte
+  lda ActorDirection,x ; Ignore high byte
   lsr
   bcs Left
 Right:
@@ -549,90 +549,90 @@ Left:
   rtl
 .endproc
 
-.proc ObjectApplyVelocity
-  lda ObjectPX,x
-  add ObjectVX,x
-  sta ObjectPX,x
+.proc ActorApplyVelocity
+  lda ActorPX,x
+  add ActorVX,x
+  sta ActorPX,x
 YOnly:
-  lda ObjectPY,x
-  add ObjectVY,x
-  sta ObjectPY,x
+  lda ActorPY,x
+  add ActorVY,x
+  sta ActorPY,x
   rtl
 .endproc
-ObjectApplyYVelocity = ObjectApplyVelocity::YOnly
+ActorApplyYVelocity = ActorApplyVelocity::YOnly
 
-.proc ObjectApplyXVelocity
-  lda ObjectPX,x
-  add ObjectVX,x
-  sta ObjectPX,x
+.proc ActorApplyXVelocity
+  lda ActorPX,x
+  add ActorVX,x
+  sta ActorPX,x
   rtl
 .endproc
 
 
 ; Walks forward, and turns around if walking farther
-; would cause the object to fall off the edge of a platform
-; input: A (walk speed), X (object slot)
-.export ObjectWalkOnPlatform
-.proc ObjectWalkOnPlatform
-  jsl ObjectWalk
-  jsl ObjectAutoBump
+; would cause the Actor to fall off the edge of a platform
+; input: A (walk speed), X (Actor slot)
+.export ActorWalkOnPlatform
+.proc ActorWalkOnPlatform
+  jsl ActorWalk
+  jsl ActorAutoBump
 .endproc
 ; fallthrough
 .a16
-.export ObjectStayOnPlatform
-.proc ObjectStayOnPlatform
+.export ActorStayOnPlatform
+.proc ActorStayOnPlatform
   ; Check forward a bit
-  ldy ObjectPY,x
+  ldy ActorPY,x
   lda #8*16
-  jsl ObjectNegIfLeft
-  add ObjectPX,x
-  jsl ObjectTryVertInteraction
+  jsl ActorNegIfLeft
+  add ActorPX,x
+  jsl ActorTryVertInteraction
 
   cmp #$4000 ; Test for solid on top
   bcs :+
-    jsl ObjectTurnAround
+    jsl ActorTurnAround
   :
   rtl
 .endproc
 
 ; Look up the block at a coordinate and run the interaction routine it has, if applicable
-.export ObjectTryVertInteraction
-.import BlockRunInteractionEntityTopBottom
-.proc ObjectTryVertInteraction
+.export ActorTryVertInteraction
+.import BlockRunInteractionActorTopBottom
+.proc ActorTryVertInteraction
   jsl GetLevelPtrXY
   phx
   tax
   lda f:BlockFlags,x
   sta BlockFlag
   plx
-  jsl BlockRunInteractionEntityTopBottom
+  jsl BlockRunInteractionActorTopBottom
   lda BlockFlag
   rtl
 .endproc
 
-.export ObjectTrySideInteraction
-.import BlockRunInteractionEntitySide
-.proc ObjectTrySideInteraction
+.export ActorTrySideInteraction
+.import BlockRunInteractionActorSide
+.proc ActorTrySideInteraction
   jsl GetLevelPtrXY
   phx
   tax
   lda f:BlockFlags,x
   sta BlockFlag
   plx
-  jsl BlockRunInteractionEntitySide
+  jsl BlockRunInteractionActorSide
   lda BlockFlag
   rtl
 .endproc
 
 .a16
-.export ObjectWalk
-.proc ObjectWalk
+.export ActorWalk
+.proc ActorWalk
 WalkDistance = 0
-  jsl ObjectNegIfLeft
+  jsl ActorNegIfLeft
   sta WalkDistance
 
   ; Don't walk if the state is nonzero
-  lda ObjectState,x
+  lda ActorState,x
   and #255
   beq :+
     clc
@@ -640,12 +640,12 @@ WalkDistance = 0
   :
 
   ; Look up if the wall is solid
-  lda ObjectPY,x
+  lda ActorPY,x
   sub #1<<8
   tay
-  lda ObjectPX,x
+  lda ActorPX,x
   add WalkDistance
-  jsl ObjectTrySideInteraction
+  jsl ActorTrySideInteraction
   bpl NotSolid
   Solid:
      sec
@@ -653,110 +653,110 @@ WalkDistance = 0
   NotSolid:
 
   ; Apply the walk
-  lda ObjectPX,x
+  lda ActorPX,x
   add WalkDistance
-  sta ObjectPX,x
-  ; Fall into ObjectDownhillFix
+  sta ActorPX,x
+  ; Fall into ActorDownhillFix
 .endproc
 .a16
-.proc ObjectDownhillFix
+.proc ActorDownhillFix
 
   ; Going downhill requires special help
   seta8
-  lda ObjectOnGround,x ; Need to have been on ground last frame
+  lda ActorOnGround,x ; Need to have been on ground last frame
   beq NoSlopeDown
-  lda ObjectVY+1,x
+  lda ActorVY+1,x
   bmi NoSlopeDown
   seta16
-    jsr ObjectGetSlopeYPos
+    jsr ActorGetSlopeYPos
     bcs :+
       ; Try again one block below
       inc LevelBlockPtr
       inc LevelBlockPtr
       lda [LevelBlockPtr]
-      jsr ObjectGetSlopeYPosBelow
+      jsr ActorGetSlopeYPosBelow
       bcc NoSlopeDown
     :
 
     lda SlopeY
-    sta ObjectPY,x
-    stz ObjectVY,x
+    sta ActorPY,x
+    stz ActorVY,x
   NoSlopeDown:
   seta16
 
   ; Reset carry to indicate not bumping into something
-  ; because ObjectWalk falls into this
+  ; because ActorWalk falls into this
   clc
   rtl
 .endproc
 
 .a16
-.export ObjectGravity
-.proc ObjectGravity
-  lda ObjectVY,x
+.export ActorGravity
+.proc ActorGravity
+  lda ActorVY,x
   bmi OK
   cmp #$60
   bcs Skip
 OK:
   add #4
-  sta ObjectVY,x
+  sta ActorVY,x
 Skip:
-  jmp ObjectApplyYVelocity
+  jmp ActorApplyYVelocity
 .endproc
 
-; Calls ObjectGravity and then fixes things if they land on a solid block
-; input: X (object pointer)
+; Calls ActorGravity and then fixes things if they land on a solid block
+; input: X (Actor pointer)
 ; output: carry (standing on platform)
 .a16
-.export ObjectFall
-.proc ObjectFall
-  jsl ObjectGravity
+.export ActorFall
+.proc ActorFall
+  jsl ActorGravity
 
   ; Remove if too far off the bottom
-  lda ObjectPY,x
+  lda ActorPY,x
   bmi :+
     cmp #32*256
     bcc :+
     cmp #$ffff - 2*256
     bcs :+
-      stz ObjectType,x
+      stz ActorType,x
       rtl
   :
 
-  jmp ObjectCheckStandingOnSolid
+  jmp ActorCheckStandingOnSolid
 .endproc
 
 
-; Checks if an object is on top of a solid block
-; input: X (object slot)
+; Checks if an Actor is on top of a solid block
+; input: X (Actor slot)
 ; output: Zero flag (not zero if on top of a solid block)
 ; locals: 0, 1
 .a16
-.export ObjectCheckStandingOnSolid
-.proc ObjectCheckStandingOnSolid
+.export ActorCheckStandingOnSolid
+.proc ActorCheckStandingOnSolid
   seta8
-  stz ObjectOnGround,x
+  stz ActorOnGround,x
   seta16
 
   ; If going upwards, don't check (for now)
   stz 0
-  lda ObjectVY,x
+  lda ActorVY,x
   bpl :+
     lda #0
     rtl
   :
 
   ; Check for slope interaction
-  jsr ObjectGetSlopeYPos
+  jsr ActorGetSlopeYPos
   bcc :+
     lda SlopeY
-;    cmp ObjectPY,x
+;    cmp ActorPY,x
 ;    bcs :+
-    sta ObjectPY,x
-    stz ObjectVY,x
+    sta ActorPY,x
+    stz ActorVY,x
 
     seta8
-    inc ObjectOnGround,x
+    inc ActorOnGround,x
     seta16
     ; Don't do the normal ground check
     sec
@@ -764,20 +764,20 @@ Skip:
   :
 
   ; Maybe add checks for the sides
-  ldy ObjectPY,x
-  lda ObjectPX,x
-  jsl ObjectTryVertInteraction
+  ldy ActorPY,x
+  lda ActorPX,x
+  jsl ActorTryVertInteraction
   cmp #$4000
   rol 0
 
   lda 0
   seta8
-  sta ObjectOnGround,x
+  sta ActorOnGround,x
   ; React to touching the ground
   beq :+
-    stz ObjectPY,x ; Clear the low byte
+    stz ActorPY,x ; Clear the low byte
     seta16
-    stz ObjectVY,x
+    stz ActorVY,x
     sec
     rtl
   :
@@ -789,15 +789,15 @@ Skip:
 ; Get the Y position of the slope under the player's hotspot (SlopeY)
 ; and also return if they're on a slope at all (carry)
 .a16
-.proc ObjectGetSlopeYPos
-  ldy ObjectPY,x
-  lda ObjectPX,x
+.proc ActorGetSlopeYPos
+  ldy ActorPY,x
+  lda ActorPX,x
   jsl GetLevelPtrXY
-  jsr ObjectIsSlope
+  jsr ActorIsSlope
   bcc NotSlope
     phk
     plb
-    lda ObjectPY,x
+    lda ActorPY,x
     and #$ff00
     ora SlopeHeightTable,y
     sta SlopeY
@@ -808,9 +808,9 @@ Skip:
       dec LevelBlockPtr
       dec LevelBlockPtr
       lda [LevelBlockPtr]
-      jsr ObjectIsSlope
+      jsr ActorIsSlope
       bcc :+
-        lda ObjectPY,x
+        lda ActorPY,x
         sbc #$0100 ; Carry already set
         ora SlopeHeightTable,y
         sta SlopeY
@@ -822,10 +822,10 @@ NotSlope:
 
 .a16
 ; Similar but for checking one block below
-.proc ObjectGetSlopeYPosBelow
-  jsr ObjectIsSlope
+.proc ActorGetSlopeYPosBelow
+  jsr ActorIsSlope
   bcc NotSlope
-    lda ObjectPY,x
+    lda ActorPY,x
     add #$0100
     and #$ff00
     ora SlopeHeightTable,y
@@ -837,9 +837,9 @@ NotSlope:
       dec LevelBlockPtr
       dec LevelBlockPtr
       lda [LevelBlockPtr]
-      jsr ObjectIsSlope
+      jsr ActorIsSlope
       bcc :+
-        lda ObjectPY,x
+        lda ActorPY,x
         ora SlopeHeightTable,y
         sta SlopeY
     :
@@ -849,7 +849,7 @@ NotSlope:
 .endproc
 
 .a16
-.proc ObjectIsSlope
+.proc ActorIsSlope
   cmp #SlopeBCC
   bcc :+
   cmp #SlopeBCS
@@ -865,7 +865,7 @@ NotSlope:
   sta 0
 
   ; Select the column
-  lda ObjectPX,x
+  lda ActorPX,x
   and #$f0 ; Get the pixels within a block
   lsr
   lsr
@@ -880,60 +880,60 @@ NotSlope:
 .endproc
 
 ; Automatically turn around when bumping
-; into something during ObjectWalk
+; into something during ActorWalk
 .a16
-.export ObjectAutoBump
-.proc ObjectAutoBump
+.export ActorAutoBump
+.proc ActorAutoBump
   bcc NoBump
-  jmp ObjectTurnAround
+  jmp ActorTurnAround
 NoBump:
   rtl
 .endproc
 
-; Automatically removes an object if they're too far away from the camera
+; Automatically removes an Actor if they're too far away from the camera
 .a16
-.export ObjectAutoRemove
-.proc ObjectAutoRemove
-  lda ObjectPX
+.export ActorAutoRemove
+.proc ActorAutoRemove
+  lda ActorPX
   sub ScrollX
   cmp #.loword(-8*256)
   bcs Good
   cmp #32*256
   bcc Good
-  stz ObjectType,x
+  stz ActorType,x
 Good:
   rtl
 .endproc
 
-; Automatically removes an object if they're too far away from the camera
+; Automatically removes an Actor if they're too far away from the camera
 ; (Bigger range)
 .a16
-.export ObjectAutoRemoveFar
-.proc ObjectAutoRemoveFar
-  lda ObjectPX
+.export ActorAutoRemoveFar
+.proc ActorAutoRemoveFar
+  lda ActorPX
   sub ScrollX
   cmp #.loword(-24*256)
   bcs Good
   cmp #40*256
   bcc Good
-  stz ObjectType,x
+  stz ActorType,x
 Good:
   rtl
 .endproc
 
 ; TODO
 .a16
-.proc ObjectBecomePoof
-  stz ObjectType,x
+.proc ActorBecomePoof
+  stz ActorType,x
   rtl
 .endproc
 
 
-; Calculate the position of the object on-screen
+; Calculate the position of the Actor on-screen
 ; and whether it's visible in the first place
 .a16
-.proc ObjectDrawPosition
-  lda ObjectPX,x
+.proc ActorDrawPosition
+  lda ActorPX,x
   sub ScrollX
   cmp #.loword(-1*256)
   bcs :+
@@ -946,7 +946,7 @@ Good:
   sub #8
   sta 0
 
-  lda ObjectPY,x
+  lda ActorPY,x
   sub ScrollY
   ; TODO: properly allow sprites to be partially offscreen on the top
 ;  cmp #.loword(-1*256)
@@ -969,12 +969,12 @@ Invalid:
 
 ; A = tile to draw
 .a16
-.export DispObject16x16
-.proc DispObject16x16
+.export DispActor16x16
+.proc DispActor16x16
   sta 4
 
   ; If facing left, set the X flip bit
-  lda ObjectDirection,x ; Ignore high byte
+  lda ActorDirection,x ; Ignore high byte
   lsr
   bcc :+
     lda #OAM_XFLIP
@@ -983,7 +983,7 @@ Invalid:
 
   ldy OamPtr
 
-  jsr ObjectDrawPosition
+  jsr ActorDrawPosition
   bcs :+
     rtl
   :  

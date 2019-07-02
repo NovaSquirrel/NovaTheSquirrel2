@@ -44,7 +44,7 @@ ExtraBG = $E000
 .global StartLevel, DecompressLevel
 
 ; Flags
-.enum ObjectFlag
+.enum ActorFlag
   AutoRemove    = 1
   GetShot       = 2
   AutoReset     = 4
@@ -55,7 +55,7 @@ ExtraBG = $E000
   Secondary     = %0000000000000000
 .endenum
 
-.enum ObjectStateValue
+.enum ActorStateValue
   None    = 0
   Paused  = 128|1
   Stunned = 128|2
@@ -63,4 +63,4 @@ ExtraBG = $E000
   Init    = 128|4
 .endenum
 
-.global FindFreeObjectX, FindFreeObjectY, FindFreeParticleY
+.global FindFreeActorX, FindFreeActorY, FindFreeParticleY

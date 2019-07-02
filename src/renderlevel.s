@@ -35,12 +35,12 @@
 
   ; -------------------
 
-  ; Init entities
-  ldx #ObjectStart
+  ; Init actors
+  ldx #ActorStart
 : stz 0,x
   inx
   inx
-  cpx #ObjectEnd
+  cpx #ActorEnd
   bne :-
 
   ; Init particles
@@ -73,15 +73,15 @@
   ; Now look through the list
   ldy #0
 EnemyLoop:
-  lda [LevelSpritePointer],y
+  lda [LevelActorPointer],y
   cmp #255
   beq Exit
   cmp Low
   bcc Nope
   cmp High
   bcs Nope
-  .import TryMakeSprite
-  jsl TryMakeSprite
+  .import TryMakeActor
+  jsl TryMakeActor
 Nope:
   iny
   iny

@@ -29,8 +29,8 @@
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
 .export BlockRunInteractionSide, BlockRunInteractionInsideHead
-.export BlockRunInteractionInsideBody, BlockRunInteractionEntityInside
-.export BlockRunInteractionEntityTopBottom, BlockRunInteractionEntitySide
+.export BlockRunInteractionInsideBody, BlockRunInteractionActorInside
+.export BlockRunInteractionActorTopBottom, BlockRunInteractionActorSide
 
 ; .-------------------------------------
 ; | Runners for interactions
@@ -129,8 +129,8 @@ Skip:
 
 .a16
 .i16
-.import BlockInteractionEntityInside
-.proc BlockRunInteractionEntityInside
+.import BlockInteractionActorInside
+.proc BlockRunInteractionActorInside
   and #255 ; Get the interaction set only
   beq Skip
 
@@ -139,7 +139,7 @@ Skip:
   plb
   asl
   tax
-  jsr (.loword(BlockInteractionEntityInside),x)
+  jsr (.loword(BlockInteractionActorInside),x)
   plb
 Skip:
   rtl
@@ -148,8 +148,8 @@ Skip:
 ; Pass in a block flag word and it will run the interaction
 .a16
 .i16
-.import BlockInteractionEntityTopBottom
-.proc BlockRunInteractionEntityTopBottom
+.import BlockInteractionActorTopBottom
+.proc BlockRunInteractionActorTopBottom
   and #255 ; Get the interaction set only
   beq Skip
 
@@ -158,7 +158,7 @@ Skip:
   plb
   asl
   tay
-  lda BlockInteractionEntityTopBottom,y
+  lda BlockInteractionActorTopBottom,y
   jsr Call
   plb
 Skip:
@@ -172,8 +172,8 @@ Call: ; Could use the RTS trick here instead
 ; Pass in a block flag word and it will run the interaction
 .a16
 .i16
-.import BlockInteractionEntitySide
-.proc BlockRunInteractionEntitySide
+.import BlockInteractionActorSide
+.proc BlockRunInteractionActorSide
   and #255 ; Get the interaction set only
   beq Skip
 
@@ -182,8 +182,8 @@ Call: ; Could use the RTS trick here instead
   plb
   asl
   tay
-  lda BlockInteractionEntitySide,y
-  jsr BlockRunInteractionEntityTopBottom::Call
+  lda BlockInteractionActorSide,y
+  jsr BlockRunInteractionActorTopBottom::Call
   plb
 Skip:
   rtl

@@ -66,7 +66,7 @@
 
   ; Clear out some buffers before the level loads stuff into them
 
-  ; Don't clear any sprites, that'll be done when rendering
+  ; Don't clear any entities, that'll be done when rendering
 
   ; Clear level buffer
   lda #0
@@ -193,15 +193,15 @@
   iny ; Y = 7
   ; Unused background byte
 
-  ; Sprite data pointer
+  ; Actor data pointer
   iny ; Y = 8
   lda [DecodePointer],y
-  sta LevelSpritePointer+0
+  sta LevelActorPointer+0
   iny ; Y = 9
   lda [DecodePointer],y
-  sta LevelSpritePointer+1
+  sta LevelActorPointer+1
   lda DecodePointer+2
-  sta LevelSpritePointer+2
+  sta LevelActorPointer+2
 
   ; Scroll barriers
   ; Convert from bit array to byte array for easier access
@@ -305,7 +305,7 @@
   sta PPUNMI
 
   ; -----------------------------------
-  jsr IndexSpriteList
+  jsr IndexActorList
 
   ; Now use the new DecodePointer to decompress the level data
   phk
@@ -320,11 +320,11 @@
 
 .a8
 .i16
-.proc IndexSpriteList
+.proc IndexActorList
   setaxy8
   ldy #0
 @Loop:
-  lda [LevelSpritePointer],y
+  lda [LevelActorPointer],y
   cmp #255 ; 255 marks the end of the list
   beq @Exit
   ; Get screen number
@@ -333,8 +333,8 @@
   lsr
   lsr
   tax
-  ; Write sprite number to the list, if the
-  ; screen doesn't already have a sprite set for it
+  ; Write actor number to the list, if the
+  ; screen doesn't already have an actor set for it
   lda FirstActorOnScreen,x
   cmp #255
   bne :+

@@ -21,7 +21,7 @@ def parseNumber(number):
 # Globals
 aliases = {}
 actor = None
-all_objects = []
+all_actors = []
 all_particles = []
 all_subroutines = []
 
@@ -36,7 +36,7 @@ def saveActor():
 	if actor["particle"]:
 		all_particles.append(actor)
 	else:
-		all_objects.append(actor)
+		all_actors.append(actor)
 
 for line in text:
 	if not len(line):
@@ -79,63 +79,63 @@ outfile = open("src/actordata.s", "w")
 outfile.write('; This is automatically generated. Edit "actors.txt" instead\n')
 outfile.write('.include "snes.inc"\n.include "actorenum.s"\n.include "global.inc"\n.include "graphicsenum.s"\n.include "paletteenum.s"\n')
 
-outfile.write('.export ObjectFlags, ObjectBank, ObjectRun, ObjectDraw, ObjectWidth, ObjectHeight, ObjectPalette, ObjectGraphic\n')
+outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidth, ActorHeight, ActorPalette, ActorGraphic\n')
 outfile.write('.export ParticleRun, ParticleDraw\n')
 
 outfile.write('.import %s\n' % str(", ".join(all_subroutines)))
 outfile.write('\n.segment "ActorData"\n\n')
 
-outfile.write('.proc ObjectFlags\n')
-for b in all_objects:
+outfile.write('.proc ActorFlags\n')
+for b in all_actors:
 	if b["essential"]:
 		b["flags"].append("Essential")
 	elif b["secondary"]:
 		b["flags"].append("Secondary")
 	else:
 		b["flags"].append("Primary")
-	outfile.write('  .word %s\n' % " | ".join(["ObjectFlag::"+f for f in b["flags"]]))
+	outfile.write('  .word %s\n' % " | ".join(["ActorFlag::"+f for f in b["flags"]]))
 outfile.write('.endproc\n\n')
 
 # no-operation routine
 outfile.write(".proc ActorNothing\n  rtl\n.endproc\n\n")
 outfile.write(".proc ParticleNothing\n  rts\n.endproc\n\n")
 
-# Objects
-outfile.write('.proc ObjectDraw\n  .addr .loword(ActorNothing)\n')
-for b in all_objects:
+# Actors
+outfile.write('.proc ActorDraw\n  .addr .loword(ActorNothing)\n')
+for b in all_actors:
 	outfile.write('  .addr .loword(%s)\n' % b["draw"])
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ObjectRun\n  .addr .loword(ActorNothing)\n')
-for b in all_objects:
+outfile.write('.proc ActorRun\n  .addr .loword(ActorNothing)\n')
+for b in all_actors:
 	outfile.write('  .addr .loword(%s)\n' % b["run"])
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ObjectBank\n  .byt ^ActorNothing, ^ActorNothing\n')
-for b in all_objects:
+outfile.write('.proc ActorBank\n  .byt ^ActorNothing, ^ActorNothing\n')
+for b in all_actors:
 	outfile.write('  .byt ^%s, ^%s\n' % (b["run"], b["draw"]))
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ObjectWidth\n  .word 0\n')
-for b in all_objects:
+outfile.write('.proc ActorWidth\n  .word 0\n')
+for b in all_actors:
 	outfile.write('  .word %s<<4 ; %s\n' % (b["size"][0], b["name"]))
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ObjectHeight\n  .word 0\n')
-for b in all_objects:
+outfile.write('.proc ActorHeight\n  .word 0\n')
+for b in all_actors:
 	outfile.write('  .word %s<<4 ; %s\n' % (b["size"][1], b["name"]))
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ObjectGraphic\n  .word $ffff\n')
-for b in all_objects:
+outfile.write('.proc ActorGraphic\n  .word $ffff\n')
+for b in all_actors:
 	if b["gfx"]:
 		outfile.write('  .word GraphicsUpload::%s\n' % (b["gfx"]))
 	else:
 		outfile.write('  .word $ffff\n')
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ObjectPalette\n  .word $ffff\n')
-for b in all_objects:
+outfile.write('.proc ActorPalette\n  .word $ffff\n')
+for b in all_actors:
 	if b["pal"]:
 		outfile.write('  .word Palette::%s\n' % (b["pal"]))
 	else:
@@ -162,8 +162,8 @@ outfile.close()
 # Generate the enum in a separate file
 outfile = open("src/actorenum.s", "w")
 outfile.write('; This is automatically generated. Edit "actors.txt" instead\n')
-outfile.write('.enum Object\n  Empty\n')
-for b in all_objects:
+outfile.write('.enum Actor\n  Empty\n')
+for b in all_actors:
 	outfile.write('  %s\n' % b['name'])
 outfile.write('.endenum\n\n')
 

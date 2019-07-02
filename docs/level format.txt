@@ -99,12 +99,12 @@ Layer 3 effects
 Per-level assembly routine
 
 .---------------------------------------
-| Sprite/actor data
+| Actor data
 '---------------------------------------
 XXXXXXXX D..YYYYY tttttttt abcdTTTT
-tT - Sprite number (T is higher bits)
+tT - Actor number (T is higher bits)
 D - direction (1 is left)
-abcd - misc sprite information
+abcd - misc actor information
 X - X position (0-255) (or Y position for vertical levels)
 Y - Y position (0-31)  (or X position for vertical levels)
 List ends in $ff (so you can't put anything on the rightmost column)

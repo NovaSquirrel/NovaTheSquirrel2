@@ -192,7 +192,7 @@ for f in glob.glob("levels/*.json"):
 	foreground = []
 	for z in range(len(level_json["Layers"][0]["Data"])):
 		foreground.append(Rect(level_json["Layers"][0]["Data"][z], z))
-	sprites = [Rect(x) for x in level_json["Layers"][1]["Data"]]
+	actors = [Rect(x) for x in level_json["Layers"][1]["Data"]]
 	control = [Rect(x) for x in level_json["Layers"][2]["Data"]]
 
 	# ---------------------------------
@@ -262,14 +262,14 @@ for f in glob.glob("levels/*.json"):
 		outfile.write("  %s\n" % line)
 	outfile.write("  LFinished\n\n")
 
-	# Write the sprite data
-	sprites = sorted(sprites, key=lambda r: r.x)
+	# Write the actor data
+	actors = sorted(actors, key=lambda r: r.x)
 	outfile.write("level_%s_sp:\n" % plain_name)
-	for sprite in sprites:
-		if len(sprite.extra):
-			outfile.write("  LSpr Object::%s, %d, %d, %d, %s\n" % (sprite.type, (1 if sprite.xflip else 0), sprite.x, sprite.y, sprite.extra))
+	for actor in actors:
+		if len(actor.extra):
+			outfile.write("  LSpr Actor::%s, %d, %d, %d, %s\n" % (actor.type, (1 if actor.xflip else 0), actor.x, actor.y, actor.extra))
 		else:
-			outfile.write("  LSpr Object::%s, %d, %d, %d\n" % (sprite.type, (1 if sprite.xflip else 0), sprite.x, sprite.y))
+			outfile.write("  LSpr Actor::%s, %d, %d, %d\n" % (actor.type, (1 if actor.xflip else 0), actor.x, actor.y))
 		total_level_size += 4
 	outfile.write("  .byt 255\n\n")
 

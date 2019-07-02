@@ -69,26 +69,26 @@
 
   LevelColumnSize:  .res 2 ; for moving left and right in a level buffer
   DecodePointer:    .res 3 ; multipurpose 24-bit pointer
-  LevelSpritePointer: .res 3 ; sprite pointer for this level
+  LevelActorPointer: .res 3 ; actor pointer for this level
 
 .segment "BSS" ; First 8KB of RAM
-  ObjectSize = 10*2+3
-  ObjectStart: .res ObjectLen*ObjectSize
-  ObjectEnd:
+  ActorSize = 10*2+3
+  ActorStart: .res ActorLen*ActorSize
+  ActorEnd:
 
-  ObjectType         = 0 ; Entity type number
-  ObjectPX           = 2 ; Positions
-  ObjectPY           = 4 ;
-  ObjectVX           = 6 ; Speeds
-  ObjectVY           = 8 ;
-  ObjectVarA         = 10 ; 
-  ObjectVarB         = 12 ; 
-  ObjectVarC         = 14 ; 
-  ObjectIndexInLevel = 16 ; object's index in level list, prevents object from being respawned until it's despawned
-  ObjectTimer        = 18 ; when timer reaches 0, reset state
-  ObjectDirection    = 20 ; 0 (Right) or 1 (Left). Other bits may be used later. Good place for parameters from level?
-  ObjectState        = 21 ; Nonzero usually means stunned
-  ObjectOnGround     = 22 ; Nonzero means on ground
+  ActorType         = 0 ; Actor type ID
+  ActorPX           = 2 ; Positions
+  ActorPY           = 4 ;
+  ActorVX           = 6 ; Speeds
+  ActorVY           = 8 ;
+  ActorVarA         = 10 ; 
+  ActorVarB         = 12 ; 
+  ActorVarC         = 14 ; 
+  ActorIndexInLevel = 16 ; Actor's index in level list, prevents Actor from being respawned until it's despawned
+  ActorTimer        = 18 ; when timer reaches 0, reset state
+  ActorDirection    = 20 ; 0 (Right) or 1 (Left). Other bits may be used later. Good place for parameters from level?
+  ActorState        = 21 ; Nonzero usually means stunned
+  ActorOnGround     = 22 ; Nonzero means on ground
 
   ; For less important, light entities
   ParticleSize = 7*2
@@ -151,7 +151,7 @@ LevelZeroWhenLoad_Start:
   ScreenFlagsDummy:       .res 1
   VerticalLevelFlag:      .res 1
 
-  ; How many objects use each of the four palette slots, for detecting when one is free
+  ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4
   PaletteInUseLast:    .res 4
   ; Dynamically uploading sprite palettes

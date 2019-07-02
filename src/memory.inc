@@ -75,23 +75,23 @@ OAM_YPOS = OAM+1
 OAM_TILE = OAM+2
 OAM_ATTR = OAM+3
 
-ObjectLen = 20
-.global ObjectStart
-.globalzp ObjectSize
-.global ObjectEnd
-.globalzp ObjectType
-.globalzp ObjectPX
-.globalzp ObjectPY
-.globalzp ObjectVX
-.globalzp ObjectVY
-.globalzp ObjectVarA
-.globalzp ObjectVarB
-.globalzp ObjectVarC
-.globalzp ObjectDirection
-.globalzp ObjectIndexInLevel
-.globalzp ObjectTimer
-.globalzp ObjectState
-.globalzp ObjectOnGround
+ActorLen = 20
+.global ActorStart
+.globalzp ActorSize
+.global ActorEnd
+.globalzp ActorType
+.globalzp ActorPX
+.globalzp ActorPY
+.globalzp ActorVX
+.globalzp ActorVY
+.globalzp ActorVarA
+.globalzp ActorVarB
+.globalzp ActorVarC
+.globalzp ActorDirection
+.globalzp ActorIndexInLevel
+.globalzp ActorTimer
+.globalzp ActorState
+.globalzp ActorOnGround
 
 ParticleLen = 16
 .global ParticleStart
@@ -125,5 +125,5 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global ScreenFlags
 .global ScreenFlagsDummy
 .global LevelBackgroundColor
-.globalzp LevelSpritePointer
+.globalzp LevelActorPointer
 .global VerticalLevelFlag
