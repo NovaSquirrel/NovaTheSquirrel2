@@ -20,6 +20,7 @@
 .globalzp PlayerFrame
 .globalzp PlayerDir
 .globalzp PlayerWasRunning
+.global PlayerOnLadder
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
@@ -31,6 +32,8 @@
 .globalzp TempX
 .globalzp TempY
 .globalzp DecodePointer
+.globalzp ForceControllerBits
+.globalzp ForceControllerTime
 
 .global PlayerJumpCancel
 .global PlayerJumpCancelLock

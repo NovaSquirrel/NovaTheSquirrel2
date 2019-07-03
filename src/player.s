@@ -94,14 +94,32 @@ MaxSpeedRight = 12
   phk
   plb
 
-  ; Horizontal movement
-
-  ; Calculate max speed from whether they're running or not
-  ; (Updated only when on the ground)
   seta8
   countdown JumpGracePeriod
   countdown PlayerWantsToJump
   countdown PlayerJumpCancelLock
+  countdown PlayerOnLadder
+
+  lda ForceControllerTime
+  beq :+
+     dec ForceControllerTime
+     seta16
+     lda ForceControllerBits
+     tsb keydown
+     seta8
+  :
+
+  lda keydown+1
+  and #(KEY_DOWN>>8)
+  beq NotDown
+    lda PlayerDownTimer
+    cmp #60
+    bcs YesDown
+    inc PlayerDownTimer
+    bne YesDown
+  NotDown:
+    stz PlayerDownTimer
+  YesDown:
 
   lda keynew+1
   and #(KEY_B>>8)
@@ -109,6 +127,11 @@ MaxSpeedRight = 12
     lda #3
     sta PlayerWantsToJump
   :
+
+  ; Horizontal movement
+
+  ; Calculate max speed from whether they're running or not
+  ; (Updated only when on the ground)
 
   lda PlayerWasRunning ; nonzero = B button, only updated when on ground
   seta16
@@ -279,6 +302,10 @@ NoFixWalkSpeed:
 
   ; -------------------  
 
+  lda PlayerOnLadder
+  and #255
+  bne HandleLadder
+
   ; Vertical movement
   lda PlayerVY
   bmi GravityAddOK
@@ -291,6 +318,28 @@ SkipGravity:
   add PlayerPY ; Apply the vertical speed
   sta PlayerPY
 SkipApplyGravity:
+  jmp PlayerIsntOnLadder
+
+HandleLadder:
+  stz PlayerVY
+  jsr OfferJump
+  lda keydown
+  and #KEY_UP
+  beq :+
+    lda PlayerPY
+    sub #$20
+    sta PlayerPY
+  :
+  lda keydown
+  and #KEY_DOWN
+  beq :+
+    lda PlayerPY
+    add #$20
+    sta PlayerPY
+  :
+PlayerIsntOnLadder:
+
+
 
 
   ; Allow canceling a jump
@@ -490,6 +539,7 @@ TryAboveInteraction:
 
     seta8
     inc PlayerOnGround
+    stz PlayerOnLadder
     seta16
   :
   rts
@@ -628,6 +678,7 @@ OfferJumpFromGracePeriod:
   and #KEY_B
   beq :+
     seta8
+    stz PlayerOnLadder
     stz JumpGracePeriod
     inc PlayerJumping
     seta16
@@ -657,6 +708,8 @@ OfferJumpFromGracePeriod:
   RUN8
   JUMP
   FALL
+  CLIMB1
+  CLIMB2
 .endenum
 
 .a16
@@ -797,7 +850,28 @@ OfferJumpFromGracePeriod:
     beq OnGround
       dec PlayerFrame
   OnGround:
+
+  lda PlayerOnLadder
+  beq OffLadder
+    lda retraces
+    lsr
+    lsr
+    lsr
+    and #1
+    add #PlayerFrame::CLIMB1
+    sta PlayerFrame
+
+    ; Turn around
+    lda retraces
+    and #8+7
+    cmp #8+7
+    bne OffLadder
+      lda PlayerDir
+      eor #1
+      sta PlayerDir
+  OffLadder:
   setaxy16
+
   rtl
 
 XToPixels:

@@ -129,7 +129,9 @@ t 4,4 4,4h
 base wood
 
 +LadderTop
+solid_top
 when InsideBody, BlockLadder
+when Above, BlockLadderTop
 q 0,0
 
 +Ladder

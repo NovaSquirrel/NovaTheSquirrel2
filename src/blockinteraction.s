@@ -24,7 +24,7 @@
 
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
-.export BlockSign, BlockSpikes, BlockSpring, BlockLadder
+.export BlockSign, BlockSpikes, BlockSpring, BlockLadder, BlockLadderTop
 
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -282,7 +282,58 @@ Skip:
   rts
 .endproc
 
+.a16
 .proc BlockLadder
+  seta8
+  lda PlayerOnLadder
+  beq :+
+    inc PlayerOnLadder
+  :
+  seta16
+
+  lda keydown
+  and #KEY_UP|KEY_DOWN
+  beq :+
+GetOnLadder:
+    ; Snap onto the ladder
+    lda PlayerPX
+    and #$ff00
+    ora #$0080
+    sta PlayerPX
+    stz PlayerVX
+
+    seta8
+    lda #2
+    sta PlayerOnLadder
+    seta16
+  :
+  rts
+.endproc
+
+.a16
+.proc BlockLadderTop
+  ; Make sure you're standing on it
+  jsl GetBlockX
+  seta8
+  cmp PlayerPX+1
+  seta16
+  beq :+
+    rts
+  :
+
+  seta8
+  lda PlayerDownTimer
+  cmp #4
+  bcc :+
+    lda #2
+    sta ForceControllerTime
+    seta16
+    lda #KEY_DOWN
+    sta ForceControllerBits
+    stz BlockFlag
+    jmp BlockLadder::GetOnLadder
+  :
+  seta16
   rts
 .endproc
 

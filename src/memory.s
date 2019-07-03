@@ -45,11 +45,13 @@
   PlayerVY:        .res 2 ; /
   PlayerFrame:     .res 1 ; Player animation frame
 
+  ForceControllerBits: .res 2
+  ForceControllerTime: .res 1
   PlayerWasRunning: .res 1     ; was the player running when they jumped?
   PlayerDir:        .res 1     ; currently facing left?
   PlayerJumping:    .res 1     ; true if jumping (not falling)
   PlayerOnGround:   .res 1     ; true if on ground
-  PlayerOnGroundLast: .res 1     ; true if on ground last frame
+  PlayerOnGroundLast: .res 1   ; true if on ground last frame
   PlayerWalkLock:   .res 1     ; timer for the player being unable to move left/right
   PlayerDownTimer:  .res 1     ; timer for how long the player has been holding down
                                ; (used for fallthrough platforms)
@@ -157,6 +159,7 @@ LevelZeroWhenLoad_Start:
   ; Dynamically uploading sprite palettes
   PaletteRequestIndex: .res 1
   PaletteRequestValue: .res 1
+  PlayerOnLadder:      .res 1
 
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the edit
 LevelZeroWhenLoad_End:
