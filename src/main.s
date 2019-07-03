@@ -88,6 +88,12 @@
   jsl ppu_clear_nt
   setaxy16
 
+  ; Initialize random generator
+  lda #12345
+  sta random1
+  dec
+  sta random2
+
   lda #0
   jml StartLevel
 .endproc

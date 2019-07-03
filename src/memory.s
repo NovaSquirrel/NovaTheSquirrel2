@@ -33,6 +33,9 @@
   ScrollX:  .res 2
   ScrollY:  .res 2
 
+  random1:  .res 2
+  random2:  .res 2
+
   LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks. 00xxxxxxxxyyyyy0
   BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
   BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr (Unused)

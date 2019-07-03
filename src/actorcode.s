@@ -242,3 +242,38 @@ CommonTileBase = $40
 .proc RunPrizeParticle
   rts
 .endproc
+
+
+.a16
+.i16
+.export DrawBricksParticle
+.proc DrawBricksParticle
+  lda #CommonTileBase+$3c+OAM_PRIORITY_2
+  jsl DispParticle8x8
+  rts
+.endproc
+
+.a16
+.i16
+.export RunBricksParticle
+.proc RunBricksParticle
+  lda ParticlePX,x
+  add ParticleVX,x
+  sta ParticlePX,x
+
+  lda ParticleVY,x
+  add #4
+  sta ParticleVY,x
+  add ParticlePY,x
+  sta ParticlePY,x
+  cmp #256*32
+  bcc :+
+    stz ParticleType,x
+  :
+
+  dec ParticleTimer,x
+  bne :+
+    stz ParticleType,x
+  :
+  rts
+.endproc

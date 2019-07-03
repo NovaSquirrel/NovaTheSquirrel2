@@ -96,7 +96,7 @@ ActorLen = 20
 .globalzp ActorState
 .globalzp ActorOnGround
 
-ParticleLen = 16
+ParticleLen = 32
 .global ParticleStart
 .globalzp ParticleSize
 .global ParticleEnd
@@ -130,3 +130,6 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global LevelBackgroundColor
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
+
+.globalzp random1
+.globalzp random2

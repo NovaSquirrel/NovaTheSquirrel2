@@ -152,6 +152,7 @@ $(objdir)/uploadppu.o: $(palettes)
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py
+$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(srcdir)/actorenum.s: tools/actors.txt
 	$(PY) tools/makeactor.py

@@ -64,3 +64,5 @@ ExtraBG = $E000
 .endenum
 
 .global FindFreeActorX, FindFreeActorY, FindFreeParticleY
+
+.global RandomByte

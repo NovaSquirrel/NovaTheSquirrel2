@@ -305,3 +305,41 @@ Exit:
   and #31
   rtl
 .endproc
+
+
+
+; Random number generator, consists of two LFSRs that get used together for a high period
+; http://codebase64.org/doku.php?id=base:two_very_fast_16bit_pseudo_random_generators_as_lfsr
+; output: A (random number)
+.proc RandomByte
+  php
+  seta8
+  lda #0 ; Clear the high byte
+  xba
+
+  lda random1+1
+  asl
+  asl
+  eor random1+1
+  asl
+  eor random1+1
+  asl
+  asl
+  eor random1+1
+  asl
+  rol random1         ;shift this left, "random" bit comes from low
+  rol random1+1
+
+  lda random2+1
+  asl
+  eor random2+1
+  asl
+  asl
+  ror random2         ;shift this right, random bit comes from high - nicer when eor with random1
+  rol random2+1
+
+  lda random1           ;mix up lowbytes of random1
+  eor random2           ;and random2 to combine both 
+  plp
+  rtl
+.endproc

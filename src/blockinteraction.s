@@ -251,6 +251,45 @@ Skip:
 .proc BlockBricks
   lda #Block::Empty
   jsl ChangeBlock
+
+  jsr Create
+  jmp Create
+
+Create:
+  ; Create one facing right
+  jsl FindFreeParticleY
+  bcc :+
+    jsl RandomByte
+    and #15
+    sta ParticleVX,y
+
+    jsr Common
+  :
+
+  ; Create one facing left
+  jsl FindFreeParticleY
+  bcc :+
+    jsl RandomByte
+    and #15
+    eor #$ffff
+    inc a
+    sta ParticleVX,y
+    bra Common
+  :
+  rts
+
+Common:
+  jsl RandomByte
+  and #15
+  add #.loword(-$30)
+  sta ParticleVY,y
+
+  lda #30
+  sta ParticleTimer,y
+
+  lda #Particle::BricksParticle
+  sta ParticleType,y
+  jsr ParticleAtBlock
   rts
 .endproc
 
