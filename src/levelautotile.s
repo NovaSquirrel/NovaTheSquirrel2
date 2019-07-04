@@ -146,6 +146,25 @@ No:
   ldx 0
   lda Table,x
   sta [MidPointer],y
+
+  ; Add dirt if needed
+  cpx #0*2
+  beq NoDirt
+  cpx #3*2
+  beq NoDirt
+    dey
+    dey
+    lda [MidPointer],y
+    iny
+    iny
+    cmp #Block::LedgeMiddle
+    bne :+
+      lda [MidPointer],y
+      add #4*2
+      sta [MidPointer],y
+    :
+  NoDirt:
+
   lda ExpandWith,x
   bra AutotileExpandOther
 
@@ -197,15 +216,6 @@ No:
 ;  cmp #Block::LedgeMiddle
 ;  bne NotFillDirt
     lda [MidPointer],y
-    cmp #Block::LedgeLeft
-    bcc @NotLedge
-    cmp #Block::LedgeSolidRight+1
-    bcs @NotLedge
-       adc #4*2
-       sta [MidPointer],y
-       bra NotFillDirt
-    @NotLedge:
-
     cmp #Block::MedSlopeL_UL
     bcc @NotSlope
     cmp #Block::GradualSlopeR_U4+1
@@ -213,7 +223,6 @@ No:
        adc #14*2
        sta [MidPointer],y
 	@NotSlope:
-
   NotFillDirt:
 
   dey
