@@ -213,6 +213,13 @@ Skip:
 .proc BlockMoney
   lda #Block::Empty
   jsl ChangeBlock
+
+  jsl FindFreeParticleY
+  bcc :+
+    lda #Particle::LandingParticle
+    sta ParticleType,y
+    jmp ParticleAtBlock
+  :
   rts
 .endproc
 
