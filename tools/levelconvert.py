@@ -212,7 +212,7 @@ for f in glob.glob("levels/*.json"):
 	for r in control:
 		if r.type == 'PLAYER_START_R' or r.type == 'PLAYER_START_L':
 			player_x = r.x
-			player_y = r.y
+			player_y = r.y+1
 			player_dir = r.type[-1] == 'L'
 		if r.type == 'SCROLL_LOCK':
 			screen = (r.x//16);

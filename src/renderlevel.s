@@ -33,6 +33,16 @@
     lda #0
 : sta ScrollX
 
+  lda PlayerPY
+  sub #(8*256)
+  bcs :+
+    lda #0
+: cmp #((32-14)*256)
+  bcc :+
+    lda #((32-14)*256)
+  :
+  sta ScrollY
+
   ; -------------------
 
   ; Init actors

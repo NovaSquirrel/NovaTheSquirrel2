@@ -144,7 +144,6 @@
   iny ; Y = 2
   ; Starting Y position
   lda [DecodePointer],y
-  and #31
   sta PlayerPY+1
   stz PlayerPY+0
 
