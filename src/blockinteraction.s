@@ -243,6 +243,16 @@ Skip:
   bcc :+
     lda #Particle::PrizeParticle
     sta ParticleType,y
+    lda #30
+    sta ParticleTimer,y
+    lda #.loword(-$30)
+    sta ParticleVY,y
+
+    jsl RandomByte
+    and #7
+    jsl VelocityLeftOrRight
+    sta ParticleVX,y
+
     jmp ParticleAtBlock
   :
   rts

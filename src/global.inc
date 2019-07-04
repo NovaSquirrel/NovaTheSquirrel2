@@ -65,4 +65,4 @@ ExtraBG = $E000
 
 .global FindFreeActorX, FindFreeActorY, FindFreeParticleY
 
-.global RandomByte
+.global RandomByte, VelocityLeftOrRight

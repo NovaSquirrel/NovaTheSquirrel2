@@ -343,3 +343,19 @@ Exit:
   plp
   rtl
 .endproc
+
+.a16
+.proc VelocityLeftOrRight
+  pha
+  jsl RandomByte
+  lsr
+  bcc Right
+Left:
+  pla
+  eor #$ffff
+  ina
+  rtl
+Right:
+  pla
+  rtl
+.endproc

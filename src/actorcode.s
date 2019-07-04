@@ -233,6 +233,8 @@ CommonTileBase = $40
 .i16
 .export DrawPrizeParticle
 .proc DrawPrizeParticle
+  lda #CommonTileBase+$28+OAM_PRIORITY_2
+  jsl DispParticle8x8
   rts
 .endproc
 
@@ -240,6 +242,20 @@ CommonTileBase = $40
 .i16
 .export RunPrizeParticle
 .proc RunPrizeParticle
+  lda ParticlePX,x
+  add ParticleVX,x
+  sta ParticlePX,x
+
+  lda ParticleVY,x
+  add #4
+  sta ParticleVY,x
+  add ParticlePY,x
+  sta ParticlePY,x
+
+  dec ParticleTimer,x
+  bne :+
+    stz ParticleType,x
+  :
   rts
 .endproc
 
@@ -276,6 +292,7 @@ CommonTileBase = $40
     stz ParticleType,x
   :
 
+.if 0
   lda ParticlePX,x
   ldy ParticlePY,x
   phx
@@ -290,6 +307,7 @@ CommonTileBase = $40
     inc a
     sta ParticleVY,x
   :
+.endif
 
   rts
 .endproc
