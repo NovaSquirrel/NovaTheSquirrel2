@@ -241,6 +241,22 @@ solid
 t 8,3 9,3
 t 3,3 3,3
 
++LedgeSolidBottom
+autotile AutotileLedgeSolidBottom
+solid
+t 4,2 4,2
+t 11,2 11,2
+
++LedgeSolidBottomLeft
+solid
+t 6,2 3,2
+t 10,2 11,2
+
++LedgeSolidBottomRight
+solid
+t 5,2 9,2
+t 11,2 12,2
+
 #######################################
 # Terrain (slopes) - fully solid
 #######################################

@@ -275,5 +275,21 @@ CommonTileBase = $40
   bne :+
     stz ParticleType,x
   :
+
+  lda ParticlePX,x
+  ldy ParticlePY,x
+  phx
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  plx  
+  cmp #$4000
+  bcc :+
+    lda ParticleVY,x
+    lsr
+    eor #$ffff
+    inc a
+    sta ParticleVY,x
+  :
+
   rts
 .endproc

@@ -272,3 +272,42 @@ Nope:
   rts
 .endproc
 
+
+.export AutotileLedgeSolidBottom
+.proc AutotileLedgeSolidBottom
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsBottom
+  rol 0
+  lda [RightPointer],y
+  jsr IsBottom
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  ; Use the table
+  ldx 0
+  lda Table,x
+  sta [MidPointer],y
+  rts
+
+Table:
+  .word Block::LedgeSolidBottom
+  .word Block::LedgeSolidBottomLeft
+  .word Block::LedgeSolidBottomRight
+  .word Block::LedgeSolidBottom
+
+IsBottom:
+  cmp #Block::LedgeSolidBottom
+  beq Yes
+  cmp #Block::LedgeSolidBottomLeft
+  beq Yes
+  cmp #Block::LedgeSolidBottomRight
+  beq Yes
+  clc
+  rts
+Yes:
+  sec
+  rts
+.endproc
+

@@ -495,9 +495,9 @@ SpecialConfig:
   .word Block::LedgeMiddle
   .word Block::Prize
   .word Block::SolidBlock
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::LedgeSolidBottom
+  .word Block::LedgeSolidLeft
+  .word Block::LedgeSolidRight
   .word Block::Empty
   .word Block::Empty
 ; Set 2

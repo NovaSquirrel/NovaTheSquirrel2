@@ -50,6 +50,9 @@
   LedgeMiddle
   Prize
   SolidBlock
+  LedgeSolidBottom
+  LedgeSolidLeft
+  LedgeSolidRight
 .endenum
 
 .enum LN2
