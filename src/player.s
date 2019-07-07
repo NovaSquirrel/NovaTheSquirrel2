@@ -978,6 +978,7 @@ OfferJumpFromGracePeriod:
     sta PlayerFrame
 
     lda retraces
+    inc a
     and #16
     beq NoRoll
       inc PlayerFrameXFlip
