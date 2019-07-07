@@ -28,7 +28,7 @@
 
 .segment "Player"
 .importzp SlopeBCC, SlopeBCS
-.import SlopeHeightTable
+.import SlopeHeightTable, SlopeFlagTable
 
 .a16
 .i16
@@ -99,14 +99,20 @@ MaxSpeedRight = 12
   countdown PlayerWantsToJump
   countdown PlayerJumpCancelLock
   countdown PlayerOnLadder
+  stz PlayerOnSlope
 
   lda ForceControllerTime
   beq :+
-     dec ForceControllerTime
      seta16
      lda ForceControllerBits
      tsb keydown
      seta8
+
+     dec ForceControllerTime
+     bne @NoCancelForce
+       stz ForceControllerBits+0
+       stz ForceControllerBits+1
+     @NoCancelForce:
   :
 
   lda keydown+1
@@ -152,6 +158,9 @@ NotWalkSpeed:
   lda keydown
   and #KEY_LEFT
   beq NotLeft
+  lda ForceControllerBits
+  and #KEY_RIGHT
+  bne NotLeft
     seta8
     lda #1
     sta PlayerDir
@@ -169,6 +178,9 @@ NotLeft:
   lda keydown
   and #KEY_RIGHT
   beq NotRight
+  lda ForceControllerBits
+  and #KEY_LEFT
+  bne NotRight
     seta8
     stz PlayerDir
     seta16
@@ -392,20 +404,58 @@ PlayerIsntOnLadder:
 
   ; Slope interaction
   jsr GetSlopeYPos
-  bcc :+
+  bcc NoSlopeInteraction
     lda SlopeY
     cmp PlayerPY
-    bcs :+
+    bcs NoSlopeInteraction
     
     sta PlayerPY
     stz PlayerVY
 
+    ; Some unnecessary shifting, since this was previously shifted left
+    ; and we're just undoing it, but the alternative is probably storing
+    ; to PlayerSlopeType in every IsSlope call and I'd rather not.
+    txa
+    lsr
+    lsr
+    lsr
+    lsr
+    and #.loword(~1)
+    sta PlayerSlopeType
+
     seta8
+    inc PlayerOnSlope
     inc PlayerOnGround
+
+    ; Start rolling
+    lda PlayerDownTimer
+    cmp #4
+    bcc :+
+      lda #1
+      sta PlayerRolling
+    :
     seta16
+
+    ; Perform rolling
+    lda PlayerRolling
+    and #255
+    beq :+
+       lda #2
+       sta ForceControllerTime
+       ; Force left or right based on the slope direction
+       lda #KEY_RIGHT|KEY_Y
+       sta ForceControllerBits
+
+       ldx PlayerSlopeType
+       lda f:SlopeFlagTable,x
+       bpl :+
+         lda #KEY_LEFT|KEY_Y
+         sta ForceControllerBits
+    :
+ 
     ; Don't do the normal ground check
     bra SkipGroundCheck
-  :
+  NoSlopeInteraction:
 
   lda PlayerVY
   bmi :+
@@ -496,8 +546,14 @@ SkipGroundCheck:
   beq :+
     jsr OfferJump
 
-    ; Update run status
     seta8
+    ; Update roll status
+    lda PlayerOnSlope
+    bne @NoCancelRoll
+      stz PlayerRolling
+    @NoCancelRoll:
+
+    ; Update run status
     lda keydown
     and #KEY_R|KEY_L
     sta PlayerWasRunning
@@ -631,7 +687,7 @@ GetSlopeYPosBelow:
 
 .a16
 ; Determine if it's a slope (carry),
-; but also determine the index into the height table (Y)
+; but also determine the index into the height table (X)
 IsSlope:
   cmp #SlopeBCC
   bcc :+
@@ -640,7 +696,7 @@ IsSlope:
   sub #SlopeBCC
   ; Now we have the block ID times 2
 
-  ; Multiply by 16 to get the index into the slope table
+  ; Multiply by 16 to get the index into the slope height table
   asl
   asl
   asl
@@ -710,6 +766,10 @@ OfferJumpFromGracePeriod:
   FALL
   CLIMB1
   CLIMB2
+  ROLL1
+  ROLL2
+  ROLL3
+  ROLL4
 .endenum
 
 .a16
@@ -720,6 +780,7 @@ OfferJumpFromGracePeriod:
   jsr XToPixels
 
   ; Keep the player within bounds horizontally
+  ; and fix it if they're out of bounds.
   lda 0
   cmp #$10
   bcs :+
@@ -766,6 +827,13 @@ OfferJumpFromGracePeriod:
   sta OAM_XPOS+(4*0),x
   sta OAM_XPOS+(4*2),x
 
+  lda PlayerRolling
+  beq :+
+    lda 2
+    add #8
+    sta 2
+  :
+
   lda 2
   sub #16
   sta OAM_YPOS+(4*2),x
@@ -785,8 +853,9 @@ OfferJumpFromGracePeriod:
   lda #6
   sta OAM_TILE+(4*3),x
 
-  ; Background flip
+  ; Horizontal flip
   lda PlayerDir
+  eor PlayerFrameXFlip
   beq :+
     ; Rewrite tile numbers
     lda #2
@@ -798,13 +867,41 @@ OfferJumpFromGracePeriod:
     lda #4
     sta OAM_TILE+(4*3),x
 
-    lda #%01000000
+    lda #OAM_XFLIP>>8
   :
   ora #>(OAM_PRIORITY_2|OAM_COLOR_1) ; priority
   sta OAM_ATTR+(4*0),x
   sta OAM_ATTR+(4*1),x
   sta OAM_ATTR+(4*2),x
   sta OAM_ATTR+(4*3),x
+
+  ; Do a vertical flip (possibly on top of a horizontal flip) if requested
+  lda PlayerFrameYFlip
+  beq :+
+    ; Swap vertically
+    lda OAM_TILE+(4*0),x
+    pha
+    lda OAM_TILE+(4*2),x
+    sta OAM_TILE+(4*0),x
+    pla
+    sta OAM_TILE+(4*2),x
+
+    lda OAM_TILE+(4*1),x
+    pha
+    lda OAM_TILE+(4*3),x
+    sta OAM_TILE+(4*1),x
+    pla
+    sta OAM_TILE+(4*3),x
+
+    ; Fix attributes
+    lda OAM_ATTR+(4*0),x
+    ora #OAM_YFLIP>>8
+    sta OAM_ATTR+(4*0),x
+    sta OAM_ATTR+(4*1),x
+    sta OAM_ATTR+(4*2),x
+    sta OAM_ATTR+(4*3),x
+  :
+
  
   seta16
   ; Four sprites
@@ -818,6 +915,8 @@ OfferJumpFromGracePeriod:
   ; Automatically cycle through the walk animation
   seta8
   stz PlayerFrame
+  stz PlayerFrameXFlip
+  stz PlayerFrameYFlip
 
   lda keydown+1
   and #(KEY_LEFT|KEY_RIGHT)>>8
@@ -863,13 +962,27 @@ OfferJumpFromGracePeriod:
 
     ; Turn around
     lda retraces
-    and #8+7
-    cmp #8+7
+    and #16
     bne OffLadder
-      lda PlayerDir
-      eor #1
-      sta PlayerDir
+      inc PlayerFrameXFlip
   OffLadder:
+
+
+  lda PlayerRolling
+  beq NoRoll
+    lda retraces
+    lsr
+    lsr
+    and #3
+    add #PlayerFrame::ROLL1
+    sta PlayerFrame
+
+    lda retraces
+    and #16
+    beq NoRoll
+      inc PlayerFrameXFlip
+      inc PlayerFrameYFlip
+  NoRoll:
   setaxy16
 
   rtl

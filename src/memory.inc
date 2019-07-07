@@ -18,9 +18,14 @@
 .globalzp PlayerVX
 .globalzp PlayerVY
 .globalzp PlayerFrame
+.globalzp PlayerFrameXFlip
+.globalzp PlayerFrameYFlip
 .globalzp PlayerDir
 .globalzp PlayerWasRunning
 .global PlayerOnLadder
+.global PlayerOnSlope
+.global PlayerSlopeType
+.global PlayerRolling
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth

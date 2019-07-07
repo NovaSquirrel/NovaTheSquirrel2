@@ -1170,3 +1170,40 @@ Invalid:
 .word $e0, $e0, $e0, $e0, $f0, $f0, $f0, $f0
 .endrep
 .endproc
+
+.pushseg
+.segment "Player"
+.export SlopeFlagTable
+.proc SlopeFlagTable
+Left  = $8000
+Right = $0000
+Gradual = 1
+Medium  = 2
+Steep   = 4
+
+.word Left  ; MedSlopeL_DL
+.word Right ; MedSlopeR_DR
+.word Left  ; GradualSlopeL_D1
+.word Left  ; GradualSlopeL_D2
+.word Right ; GradualSlopeR_D3
+.word Right ; GradualSlopeR_D4
+.word Left  ; SteepSlopeL_D
+.word Right ; SteepSlopeR_D
+.repeat 2
+.word Left  | Medium  ; MedSlopeL_UL
+.word Left  | Medium  ; MedSlopeL_UR
+.word Right | Medium  ; MedSlopeR_UL
+.word Right | Medium  ; MedSlopeR_UR
+.word Left  | Steep   ; SteepSlopeL_U
+.word Right | Steep   ; SteepSlopeR_U
+.word Left  | Gradual ; GradualSlopeL_U1
+.word Left  | Gradual ; GradualSlopeL_U2
+.word Left  | Gradual ; GradualSlopeL_U3
+.word Left  | Gradual ; GradualSlopeL_U4
+.word Right | Gradual ; GradualSlopeR_U1
+.word Right | Gradual ; GradualSlopeR_U2
+.word Right | Gradual ; GradualSlopeR_U3
+.word Right | Gradual ; GradualSlopeR_U4
+.endrep
+.endproc
+.popseg

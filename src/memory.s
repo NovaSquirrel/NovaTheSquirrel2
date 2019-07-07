@@ -47,6 +47,8 @@
   PlayerVX:        .res 2 ; \
   PlayerVY:        .res 2 ; /
   PlayerFrame:     .res 1 ; Player animation frame
+  PlayerFrameXFlip: .res 1
+  PlayerFrameYFlip: .res 1
 
   ForceControllerBits: .res 2
   ForceControllerTime: .res 1
@@ -163,6 +165,10 @@ LevelZeroWhenLoad_Start:
   PaletteRequestIndex: .res 1
   PaletteRequestValue: .res 1
   PlayerOnLadder:      .res 1
+
+  PlayerOnSlope:       .res 1 ; Nonzero if the player is on a slope
+  PlayerSlopeType:     .res 2 ; Type of slope the player is on, if they are on one
+  PlayerRolling:       .res 1 ; Nonzero if the player is rolling down a slope
 
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the edit
 LevelZeroWhenLoad_End:
