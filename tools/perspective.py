@@ -1,0 +1,84 @@
+import math
+
+def perspective(angle, height, scale_x, scale_y):
+    """
+    angle   - angle to face
+    height  - this is the height of the camera above the plane
+    scale_x - scale of space coordinates to pixels
+    scale_y - scale of space coordinates to pixels
+    """
+    def to_fixed(f):
+        return int(round(f*256)) & 0xffff
+   
+    m7a, m7b, m7c, m7d, m7x, m7y = [], [], [], [], [], []
+    for screen_y in range(224):
+        scale_z = 1/(screen_y+1)
+        
+        m7a.append(to_fixed( math.cos(angle) * scale_x * scale_z))
+        m7b.append(to_fixed( math.sin(angle) * scale_x * scale_z))
+        m7c.append(to_fixed(-math.sin(angle) * scale_y * scale_z))
+        m7d.append(to_fixed( math.cos(angle) * scale_y * scale_z))
+#        m7x.append(128)
+#        m7y.append(256-height)
+
+        m7x.append(128 + to_fixed(height * math.cos(angle + math.pi/2)))
+        m7y.append(to_fixed(height * math.sin(angle + math.pi/2)))
+    return (m7a, m7b, m7c, m7d, m7x, m7y)
+
+""" HDMA format:
+xx Line count
+xx * N Data
+xx Line count
+xx * N Data
+xx Line count
+xx * N Data
+00 Terminate
+"""
+def output_tables():
+	outfile = open("src/perspective_data.s", "w")
+
+	sky_lines = 48
+	data_skip = 16
+	angles    = 32
+
+	outfile.write('; This is automatically generated. Edit "perspective.py" instead\n')
+	outfile.write('.export m7a_m7b_list, m7c_m7d_list, m7a_m7b_0, m7c_m7d_0\n')
+	outfile.write('.segment "Mode7Game"\n')
+	outfile.write('m7a_m7b_list:\n')
+	for a in range(angles):
+		outfile.write('  .addr .loword(m7a_m7b_%d)\n' % a)
+	outfile.write('m7c_m7d_list:\n')
+	for a in range(angles):
+		outfile.write('  .addr .loword(m7c_m7d_%d)\n' % a)
+
+	for a in range(angles):
+		m7a, m7b, m7c, m7d, m7x, m7y = perspective((a/angles)*2*math.pi, 0, 64, 64)
+
+		outfile.write('.segment "Mode7TblAB"\n')
+		outfile.write('m7a_m7b_%d:\n' % a)
+		outfile.write('  .byte %d\n' % sky_lines)
+		outfile.write('  .word 0, 0\n')
+		for i in range(224-sky_lines):
+			outfile.write('  .byte 1\n')
+			outfile.write('  .word $%.4x, $%.4x\n' % (m7a[i+data_skip], m7b[i+data_skip]))
+		outfile.write('  .byte 0\n')
+
+		outfile.write('.segment "Mode7TblCD"\n')
+		outfile.write('m7c_m7d_%d:\n' % a)
+		outfile.write('  .byte %d\n' % sky_lines)
+		outfile.write('  .word 0, 0\n')
+		for i in range(224-sky_lines):
+			outfile.write('  .byte 1\n')
+			outfile.write('  .word $%.4x, $%.4x\n' % (m7c[i+data_skip], m7d[i+data_skip]))
+		outfile.write('  .byte 0\n')
+
+	"""
+	outfile.write('m7x_m7y:\n')
+	for i in range(220):
+		outfile.write('  .byte 1\n')
+		outfile.write('  .word $%.4x, $%.4x\n' % (m7x[i], m7y[i]))
+	outfile.write('  .byte 0\n')
+	"""
+
+	outfile.close()
+output_tables()

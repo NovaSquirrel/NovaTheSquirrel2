@@ -20,7 +20,7 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7
+  mode7 perspective_data
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -159,6 +159,8 @@ $(srcdir)/actorenum.s: tools/actors.txt
 	$(PY) tools/makeactor.py
 $(srcdir)/leveldata.s: $(levels)
 	$(PY) tools/levelconvert.py
+$(srcdir)/perspective_data.s: $(levels) tools/perspective.py
+	$(PY) tools/perspective.py
 
 
 #$(objdir)/graphics.o: $(chr2all) $(chr4all)
