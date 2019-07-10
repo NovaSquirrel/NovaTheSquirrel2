@@ -34,3 +34,4 @@ src/actordata.s
 src/graphicsenum.s
 *.driveupload
 src/leveldata.s
+*.dbg

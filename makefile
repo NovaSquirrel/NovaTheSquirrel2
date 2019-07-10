@@ -19,7 +19,8 @@ objlist = \
   snesheader init main player memory common renderlevel \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
-  levelload levelautotile leveldata actordata actorcode object
+  levelload levelautotile leveldata actordata actorcode object \
+  mode7
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -27,7 +28,7 @@ brrlist = \
 
 AS65 := ca65
 LD65 := ld65
-CFLAGS65 = 
+CFLAGS65 = -g
 objdir := obj/snes
 srcdir := src
 imgdir4 := tilesets4
@@ -110,7 +111,7 @@ backgrounds := $(wildcard backgrounds/*.png)
 chr4allbackground := $(patsubst %.png,%.chrsfc,$(wildcard backgrounds/*.png))
 
 map.txt $(title).sfc: lorom1024k.cfg $(objlisto)
-	$(LD65) -o $(title).sfc -m map.txt -C $^
+	$(LD65) -o $(title).sfc -m map.txt --dbgfile $(title).dbg -C $^
 	$(PY) tools/fixchecksum.py $(title).sfc
 
 spcmap.txt $(title).spc: spc.cfg $(objlistospc)
