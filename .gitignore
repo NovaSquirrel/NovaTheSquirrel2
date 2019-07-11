@@ -35,3 +35,6 @@ src/graphicsenum.s
 *.driveupload
 src/leveldata.s
 *.dbg
+tools/M7TilesetRearranged.png
+tools/M7Tileset.chrm7
+src/m7palettedata.s

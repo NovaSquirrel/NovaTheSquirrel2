@@ -182,6 +182,12 @@ $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
 $(bgdir)/%.chrsfc: $(bgdir)/%.png
 	$(PY) tools/makebackground.py $<
+tools/M7TilesetRearranged.png: tools/M7Tileset.png
+	$(PY) tools/rearrangem7.py
+tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
+	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
+	$(PY) tools/mode7palette.py
+$(objdir)/mode7.o: tools/M7Tileset.chrm7
 
 
 

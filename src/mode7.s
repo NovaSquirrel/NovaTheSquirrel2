@@ -21,15 +21,21 @@
 .include "paletteenum.s"
 .smart
 
+Mode7LevelMap = LevelBufAlt
 .import m7a_m7b_0
 .import m7c_m7d_0
 .import m7a_m7b_list
 .import m7c_m7d_list
 
-.segment "ZEROPAGE"
-Mode7ScrollX: .res 2
-Mode7ScrollY: .res 2
-Mode7Angle:   .res 2
+.segment "BSS"
+Mode7ScrollX:    .res 2
+Mode7ScrollY:    .res 2
+Mode7PlayerX:    .res 2
+Mode7PlayerY:    .res 2
+Mode7RealAngle:  .res 2 ; 0-31
+Mode7Direction:  .res 2 ; 0-3
+Mode7Turning:    .res 2
+Mode7TurnWanted: .res 2
 
 .segment "Mode7Game"
 
@@ -39,20 +45,77 @@ Mode7Angle:   .res 2
   plb
 
   setaxy16
+  ; Clear variables
   stz Mode7ScrollX
   stz Mode7ScrollY
-  stz Mode7Angle
+  stz Mode7PlayerX
+  stz Mode7PlayerY
+  stz Mode7RealAngle
+  stz Mode7Direction
+  stz Mode7Turning
+  stz Mode7TurnWanted
+
+
 
   stz CGADDR
   lda #RGB(15,23,31)
   sta CGDATA
   ; ---
-  lda #Palette::FGCommon
-  ldy #0
-  jsl DoPaletteUpload
-  lda #Palette::FGGrassy
-  ldy #1
-  jsl DoPaletteUpload
+  lda #DMAMODE_CGDATA
+  ldx #$ffff & Mode7Palette
+  ldy #64*2
+  jsl ppu_copy
+
+
+  ; Clear level map with a checkerboard pattern
+  ldx #0
+  lda #$0201
+CheckerLoop:
+  ldy #16
+: sta f:Mode7LevelMap,x
+  inx
+  inx
+  dey
+  bne :-
+
+  ldy #16
+  xba
+: sta f:Mode7LevelMap,x
+  inx
+  inx
+  dey
+  bne :-
+
+  cpx #4096
+  bne CheckerLoop
+
+  ; Write some sample blocks
+  seta8
+  lda #5
+  sta f:Mode7LevelMap+(64*5+5)
+  sta f:Mode7LevelMap+(64*5+6)
+  sta f:Mode7LevelMap+(64*5+7)
+  sta f:Mode7LevelMap+(64*5+8)
+  sta f:Mode7LevelMap+(64*6+5)
+  sta f:Mode7LevelMap+(64*7+5)
+  sta f:Mode7LevelMap+(64*8+5)
+
+  ina
+  sta f:Mode7LevelMap+(64*5+15)
+  sta f:Mode7LevelMap+(64*5+16)
+  sta f:Mode7LevelMap+(64*5+17)
+  sta f:Mode7LevelMap+(64*5+18)
+  sta f:Mode7LevelMap+(64*6+15)
+  sta f:Mode7LevelMap+(64*7+15)
+  sta f:Mode7LevelMap+(64*8+15)
+
+  ina
+  sta f:Mode7LevelMap+(64*5+10)
+  sta f:Mode7LevelMap+(64*6+10)
+  sta f:Mode7LevelMap+(64*7+10)
+  sta f:Mode7LevelMap+(64*8+10)
+  seta16
+
 
   ; Copy in the tiles
   stz PPUADDR
@@ -61,23 +124,55 @@ Mode7Angle:   .res 2
   ldy #Mode7TilesEnd-Mode7Tiles
   jsl ppu_copy
 
-
-  ; Make a tilemap I guess
+  ; .----------------------------------
+  ; | Render Mode7LevelMap
+  ; '----------------------------------
   stz PPUADDR
   seta8
+  ; Increment the address on low writes, as the tilemap is in low VRAM bytes
   stz PPUCTRL
 
-  ldx #128*128
-: jsl RandomByte
-  and #3
+  ldx #0
+  lda #64 ; Row counter
+  sta 0
+RenderMapLoop:
+  ldy #64
+: lda f:Mode7LevelMap,x
+  asl
+  asl
   sta PPUDATA
-  dex
+  ina
+  sta PPUDATA
+  inx
+  dey
   bne :-
+
+  seta16
+  txa
+  sub #64
+  tax
+  seta8
+
+  ldy #64
+: lda f:Mode7LevelMap,x
+  asl
+  asl
+  ora #2
+  sta PPUDATA
+  ina
+  sta PPUDATA
+  inx
+  dey
+  bne :-
+
+  dec 0
+  bne RenderMapLoop
+
   ; Restore it to incrementing address on high writes
   lda #INC_DATAHI
   sta PPUCTRL
 
-
+  ; -----------------------------------
 
   seta8
   lda #7
@@ -160,17 +255,52 @@ padwait:
     inc Mode7ScrollY
   :
 
-  lda keydown
-  and #KEY_LEFT
-  beq :+
-    dec Mode7ScrollX
-  :
+  lda Mode7Turning
+  bne AlreadyTurning
+    lda keydown
+    and #KEY_LEFT|KEY_RIGHT
+    tsb Mode7TurnWanted
 
-  lda keydown
-  and #KEY_RIGHT
-  beq :+
-    inc Mode7ScrollX
-  :
+    lda Mode7PlayerX
+    ora Mode7PlayerY
+    and #15
+    bne AlreadyTurning
+
+    lda Mode7TurnWanted
+    and #KEY_RIGHT
+    beq :+
+      dec Mode7Turning
+      lda Mode7Direction
+      dec
+      and #3
+      sta Mode7Direction
+      stz Mode7TurnWanted
+    :
+
+    lda Mode7TurnWanted
+    and #KEY_LEFT
+    beq :+
+      inc Mode7Turning
+      lda Mode7Direction
+      inc
+      and #3
+      sta Mode7Direction
+      stz Mode7TurnWanted
+    :
+  AlreadyTurning:
+
+
+  lda Mode7Turning
+  beq NotTurning
+    lda Mode7RealAngle
+    add Mode7Turning
+    and #31
+    sta Mode7RealAngle
+    and #7
+    bne NotTurning
+      stz Mode7Turning
+  NotTurning:
+
 
 
   lda retraces
@@ -179,30 +309,41 @@ padwait:
   lda keydown
   and #KEY_L
   beq :+
-    dec Mode7Angle
-    lda Mode7Angle
+    dec Mode7RealAngle
+    lda Mode7RealAngle
     and #31
-    sta Mode7Angle
+    sta Mode7RealAngle
   :
 
   lda keydown
   and #KEY_R
   beq :+
-    inc Mode7Angle
-    lda Mode7Angle
+    inc Mode7RealAngle
+    lda Mode7RealAngle
     and #31
-    sta Mode7Angle
+    sta Mode7RealAngle
   :
+  bra WasRotation
+
 NoRotation:
+  ; If not rotating, move forward
+  lda Mode7Direction
+  asl
+  tax
+  lda Mode7PlayerX
+  add ForwardX,x
+  sta Mode7PlayerX
+
+  lda Mode7PlayerY
+  add ForwardY,x
+  sta Mode7PlayerY
+WasRotation:
 
 
-.if 0
-  lda retraces
-  and #3
-  bne :+
-    dec Mode7ScrollY
-  :
-.endif
+  lda Mode7PlayerX
+  sta Mode7ScrollX
+  lda Mode7PlayerY
+  sta Mode7ScrollY
 
 
   seta16
@@ -228,7 +369,7 @@ NoRotation:
   sta BGSCROLLY
   seta16
   lda Mode7ScrollY
-  add #256
+  add #192
   seta8
   sta M7Y
   xba
@@ -241,7 +382,7 @@ NoRotation:
   lda #$1d03 ; m7c and m7d
   sta DMAMODE+$30
 
-  lda Mode7Angle
+  lda Mode7RealAngle
   asl
   tax
   lda m7a_m7b_list,x
@@ -261,21 +402,17 @@ NoRotation:
 
 
   rtl
+
+ForwardX:
+  .word 0, .loword(-2), 0, .loword(2)
+ForwardY:
+  .word .loword(-2), 0, .loword(2), 0
 .endproc
 
 Mode7Tiles:
-.repeat 64
-  .byt 1
-.endrep
+.incbin "../tools/M7Tileset.chrm7"
 
-.repeat 64
-  .byt 11
-.endrep
-
-.repeat 64
-  .byt 12
-.endrep
-
+; Smiley
   .byt 0,   0, 11, 11, 11, 11,  0,  0
   .byt 0,  11, 12, 12, 12, 12, 11,  0
   .byt 11, 12,  1, 12, 12,  1, 12, 11
@@ -285,3 +422,5 @@ Mode7Tiles:
   .byt 0,  11, 12, 12, 12, 12, 11,  0
   .byt 0,   0, 11, 11, 11, 11,  0,  0
 Mode7TilesEnd:
+
+.include "m7palettedata.s"
