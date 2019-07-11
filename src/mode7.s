@@ -69,16 +69,17 @@ Mode7TurnWanted: .res 2
 
   ; Clear level map with a checkerboard pattern
   ldx #0
-  lda #$0201
+  lda #$0102
 CheckerLoop:
-  ldy #16
+  ldy #32
+  xba
 : sta f:Mode7LevelMap,x
   inx
   inx
   dey
   bne :-
 
-  ldy #16
+  ldy #32
   xba
 : sta f:Mode7LevelMap,x
   inx
