@@ -131,6 +131,7 @@ CheckerLoop:
   lda #64 ; Row counter
   sta 0
 RenderMapLoop:
+  ; Top row
   ldy #64
 : lda f:Mode7LevelMap,x
   asl
@@ -148,6 +149,7 @@ RenderMapLoop:
   tax
   seta8
 
+  ; Bottom row
   ldy #64
 : lda f:Mode7LevelMap,x
   asl
@@ -170,20 +172,19 @@ RenderMapLoop:
   ; -----------------------------------
 
   seta8
-  lda #7
-  sta BGMODE       ; mode 7
-
+  lda #^Mode7IRQ
+  sta IRQHandler+2
   ; -----------------------
 
   lda #$8000 >> 14
   sta OBSEL       ; sprite CHR at $8000, sprites are 8x8 and 16x16
 
-  lda #%00010001  ; enable sprites, plane 0
-  sta BLENDMAIN
-  lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
+  lda #VBLANK_NMI|AUTOREAD
   sta PPUNMI
 
   setaxy16
+  lda #.loword(Mode7IRQ)
+  sta IRQHandler+0
 
 Loop:
   setaxy16
@@ -202,6 +203,10 @@ Loop:
   lda #$1d03 ; m7c and m7d
   sta DMAMODE+$30
 
+  lda #220
+  sta HTIME
+  lda #48
+  sta VTIME
   seta8
   lda #^m7a_m7b_0
   sta DMAADDRBANK+$20
@@ -211,15 +216,29 @@ Loop:
   sta HDMASTART
 
   lda #$0F
-  sta PPUBRIGHT  ; turn on rendering
+  sta PPUBRIGHT ; Turn on rendering
+  lda #1
+  sta BGMODE
 
-  ; Set the scroll registers
-  seta16
-  lda Mode7ScrollX
+  lda #VBLANK_NMI|AUTOREAD|HVTIME_IRQ ; enable HV IRQ
+  sta PPUNMI
+  cli
+
+  ; Initialize the scroll registers
   seta8
+  lda Mode7ScrollX+0
   sta BGSCROLLX
-  xba
+  lda Mode7ScrollX+1
   sta BGSCROLLX
+  lda Mode7ScrollY+0
+  sta BGSCROLLY
+  lda Mode7ScrollY+1
+  sta BGSCROLLY
+
+  lda #%00010010  ; enable sprites, plane 1
+  sta BLENDMAIN
+
+  ; Calculate the centers
   seta16
   lda Mode7ScrollX
   add #128
@@ -227,13 +246,6 @@ Loop:
   sta M7X
   xba
   sta M7X
-
-  seta16
-  lda Mode7ScrollY
-  seta8
-  sta BGSCROLLY
-  xba
-  sta BGSCROLLY
   seta16
   lda Mode7ScrollY
   add #192
@@ -260,18 +272,6 @@ padwait:
   eor #$ffff
   and keydown
   sta keynew
-
-  lda keydown
-  and #KEY_UP
-  beq :+
-    dec Mode7ScrollY
-  :
-
-  lda keydown
-  and #KEY_DOWN
-  beq :+
-    inc Mode7ScrollY
-  :
 
   lda Mode7Turning
   bne AlreadyTurning
@@ -307,42 +307,15 @@ padwait:
     :
   AlreadyTurning:
 
-
   lda Mode7Turning
-  beq NotTurning
+  beq NoRotation
     lda Mode7RealAngle
     add Mode7Turning
     and #31
     sta Mode7RealAngle
     and #7
-    bne NotTurning
+    bne NoRotation
       stz Mode7Turning
-  NotTurning:
-
-
-
-  lda retraces
-  and #3
-  bne NoRotation
-  lda keydown
-  and #KEY_L
-  beq :+
-    dec Mode7RealAngle
-    lda Mode7RealAngle
-    and #31
-    sta Mode7RealAngle
-  :
-
-  lda keydown
-  and #KEY_R
-  beq :+
-    inc Mode7RealAngle
-    lda Mode7RealAngle
-    and #31
-    sta Mode7RealAngle
-  :
-  bra WasRotation
-
 NoRotation:
   ; If not rotating, move forward
   lda Mode7Direction
@@ -357,11 +330,11 @@ NoRotation:
   sta Mode7PlayerY
 WasRotation:
 
-
   lda Mode7PlayerX
   sta Mode7ScrollX
   lda Mode7PlayerY
   sta Mode7ScrollY
+
   jmp Loop
   rtl
 
@@ -386,3 +359,20 @@ Mode7Tiles:
 Mode7TilesEnd:
 
 .include "m7palettedata.s"
+
+
+.proc Mode7IRQ
+  pha
+  php
+  setxy16
+  seta8
+  bit TIMESTATUS ; Acknowledge interrupt
+  lda #7
+  sta BGMODE
+  lda #%00010001  ; enable sprites, plane 0
+  sta BLENDMAIN
+  plp
+  pla
+  rti
+.endproc
+
