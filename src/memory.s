@@ -114,7 +114,7 @@
   SpriteTileSlots:     .res 2*8
   SpritePaletteSlots:  .res 2*4
 
-
+  IRQHandler: .res 3
 
   OAM:   .res 512
   OAMHI: .res 512

@@ -6,7 +6,7 @@
 .include "snes.inc"
 ;.include "global.inc"
 .smart
-.import resetstub, main, nmi_handler, irq_handler
+.import resetstub, main, nmi_handler, IRQHandler
 
 ; LoROM is mapped to $808000-$FFFFFF in 32K blocks,
 ; skipping a15 and a23. Most is mirrored down to $008000.
@@ -56,7 +56,7 @@ romname:
   .if * - romname < 21
     .res romname + 21 - *, $20  ; space padding
   .endif
-  .byte MAPPER_LOROM|ROMSPEED_200NS
+  .byte MAPPER_LOROM|ROMSPEED_120NS
   .byte $00   ; 00: no extra RAM; 02: RAM with battery
   .byte MEMSIZE_1MB  ; ROM size (08-0C typical)
   .byte MEMSIZE_NONE   ; backup RAM size (01,03,05 typical; Dezaemon has 07)
@@ -69,7 +69,7 @@ romname:
   ; clcxce mode vectors
   ; reset unused because reset switches to 6502 mode
   .addr cop_handler, brk_handler, abort_handler
-  .addr nmistub, $FFFF, irq_handler
+  .addr nmistub, $FFFF, irqstub
   .res 4  ; more unused vectors
   ; 6502 mode vectors
   ; brk unused because 6502 mode uses irq handler and pushes the
@@ -85,7 +85,7 @@ nmistub:
   jml nmi_handler
 
 irqstub:
-  jml irq_handler
+  jml [IRQHandler]
 
 ; Unused exception handlers
 cop_handler:

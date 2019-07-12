@@ -55,17 +55,28 @@ Mode7TurnWanted: .res 2
   stz Mode7Turning
   stz Mode7TurnWanted
 
-
-
+  ; Upload palettes
+  seta8
   stz CGADDR
-  lda #RGB(15,23,31)
+  lda #<RGB(15,23,31)
   sta CGDATA
+  lda #>RGB(15,23,31)
+  sta CGDATA
+  seta16
   ; ---
   lda #DMAMODE_CGDATA
   ldx #$ffff & Mode7Palette
   ldy #64*2
   jsl ppu_copy
 
+  ; Upload graphics
+  stz PPUADDR
+  lda #DMAMODE_PPUHIDATA
+  ldx #$ffff & Mode7Tiles
+  ldy #Mode7TilesEnd-Mode7Tiles
+  jsl ppu_copy
+
+  ; -----------------------------------
 
   ; Clear level map with a checkerboard pattern
   ldx #0
@@ -78,15 +89,6 @@ CheckerLoop:
   inx
   dey
   bne :-
-
-  ldy #32
-  xba
-: sta f:Mode7LevelMap,x
-  inx
-  inx
-  dey
-  bne :-
-
   cpx #4096
   bne CheckerLoop
 
@@ -115,22 +117,14 @@ CheckerLoop:
   sta f:Mode7LevelMap+(64*6+10)
   sta f:Mode7LevelMap+(64*7+10)
   sta f:Mode7LevelMap+(64*8+10)
-  seta16
-
-
-  ; Copy in the tiles
-  stz PPUADDR
-  lda #DMAMODE_PPUHIDATA
-  ldx #$ffff & Mode7Tiles
-  ldy #Mode7TilesEnd-Mode7Tiles
-  jsl ppu_copy
 
   ; .----------------------------------
   ; | Render Mode7LevelMap
   ; '----------------------------------
-  stz PPUADDR
   seta8
   ; Increment the address on low writes, as the tilemap is in low VRAM bytes
+  stz PPUADDR+0
+  stz PPUADDR+1
   stz PPUCTRL
 
   ldx #0
@@ -181,34 +175,6 @@ RenderMapLoop:
 
   ; -----------------------
 
-  ; Identity matrix:
-  ; $0100 $0000
-  ; $0000 $0100
-  lda #$01
-  stz M7A
-  sta M7A
-  stz M7B
-  stz M7B
-  stz M7C
-  stz M7C
-  stz M7D
-  sta M7D
-
-  ; Rotation center
-  lda #$80
-  sta M7X
-  stz M7X
-
-  lda #$40
-  sta M7Y
-  lda #$01
-  sta M7Y
-
-  stz BGSCROLLX
-  stz BGSCROLLX
-  stz BGSCROLLY
-  stz BGSCROLLY
-
   lda #$8000 >> 14
   sta OBSEL       ; sprite CHR at $8000, sprites are 8x8 and 16x16
 
@@ -219,21 +185,72 @@ RenderMapLoop:
 
   setaxy16
 
-
-  jsl WaitVblank
-  seta8
-  lda #$0F
-  sta PPUBRIGHT  ; turn on rendering
-  seta16
-
 Loop:
   setaxy16
   jsl WaitVblank
 
+  ; Start preparing the HDMA
+  lda Mode7RealAngle
+  asl
+  tax
+  lda m7a_m7b_list,x
+  sta DMAADDR+$20
+  lda m7c_m7d_list,x
+  sta DMAADDR+$30
+  lda #$1b03 ; m7a and m7b
+  sta DMAMODE+$20
+  lda #$1d03 ; m7c and m7d
+  sta DMAMODE+$30
+
+  seta8
+  lda #^m7a_m7b_0
+  sta DMAADDRBANK+$20
+  lda #^m7c_m7d_0
+  sta DMAADDRBANK+$30
+  lda #4|8
+  sta HDMASTART
+
+  lda #$0F
+  sta PPUBRIGHT  ; turn on rendering
+
+  ; Set the scroll registers
+  seta16
+  lda Mode7ScrollX
+  seta8
+  sta BGSCROLLX
+  xba
+  sta BGSCROLLX
+  seta16
+  lda Mode7ScrollX
+  add #128
+  seta8
+  sta M7X
+  xba
+  sta M7X
+
+  seta16
+  lda Mode7ScrollY
+  seta8
+  sta BGSCROLLY
+  xba
+  sta BGSCROLLY
+  seta16
+  lda Mode7ScrollY
+  add #192
+  seta8
+  sta M7Y
+  xba
+  sta M7Y
+
+  seta8
+  ; Wait for the controller to be ready
   lda #$01
 padwait:
   bit VBLSTATUS
   bne padwait
+  seta16
+
+  ; -----------------------------------
 
   lda keydown
   sta keylast
@@ -345,63 +362,7 @@ WasRotation:
   sta Mode7ScrollX
   lda Mode7PlayerY
   sta Mode7ScrollY
-
-
-  seta16
-  lda Mode7ScrollX
-  seta8
-  sta BGSCROLLX
-  xba
-  sta BGSCROLLX
-  seta16
-  lda Mode7ScrollX
-  add #128
-  seta8
-  sta M7X
-  xba
-  sta M7X
-
-
-  seta16
-  lda Mode7ScrollY
-  seta8
-  sta BGSCROLLY
-  xba
-  sta BGSCROLLY
-  seta16
-  lda Mode7ScrollY
-  add #192
-  seta8
-  sta M7Y
-  xba
-  sta M7Y
-
-
-  seta16
-  lda #$1b03 ; m7a and m7b
-  sta DMAMODE+$20
-  lda #$1d03 ; m7c and m7d
-  sta DMAMODE+$30
-
-  lda Mode7RealAngle
-  asl
-  tax
-  lda m7a_m7b_list,x
-  sta DMAADDR+$20
-  lda m7c_m7d_list,x
-  sta DMAADDR+$30
-  seta8
-  lda #^m7a_m7b_0
-  sta DMAADDRBANK+$20
-  lda #^m7c_m7d_0
-  sta DMAADDRBANK+$30
-  lda #4|8
-  sta HDMASTART
-
-
   jmp Loop
-
-
   rtl
 
 ForwardX:

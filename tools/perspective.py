@@ -10,7 +10,7 @@ def perspective(angle, height, scale_x, scale_y):
     def to_fixed(f):
         return int(round(f*256)) & 0xffff
    
-    m7a, m7b, m7c, m7d, m7x, m7y = [], [], [], [], [], []
+    m7a, m7b, m7c, m7d = [], [], [], []
     for screen_y in range(224):
         scale_z = 1/(screen_y+1)
         
@@ -18,12 +18,7 @@ def perspective(angle, height, scale_x, scale_y):
         m7b.append(to_fixed( math.sin(angle) * scale_x * scale_z))
         m7c.append(to_fixed(-math.sin(angle) * scale_y * scale_z))
         m7d.append(to_fixed( math.cos(angle) * scale_y * scale_z))
-#        m7x.append(128)
-#        m7y.append(256-height)
-
-        m7x.append(128 + to_fixed(height * math.cos(angle + math.pi/2)))
-        m7y.append(to_fixed(height * math.sin(angle + math.pi/2)))
-    return (m7a, m7b, m7c, m7d, m7x, m7y)
+    return (m7a, m7b, m7c, m7d)
 
 """ HDMA format:
 xx Line count
@@ -52,7 +47,7 @@ def output_tables():
 		outfile.write('  .addr .loword(m7c_m7d_%d)\n' % a)
 
 	for a in range(angles):
-		m7a, m7b, m7c, m7d, m7x, m7y = perspective((a/angles)*2*math.pi, 0, 64, 64)
+		m7a, m7b, m7c, m7d = perspective((a/angles)*2*math.pi, 0, 64, 64)
 
 		outfile.write('.segment "Mode7TblAB"\n')
 		outfile.write('m7a_m7b_%d:\n' % a)
@@ -71,14 +66,6 @@ def output_tables():
 			outfile.write('  .byte 1\n')
 			outfile.write('  .word $%.4x, $%.4x\n' % (m7c[i+data_skip], m7d[i+data_skip]))
 		outfile.write('  .byte 0\n')
-
-	"""
-	outfile.write('m7x_m7y:\n')
-	for i in range(220):
-		outfile.write('  .byte 1\n')
-		outfile.write('  .word $%.4x, $%.4x\n' % (m7x[i], m7y[i]))
-	outfile.write('  .byte 0\n')
-	"""
 
 	outfile.close()
 output_tables()
