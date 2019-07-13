@@ -21,7 +21,7 @@
 .include "paletteenum.s"
 .smart
 
-Mode7LevelMap = LevelBufAlt
+Mode7LevelMap = LevelBuf
 .import m7a_m7b_0
 .import m7c_m7d_0
 .import m7a_m7b_list
@@ -48,15 +48,24 @@ Mode7TurnWanted: .res 2
   ; Clear variables
   stz Mode7ScrollX
   stz Mode7ScrollY
-  stz Mode7PlayerX
-  stz Mode7PlayerY
   stz Mode7RealAngle
   stz Mode7Direction
   stz Mode7Turning
   stz Mode7TurnWanted
 
+  lda #10*16
+  sta Mode7PlayerX
+  sta Mode7PlayerY
+
   ; Upload palettes
   seta8
+  ; Try just transparency outside the map for now  
+  lda #M7_NOWRAP
+  sta M7SEL
+  lda #^Mode7LevelMap
+  sta LevelBlockPtr+2
+
+
   stz CGADDR
   lda #<RGB(15,23,31)
   sta CGDATA
@@ -68,6 +77,13 @@ Mode7TurnWanted: .res 2
   ldx #$ffff & Mode7Palette
   ldy #64*2
   jsl ppu_copy
+
+  ; Common sprites
+  lda #Palette::FGCommon
+  ldy #8
+  jsl DoPaletteUpload
+  lda #GraphicsUpload::SPCommon
+  jsl DoGraphicUpload
 
   ; Upload graphics
   stz PPUADDR
@@ -189,7 +205,48 @@ RenderMapLoop:
 Loop:
   setaxy16
   jsl WaitVblank
+  jsl ppu_copy_oam
 
+
+  ; -----------------------------------
+  seta8
+  stz PPUCTRL
+  seta16
+  ; Do block updates
+  ldx #(BLOCK_UPDATE_COUNT-1)*2
+BlockUpdateLoop:
+  lda BlockUpdateAddress,x
+  beq SkipBlock
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  ina
+  sta PPUDATA
+
+  seta16
+  lda BlockUpdateAddress,x ; Move down a row
+  add #128
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataTL,x
+  add #2
+  sta PPUDATA
+  ina
+  sta PPUDATA
+  seta16
+
+  stz BlockUpdateAddress,x ; Cancel out the block now that it's been written
+SkipBlock:
+  dex
+  dex
+  bpl BlockUpdateLoop
+  seta8
+  lda #INC_DATAHI
+  sta PPUCTRL
+
+  seta16
+  ; -----------------------------------
   ; Start preparing the HDMA
   lda Mode7RealAngle
   asl
@@ -235,7 +292,7 @@ Loop:
   lda Mode7ScrollY+1
   sta BGSCROLLY
 
-  lda #%00010010  ; enable sprites, plane 1
+  lda #%00010000  ; enable sprites, plane 1
   sta BLENDMAIN
 
   ; Calculate the centers
@@ -272,6 +329,7 @@ padwait:
   eor #$ffff
   and keydown
   sta keynew
+  stz OamPtr
 
   lda Mode7Turning
   bne AlreadyTurning
@@ -330,12 +388,53 @@ NoRotation:
   sta Mode7PlayerY
 WasRotation:
 
+  ; Make it so that 0,0 places the player on the top left corner of the map
   lda Mode7PlayerX
+  sub #7*16+8
   sta Mode7ScrollX
   lda Mode7PlayerY
+  sub #11*16+8
   sta Mode7ScrollY
 
+  ldy OamPtr
+  lda #$68|OAM_PRIORITY_2
+  sta OAM_TILE,y
+  seta8
+  lda #128-4
+  sta OAM_XPOS,y
+  lda #192-4
+  sta OAM_YPOS,y
+  lda #0
+  sta OAMHI+1,y
+  seta16
+  tya
+  add #4
+  sta OamPtr
+
+
+  ; Change green to red
+  lda Mode7PlayerX
+  ora Mode7PlayerY
+  and #15
+  bne :+
+  lda Mode7PlayerX
+  ldy Mode7PlayerY
+  jsr Mode7BlockAddress
+  cmp #5
+  bne :+
+    lda #6
+    jsr Mode7ChangeBlock
+  :
+
+
+
+  setaxy16
+  ldx OamPtr
+  jsl ppu_clear_oam
+  jsl ppu_pack_oamhi
+
   jmp Loop
+
   rtl
 
 ForwardX:
@@ -364,7 +463,6 @@ Mode7TilesEnd:
 .proc Mode7IRQ
   pha
   php
-  setxy16
   seta8
   bit TIMESTATUS ; Acknowledge interrupt
   lda #7
@@ -374,5 +472,85 @@ Mode7TilesEnd:
   plp
   pla
   rti
+.endproc
+
+; A = block to set
+; X = block address
+.a16
+.i16
+.proc Mode7ChangeBlock
+Temp = BlockTemp
+  phx
+  phy
+  php
+  seta8
+  sta [LevelBlockPtr] ; Make the change in the level buffer itself
+  setaxy16
+  ; Find a free index in the block update queue
+  ldy #(BLOCK_UPDATE_COUNT-1)*2
+FindIndex:
+  ldx BlockUpdateAddress,y ; Test for zero (exact value not used)
+  beq Found
+  dey                      ; Next index
+  dey
+  bpl FindIndex            ; Give up if all slots full
+  jmp Exit
+Found:
+  ; From this point on in the routine, Y = free update queue index
+
+  ; Store the tile number
+  asl
+  asl
+  sta BlockUpdateDataTL,y
+
+  ; Now calculate the PPU address
+  ; LevelBlockPtr is 0000yyyyyyxxxxxx
+  ; Needs to become  00yyyyyy0xxxxxx0
+  lda LevelBlockPtr
+  and #%111111000000 ; Get Y
+  asl
+  asl
+  sta BlockUpdateAddress,y
+
+  ; Add in X
+  lda LevelBlockPtr
+  and #%111111
+  asl
+  ora BlockUpdateAddress,y
+  wdm 0
+  sta BlockUpdateAddress,y
+
+  ; Restore registers
+Exit:
+
+  plp
+  ply
+  plx
+  rts
+.endproc
+
+
+; A = X coordinate
+; Y = Y coordinate
+; Output: LevelBlockPtr
+.a16
+.i16
+.proc Mode7BlockAddress
+  and #%1111110000
+      ; ......xx xxxx....
+  lsr ; .......x xxxxx...
+  lsr ; ........ xxxxxx..
+  lsr ; ........ .xxxxxx.
+  lsr ; ........ ..xxxxxx
+  sta LevelBlockPtr
+  tya ; ......yy yyyy....
+  and #%1111110000
+  asl ; .....yyy yyy.....
+  asl ; ....yyyy yy......
+  tsb LevelBlockPtr
+      ; ....yyyy yyxxxxxx
+  lda [LevelBlockPtr]
+  and #255
+  rts
 .endproc
 
