@@ -20,7 +20,7 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7 perspective_data
+  mode7 perspective_data huffmunch
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -104,6 +104,7 @@ chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 palettes := $(wildcard palettes/*.png)
 levels := $(wildcard levels/*.json)
+m7levels := $(patsubst %.bin,%.hfm,$(wildcard m7levels/*.bin))
 
 # Background conversion
 # (nametable conversion is implied)
@@ -149,6 +150,7 @@ $(srcdir)/graphics.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.t
 $(srcdir)/blockdata.s: tools/blocks.txt
 $(srcdir)/blockenum.s: tools/blocks.txt
 	$(PY) tools/makeblocks.py
+
 $(objdir)/uploadppu.o: $(palettes)
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
@@ -161,9 +163,8 @@ $(srcdir)/leveldata.s: $(levels)
 	$(PY) tools/levelconvert.py
 $(srcdir)/perspective_data.s: $(levels) tools/perspective.py
 	$(PY) tools/perspective.py
-
-
-#$(objdir)/graphics.o: $(chr2all) $(chr4all)
+m7levels/%.hfm: m7levels/%.bin
+	tools/huffmunch -B $< $@
 
 
 $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
@@ -187,7 +188,7 @@ tools/M7TilesetRearranged.png: tools/M7Tileset.png
 tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py
-$(objdir)/mode7.o: tools/M7Tileset.chrm7
+$(objdir)/mode7.o: tools/M7Tileset.chrm7 $(m7levels)
 
 
 

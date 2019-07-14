@@ -1,0 +1,26 @@
+.enum Mode7Block
+  Void
+  Checker1
+  Checker2
+  ToggleFloor
+  ToggleWall
+  Collect
+  Hurt
+  Spring
+  ForceDown
+  ForceUp
+  ForceLeft
+  ForceRight
+  Unused1
+  Unused2
+  ToggleButton
+  Button
+  BlueLock
+  RedLock
+  GreenLock
+  YellowLock
+  BlueKey
+  RedKey
+  GreenKey
+  YellowKey
+.endenum

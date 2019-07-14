@@ -19,6 +19,7 @@
 .include "blockenum.s"
 .include "graphicsenum.s"
 .include "paletteenum.s"
+.include "m7leveldata.inc"
 .smart
 
 Mode7LevelMap = LevelBuf
@@ -146,31 +147,39 @@ CheckerLoop:
   cpx #4096
   bne CheckerLoop
 
-  ; Write some sample blocks
+  ; Decompress a level of some sort
   seta8
-  lda #5
-  sta f:Mode7LevelMap+(64*5+5)
-  sta f:Mode7LevelMap+(64*5+6)
-  sta f:Mode7LevelMap+(64*5+7)
-  sta f:Mode7LevelMap+(64*5+8)
-  sta f:Mode7LevelMap+(64*6+5)
-  sta f:Mode7LevelMap+(64*7+5)
-  sta f:Mode7LevelMap+(64*8+5)
+  .importzp hm_node
+  lda #<DemoLevel
+  sta hm_node+0
+  lda #>DemoLevel
+  sta hm_node+1
+  lda #^DemoLevel
+  sta hm_node+2
+  seta16
+  ldx #0
+  .import huffmunch_load_snes, huffmunch_read_snes
+  jsl huffmunch_load_snes
 
-  ina
-  sta f:Mode7LevelMap+(64*5+15)
-  sta f:Mode7LevelMap+(64*5+16)
-  sta f:Mode7LevelMap+(64*5+17)
-  sta f:Mode7LevelMap+(64*5+18)
-  sta f:Mode7LevelMap+(64*6+15)
-  sta f:Mode7LevelMap+(64*7+15)
-  sta f:Mode7LevelMap+(64*8+15)
+  ; Read out the level
+  tay ; Y = compressed file size
+  ldx #0
+  seta8
+DecompressReadLoop:
+  phx
+  phy
+  jsl huffmunch_read_snes
+  ply
+  plx
+  cmp #1 ; Keep the checkerboard if it's 1
+  beq :+
+    sta f:Mode7LevelMap,x
+  :
+  inx
+  dey
+  bne DecompressReadLoop
+  seta16
 
-  ina
-  sta f:Mode7LevelMap+(64*5+10)
-  sta f:Mode7LevelMap+(64*6+10)
-  sta f:Mode7LevelMap+(64*7+10)
-  sta f:Mode7LevelMap+(64*8+10)
 
   ; .----------------------------------
   ; | Render Mode7LevelMap
@@ -445,6 +454,28 @@ NoRotation:
   lda Mode7Direction
   asl
   tax
+
+  ; Don't check for walls except when moving onto a new block
+  lda Mode7PlayerX
+  ora Mode7PlayerY
+  and #15
+  bne NotWall
+  ; Is there a wall one block ahead?
+  lda Mode7PlayerY
+  add ForwardYTile,x
+  cmp #64*16 ; Don't allow if this would make the player go out of bounds
+  bcs WasRotation
+  tay
+  lda Mode7PlayerX
+  add ForwardXTile,x
+  cmp #64*16 ; Don't allow if this would make the player go out of bounds
+  bcs WasRotation
+  jsr Mode7BlockAddress
+  bne NotWall
+IsWall:
+    bra WasRotation
+  NotWall:
+
   lda Mode7PlayerX
   add ForwardX,x
   sta Mode7PlayerX
@@ -486,9 +517,9 @@ WasRotation:
   lda Mode7PlayerX
   ldy Mode7PlayerY
   jsr Mode7BlockAddress
-  cmp #5
+  cmp #Mode7Block::Collect
   bne :+
-    lda #6
+    lda #Mode7Block::Hurt
     jsr Mode7ChangeBlock
   :
 
@@ -557,6 +588,10 @@ ForwardX:
   .word 0, .loword(-2), 0, .loword(2)
 ForwardY:
   .word .loword(-2), 0, .loword(2), 0
+ForwardXTile:
+  .word 0, .loword(-16), 0, .loword(16)
+ForwardYTile:
+  .word .loword(-16), 0, .loword(16), 0
 .endproc
 
 Mode7Tiles:
@@ -633,7 +668,6 @@ Found:
   and #%111111
   asl
   ora BlockUpdateAddress,y
-  wdm 0
   sta BlockUpdateAddress,y
 
   ; Restore registers
@@ -705,3 +739,6 @@ GradientTable:     ;
    .byt $07, $81   ; 
    .byt $05, $80   ; 
    .byt $00        ; 
+
+DemoLevel:
+  .incbin "../m7levels/demo.hfm"
