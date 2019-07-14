@@ -140,3 +140,5 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .globalzp random2
 
 .global IRQHandler ; For changing what IRQ does for different effects
+.global HDMA_Buffer1
+.global HDMA_Buffer2

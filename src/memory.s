@@ -187,4 +187,5 @@ LevelZeroWhenLoad_End:
   ColumnBytes: .res 256
 
   ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
-
+  HDMA_Buffer1: .res 2048    ; for building HDMA tables in
+  HDMA_Buffer2: .res 2048    ; for double buffering the previous

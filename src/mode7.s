@@ -22,6 +22,12 @@
 .smart
 
 Mode7LevelMap = LevelBuf
+
+M7A_M7B_Buffer1 = HDMA_Buffer1
+M7C_M7D_Buffer1 = HDMA_Buffer1+1024
+M7A_M7B_Buffer2 = HDMA_Buffer2
+M7C_M7D_Buffer2 = HDMA_Buffer2+1024
+
 .import m7a_m7b_0
 .import m7c_m7d_0
 .import m7a_m7b_list
@@ -57,19 +63,48 @@ Mode7TurnWanted: .res 2
   sta Mode7PlayerX
   sta Mode7PlayerY
 
-  ; Upload palettes
   seta8
-  ; Try just transparency outside the map for now  
+  ; Transparency outside the mode 7 plane
   lda #M7_NOWRAP
   sta M7SEL
   lda #^Mode7LevelMap
   sta LevelBlockPtr+2
 
 
-  stz CGADDR
+  ; Prepare the HDMA tables
+  lda #49
+  sta f:M7A_M7B_Buffer1
+  sta f:M7C_M7D_Buffer1
+  sta f:M7A_M7B_Buffer2
+  sta f:M7C_M7D_Buffer2
+  ; "1 scanline"
+  lda #1
+  ldx #5
+: sta f:M7A_M7B_Buffer1,x
+  sta f:M7C_M7D_Buffer1,x
+  sta f:M7A_M7B_Buffer2,x
+  sta f:M7C_M7D_Buffer2,x
+  inx
+  inx
+  inx
+  inx
+  inx
+  cpx #5*(224-48)
+  bne :-
+  ; Zero scanlines, terminate the list
+  dea
+  sta f:M7A_M7B_Buffer1,x
+  sta f:M7C_M7D_Buffer1,x
+  sta f:M7A_M7B_Buffer2,x
+  sta f:M7C_M7D_Buffer2,x
 
+
+  ; Upload palettes
+  stz CGADDR
+  ; Write black
   stz CGDATA
   stz CGDATA
+  ; Old sky palette before I went with the gradient instead
 ;  lda #<RGB(15,23,31)
 ;  sta CGDATA
 ;  lda #>RGB(15,23,31)
@@ -207,6 +242,8 @@ RenderMapLoop:
 
 Loop:
   setaxy16
+  inc framecount
+
   jsl WaitVblank
   jsl ppu_copy_oam
 
@@ -254,10 +291,21 @@ SkipBlock:
   lda Mode7RealAngle
   asl
   tax
-  lda m7a_m7b_list,x
+
+  ; Double buffering
+  lda #.loword(M7A_M7B_Buffer1)
   sta DMAADDR+$20
-  lda m7c_m7d_list,x
+  lda #.loword(M7C_M7D_Buffer1)
   sta DMAADDR+$30
+  lda framecount
+  lsr
+  bcc :+
+    lda #.loword(M7A_M7B_Buffer2)
+    sta DMAADDR+$20
+    lda #.loword(M7C_M7D_Buffer2)
+    sta DMAADDR+$30
+  :
+
   lda #.loword(GradientTable)
   sta DMAADDR+$40
   lda #$1b03 ; m7a and m7b
@@ -272,9 +320,8 @@ SkipBlock:
   lda #48
   sta VTIME
   seta8
-  lda #^m7a_m7b_0
+  lda #^HDMA_Buffer1
   sta DMAADDRBANK+$20
-  lda #^m7c_m7d_0
   sta DMAADDRBANK+$30
   lda #^GradientTable
   sta DMAADDRBANK+$40
@@ -451,6 +498,56 @@ WasRotation:
   ldx OamPtr
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
+
+
+  ; Build the HDMA table for the matrix registers,
+  ; allowing them to be compressed significantly.
+  lda Mode7RealAngle
+  asl
+  tax
+  ldy m7a_m7b_list,x ; Should be the same bank as this one
+
+  ; Counter for how many rows are left
+  lda #224-48
+  sta 0
+
+  ; Switch the data bank.
+  ; Probably actually better than switching to 8-bit mode and back to do it.
+  ph2banks m7a_m7b_0, m7a_m7b_0
+  plb
+  plb
+
+  ; Write index
+  ldx #1
+  lda framecount
+  lsr
+  bcs :+
+    ldx #1+2048
+  :
+BuildHDMALoop:
+  lda $0,y ; M7A
+  sta f:M7A_M7B_Buffer1+0,x
+  sta f:M7C_M7D_Buffer1+2,x
+  lda $2,y ; M7B
+  sta f:M7A_M7B_Buffer1+2,x
+  eor #$ffff
+  ina
+  sta f:M7C_M7D_Buffer1+0,x
+
+  inx ; Next HDMA table entry
+  inx
+  inx
+  inx
+  inx
+  iny ; Next perspective table entry
+  iny
+  iny
+  iny
+  dec 0
+  bne BuildHDMALoop
+
+  phk
+  plb
 
   jmp Loop
 
