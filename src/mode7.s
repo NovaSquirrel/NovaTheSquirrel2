@@ -67,10 +67,13 @@ Mode7TurnWanted: .res 2
 
 
   stz CGADDR
-  lda #<RGB(15,23,31)
-  sta CGDATA
-  lda #>RGB(15,23,31)
-  sta CGDATA
+
+  stz CGDATA
+  stz CGDATA
+;  lda #<RGB(15,23,31)
+;  sta CGDATA
+;  lda #>RGB(15,23,31)
+;  sta CGDATA
   seta16
   ; ---
   lda #DMAMODE_CGDATA
@@ -255,10 +258,14 @@ SkipBlock:
   sta DMAADDR+$20
   lda m7c_m7d_list,x
   sta DMAADDR+$30
+  lda #.loword(GradientTable)
+  sta DMAADDR+$40
   lda #$1b03 ; m7a and m7b
   sta DMAMODE+$20
   lda #$1d03 ; m7c and m7d
   sta DMAMODE+$30
+  lda #$3200 ; one byte to COLDATA
+  sta DMAMODE+$40
 
   lda #220
   sta HTIME
@@ -269,13 +276,25 @@ SkipBlock:
   sta DMAADDRBANK+$20
   lda #^m7c_m7d_0
   sta DMAADDRBANK+$30
-  lda #4|8
+  lda #^GradientTable
+  sta DMAADDRBANK+$40
+
+  lda #4|8|16
   sta HDMASTART
 
   lda #$0F
   sta PPUBRIGHT ; Turn on rendering
   lda #1
   sta BGMODE
+  lda #%11100000 ; Reset COLDATA
+  sta COLDATA
+
+
+  lda #0          ; Color math is always enabled
+  sta CGWSEL
+  lda #%00100000  ; Color math when the background color is used
+  sta CGADSUB
+
 
   lda #VBLANK_NMI|AUTOREAD|HVTIME_IRQ ; enable HV IRQ
   sta PPUNMI
@@ -554,3 +573,38 @@ Exit:
   rts
 .endproc
 
+
+GradientTable:     ; 
+   .byt $02, $9F   ; 
+   .byt $07, $9E   ; 
+   .byt $08, $9D   ; 
+   .byt $07, $9C   ; 
+   .byt $07, $9B   ; 
+   .byt $07, $9A   ; 
+   .byt $08, $99   ; 
+   .byt $07, $98   ; 
+   .byt $07, $97   ; 
+   .byt $07, $96   ; 
+   .byt $08, $95   ; 
+   .byt $07, $94   ; 
+   .byt $07, $93   ; 
+   .byt $07, $92   ; 
+   .byt $07, $91   ; 
+   .byt $07, $90   ; 
+   .byt $08, $8F   ; 
+   .byt $07, $8E   ; 
+   .byt $07, $8D   ; 
+   .byt $07, $8C   ; 
+   .byt $08, $8B   ; 
+   .byt $07, $8A   ; 
+   .byt $07, $89   ; 
+   .byt $07, $88   ; 
+   .byt $08, $87   ; 
+   .byt $07, $86   ; 
+   .byt $07, $85   ; 
+   .byt $07, $84   ; 
+   .byt $08, $83   ; 
+   .byt $07, $82   ; 
+   .byt $07, $81   ; 
+   .byt $05, $80   ; 
+   .byt $00        ; 
