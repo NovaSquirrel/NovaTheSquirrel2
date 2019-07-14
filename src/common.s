@@ -344,6 +344,7 @@ Exit:
   rtl
 .endproc
 
+; Randomly negates the input you give it
 .a16
 .proc VelocityLeftOrRight
   pha
