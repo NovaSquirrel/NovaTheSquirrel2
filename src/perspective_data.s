@@ -36,5697 +36,7121 @@ m7a_m7b_list:
   .addr .loword(m7a_m7b_31)
 .segment "Mode7TblAB"
 m7a_m7b_0:
-  .word $03c4, $0000
-  .word $038e, $0000
-  .word $035e, $0000
-  .word $0333, $0000
-  .word $030c, $0000
-  .word $02e9, $0000
-  .word $02c8, $0000
-  .word $02ab, $0000
-  .word $028f, $0000
-  .word $0276, $0000
-  .word $025f, $0000
-  .word $0249, $0000
-  .word $0235, $0000
-  .word $0222, $0000
-  .word $0211, $0000
-  .word $0200, $0000
-  .word $01f0, $0000
-  .word $01e2, $0000
-  .word $01d4, $0000
-  .word $01c7, $0000
-  .word $01bb, $0000
-  .word $01af, $0000
-  .word $01a4, $0000
-  .word $019a, $0000
-  .word $0190, $0000
-  .word $0186, $0000
-  .word $017d, $0000
-  .word $0174, $0000
-  .word $016c, $0000
-  .word $0164, $0000
-  .word $015d, $0000
-  .word $0155, $0000
-  .word $014e, $0000
-  .word $0148, $0000
-  .word $0141, $0000
-  .word $013b, $0000
-  .word $0135, $0000
-  .word $012f, $0000
-  .word $012a, $0000
-  .word $0125, $0000
-  .word $011f, $0000
-  .word $011a, $0000
-  .word $0116, $0000
-  .word $0111, $0000
-  .word $010d, $0000
-  .word $0108, $0000
-  .word $0104, $0000
-  .word $0100, $0000
-  .word $00fc, $0000
-  .word $00f8, $0000
-  .word $00f5, $0000
-  .word $00f1, $0000
-  .word $00ed, $0000
-  .word $00ea, $0000
-  .word $00e7, $0000
-  .word $00e4, $0000
-  .word $00e0, $0000
-  .word $00dd, $0000
-  .word $00da, $0000
-  .word $00d8, $0000
-  .word $00d5, $0000
-  .word $00d2, $0000
-  .word $00cf, $0000
-  .word $00cd, $0000
-  .word $00ca, $0000
-  .word $00c8, $0000
-  .word $00c5, $0000
-  .word $00c3, $0000
-  .word $00c1, $0000
-  .word $00bf, $0000
-  .word $00bc, $0000
-  .word $00ba, $0000
-  .word $00b8, $0000
-  .word $00b6, $0000
-  .word $00b4, $0000
-  .word $00b2, $0000
-  .word $00b0, $0000
-  .word $00ae, $0000
-  .word $00ac, $0000
-  .word $00ab, $0000
-  .word $00a9, $0000
-  .word $00a7, $0000
-  .word $00a5, $0000
-  .word $00a4, $0000
-  .word $00a2, $0000
-  .word $00a1, $0000
-  .word $009f, $0000
-  .word $009e, $0000
-  .word $009c, $0000
-  .word $009b, $0000
-  .word $0099, $0000
-  .word $0098, $0000
-  .word $0096, $0000
-  .word $0095, $0000
-  .word $0094, $0000
-  .word $0092, $0000
-  .word $0091, $0000
-  .word $0090, $0000
-  .word $008e, $0000
-  .word $008d, $0000
-  .word $008c, $0000
-  .word $008b, $0000
-  .word $008a, $0000
-  .word $0089, $0000
-  .word $0087, $0000
-  .word $0086, $0000
-  .word $0085, $0000
-  .word $0084, $0000
-  .word $0083, $0000
-  .word $0082, $0000
-  .word $0081, $0000
-  .word $0080, $0000
-  .word $007f, $0000
-  .word $007e, $0000
-  .word $007d, $0000
-  .word $007c, $0000
-  .word $007b, $0000
-  .word $007a, $0000
-  .word $0079, $0000
-  .word $0078, $0000
-  .word $0078, $0000
-  .word $0077, $0000
-  .word $0076, $0000
-  .word $0075, $0000
-  .word $0074, $0000
-  .word $0073, $0000
-  .word $0073, $0000
-  .word $0072, $0000
-  .word $0071, $0000
-  .word $0070, $0000
-  .word $006f, $0000
-  .word $006f, $0000
-  .word $006e, $0000
-  .word $006d, $0000
-  .word $006d, $0000
-  .word $006c, $0000
-  .word $006b, $0000
-  .word $006a, $0000
-  .word $006a, $0000
-  .word $0069, $0000
-  .word $0068, $0000
-  .word $0068, $0000
-  .word $0067, $0000
-  .word $0066, $0000
-  .word $0066, $0000
-  .word $0065, $0000
-  .word $0065, $0000
-  .word $0064, $0000
-  .word $0063, $0000
-  .word $0063, $0000
-  .word $0062, $0000
-  .word $0062, $0000
-  .word $0061, $0000
-  .word $0060, $0000
-  .word $0060, $0000
-  .word $005f, $0000
-  .word $005f, $0000
-  .word $005e, $0000
-  .word $005e, $0000
-  .word $005d, $0000
-  .word $005d, $0000
-  .word $005c, $0000
-  .word $005c, $0000
-  .word $005b, $0000
-  .word $005b, $0000
-  .word $005a, $0000
-  .word $005a, $0000
-  .word $0059, $0000
-  .word $0059, $0000
-  .word $0058, $0000
-  .word $0058, $0000
-  .word $0057, $0000
-  .word $0057, $0000
-  .word $0056, $0000
-  .word $0056, $0000
-  .word $0055, $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
 .segment "Mode7TblAB"
 m7a_m7b_1:
-  .word $03b1, $00bc
-  .word $037d, $00b2
-  .word $034e, $00a8
-  .word $0323, $00a0
-  .word $02fd, $0098
-  .word $02da, $0091
-  .word $02bb, $008b
-  .word $029e, $0085
-  .word $0283, $0080
-  .word $026a, $007b
-  .word $0253, $0076
-  .word $023e, $0072
-  .word $022a, $006e
-  .word $0218, $006b
-  .word $0206, $0067
-  .word $01f6, $0064
-  .word $01e7, $0061
-  .word $01d9, $005e
-  .word $01cb, $005b
-  .word $01be, $0059
-  .word $01b2, $0056
-  .word $01a7, $0054
-  .word $019c, $0052
-  .word $0192, $0050
-  .word $0188, $004e
-  .word $017f, $004c
-  .word $0176, $004a
-  .word $016d, $0049
-  .word $0165, $0047
-  .word $015d, $0045
-  .word $0156, $0044
-  .word $014f, $0043
-  .word $0148, $0041
-  .word $0141, $0040
-  .word $013b, $003f
-  .word $0135, $003d
-  .word $012f, $003c
-  .word $012a, $003b
-  .word $0124, $003a
-  .word $011f, $0039
-  .word $011a, $0038
-  .word $0115, $0037
-  .word $0110, $0036
-  .word $010c, $0035
-  .word $0107, $0034
-  .word $0103, $0034
-  .word $00ff, $0033
-  .word $00fb, $0032
-  .word $00f7, $0031
-  .word $00f3, $0030
-  .word $00f0, $0030
-  .word $00ec, $002f
-  .word $00e9, $002e
-  .word $00e6, $002e
-  .word $00e2, $002d
-  .word $00df, $002c
-  .word $00dc, $002c
-  .word $00d9, $002b
-  .word $00d6, $002b
-  .word $00d3, $002a
-  .word $00d1, $002a
-  .word $00ce, $0029
-  .word $00cb, $0028
-  .word $00c9, $0028
-  .word $00c6, $0027
-  .word $00c4, $0027
-  .word $00c2, $0027
-  .word $00bf, $0026
-  .word $00bd, $0026
-  .word $00bb, $0025
-  .word $00b9, $0025
-  .word $00b7, $0024
-  .word $00b5, $0024
-  .word $00b3, $0024
-  .word $00b1, $0023
-  .word $00af, $0023
-  .word $00ad, $0022
-  .word $00ab, $0022
-  .word $00a9, $0022
-  .word $00a7, $0021
-  .word $00a6, $0021
-  .word $00a4, $0021
-  .word $00a2, $0020
-  .word $00a1, $0020
-  .word $009f, $0020
-  .word $009e, $001f
-  .word $009c, $001f
-  .word $009b, $001f
-  .word $0099, $001e
-  .word $0098, $001e
-  .word $0096, $001e
-  .word $0095, $001e
-  .word $0093, $001d
-  .word $0092, $001d
-  .word $0091, $001d
-  .word $008f, $001d
-  .word $008e, $001c
-  .word $008d, $001c
-  .word $008c, $001c
-  .word $008b, $001c
-  .word $0089, $001b
-  .word $0088, $001b
-  .word $0087, $001b
-  .word $0086, $001b
-  .word $0085, $001a
-  .word $0084, $001a
-  .word $0083, $001a
-  .word $0082, $001a
-  .word $0081, $001a
-  .word $0080, $0019
-  .word $007f, $0019
-  .word $007e, $0019
-  .word $007d, $0019
-  .word $007c, $0019
-  .word $007b, $0018
-  .word $007a, $0018
-  .word $0079, $0018
-  .word $0078, $0018
-  .word $0077, $0018
-  .word $0076, $0018
-  .word $0075, $0017
-  .word $0074, $0017
-  .word $0074, $0017
-  .word $0073, $0017
-  .word $0072, $0017
-  .word $0071, $0017
-  .word $0070, $0016
-  .word $0070, $0016
-  .word $006f, $0016
-  .word $006e, $0016
-  .word $006d, $0016
-  .word $006d, $0016
-  .word $006c, $0015
-  .word $006b, $0015
-  .word $006a, $0015
-  .word $006a, $0015
-  .word $0069, $0015
-  .word $0068, $0015
-  .word $0068, $0015
-  .word $0067, $0014
-  .word $0066, $0014
-  .word $0066, $0014
-  .word $0065, $0014
-  .word $0064, $0014
-  .word $0064, $0014
-  .word $0063, $0014
-  .word $0063, $0014
-  .word $0062, $0013
-  .word $0061, $0013
-  .word $0061, $0013
-  .word $0060, $0013
-  .word $0060, $0013
-  .word $005f, $0013
-  .word $005f, $0013
-  .word $005e, $0013
-  .word $005d, $0013
-  .word $005d, $0012
-  .word $005c, $0012
-  .word $005c, $0012
-  .word $005b, $0012
-  .word $005b, $0012
-  .word $005a, $0012
-  .word $005a, $0012
-  .word $0059, $0012
-  .word $0059, $0012
-  .word $0058, $0012
-  .word $0058, $0011
-  .word $0057, $0011
-  .word $0057, $0011
-  .word $0056, $0011
-  .word $0056, $0011
-  .word $0055, $0011
-  .word $0055, $0011
-  .word $0055, $0011
-  .word $0054, $0011
-  .word $0054, $0011
+  .word $00bc
+  .word $00b2
+  .word $00a8
+  .word $00a0
+  .word $0098
+  .word $0091
+  .word $008b
+  .word $0085
+  .word $0080
+  .word $007b
+  .word $0076
+  .word $0072
+  .word $006e
+  .word $006b
+  .word $0067
+  .word $0064
+  .word $0061
+  .word $005e
+  .word $005b
+  .word $0059
+  .word $0056
+  .word $0054
+  .word $0052
+  .word $0050
+  .word $004e
+  .word $004c
+  .word $004a
+  .word $0049
+  .word $0047
+  .word $0045
+  .word $0044
+  .word $0043
+  .word $0041
+  .word $0040
+  .word $003f
+  .word $003d
+  .word $003c
+  .word $003b
+  .word $003a
+  .word $0039
+  .word $0038
+  .word $0037
+  .word $0036
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0032
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $002f
+  .word $002e
+  .word $002e
+  .word $002d
+  .word $002c
+  .word $002c
+  .word $002b
+  .word $002b
+  .word $002a
+  .word $002a
+  .word $0029
+  .word $0028
+  .word $0028
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0026
+  .word $0026
+  .word $0025
+  .word $0025
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0023
+  .word $0023
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0020
+  .word $0020
+  .word $0020
+  .word $001f
+  .word $001f
+  .word $001f
+  .word $001e
+  .word $001e
+  .word $001e
+  .word $001e
+  .word $001d
+  .word $001d
+  .word $001d
+  .word $001d
+  .word $001c
+  .word $001c
+  .word $001c
+  .word $001c
+  .word $001b
+  .word $001b
+  .word $001b
+  .word $001b
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
 .segment "Mode7TblAB"
 m7a_m7b_2:
-  .word $037a, $0171
-  .word $0349, $015c
-  .word $031d, $014a
-  .word $02f5, $0139
-  .word $02d1, $012b
-  .word $02b0, $011d
-  .word $0292, $0111
-  .word $0277, $0105
-  .word $025d, $00fb
-  .word $0246, $00f1
-  .word $0231, $00e8
-  .word $021d, $00e0
-  .word $020a, $00d8
-  .word $01f9, $00d1
-  .word $01e8, $00ca
-  .word $01d9, $00c4
-  .word $01cb, $00be
-  .word $01bd, $00b8
-  .word $01b0, $00b3
-  .word $01a4, $00ae
-  .word $0199, $00a9
-  .word $018e, $00a5
-  .word $0184, $00a1
-  .word $017a, $009d
-  .word $0171, $0099
-  .word $0168, $0095
-  .word $0160, $0092
-  .word $0158, $008e
-  .word $0150, $008b
-  .word $0149, $0088
-  .word $0142, $0085
-  .word $013b, $0083
-  .word $0135, $0080
-  .word $012f, $007d
-  .word $0129, $007b
-  .word $0123, $0079
-  .word $011e, $0076
-  .word $0118, $0074
-  .word $0113, $0072
-  .word $010e, $0070
-  .word $010a, $006e
-  .word $0105, $006c
-  .word $0101, $006a
-  .word $00fc, $0068
-  .word $00f8, $0067
-  .word $00f4, $0065
-  .word $00f0, $0064
-  .word $00ed, $0062
-  .word $00e9, $0060
-  .word $00e5, $005f
-  .word $00e2, $005e
-  .word $00df, $005c
-  .word $00db, $005b
-  .word $00d8, $005a
-  .word $00d5, $0058
-  .word $00d2, $0057
-  .word $00cf, $0056
-  .word $00cd, $0055
-  .word $00ca, $0054
-  .word $00c7, $0052
-  .word $00c5, $0051
-  .word $00c2, $0050
-  .word $00c0, $004f
-  .word $00bd, $004e
-  .word $00bb, $004d
-  .word $00b9, $004c
-  .word $00b6, $004c
-  .word $00b4, $004b
-  .word $00b2, $004a
-  .word $00b0, $0049
-  .word $00ae, $0048
-  .word $00ac, $0047
-  .word $00aa, $0046
-  .word $00a8, $0046
-  .word $00a6, $0045
-  .word $00a5, $0044
-  .word $00a3, $0043
-  .word $00a1, $0043
-  .word $009f, $0042
-  .word $009e, $0041
-  .word $009c, $0041
-  .word $009a, $0040
-  .word $0099, $003f
-  .word $0097, $003f
-  .word $0096, $003e
-  .word $0094, $003d
-  .word $0093, $003d
-  .word $0092, $003c
-  .word $0090, $003c
-  .word $008f, $003b
-  .word $008d, $003b
-  .word $008c, $003a
-  .word $008b, $003a
-  .word $008a, $0039
-  .word $0088, $0038
-  .word $0087, $0038
-  .word $0086, $0037
-  .word $0085, $0037
-  .word $0084, $0037
-  .word $0082, $0036
-  .word $0081, $0036
-  .word $0080, $0035
-  .word $007f, $0035
-  .word $007e, $0034
-  .word $007d, $0034
-  .word $007c, $0033
-  .word $007b, $0033
-  .word $007a, $0033
-  .word $0079, $0032
-  .word $0078, $0032
-  .word $0077, $0031
-  .word $0076, $0031
-  .word $0075, $0031
-  .word $0074, $0030
-  .word $0074, $0030
-  .word $0073, $002f
-  .word $0072, $002f
-  .word $0071, $002f
-  .word $0070, $002e
-  .word $006f, $002e
-  .word $006e, $002e
-  .word $006e, $002d
-  .word $006d, $002d
-  .word $006c, $002d
-  .word $006b, $002c
-  .word $006b, $002c
-  .word $006a, $002c
-  .word $0069, $002c
-  .word $0068, $002b
-  .word $0068, $002b
-  .word $0067, $002b
-  .word $0066, $002a
-  .word $0066, $002a
-  .word $0065, $002a
-  .word $0064, $002a
-  .word $0064, $0029
-  .word $0063, $0029
-  .word $0062, $0029
-  .word $0062, $0028
-  .word $0061, $0028
-  .word $0060, $0028
-  .word $0060, $0028
-  .word $005f, $0027
-  .word $005f, $0027
-  .word $005e, $0027
-  .word $005d, $0027
-  .word $005d, $0026
-  .word $005c, $0026
-  .word $005c, $0026
-  .word $005b, $0026
-  .word $005b, $0026
-  .word $005a, $0025
-  .word $005a, $0025
-  .word $0059, $0025
-  .word $0059, $0025
-  .word $0058, $0024
-  .word $0057, $0024
-  .word $0057, $0024
-  .word $0056, $0024
-  .word $0056, $0024
-  .word $0056, $0023
-  .word $0055, $0023
-  .word $0055, $0023
-  .word $0054, $0023
-  .word $0054, $0023
-  .word $0053, $0022
-  .word $0053, $0022
-  .word $0052, $0022
-  .word $0052, $0022
-  .word $0051, $0022
-  .word $0051, $0022
-  .word $0051, $0021
-  .word $0050, $0021
-  .word $0050, $0021
-  .word $004f, $0021
-  .word $004f, $0021
+  .word $0171
+  .word $015c
+  .word $014a
+  .word $0139
+  .word $012b
+  .word $011d
+  .word $0111
+  .word $0105
+  .word $00fb
+  .word $00f1
+  .word $00e8
+  .word $00e0
+  .word $00d8
+  .word $00d1
+  .word $00ca
+  .word $00c4
+  .word $00be
+  .word $00b8
+  .word $00b3
+  .word $00ae
+  .word $00a9
+  .word $00a5
+  .word $00a1
+  .word $009d
+  .word $0099
+  .word $0095
+  .word $0092
+  .word $008e
+  .word $008b
+  .word $0088
+  .word $0085
+  .word $0083
+  .word $0080
+  .word $007d
+  .word $007b
+  .word $0079
+  .word $0076
+  .word $0074
+  .word $0072
+  .word $0070
+  .word $006e
+  .word $006c
+  .word $006a
+  .word $0068
+  .word $0067
+  .word $0065
+  .word $0064
+  .word $0062
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005c
+  .word $005b
+  .word $005a
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0055
+  .word $0054
+  .word $0052
+  .word $0051
+  .word $0050
+  .word $004f
+  .word $004e
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004a
+  .word $0049
+  .word $0048
+  .word $0047
+  .word $0046
+  .word $0046
+  .word $0045
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003c
+  .word $003c
+  .word $003b
+  .word $003b
+  .word $003a
+  .word $003a
+  .word $0039
+  .word $0038
+  .word $0038
+  .word $0037
+  .word $0037
+  .word $0037
+  .word $0036
+  .word $0036
+  .word $0035
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0032
+  .word $0032
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $002f
+  .word $002f
+  .word $002f
+  .word $002e
+  .word $002e
+  .word $002e
+  .word $002d
+  .word $002d
+  .word $002d
+  .word $002c
+  .word $002c
+  .word $002c
+  .word $002c
+  .word $002b
+  .word $002b
+  .word $002b
+  .word $002a
+  .word $002a
+  .word $002a
+  .word $002a
+  .word $0029
+  .word $0029
+  .word $0029
+  .word $0028
+  .word $0028
+  .word $0028
+  .word $0028
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0025
+  .word $0025
+  .word $0025
+  .word $0025
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0021
 .segment "Mode7TblAB"
 m7a_m7b_3:
-  .word $0321, $0217
-  .word $02f5, $01fa
-  .word $02cd, $01df
-  .word $02a9, $01c7
-  .word $0289, $01b1
-  .word $026b, $019e
-  .word $0250, $018c
-  .word $0238, $017b
-  .word $0221, $016c
-  .word $020c, $015e
-  .word $01f9, $0151
-  .word $01e7, $0145
-  .word $01d6, $013a
-  .word $01c6, $012f
-  .word $01b7, $0126
-  .word $01aa, $011c
-  .word $019d, $0114
-  .word $0191, $010c
-  .word $0185, $0104
-  .word $017a, $00fd
-  .word $0170, $00f6
-  .word $0166, $00f0
-  .word $015d, $00e9
-  .word $0155, $00e4
-  .word $014c, $00de
-  .word $0144, $00d9
-  .word $013d, $00d4
-  .word $0136, $00cf
-  .word $012f, $00ca
-  .word $0128, $00c6
-  .word $0122, $00c2
-  .word $011c, $00be
-  .word $0116, $00ba
-  .word $0110, $00b6
-  .word $010b, $00b2
-  .word $0106, $00af
-  .word $0101, $00ac
-  .word $00fc, $00a9
-  .word $00f8, $00a5
-  .word $00f3, $00a3
-  .word $00ef, $00a0
-  .word $00eb, $009d
-  .word $00e7, $009a
-  .word $00e3, $0098
-  .word $00df, $0095
-  .word $00dc, $0093
-  .word $00d8, $0090
-  .word $00d5, $008e
-  .word $00d2, $008c
-  .word $00ce, $008a
-  .word $00cb, $0088
-  .word $00c8, $0086
-  .word $00c5, $0084
-  .word $00c3, $0082
-  .word $00c0, $0080
-  .word $00bd, $007e
-  .word $00bb, $007d
-  .word $00b8, $007b
-  .word $00b6, $0079
-  .word $00b3, $0078
-  .word $00b1, $0076
-  .word $00af, $0075
-  .word $00ac, $0073
-  .word $00aa, $0072
-  .word $00a8, $0070
-  .word $00a6, $006f
-  .word $00a4, $006e
-  .word $00a2, $006c
-  .word $00a0, $006b
-  .word $009e, $006a
-  .word $009d, $0069
-  .word $009b, $0067
-  .word $0099, $0066
-  .word $0097, $0065
-  .word $0096, $0064
-  .word $0094, $0063
-  .word $0092, $0062
-  .word $0091, $0061
-  .word $008f, $0060
-  .word $008e, $005f
-  .word $008c, $005e
-  .word $008b, $005d
-  .word $008a, $005c
-  .word $0088, $005b
-  .word $0087, $005a
-  .word $0086, $0059
-  .word $0084, $0058
-  .word $0083, $0058
-  .word $0082, $0057
-  .word $0081, $0056
-  .word $007f, $0055
-  .word $007e, $0054
-  .word $007d, $0054
-  .word $007c, $0053
-  .word $007b, $0052
-  .word $007a, $0051
-  .word $0079, $0051
-  .word $0077, $0050
-  .word $0076, $004f
-  .word $0075, $004e
-  .word $0074, $004e
-  .word $0073, $004d
-  .word $0072, $004c
-  .word $0072, $004c
-  .word $0071, $004b
-  .word $0070, $004b
-  .word $006f, $004a
-  .word $006e, $0049
-  .word $006d, $0049
-  .word $006c, $0048
-  .word $006b, $0048
-  .word $006a, $0047
-  .word $006a, $0047
-  .word $0069, $0046
-  .word $0068, $0045
-  .word $0067, $0045
-  .word $0066, $0044
-  .word $0066, $0044
-  .word $0065, $0043
-  .word $0064, $0043
-  .word $0063, $0042
-  .word $0063, $0042
-  .word $0062, $0041
-  .word $0061, $0041
-  .word $0061, $0041
-  .word $0060, $0040
-  .word $005f, $0040
-  .word $005f, $003f
-  .word $005e, $003f
-  .word $005d, $003e
-  .word $005d, $003e
-  .word $005c, $003e
-  .word $005b, $003d
-  .word $005b, $003d
-  .word $005a, $003c
-  .word $005a, $003c
-  .word $0059, $003b
-  .word $0058, $003b
-  .word $0058, $003b
-  .word $0057, $003a
-  .word $0057, $003a
-  .word $0056, $003a
-  .word $0056, $0039
-  .word $0055, $0039
-  .word $0055, $0039
-  .word $0054, $0038
-  .word $0054, $0038
-  .word $0053, $0038
-  .word $0053, $0037
-  .word $0052, $0037
-  .word $0052, $0037
-  .word $0051, $0036
-  .word $0051, $0036
-  .word $0050, $0036
-  .word $0050, $0035
-  .word $004f, $0035
-  .word $004f, $0035
-  .word $004e, $0034
-  .word $004e, $0034
-  .word $004d, $0034
-  .word $004d, $0033
-  .word $004d, $0033
-  .word $004c, $0033
-  .word $004c, $0033
-  .word $004b, $0032
-  .word $004b, $0032
-  .word $004a, $0032
-  .word $004a, $0031
-  .word $004a, $0031
-  .word $0049, $0031
-  .word $0049, $0031
-  .word $0048, $0030
-  .word $0048, $0030
-  .word $0048, $0030
-  .word $0047, $0030
-  .word $0047, $002f
+  .word $0217
+  .word $01fa
+  .word $01df
+  .word $01c7
+  .word $01b1
+  .word $019e
+  .word $018c
+  .word $017b
+  .word $016c
+  .word $015e
+  .word $0151
+  .word $0145
+  .word $013a
+  .word $012f
+  .word $0126
+  .word $011c
+  .word $0114
+  .word $010c
+  .word $0104
+  .word $00fd
+  .word $00f6
+  .word $00f0
+  .word $00e9
+  .word $00e4
+  .word $00de
+  .word $00d9
+  .word $00d4
+  .word $00cf
+  .word $00ca
+  .word $00c6
+  .word $00c2
+  .word $00be
+  .word $00ba
+  .word $00b6
+  .word $00b2
+  .word $00af
+  .word $00ac
+  .word $00a9
+  .word $00a5
+  .word $00a3
+  .word $00a0
+  .word $009d
+  .word $009a
+  .word $0098
+  .word $0095
+  .word $0093
+  .word $0090
+  .word $008e
+  .word $008c
+  .word $008a
+  .word $0088
+  .word $0086
+  .word $0084
+  .word $0082
+  .word $0080
+  .word $007e
+  .word $007d
+  .word $007b
+  .word $0079
+  .word $0078
+  .word $0076
+  .word $0075
+  .word $0073
+  .word $0072
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0067
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+  .word $0046
+  .word $0045
+  .word $0045
+  .word $0044
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003e
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003c
+  .word $003c
+  .word $003b
+  .word $003b
+  .word $003b
+  .word $003a
+  .word $003a
+  .word $003a
+  .word $0039
+  .word $0039
+  .word $0039
+  .word $0038
+  .word $0038
+  .word $0038
+  .word $0037
+  .word $0037
+  .word $0037
+  .word $0036
+  .word $0036
+  .word $0036
+  .word $0035
+  .word $0035
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0032
+  .word $0032
+  .word $0032
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $0030
+  .word $0030
+  .word $002f
 .segment "Mode7TblAB"
 m7a_m7b_4:
-  .word $02a9, $02a9
-  .word $0284, $0284
-  .word $0262, $0262
-  .word $0243, $0243
-  .word $0228, $0228
-  .word $020f, $020f
-  .word $01f8, $01f8
-  .word $01e3, $01e3
-  .word $01cf, $01cf
-  .word $01be, $01be
-  .word $01ad, $01ad
-  .word $019e, $019e
-  .word $018f, $018f
-  .word $0182, $0182
-  .word $0176, $0176
-  .word $016a, $016a
-  .word $015f, $015f
-  .word $0155, $0155
-  .word $014b, $014b
-  .word $0142, $0142
-  .word $0139, $0139
-  .word $0131, $0131
-  .word $0129, $0129
-  .word $0122, $0122
-  .word $011b, $011b
-  .word $0114, $0114
-  .word $010d, $010d
-  .word $0107, $0107
-  .word $0101, $0101
-  .word $00fc, $00fc
-  .word $00f6, $00f6
-  .word $00f1, $00f1
-  .word $00ec, $00ec
-  .word $00e8, $00e8
-  .word $00e3, $00e3
-  .word $00df, $00df
-  .word $00db, $00db
-  .word $00d7, $00d7
-  .word $00d3, $00d3
-  .word $00cf, $00cf
-  .word $00cb, $00cb
-  .word $00c8, $00c8
-  .word $00c4, $00c4
-  .word $00c1, $00c1
-  .word $00be, $00be
-  .word $00bb, $00bb
-  .word $00b8, $00b8
-  .word $00b5, $00b5
-  .word $00b2, $00b2
-  .word $00b0, $00b0
-  .word $00ad, $00ad
-  .word $00aa, $00aa
-  .word $00a8, $00a8
-  .word $00a6, $00a6
-  .word $00a3, $00a3
-  .word $00a1, $00a1
-  .word $009f, $009f
-  .word $009d, $009d
-  .word $009a, $009a
-  .word $0098, $0098
-  .word $0096, $0096
-  .word $0095, $0095
-  .word $0093, $0093
-  .word $0091, $0091
-  .word $008f, $008f
-  .word $008d, $008d
-  .word $008c, $008c
-  .word $008a, $008a
-  .word $0088, $0088
-  .word $0087, $0087
-  .word $0085, $0085
-  .word $0084, $0084
-  .word $0082, $0082
-  .word $0081, $0081
-  .word $007f, $007f
-  .word $007e, $007e
-  .word $007d, $007d
-  .word $007b, $007b
-  .word $007a, $007a
-  .word $0079, $0079
-  .word $0077, $0077
-  .word $0076, $0076
-  .word $0075, $0075
-  .word $0074, $0074
-  .word $0073, $0073
-  .word $0072, $0072
-  .word $0070, $0070
-  .word $006f, $006f
-  .word $006e, $006e
-  .word $006d, $006d
-  .word $006c, $006c
-  .word $006b, $006b
-  .word $006a, $006a
-  .word $0069, $0069
-  .word $0068, $0068
-  .word $0067, $0067
-  .word $0067, $0067
-  .word $0066, $0066
-  .word $0065, $0065
-  .word $0064, $0064
-  .word $0063, $0063
-  .word $0062, $0062
-  .word $0061, $0061
-  .word $0061, $0061
-  .word $0060, $0060
-  .word $005f, $005f
-  .word $005e, $005e
-  .word $005d, $005d
-  .word $005d, $005d
-  .word $005c, $005c
-  .word $005b, $005b
-  .word $005b, $005b
-  .word $005a, $005a
-  .word $0059, $0059
-  .word $0058, $0058
-  .word $0058, $0058
-  .word $0057, $0057
-  .word $0056, $0056
-  .word $0056, $0056
-  .word $0055, $0055
-  .word $0055, $0055
-  .word $0054, $0054
-  .word $0053, $0053
-  .word $0053, $0053
-  .word $0052, $0052
-  .word $0052, $0052
-  .word $0051, $0051
-  .word $0050, $0050
-  .word $0050, $0050
-  .word $004f, $004f
-  .word $004f, $004f
-  .word $004e, $004e
-  .word $004e, $004e
-  .word $004d, $004d
-  .word $004d, $004d
-  .word $004c, $004c
-  .word $004c, $004c
-  .word $004b, $004b
-  .word $004b, $004b
-  .word $004a, $004a
-  .word $004a, $004a
-  .word $0049, $0049
-  .word $0049, $0049
-  .word $0048, $0048
-  .word $0048, $0048
-  .word $0048, $0048
-  .word $0047, $0047
-  .word $0047, $0047
-  .word $0046, $0046
-  .word $0046, $0046
-  .word $0045, $0045
-  .word $0045, $0045
-  .word $0045, $0045
-  .word $0044, $0044
-  .word $0044, $0044
-  .word $0043, $0043
-  .word $0043, $0043
-  .word $0043, $0043
-  .word $0042, $0042
-  .word $0042, $0042
-  .word $0041, $0041
-  .word $0041, $0041
-  .word $0041, $0041
-  .word $0040, $0040
-  .word $0040, $0040
-  .word $0040, $0040
-  .word $003f, $003f
-  .word $003f, $003f
-  .word $003f, $003f
-  .word $003e, $003e
-  .word $003e, $003e
-  .word $003e, $003e
-  .word $003d, $003d
-  .word $003d, $003d
-  .word $003d, $003d
-  .word $003c, $003c
+  .word $02a9
+  .word $0284
+  .word $0262
+  .word $0243
+  .word $0228
+  .word $020f
+  .word $01f8
+  .word $01e3
+  .word $01cf
+  .word $01be
+  .word $01ad
+  .word $019e
+  .word $018f
+  .word $0182
+  .word $0176
+  .word $016a
+  .word $015f
+  .word $0155
+  .word $014b
+  .word $0142
+  .word $0139
+  .word $0131
+  .word $0129
+  .word $0122
+  .word $011b
+  .word $0114
+  .word $010d
+  .word $0107
+  .word $0101
+  .word $00fc
+  .word $00f6
+  .word $00f1
+  .word $00ec
+  .word $00e8
+  .word $00e3
+  .word $00df
+  .word $00db
+  .word $00d7
+  .word $00d3
+  .word $00cf
+  .word $00cb
+  .word $00c8
+  .word $00c4
+  .word $00c1
+  .word $00be
+  .word $00bb
+  .word $00b8
+  .word $00b5
+  .word $00b2
+  .word $00b0
+  .word $00ad
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a3
+  .word $00a1
+  .word $009f
+  .word $009d
+  .word $009a
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0093
+  .word $0091
+  .word $008f
+  .word $008d
+  .word $008c
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0085
+  .word $0084
+  .word $0082
+  .word $0081
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0067
+  .word $0067
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+  .word $0046
+  .word $0046
+  .word $0045
+  .word $0045
+  .word $0045
+  .word $0044
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $0040
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003e
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003d
+  .word $003c
 .segment "Mode7TblAB"
 m7a_m7b_5:
-  .word $0217, $0321
-  .word $01fa, $02f5
-  .word $01df, $02cd
-  .word $01c7, $02a9
-  .word $01b1, $0289
-  .word $019e, $026b
-  .word $018c, $0250
-  .word $017b, $0238
-  .word $016c, $0221
-  .word $015e, $020c
-  .word $0151, $01f9
-  .word $0145, $01e7
-  .word $013a, $01d6
-  .word $012f, $01c6
-  .word $0126, $01b7
-  .word $011c, $01aa
-  .word $0114, $019d
-  .word $010c, $0191
-  .word $0104, $0185
-  .word $00fd, $017a
-  .word $00f6, $0170
-  .word $00f0, $0166
-  .word $00e9, $015d
-  .word $00e4, $0155
-  .word $00de, $014c
-  .word $00d9, $0144
-  .word $00d4, $013d
-  .word $00cf, $0136
-  .word $00ca, $012f
-  .word $00c6, $0128
-  .word $00c2, $0122
-  .word $00be, $011c
-  .word $00ba, $0116
-  .word $00b6, $0110
-  .word $00b2, $010b
-  .word $00af, $0106
-  .word $00ac, $0101
-  .word $00a9, $00fc
-  .word $00a5, $00f8
-  .word $00a3, $00f3
-  .word $00a0, $00ef
-  .word $009d, $00eb
-  .word $009a, $00e7
-  .word $0098, $00e3
-  .word $0095, $00df
-  .word $0093, $00dc
-  .word $0090, $00d8
-  .word $008e, $00d5
-  .word $008c, $00d2
-  .word $008a, $00ce
-  .word $0088, $00cb
-  .word $0086, $00c8
-  .word $0084, $00c5
-  .word $0082, $00c3
-  .word $0080, $00c0
-  .word $007e, $00bd
-  .word $007d, $00bb
-  .word $007b, $00b8
-  .word $0079, $00b6
-  .word $0078, $00b3
-  .word $0076, $00b1
-  .word $0075, $00af
-  .word $0073, $00ac
-  .word $0072, $00aa
-  .word $0070, $00a8
-  .word $006f, $00a6
-  .word $006e, $00a4
-  .word $006c, $00a2
-  .word $006b, $00a0
-  .word $006a, $009e
-  .word $0069, $009d
-  .word $0067, $009b
-  .word $0066, $0099
-  .word $0065, $0097
-  .word $0064, $0096
-  .word $0063, $0094
-  .word $0062, $0092
-  .word $0061, $0091
-  .word $0060, $008f
-  .word $005f, $008e
-  .word $005e, $008c
-  .word $005d, $008b
-  .word $005c, $008a
-  .word $005b, $0088
-  .word $005a, $0087
-  .word $0059, $0086
-  .word $0058, $0084
-  .word $0058, $0083
-  .word $0057, $0082
-  .word $0056, $0081
-  .word $0055, $007f
-  .word $0054, $007e
-  .word $0054, $007d
-  .word $0053, $007c
-  .word $0052, $007b
-  .word $0051, $007a
-  .word $0051, $0079
-  .word $0050, $0077
-  .word $004f, $0076
-  .word $004e, $0075
-  .word $004e, $0074
-  .word $004d, $0073
-  .word $004c, $0072
-  .word $004c, $0072
-  .word $004b, $0071
-  .word $004b, $0070
-  .word $004a, $006f
-  .word $0049, $006e
-  .word $0049, $006d
-  .word $0048, $006c
-  .word $0048, $006b
-  .word $0047, $006a
-  .word $0047, $006a
-  .word $0046, $0069
-  .word $0045, $0068
-  .word $0045, $0067
-  .word $0044, $0066
-  .word $0044, $0066
-  .word $0043, $0065
-  .word $0043, $0064
-  .word $0042, $0063
-  .word $0042, $0063
-  .word $0041, $0062
-  .word $0041, $0061
-  .word $0041, $0061
-  .word $0040, $0060
-  .word $0040, $005f
-  .word $003f, $005f
-  .word $003f, $005e
-  .word $003e, $005d
-  .word $003e, $005d
-  .word $003e, $005c
-  .word $003d, $005b
-  .word $003d, $005b
-  .word $003c, $005a
-  .word $003c, $005a
-  .word $003b, $0059
-  .word $003b, $0058
-  .word $003b, $0058
-  .word $003a, $0057
-  .word $003a, $0057
-  .word $003a, $0056
-  .word $0039, $0056
-  .word $0039, $0055
-  .word $0039, $0055
-  .word $0038, $0054
-  .word $0038, $0054
-  .word $0038, $0053
-  .word $0037, $0053
-  .word $0037, $0052
-  .word $0037, $0052
-  .word $0036, $0051
-  .word $0036, $0051
-  .word $0036, $0050
-  .word $0035, $0050
-  .word $0035, $004f
-  .word $0035, $004f
-  .word $0034, $004e
-  .word $0034, $004e
-  .word $0034, $004d
-  .word $0033, $004d
-  .word $0033, $004d
-  .word $0033, $004c
-  .word $0033, $004c
-  .word $0032, $004b
-  .word $0032, $004b
-  .word $0032, $004a
-  .word $0031, $004a
-  .word $0031, $004a
-  .word $0031, $0049
-  .word $0031, $0049
-  .word $0030, $0048
-  .word $0030, $0048
-  .word $0030, $0048
-  .word $0030, $0047
-  .word $002f, $0047
+  .word $0321
+  .word $02f5
+  .word $02cd
+  .word $02a9
+  .word $0289
+  .word $026b
+  .word $0250
+  .word $0238
+  .word $0221
+  .word $020c
+  .word $01f9
+  .word $01e7
+  .word $01d6
+  .word $01c6
+  .word $01b7
+  .word $01aa
+  .word $019d
+  .word $0191
+  .word $0185
+  .word $017a
+  .word $0170
+  .word $0166
+  .word $015d
+  .word $0155
+  .word $014c
+  .word $0144
+  .word $013d
+  .word $0136
+  .word $012f
+  .word $0128
+  .word $0122
+  .word $011c
+  .word $0116
+  .word $0110
+  .word $010b
+  .word $0106
+  .word $0101
+  .word $00fc
+  .word $00f8
+  .word $00f3
+  .word $00ef
+  .word $00eb
+  .word $00e7
+  .word $00e3
+  .word $00df
+  .word $00dc
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00ce
+  .word $00cb
+  .word $00c8
+  .word $00c5
+  .word $00c3
+  .word $00c0
+  .word $00bd
+  .word $00bb
+  .word $00b8
+  .word $00b6
+  .word $00b3
+  .word $00b1
+  .word $00af
+  .word $00ac
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a4
+  .word $00a2
+  .word $00a0
+  .word $009e
+  .word $009d
+  .word $009b
+  .word $0099
+  .word $0097
+  .word $0096
+  .word $0094
+  .word $0092
+  .word $0091
+  .word $008f
+  .word $008e
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004d
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $004a
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
 .segment "Mode7TblAB"
 m7a_m7b_6:
-  .word $0171, $037a
-  .word $015c, $0349
-  .word $014a, $031d
-  .word $0139, $02f5
-  .word $012b, $02d1
-  .word $011d, $02b0
-  .word $0111, $0292
-  .word $0105, $0277
-  .word $00fb, $025d
-  .word $00f1, $0246
-  .word $00e8, $0231
-  .word $00e0, $021d
-  .word $00d8, $020a
-  .word $00d1, $01f9
-  .word $00ca, $01e8
-  .word $00c4, $01d9
-  .word $00be, $01cb
-  .word $00b8, $01bd
-  .word $00b3, $01b0
-  .word $00ae, $01a4
-  .word $00a9, $0199
-  .word $00a5, $018e
-  .word $00a1, $0184
-  .word $009d, $017a
-  .word $0099, $0171
-  .word $0095, $0168
-  .word $0092, $0160
-  .word $008e, $0158
-  .word $008b, $0150
-  .word $0088, $0149
-  .word $0085, $0142
-  .word $0083, $013b
-  .word $0080, $0135
-  .word $007d, $012f
-  .word $007b, $0129
-  .word $0079, $0123
-  .word $0076, $011e
-  .word $0074, $0118
-  .word $0072, $0113
-  .word $0070, $010e
-  .word $006e, $010a
-  .word $006c, $0105
-  .word $006a, $0101
-  .word $0068, $00fc
-  .word $0067, $00f8
-  .word $0065, $00f4
-  .word $0064, $00f0
-  .word $0062, $00ed
-  .word $0060, $00e9
-  .word $005f, $00e5
-  .word $005e, $00e2
-  .word $005c, $00df
-  .word $005b, $00db
-  .word $005a, $00d8
-  .word $0058, $00d5
-  .word $0057, $00d2
-  .word $0056, $00cf
-  .word $0055, $00cd
-  .word $0054, $00ca
-  .word $0052, $00c7
-  .word $0051, $00c5
-  .word $0050, $00c2
-  .word $004f, $00c0
-  .word $004e, $00bd
-  .word $004d, $00bb
-  .word $004c, $00b9
-  .word $004c, $00b6
-  .word $004b, $00b4
-  .word $004a, $00b2
-  .word $0049, $00b0
-  .word $0048, $00ae
-  .word $0047, $00ac
-  .word $0046, $00aa
-  .word $0046, $00a8
-  .word $0045, $00a6
-  .word $0044, $00a5
-  .word $0043, $00a3
-  .word $0043, $00a1
-  .word $0042, $009f
-  .word $0041, $009e
-  .word $0041, $009c
-  .word $0040, $009a
-  .word $003f, $0099
-  .word $003f, $0097
-  .word $003e, $0096
-  .word $003d, $0094
-  .word $003d, $0093
-  .word $003c, $0092
-  .word $003c, $0090
-  .word $003b, $008f
-  .word $003b, $008d
-  .word $003a, $008c
-  .word $003a, $008b
-  .word $0039, $008a
-  .word $0038, $0088
-  .word $0038, $0087
-  .word $0037, $0086
-  .word $0037, $0085
-  .word $0037, $0084
-  .word $0036, $0082
-  .word $0036, $0081
-  .word $0035, $0080
-  .word $0035, $007f
-  .word $0034, $007e
-  .word $0034, $007d
-  .word $0033, $007c
-  .word $0033, $007b
-  .word $0033, $007a
-  .word $0032, $0079
-  .word $0032, $0078
-  .word $0031, $0077
-  .word $0031, $0076
-  .word $0031, $0075
-  .word $0030, $0074
-  .word $0030, $0074
-  .word $002f, $0073
-  .word $002f, $0072
-  .word $002f, $0071
-  .word $002e, $0070
-  .word $002e, $006f
-  .word $002e, $006e
-  .word $002d, $006e
-  .word $002d, $006d
-  .word $002d, $006c
-  .word $002c, $006b
-  .word $002c, $006b
-  .word $002c, $006a
-  .word $002c, $0069
-  .word $002b, $0068
-  .word $002b, $0068
-  .word $002b, $0067
-  .word $002a, $0066
-  .word $002a, $0066
-  .word $002a, $0065
-  .word $002a, $0064
-  .word $0029, $0064
-  .word $0029, $0063
-  .word $0029, $0062
-  .word $0028, $0062
-  .word $0028, $0061
-  .word $0028, $0060
-  .word $0028, $0060
-  .word $0027, $005f
-  .word $0027, $005f
-  .word $0027, $005e
-  .word $0027, $005d
-  .word $0026, $005d
-  .word $0026, $005c
-  .word $0026, $005c
-  .word $0026, $005b
-  .word $0026, $005b
-  .word $0025, $005a
-  .word $0025, $005a
-  .word $0025, $0059
-  .word $0025, $0059
-  .word $0024, $0058
-  .word $0024, $0057
-  .word $0024, $0057
-  .word $0024, $0056
-  .word $0024, $0056
-  .word $0023, $0056
-  .word $0023, $0055
-  .word $0023, $0055
-  .word $0023, $0054
-  .word $0023, $0054
-  .word $0022, $0053
-  .word $0022, $0053
-  .word $0022, $0052
-  .word $0022, $0052
-  .word $0022, $0051
-  .word $0022, $0051
-  .word $0021, $0051
-  .word $0021, $0050
-  .word $0021, $0050
-  .word $0021, $004f
-  .word $0021, $004f
+  .word $037a
+  .word $0349
+  .word $031d
+  .word $02f5
+  .word $02d1
+  .word $02b0
+  .word $0292
+  .word $0277
+  .word $025d
+  .word $0246
+  .word $0231
+  .word $021d
+  .word $020a
+  .word $01f9
+  .word $01e8
+  .word $01d9
+  .word $01cb
+  .word $01bd
+  .word $01b0
+  .word $01a4
+  .word $0199
+  .word $018e
+  .word $0184
+  .word $017a
+  .word $0171
+  .word $0168
+  .word $0160
+  .word $0158
+  .word $0150
+  .word $0149
+  .word $0142
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $0129
+  .word $0123
+  .word $011e
+  .word $0118
+  .word $0113
+  .word $010e
+  .word $010a
+  .word $0105
+  .word $0101
+  .word $00fc
+  .word $00f8
+  .word $00f4
+  .word $00f0
+  .word $00ed
+  .word $00e9
+  .word $00e5
+  .word $00e2
+  .word $00df
+  .word $00db
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00cf
+  .word $00cd
+  .word $00ca
+  .word $00c7
+  .word $00c5
+  .word $00c2
+  .word $00c0
+  .word $00bd
+  .word $00bb
+  .word $00b9
+  .word $00b6
+  .word $00b4
+  .word $00b2
+  .word $00b0
+  .word $00ae
+  .word $00ac
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a5
+  .word $00a3
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009a
+  .word $0099
+  .word $0097
+  .word $0096
+  .word $0094
+  .word $0093
+  .word $0092
+  .word $0090
+  .word $008f
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
 .segment "Mode7TblAB"
 m7a_m7b_7:
-  .word $00bc, $03b1
-  .word $00b2, $037d
-  .word $00a8, $034e
-  .word $00a0, $0323
-  .word $0098, $02fd
-  .word $0091, $02da
-  .word $008b, $02bb
-  .word $0085, $029e
-  .word $0080, $0283
-  .word $007b, $026a
-  .word $0076, $0253
-  .word $0072, $023e
-  .word $006e, $022a
-  .word $006b, $0218
-  .word $0067, $0206
-  .word $0064, $01f6
-  .word $0061, $01e7
-  .word $005e, $01d9
-  .word $005b, $01cb
-  .word $0059, $01be
-  .word $0056, $01b2
-  .word $0054, $01a7
-  .word $0052, $019c
-  .word $0050, $0192
-  .word $004e, $0188
-  .word $004c, $017f
-  .word $004a, $0176
-  .word $0049, $016d
-  .word $0047, $0165
-  .word $0045, $015d
-  .word $0044, $0156
-  .word $0043, $014f
-  .word $0041, $0148
-  .word $0040, $0141
-  .word $003f, $013b
-  .word $003d, $0135
-  .word $003c, $012f
-  .word $003b, $012a
-  .word $003a, $0124
-  .word $0039, $011f
-  .word $0038, $011a
-  .word $0037, $0115
-  .word $0036, $0110
-  .word $0035, $010c
-  .word $0034, $0107
-  .word $0034, $0103
-  .word $0033, $00ff
-  .word $0032, $00fb
-  .word $0031, $00f7
-  .word $0030, $00f3
-  .word $0030, $00f0
-  .word $002f, $00ec
-  .word $002e, $00e9
-  .word $002e, $00e6
-  .word $002d, $00e2
-  .word $002c, $00df
-  .word $002c, $00dc
-  .word $002b, $00d9
-  .word $002b, $00d6
-  .word $002a, $00d3
-  .word $002a, $00d1
-  .word $0029, $00ce
-  .word $0028, $00cb
-  .word $0028, $00c9
-  .word $0027, $00c6
-  .word $0027, $00c4
-  .word $0027, $00c2
-  .word $0026, $00bf
-  .word $0026, $00bd
-  .word $0025, $00bb
-  .word $0025, $00b9
-  .word $0024, $00b7
-  .word $0024, $00b5
-  .word $0024, $00b3
-  .word $0023, $00b1
-  .word $0023, $00af
-  .word $0022, $00ad
-  .word $0022, $00ab
-  .word $0022, $00a9
-  .word $0021, $00a7
-  .word $0021, $00a6
-  .word $0021, $00a4
-  .word $0020, $00a2
-  .word $0020, $00a1
-  .word $0020, $009f
-  .word $001f, $009e
-  .word $001f, $009c
-  .word $001f, $009b
-  .word $001e, $0099
-  .word $001e, $0098
-  .word $001e, $0096
-  .word $001e, $0095
-  .word $001d, $0093
-  .word $001d, $0092
-  .word $001d, $0091
-  .word $001d, $008f
-  .word $001c, $008e
-  .word $001c, $008d
-  .word $001c, $008c
-  .word $001c, $008b
-  .word $001b, $0089
-  .word $001b, $0088
-  .word $001b, $0087
-  .word $001b, $0086
-  .word $001a, $0085
-  .word $001a, $0084
-  .word $001a, $0083
-  .word $001a, $0082
-  .word $001a, $0081
-  .word $0019, $0080
-  .word $0019, $007f
-  .word $0019, $007e
-  .word $0019, $007d
-  .word $0019, $007c
-  .word $0018, $007b
-  .word $0018, $007a
-  .word $0018, $0079
-  .word $0018, $0078
-  .word $0018, $0077
-  .word $0018, $0076
-  .word $0017, $0075
-  .word $0017, $0074
-  .word $0017, $0074
-  .word $0017, $0073
-  .word $0017, $0072
-  .word $0017, $0071
-  .word $0016, $0070
-  .word $0016, $0070
-  .word $0016, $006f
-  .word $0016, $006e
-  .word $0016, $006d
-  .word $0016, $006d
-  .word $0015, $006c
-  .word $0015, $006b
-  .word $0015, $006a
-  .word $0015, $006a
-  .word $0015, $0069
-  .word $0015, $0068
-  .word $0015, $0068
-  .word $0014, $0067
-  .word $0014, $0066
-  .word $0014, $0066
-  .word $0014, $0065
-  .word $0014, $0064
-  .word $0014, $0064
-  .word $0014, $0063
-  .word $0014, $0063
-  .word $0013, $0062
-  .word $0013, $0061
-  .word $0013, $0061
-  .word $0013, $0060
-  .word $0013, $0060
-  .word $0013, $005f
-  .word $0013, $005f
-  .word $0013, $005e
-  .word $0013, $005d
-  .word $0012, $005d
-  .word $0012, $005c
-  .word $0012, $005c
-  .word $0012, $005b
-  .word $0012, $005b
-  .word $0012, $005a
-  .word $0012, $005a
-  .word $0012, $0059
-  .word $0012, $0059
-  .word $0012, $0058
-  .word $0011, $0058
-  .word $0011, $0057
-  .word $0011, $0057
-  .word $0011, $0056
-  .word $0011, $0056
-  .word $0011, $0055
-  .word $0011, $0055
-  .word $0011, $0055
-  .word $0011, $0054
-  .word $0011, $0054
+  .word $03b1
+  .word $037d
+  .word $034e
+  .word $0323
+  .word $02fd
+  .word $02da
+  .word $02bb
+  .word $029e
+  .word $0283
+  .word $026a
+  .word $0253
+  .word $023e
+  .word $022a
+  .word $0218
+  .word $0206
+  .word $01f6
+  .word $01e7
+  .word $01d9
+  .word $01cb
+  .word $01be
+  .word $01b2
+  .word $01a7
+  .word $019c
+  .word $0192
+  .word $0188
+  .word $017f
+  .word $0176
+  .word $016d
+  .word $0165
+  .word $015d
+  .word $0156
+  .word $014f
+  .word $0148
+  .word $0141
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $012a
+  .word $0124
+  .word $011f
+  .word $011a
+  .word $0115
+  .word $0110
+  .word $010c
+  .word $0107
+  .word $0103
+  .word $00ff
+  .word $00fb
+  .word $00f7
+  .word $00f3
+  .word $00f0
+  .word $00ec
+  .word $00e9
+  .word $00e6
+  .word $00e2
+  .word $00df
+  .word $00dc
+  .word $00d9
+  .word $00d6
+  .word $00d3
+  .word $00d1
+  .word $00ce
+  .word $00cb
+  .word $00c9
+  .word $00c6
+  .word $00c4
+  .word $00c2
+  .word $00bf
+  .word $00bd
+  .word $00bb
+  .word $00b9
+  .word $00b7
+  .word $00b5
+  .word $00b3
+  .word $00b1
+  .word $00af
+  .word $00ad
+  .word $00ab
+  .word $00a9
+  .word $00a7
+  .word $00a6
+  .word $00a4
+  .word $00a2
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009b
+  .word $0099
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0093
+  .word $0092
+  .word $0091
+  .word $008f
+  .word $008e
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $0089
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
 .segment "Mode7TblAB"
 m7a_m7b_8:
-  .word $0000, $03c4
-  .word $0000, $038e
-  .word $0000, $035e
-  .word $0000, $0333
-  .word $0000, $030c
-  .word $0000, $02e9
-  .word $0000, $02c8
-  .word $0000, $02ab
-  .word $0000, $028f
-  .word $0000, $0276
-  .word $0000, $025f
-  .word $0000, $0249
-  .word $0000, $0235
-  .word $0000, $0222
-  .word $0000, $0211
-  .word $0000, $0200
-  .word $0000, $01f0
-  .word $0000, $01e2
-  .word $0000, $01d4
-  .word $0000, $01c7
-  .word $0000, $01bb
-  .word $0000, $01af
-  .word $0000, $01a4
-  .word $0000, $019a
-  .word $0000, $0190
-  .word $0000, $0186
-  .word $0000, $017d
-  .word $0000, $0174
-  .word $0000, $016c
-  .word $0000, $0164
-  .word $0000, $015d
-  .word $0000, $0155
-  .word $0000, $014e
-  .word $0000, $0148
-  .word $0000, $0141
-  .word $0000, $013b
-  .word $0000, $0135
-  .word $0000, $012f
-  .word $0000, $012a
-  .word $0000, $0125
-  .word $0000, $011f
-  .word $0000, $011a
-  .word $0000, $0116
-  .word $0000, $0111
-  .word $0000, $010d
-  .word $0000, $0108
-  .word $0000, $0104
-  .word $0000, $0100
-  .word $0000, $00fc
-  .word $0000, $00f8
-  .word $0000, $00f5
-  .word $0000, $00f1
-  .word $0000, $00ed
-  .word $0000, $00ea
-  .word $0000, $00e7
-  .word $0000, $00e4
-  .word $0000, $00e0
-  .word $0000, $00dd
-  .word $0000, $00da
-  .word $0000, $00d8
-  .word $0000, $00d5
-  .word $0000, $00d2
-  .word $0000, $00cf
-  .word $0000, $00cd
-  .word $0000, $00ca
-  .word $0000, $00c8
-  .word $0000, $00c5
-  .word $0000, $00c3
-  .word $0000, $00c1
-  .word $0000, $00bf
-  .word $0000, $00bc
-  .word $0000, $00ba
-  .word $0000, $00b8
-  .word $0000, $00b6
-  .word $0000, $00b4
-  .word $0000, $00b2
-  .word $0000, $00b0
-  .word $0000, $00ae
-  .word $0000, $00ac
-  .word $0000, $00ab
-  .word $0000, $00a9
-  .word $0000, $00a7
-  .word $0000, $00a5
-  .word $0000, $00a4
-  .word $0000, $00a2
-  .word $0000, $00a1
-  .word $0000, $009f
-  .word $0000, $009e
-  .word $0000, $009c
-  .word $0000, $009b
-  .word $0000, $0099
-  .word $0000, $0098
-  .word $0000, $0096
-  .word $0000, $0095
-  .word $0000, $0094
-  .word $0000, $0092
-  .word $0000, $0091
-  .word $0000, $0090
-  .word $0000, $008e
-  .word $0000, $008d
-  .word $0000, $008c
-  .word $0000, $008b
-  .word $0000, $008a
-  .word $0000, $0089
-  .word $0000, $0087
-  .word $0000, $0086
-  .word $0000, $0085
-  .word $0000, $0084
-  .word $0000, $0083
-  .word $0000, $0082
-  .word $0000, $0081
-  .word $0000, $0080
-  .word $0000, $007f
-  .word $0000, $007e
-  .word $0000, $007d
-  .word $0000, $007c
-  .word $0000, $007b
-  .word $0000, $007a
-  .word $0000, $0079
-  .word $0000, $0078
-  .word $0000, $0078
-  .word $0000, $0077
-  .word $0000, $0076
-  .word $0000, $0075
-  .word $0000, $0074
-  .word $0000, $0073
-  .word $0000, $0073
-  .word $0000, $0072
-  .word $0000, $0071
-  .word $0000, $0070
-  .word $0000, $006f
-  .word $0000, $006f
-  .word $0000, $006e
-  .word $0000, $006d
-  .word $0000, $006d
-  .word $0000, $006c
-  .word $0000, $006b
-  .word $0000, $006a
-  .word $0000, $006a
-  .word $0000, $0069
-  .word $0000, $0068
-  .word $0000, $0068
-  .word $0000, $0067
-  .word $0000, $0066
-  .word $0000, $0066
-  .word $0000, $0065
-  .word $0000, $0065
-  .word $0000, $0064
-  .word $0000, $0063
-  .word $0000, $0063
-  .word $0000, $0062
-  .word $0000, $0062
-  .word $0000, $0061
-  .word $0000, $0060
-  .word $0000, $0060
-  .word $0000, $005f
-  .word $0000, $005f
-  .word $0000, $005e
-  .word $0000, $005e
-  .word $0000, $005d
-  .word $0000, $005d
-  .word $0000, $005c
-  .word $0000, $005c
-  .word $0000, $005b
-  .word $0000, $005b
-  .word $0000, $005a
-  .word $0000, $005a
-  .word $0000, $0059
-  .word $0000, $0059
-  .word $0000, $0058
-  .word $0000, $0058
-  .word $0000, $0057
-  .word $0000, $0057
-  .word $0000, $0056
-  .word $0000, $0056
-  .word $0000, $0055
+  .word $03c4
+  .word $038e
+  .word $035e
+  .word $0333
+  .word $030c
+  .word $02e9
+  .word $02c8
+  .word $02ab
+  .word $028f
+  .word $0276
+  .word $025f
+  .word $0249
+  .word $0235
+  .word $0222
+  .word $0211
+  .word $0200
+  .word $01f0
+  .word $01e2
+  .word $01d4
+  .word $01c7
+  .word $01bb
+  .word $01af
+  .word $01a4
+  .word $019a
+  .word $0190
+  .word $0186
+  .word $017d
+  .word $0174
+  .word $016c
+  .word $0164
+  .word $015d
+  .word $0155
+  .word $014e
+  .word $0148
+  .word $0141
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $012a
+  .word $0125
+  .word $011f
+  .word $011a
+  .word $0116
+  .word $0111
+  .word $010d
+  .word $0108
+  .word $0104
+  .word $0100
+  .word $00fc
+  .word $00f8
+  .word $00f5
+  .word $00f1
+  .word $00ed
+  .word $00ea
+  .word $00e7
+  .word $00e4
+  .word $00e0
+  .word $00dd
+  .word $00da
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00cf
+  .word $00cd
+  .word $00ca
+  .word $00c8
+  .word $00c5
+  .word $00c3
+  .word $00c1
+  .word $00bf
+  .word $00bc
+  .word $00ba
+  .word $00b8
+  .word $00b6
+  .word $00b4
+  .word $00b2
+  .word $00b0
+  .word $00ae
+  .word $00ac
+  .word $00ab
+  .word $00a9
+  .word $00a7
+  .word $00a5
+  .word $00a4
+  .word $00a2
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009b
+  .word $0099
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0094
+  .word $0092
+  .word $0091
+  .word $0090
+  .word $008e
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0089
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
 .segment "Mode7TblAB"
 m7a_m7b_9:
-  .word $ff44, $03b1
-  .word $ff4e, $037d
-  .word $ff58, $034e
-  .word $ff60, $0323
-  .word $ff68, $02fd
-  .word $ff6f, $02da
-  .word $ff75, $02bb
-  .word $ff7b, $029e
-  .word $ff80, $0283
-  .word $ff85, $026a
-  .word $ff8a, $0253
-  .word $ff8e, $023e
-  .word $ff92, $022a
-  .word $ff95, $0218
-  .word $ff99, $0206
-  .word $ff9c, $01f6
-  .word $ff9f, $01e7
-  .word $ffa2, $01d9
-  .word $ffa5, $01cb
-  .word $ffa7, $01be
-  .word $ffaa, $01b2
-  .word $ffac, $01a7
-  .word $ffae, $019c
-  .word $ffb0, $0192
-  .word $ffb2, $0188
-  .word $ffb4, $017f
-  .word $ffb6, $0176
-  .word $ffb7, $016d
-  .word $ffb9, $0165
-  .word $ffbb, $015d
-  .word $ffbc, $0156
-  .word $ffbd, $014f
-  .word $ffbf, $0148
-  .word $ffc0, $0141
-  .word $ffc1, $013b
-  .word $ffc3, $0135
-  .word $ffc4, $012f
-  .word $ffc5, $012a
-  .word $ffc6, $0124
-  .word $ffc7, $011f
-  .word $ffc8, $011a
-  .word $ffc9, $0115
-  .word $ffca, $0110
-  .word $ffcb, $010c
-  .word $ffcc, $0107
-  .word $ffcc, $0103
-  .word $ffcd, $00ff
-  .word $ffce, $00fb
-  .word $ffcf, $00f7
-  .word $ffd0, $00f3
-  .word $ffd0, $00f0
-  .word $ffd1, $00ec
-  .word $ffd2, $00e9
-  .word $ffd2, $00e6
-  .word $ffd3, $00e2
-  .word $ffd4, $00df
-  .word $ffd4, $00dc
-  .word $ffd5, $00d9
-  .word $ffd5, $00d6
-  .word $ffd6, $00d3
-  .word $ffd6, $00d1
-  .word $ffd7, $00ce
-  .word $ffd8, $00cb
-  .word $ffd8, $00c9
-  .word $ffd9, $00c6
-  .word $ffd9, $00c4
-  .word $ffd9, $00c2
-  .word $ffda, $00bf
-  .word $ffda, $00bd
-  .word $ffdb, $00bb
-  .word $ffdb, $00b9
-  .word $ffdc, $00b7
-  .word $ffdc, $00b5
-  .word $ffdc, $00b3
-  .word $ffdd, $00b1
-  .word $ffdd, $00af
-  .word $ffde, $00ad
-  .word $ffde, $00ab
-  .word $ffde, $00a9
-  .word $ffdf, $00a7
-  .word $ffdf, $00a6
-  .word $ffdf, $00a4
-  .word $ffe0, $00a2
-  .word $ffe0, $00a1
-  .word $ffe0, $009f
-  .word $ffe1, $009e
-  .word $ffe1, $009c
-  .word $ffe1, $009b
-  .word $ffe2, $0099
-  .word $ffe2, $0098
-  .word $ffe2, $0096
-  .word $ffe2, $0095
-  .word $ffe3, $0093
-  .word $ffe3, $0092
-  .word $ffe3, $0091
-  .word $ffe3, $008f
-  .word $ffe4, $008e
-  .word $ffe4, $008d
-  .word $ffe4, $008c
-  .word $ffe4, $008b
-  .word $ffe5, $0089
-  .word $ffe5, $0088
-  .word $ffe5, $0087
-  .word $ffe5, $0086
-  .word $ffe6, $0085
-  .word $ffe6, $0084
-  .word $ffe6, $0083
-  .word $ffe6, $0082
-  .word $ffe6, $0081
-  .word $ffe7, $0080
-  .word $ffe7, $007f
-  .word $ffe7, $007e
-  .word $ffe7, $007d
-  .word $ffe7, $007c
-  .word $ffe8, $007b
-  .word $ffe8, $007a
-  .word $ffe8, $0079
-  .word $ffe8, $0078
-  .word $ffe8, $0077
-  .word $ffe8, $0076
-  .word $ffe9, $0075
-  .word $ffe9, $0074
-  .word $ffe9, $0074
-  .word $ffe9, $0073
-  .word $ffe9, $0072
-  .word $ffe9, $0071
-  .word $ffea, $0070
-  .word $ffea, $0070
-  .word $ffea, $006f
-  .word $ffea, $006e
-  .word $ffea, $006d
-  .word $ffea, $006d
-  .word $ffeb, $006c
-  .word $ffeb, $006b
-  .word $ffeb, $006a
-  .word $ffeb, $006a
-  .word $ffeb, $0069
-  .word $ffeb, $0068
-  .word $ffeb, $0068
-  .word $ffec, $0067
-  .word $ffec, $0066
-  .word $ffec, $0066
-  .word $ffec, $0065
-  .word $ffec, $0064
-  .word $ffec, $0064
-  .word $ffec, $0063
-  .word $ffec, $0063
-  .word $ffed, $0062
-  .word $ffed, $0061
-  .word $ffed, $0061
-  .word $ffed, $0060
-  .word $ffed, $0060
-  .word $ffed, $005f
-  .word $ffed, $005f
-  .word $ffed, $005e
-  .word $ffed, $005d
-  .word $ffee, $005d
-  .word $ffee, $005c
-  .word $ffee, $005c
-  .word $ffee, $005b
-  .word $ffee, $005b
-  .word $ffee, $005a
-  .word $ffee, $005a
-  .word $ffee, $0059
-  .word $ffee, $0059
-  .word $ffee, $0058
-  .word $ffef, $0058
-  .word $ffef, $0057
-  .word $ffef, $0057
-  .word $ffef, $0056
-  .word $ffef, $0056
-  .word $ffef, $0055
-  .word $ffef, $0055
-  .word $ffef, $0055
-  .word $ffef, $0054
-  .word $ffef, $0054
+  .word $03b1
+  .word $037d
+  .word $034e
+  .word $0323
+  .word $02fd
+  .word $02da
+  .word $02bb
+  .word $029e
+  .word $0283
+  .word $026a
+  .word $0253
+  .word $023e
+  .word $022a
+  .word $0218
+  .word $0206
+  .word $01f6
+  .word $01e7
+  .word $01d9
+  .word $01cb
+  .word $01be
+  .word $01b2
+  .word $01a7
+  .word $019c
+  .word $0192
+  .word $0188
+  .word $017f
+  .word $0176
+  .word $016d
+  .word $0165
+  .word $015d
+  .word $0156
+  .word $014f
+  .word $0148
+  .word $0141
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $012a
+  .word $0124
+  .word $011f
+  .word $011a
+  .word $0115
+  .word $0110
+  .word $010c
+  .word $0107
+  .word $0103
+  .word $00ff
+  .word $00fb
+  .word $00f7
+  .word $00f3
+  .word $00f0
+  .word $00ec
+  .word $00e9
+  .word $00e6
+  .word $00e2
+  .word $00df
+  .word $00dc
+  .word $00d9
+  .word $00d6
+  .word $00d3
+  .word $00d1
+  .word $00ce
+  .word $00cb
+  .word $00c9
+  .word $00c6
+  .word $00c4
+  .word $00c2
+  .word $00bf
+  .word $00bd
+  .word $00bb
+  .word $00b9
+  .word $00b7
+  .word $00b5
+  .word $00b3
+  .word $00b1
+  .word $00af
+  .word $00ad
+  .word $00ab
+  .word $00a9
+  .word $00a7
+  .word $00a6
+  .word $00a4
+  .word $00a2
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009b
+  .word $0099
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0093
+  .word $0092
+  .word $0091
+  .word $008f
+  .word $008e
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $0089
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
 .segment "Mode7TblAB"
 m7a_m7b_10:
-  .word $fe8f, $037a
-  .word $fea4, $0349
-  .word $feb6, $031d
-  .word $fec7, $02f5
-  .word $fed5, $02d1
-  .word $fee3, $02b0
-  .word $feef, $0292
-  .word $fefb, $0277
-  .word $ff05, $025d
-  .word $ff0f, $0246
-  .word $ff18, $0231
-  .word $ff20, $021d
-  .word $ff28, $020a
-  .word $ff2f, $01f9
-  .word $ff36, $01e8
-  .word $ff3c, $01d9
-  .word $ff42, $01cb
-  .word $ff48, $01bd
-  .word $ff4d, $01b0
-  .word $ff52, $01a4
-  .word $ff57, $0199
-  .word $ff5b, $018e
-  .word $ff5f, $0184
-  .word $ff63, $017a
-  .word $ff67, $0171
-  .word $ff6b, $0168
-  .word $ff6e, $0160
-  .word $ff72, $0158
-  .word $ff75, $0150
-  .word $ff78, $0149
-  .word $ff7b, $0142
-  .word $ff7d, $013b
-  .word $ff80, $0135
-  .word $ff83, $012f
-  .word $ff85, $0129
-  .word $ff87, $0123
-  .word $ff8a, $011e
-  .word $ff8c, $0118
-  .word $ff8e, $0113
-  .word $ff90, $010e
-  .word $ff92, $010a
-  .word $ff94, $0105
-  .word $ff96, $0101
-  .word $ff98, $00fc
-  .word $ff99, $00f8
-  .word $ff9b, $00f4
-  .word $ff9c, $00f0
-  .word $ff9e, $00ed
-  .word $ffa0, $00e9
-  .word $ffa1, $00e5
-  .word $ffa2, $00e2
-  .word $ffa4, $00df
-  .word $ffa5, $00db
-  .word $ffa6, $00d8
-  .word $ffa8, $00d5
-  .word $ffa9, $00d2
-  .word $ffaa, $00cf
-  .word $ffab, $00cd
-  .word $ffac, $00ca
-  .word $ffae, $00c7
-  .word $ffaf, $00c5
-  .word $ffb0, $00c2
-  .word $ffb1, $00c0
-  .word $ffb2, $00bd
-  .word $ffb3, $00bb
-  .word $ffb4, $00b9
-  .word $ffb4, $00b6
-  .word $ffb5, $00b4
-  .word $ffb6, $00b2
-  .word $ffb7, $00b0
-  .word $ffb8, $00ae
-  .word $ffb9, $00ac
-  .word $ffba, $00aa
-  .word $ffba, $00a8
-  .word $ffbb, $00a6
-  .word $ffbc, $00a5
-  .word $ffbd, $00a3
-  .word $ffbd, $00a1
-  .word $ffbe, $009f
-  .word $ffbf, $009e
-  .word $ffbf, $009c
-  .word $ffc0, $009a
-  .word $ffc1, $0099
-  .word $ffc1, $0097
-  .word $ffc2, $0096
-  .word $ffc3, $0094
-  .word $ffc3, $0093
-  .word $ffc4, $0092
-  .word $ffc4, $0090
-  .word $ffc5, $008f
-  .word $ffc5, $008d
-  .word $ffc6, $008c
-  .word $ffc6, $008b
-  .word $ffc7, $008a
-  .word $ffc8, $0088
-  .word $ffc8, $0087
-  .word $ffc9, $0086
-  .word $ffc9, $0085
-  .word $ffc9, $0084
-  .word $ffca, $0082
-  .word $ffca, $0081
-  .word $ffcb, $0080
-  .word $ffcb, $007f
-  .word $ffcc, $007e
-  .word $ffcc, $007d
-  .word $ffcd, $007c
-  .word $ffcd, $007b
-  .word $ffcd, $007a
-  .word $ffce, $0079
-  .word $ffce, $0078
-  .word $ffcf, $0077
-  .word $ffcf, $0076
-  .word $ffcf, $0075
-  .word $ffd0, $0074
-  .word $ffd0, $0074
-  .word $ffd1, $0073
-  .word $ffd1, $0072
-  .word $ffd1, $0071
-  .word $ffd2, $0070
-  .word $ffd2, $006f
-  .word $ffd2, $006e
-  .word $ffd3, $006e
-  .word $ffd3, $006d
-  .word $ffd3, $006c
-  .word $ffd4, $006b
-  .word $ffd4, $006b
-  .word $ffd4, $006a
-  .word $ffd4, $0069
-  .word $ffd5, $0068
-  .word $ffd5, $0068
-  .word $ffd5, $0067
-  .word $ffd6, $0066
-  .word $ffd6, $0066
-  .word $ffd6, $0065
-  .word $ffd6, $0064
-  .word $ffd7, $0064
-  .word $ffd7, $0063
-  .word $ffd7, $0062
-  .word $ffd8, $0062
-  .word $ffd8, $0061
-  .word $ffd8, $0060
-  .word $ffd8, $0060
-  .word $ffd9, $005f
-  .word $ffd9, $005f
-  .word $ffd9, $005e
-  .word $ffd9, $005d
-  .word $ffda, $005d
-  .word $ffda, $005c
-  .word $ffda, $005c
-  .word $ffda, $005b
-  .word $ffda, $005b
-  .word $ffdb, $005a
-  .word $ffdb, $005a
-  .word $ffdb, $0059
-  .word $ffdb, $0059
-  .word $ffdc, $0058
-  .word $ffdc, $0057
-  .word $ffdc, $0057
-  .word $ffdc, $0056
-  .word $ffdc, $0056
-  .word $ffdd, $0056
-  .word $ffdd, $0055
-  .word $ffdd, $0055
-  .word $ffdd, $0054
-  .word $ffdd, $0054
-  .word $ffde, $0053
-  .word $ffde, $0053
-  .word $ffde, $0052
-  .word $ffde, $0052
-  .word $ffde, $0051
-  .word $ffde, $0051
-  .word $ffdf, $0051
-  .word $ffdf, $0050
-  .word $ffdf, $0050
-  .word $ffdf, $004f
-  .word $ffdf, $004f
+  .word $037a
+  .word $0349
+  .word $031d
+  .word $02f5
+  .word $02d1
+  .word $02b0
+  .word $0292
+  .word $0277
+  .word $025d
+  .word $0246
+  .word $0231
+  .word $021d
+  .word $020a
+  .word $01f9
+  .word $01e8
+  .word $01d9
+  .word $01cb
+  .word $01bd
+  .word $01b0
+  .word $01a4
+  .word $0199
+  .word $018e
+  .word $0184
+  .word $017a
+  .word $0171
+  .word $0168
+  .word $0160
+  .word $0158
+  .word $0150
+  .word $0149
+  .word $0142
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $0129
+  .word $0123
+  .word $011e
+  .word $0118
+  .word $0113
+  .word $010e
+  .word $010a
+  .word $0105
+  .word $0101
+  .word $00fc
+  .word $00f8
+  .word $00f4
+  .word $00f0
+  .word $00ed
+  .word $00e9
+  .word $00e5
+  .word $00e2
+  .word $00df
+  .word $00db
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00cf
+  .word $00cd
+  .word $00ca
+  .word $00c7
+  .word $00c5
+  .word $00c2
+  .word $00c0
+  .word $00bd
+  .word $00bb
+  .word $00b9
+  .word $00b6
+  .word $00b4
+  .word $00b2
+  .word $00b0
+  .word $00ae
+  .word $00ac
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a5
+  .word $00a3
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009a
+  .word $0099
+  .word $0097
+  .word $0096
+  .word $0094
+  .word $0093
+  .word $0092
+  .word $0090
+  .word $008f
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
 .segment "Mode7TblAB"
 m7a_m7b_11:
-  .word $fde9, $0321
-  .word $fe06, $02f5
-  .word $fe21, $02cd
-  .word $fe39, $02a9
-  .word $fe4f, $0289
-  .word $fe62, $026b
-  .word $fe74, $0250
-  .word $fe85, $0238
-  .word $fe94, $0221
-  .word $fea2, $020c
-  .word $feaf, $01f9
-  .word $febb, $01e7
-  .word $fec6, $01d6
-  .word $fed1, $01c6
-  .word $feda, $01b7
-  .word $fee4, $01aa
-  .word $feec, $019d
-  .word $fef4, $0191
-  .word $fefc, $0185
-  .word $ff03, $017a
-  .word $ff0a, $0170
-  .word $ff10, $0166
-  .word $ff17, $015d
-  .word $ff1c, $0155
-  .word $ff22, $014c
-  .word $ff27, $0144
-  .word $ff2c, $013d
-  .word $ff31, $0136
-  .word $ff36, $012f
-  .word $ff3a, $0128
-  .word $ff3e, $0122
-  .word $ff42, $011c
-  .word $ff46, $0116
-  .word $ff4a, $0110
-  .word $ff4e, $010b
-  .word $ff51, $0106
-  .word $ff54, $0101
-  .word $ff57, $00fc
-  .word $ff5b, $00f8
-  .word $ff5d, $00f3
-  .word $ff60, $00ef
-  .word $ff63, $00eb
-  .word $ff66, $00e7
-  .word $ff68, $00e3
-  .word $ff6b, $00df
-  .word $ff6d, $00dc
-  .word $ff70, $00d8
-  .word $ff72, $00d5
-  .word $ff74, $00d2
-  .word $ff76, $00ce
-  .word $ff78, $00cb
-  .word $ff7a, $00c8
-  .word $ff7c, $00c5
-  .word $ff7e, $00c3
-  .word $ff80, $00c0
-  .word $ff82, $00bd
-  .word $ff83, $00bb
-  .word $ff85, $00b8
-  .word $ff87, $00b6
-  .word $ff88, $00b3
-  .word $ff8a, $00b1
-  .word $ff8b, $00af
-  .word $ff8d, $00ac
-  .word $ff8e, $00aa
-  .word $ff90, $00a8
-  .word $ff91, $00a6
-  .word $ff92, $00a4
-  .word $ff94, $00a2
-  .word $ff95, $00a0
-  .word $ff96, $009e
-  .word $ff97, $009d
-  .word $ff99, $009b
-  .word $ff9a, $0099
-  .word $ff9b, $0097
-  .word $ff9c, $0096
-  .word $ff9d, $0094
-  .word $ff9e, $0092
-  .word $ff9f, $0091
-  .word $ffa0, $008f
-  .word $ffa1, $008e
-  .word $ffa2, $008c
-  .word $ffa3, $008b
-  .word $ffa4, $008a
-  .word $ffa5, $0088
-  .word $ffa6, $0087
-  .word $ffa7, $0086
-  .word $ffa8, $0084
-  .word $ffa8, $0083
-  .word $ffa9, $0082
-  .word $ffaa, $0081
-  .word $ffab, $007f
-  .word $ffac, $007e
-  .word $ffac, $007d
-  .word $ffad, $007c
-  .word $ffae, $007b
-  .word $ffaf, $007a
-  .word $ffaf, $0079
-  .word $ffb0, $0077
-  .word $ffb1, $0076
-  .word $ffb2, $0075
-  .word $ffb2, $0074
-  .word $ffb3, $0073
-  .word $ffb4, $0072
-  .word $ffb4, $0072
-  .word $ffb5, $0071
-  .word $ffb5, $0070
-  .word $ffb6, $006f
-  .word $ffb7, $006e
-  .word $ffb7, $006d
-  .word $ffb8, $006c
-  .word $ffb8, $006b
-  .word $ffb9, $006a
-  .word $ffb9, $006a
-  .word $ffba, $0069
-  .word $ffbb, $0068
-  .word $ffbb, $0067
-  .word $ffbc, $0066
-  .word $ffbc, $0066
-  .word $ffbd, $0065
-  .word $ffbd, $0064
-  .word $ffbe, $0063
-  .word $ffbe, $0063
-  .word $ffbf, $0062
-  .word $ffbf, $0061
-  .word $ffbf, $0061
-  .word $ffc0, $0060
-  .word $ffc0, $005f
-  .word $ffc1, $005f
-  .word $ffc1, $005e
-  .word $ffc2, $005d
-  .word $ffc2, $005d
-  .word $ffc2, $005c
-  .word $ffc3, $005b
-  .word $ffc3, $005b
-  .word $ffc4, $005a
-  .word $ffc4, $005a
-  .word $ffc5, $0059
-  .word $ffc5, $0058
-  .word $ffc5, $0058
-  .word $ffc6, $0057
-  .word $ffc6, $0057
-  .word $ffc6, $0056
-  .word $ffc7, $0056
-  .word $ffc7, $0055
-  .word $ffc7, $0055
-  .word $ffc8, $0054
-  .word $ffc8, $0054
-  .word $ffc8, $0053
-  .word $ffc9, $0053
-  .word $ffc9, $0052
-  .word $ffc9, $0052
-  .word $ffca, $0051
-  .word $ffca, $0051
-  .word $ffca, $0050
-  .word $ffcb, $0050
-  .word $ffcb, $004f
-  .word $ffcb, $004f
-  .word $ffcc, $004e
-  .word $ffcc, $004e
-  .word $ffcc, $004d
-  .word $ffcd, $004d
-  .word $ffcd, $004d
-  .word $ffcd, $004c
-  .word $ffcd, $004c
-  .word $ffce, $004b
-  .word $ffce, $004b
-  .word $ffce, $004a
-  .word $ffcf, $004a
-  .word $ffcf, $004a
-  .word $ffcf, $0049
-  .word $ffcf, $0049
-  .word $ffd0, $0048
-  .word $ffd0, $0048
-  .word $ffd0, $0048
-  .word $ffd0, $0047
-  .word $ffd1, $0047
+  .word $0321
+  .word $02f5
+  .word $02cd
+  .word $02a9
+  .word $0289
+  .word $026b
+  .word $0250
+  .word $0238
+  .word $0221
+  .word $020c
+  .word $01f9
+  .word $01e7
+  .word $01d6
+  .word $01c6
+  .word $01b7
+  .word $01aa
+  .word $019d
+  .word $0191
+  .word $0185
+  .word $017a
+  .word $0170
+  .word $0166
+  .word $015d
+  .word $0155
+  .word $014c
+  .word $0144
+  .word $013d
+  .word $0136
+  .word $012f
+  .word $0128
+  .word $0122
+  .word $011c
+  .word $0116
+  .word $0110
+  .word $010b
+  .word $0106
+  .word $0101
+  .word $00fc
+  .word $00f8
+  .word $00f3
+  .word $00ef
+  .word $00eb
+  .word $00e7
+  .word $00e3
+  .word $00df
+  .word $00dc
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00ce
+  .word $00cb
+  .word $00c8
+  .word $00c5
+  .word $00c3
+  .word $00c0
+  .word $00bd
+  .word $00bb
+  .word $00b8
+  .word $00b6
+  .word $00b3
+  .word $00b1
+  .word $00af
+  .word $00ac
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a4
+  .word $00a2
+  .word $00a0
+  .word $009e
+  .word $009d
+  .word $009b
+  .word $0099
+  .word $0097
+  .word $0096
+  .word $0094
+  .word $0092
+  .word $0091
+  .word $008f
+  .word $008e
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004d
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $004a
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
 .segment "Mode7TblAB"
 m7a_m7b_12:
-  .word $fd57, $02a9
-  .word $fd7c, $0284
-  .word $fd9e, $0262
-  .word $fdbd, $0243
-  .word $fdd8, $0228
-  .word $fdf1, $020f
-  .word $fe08, $01f8
-  .word $fe1d, $01e3
-  .word $fe31, $01cf
-  .word $fe42, $01be
-  .word $fe53, $01ad
-  .word $fe62, $019e
-  .word $fe71, $018f
-  .word $fe7e, $0182
-  .word $fe8a, $0176
-  .word $fe96, $016a
-  .word $fea1, $015f
-  .word $feab, $0155
-  .word $feb5, $014b
-  .word $febe, $0142
-  .word $fec7, $0139
-  .word $fecf, $0131
-  .word $fed7, $0129
-  .word $fede, $0122
-  .word $fee5, $011b
-  .word $feec, $0114
-  .word $fef3, $010d
-  .word $fef9, $0107
-  .word $feff, $0101
-  .word $ff04, $00fc
-  .word $ff0a, $00f6
-  .word $ff0f, $00f1
-  .word $ff14, $00ec
-  .word $ff18, $00e8
-  .word $ff1d, $00e3
-  .word $ff21, $00df
-  .word $ff25, $00db
-  .word $ff29, $00d7
-  .word $ff2d, $00d3
-  .word $ff31, $00cf
-  .word $ff35, $00cb
-  .word $ff38, $00c8
-  .word $ff3c, $00c4
-  .word $ff3f, $00c1
-  .word $ff42, $00be
-  .word $ff45, $00bb
-  .word $ff48, $00b8
-  .word $ff4b, $00b5
-  .word $ff4e, $00b2
-  .word $ff50, $00b0
-  .word $ff53, $00ad
-  .word $ff56, $00aa
-  .word $ff58, $00a8
-  .word $ff5a, $00a6
-  .word $ff5d, $00a3
-  .word $ff5f, $00a1
-  .word $ff61, $009f
-  .word $ff63, $009d
-  .word $ff66, $009a
-  .word $ff68, $0098
-  .word $ff6a, $0096
-  .word $ff6b, $0095
-  .word $ff6d, $0093
-  .word $ff6f, $0091
-  .word $ff71, $008f
-  .word $ff73, $008d
-  .word $ff74, $008c
-  .word $ff76, $008a
-  .word $ff78, $0088
-  .word $ff79, $0087
-  .word $ff7b, $0085
-  .word $ff7c, $0084
-  .word $ff7e, $0082
-  .word $ff7f, $0081
-  .word $ff81, $007f
-  .word $ff82, $007e
-  .word $ff83, $007d
-  .word $ff85, $007b
-  .word $ff86, $007a
-  .word $ff87, $0079
-  .word $ff89, $0077
-  .word $ff8a, $0076
-  .word $ff8b, $0075
-  .word $ff8c, $0074
-  .word $ff8d, $0073
-  .word $ff8e, $0072
-  .word $ff90, $0070
-  .word $ff91, $006f
-  .word $ff92, $006e
-  .word $ff93, $006d
-  .word $ff94, $006c
-  .word $ff95, $006b
-  .word $ff96, $006a
-  .word $ff97, $0069
-  .word $ff98, $0068
-  .word $ff99, $0067
-  .word $ff99, $0067
-  .word $ff9a, $0066
-  .word $ff9b, $0065
-  .word $ff9c, $0064
-  .word $ff9d, $0063
-  .word $ff9e, $0062
-  .word $ff9f, $0061
-  .word $ff9f, $0061
-  .word $ffa0, $0060
-  .word $ffa1, $005f
-  .word $ffa2, $005e
-  .word $ffa3, $005d
-  .word $ffa3, $005d
-  .word $ffa4, $005c
-  .word $ffa5, $005b
-  .word $ffa5, $005b
-  .word $ffa6, $005a
-  .word $ffa7, $0059
-  .word $ffa8, $0058
-  .word $ffa8, $0058
-  .word $ffa9, $0057
-  .word $ffaa, $0056
-  .word $ffaa, $0056
-  .word $ffab, $0055
-  .word $ffab, $0055
-  .word $ffac, $0054
-  .word $ffad, $0053
-  .word $ffad, $0053
-  .word $ffae, $0052
-  .word $ffae, $0052
-  .word $ffaf, $0051
-  .word $ffb0, $0050
-  .word $ffb0, $0050
-  .word $ffb1, $004f
-  .word $ffb1, $004f
-  .word $ffb2, $004e
-  .word $ffb2, $004e
-  .word $ffb3, $004d
-  .word $ffb3, $004d
-  .word $ffb4, $004c
-  .word $ffb4, $004c
-  .word $ffb5, $004b
-  .word $ffb5, $004b
-  .word $ffb6, $004a
-  .word $ffb6, $004a
-  .word $ffb7, $0049
-  .word $ffb7, $0049
-  .word $ffb8, $0048
-  .word $ffb8, $0048
-  .word $ffb8, $0048
-  .word $ffb9, $0047
-  .word $ffb9, $0047
-  .word $ffba, $0046
-  .word $ffba, $0046
-  .word $ffbb, $0045
-  .word $ffbb, $0045
-  .word $ffbb, $0045
-  .word $ffbc, $0044
-  .word $ffbc, $0044
-  .word $ffbd, $0043
-  .word $ffbd, $0043
-  .word $ffbd, $0043
-  .word $ffbe, $0042
-  .word $ffbe, $0042
-  .word $ffbf, $0041
-  .word $ffbf, $0041
-  .word $ffbf, $0041
-  .word $ffc0, $0040
-  .word $ffc0, $0040
-  .word $ffc0, $0040
-  .word $ffc1, $003f
-  .word $ffc1, $003f
-  .word $ffc1, $003f
-  .word $ffc2, $003e
-  .word $ffc2, $003e
-  .word $ffc2, $003e
-  .word $ffc3, $003d
-  .word $ffc3, $003d
-  .word $ffc3, $003d
-  .word $ffc4, $003c
+  .word $02a9
+  .word $0284
+  .word $0262
+  .word $0243
+  .word $0228
+  .word $020f
+  .word $01f8
+  .word $01e3
+  .word $01cf
+  .word $01be
+  .word $01ad
+  .word $019e
+  .word $018f
+  .word $0182
+  .word $0176
+  .word $016a
+  .word $015f
+  .word $0155
+  .word $014b
+  .word $0142
+  .word $0139
+  .word $0131
+  .word $0129
+  .word $0122
+  .word $011b
+  .word $0114
+  .word $010d
+  .word $0107
+  .word $0101
+  .word $00fc
+  .word $00f6
+  .word $00f1
+  .word $00ec
+  .word $00e8
+  .word $00e3
+  .word $00df
+  .word $00db
+  .word $00d7
+  .word $00d3
+  .word $00cf
+  .word $00cb
+  .word $00c8
+  .word $00c4
+  .word $00c1
+  .word $00be
+  .word $00bb
+  .word $00b8
+  .word $00b5
+  .word $00b2
+  .word $00b0
+  .word $00ad
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a3
+  .word $00a1
+  .word $009f
+  .word $009d
+  .word $009a
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0093
+  .word $0091
+  .word $008f
+  .word $008d
+  .word $008c
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0085
+  .word $0084
+  .word $0082
+  .word $0081
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0067
+  .word $0067
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+  .word $0046
+  .word $0046
+  .word $0045
+  .word $0045
+  .word $0045
+  .word $0044
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $0040
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003e
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003d
+  .word $003c
 .segment "Mode7TblAB"
 m7a_m7b_13:
-  .word $fcdf, $0217
-  .word $fd0b, $01fa
-  .word $fd33, $01df
-  .word $fd57, $01c7
-  .word $fd77, $01b1
-  .word $fd95, $019e
-  .word $fdb0, $018c
-  .word $fdc8, $017b
-  .word $fddf, $016c
-  .word $fdf4, $015e
-  .word $fe07, $0151
-  .word $fe19, $0145
-  .word $fe2a, $013a
-  .word $fe3a, $012f
-  .word $fe49, $0126
-  .word $fe56, $011c
-  .word $fe63, $0114
-  .word $fe6f, $010c
-  .word $fe7b, $0104
-  .word $fe86, $00fd
-  .word $fe90, $00f6
-  .word $fe9a, $00f0
-  .word $fea3, $00e9
-  .word $feab, $00e4
-  .word $feb4, $00de
-  .word $febc, $00d9
-  .word $fec3, $00d4
-  .word $feca, $00cf
-  .word $fed1, $00ca
-  .word $fed8, $00c6
-  .word $fede, $00c2
-  .word $fee4, $00be
-  .word $feea, $00ba
-  .word $fef0, $00b6
-  .word $fef5, $00b2
-  .word $fefa, $00af
-  .word $feff, $00ac
-  .word $ff04, $00a9
-  .word $ff08, $00a5
-  .word $ff0d, $00a3
-  .word $ff11, $00a0
-  .word $ff15, $009d
-  .word $ff19, $009a
-  .word $ff1d, $0098
-  .word $ff21, $0095
-  .word $ff24, $0093
-  .word $ff28, $0090
-  .word $ff2b, $008e
-  .word $ff2e, $008c
-  .word $ff32, $008a
-  .word $ff35, $0088
-  .word $ff38, $0086
-  .word $ff3b, $0084
-  .word $ff3d, $0082
-  .word $ff40, $0080
-  .word $ff43, $007e
-  .word $ff45, $007d
-  .word $ff48, $007b
-  .word $ff4a, $0079
-  .word $ff4d, $0078
-  .word $ff4f, $0076
-  .word $ff51, $0075
-  .word $ff54, $0073
-  .word $ff56, $0072
-  .word $ff58, $0070
-  .word $ff5a, $006f
-  .word $ff5c, $006e
-  .word $ff5e, $006c
-  .word $ff60, $006b
-  .word $ff62, $006a
-  .word $ff63, $0069
-  .word $ff65, $0067
-  .word $ff67, $0066
-  .word $ff69, $0065
-  .word $ff6a, $0064
-  .word $ff6c, $0063
-  .word $ff6e, $0062
-  .word $ff6f, $0061
-  .word $ff71, $0060
-  .word $ff72, $005f
-  .word $ff74, $005e
-  .word $ff75, $005d
-  .word $ff76, $005c
-  .word $ff78, $005b
-  .word $ff79, $005a
-  .word $ff7a, $0059
-  .word $ff7c, $0058
-  .word $ff7d, $0058
-  .word $ff7e, $0057
-  .word $ff7f, $0056
-  .word $ff81, $0055
-  .word $ff82, $0054
-  .word $ff83, $0054
-  .word $ff84, $0053
-  .word $ff85, $0052
-  .word $ff86, $0051
-  .word $ff87, $0051
-  .word $ff89, $0050
-  .word $ff8a, $004f
-  .word $ff8b, $004e
-  .word $ff8c, $004e
-  .word $ff8d, $004d
-  .word $ff8e, $004c
-  .word $ff8e, $004c
-  .word $ff8f, $004b
-  .word $ff90, $004b
-  .word $ff91, $004a
-  .word $ff92, $0049
-  .word $ff93, $0049
-  .word $ff94, $0048
-  .word $ff95, $0048
-  .word $ff96, $0047
-  .word $ff96, $0047
-  .word $ff97, $0046
-  .word $ff98, $0045
-  .word $ff99, $0045
-  .word $ff9a, $0044
-  .word $ff9a, $0044
-  .word $ff9b, $0043
-  .word $ff9c, $0043
-  .word $ff9d, $0042
-  .word $ff9d, $0042
-  .word $ff9e, $0041
-  .word $ff9f, $0041
-  .word $ff9f, $0041
-  .word $ffa0, $0040
-  .word $ffa1, $0040
-  .word $ffa1, $003f
-  .word $ffa2, $003f
-  .word $ffa3, $003e
-  .word $ffa3, $003e
-  .word $ffa4, $003e
-  .word $ffa5, $003d
-  .word $ffa5, $003d
-  .word $ffa6, $003c
-  .word $ffa6, $003c
-  .word $ffa7, $003b
-  .word $ffa8, $003b
-  .word $ffa8, $003b
-  .word $ffa9, $003a
-  .word $ffa9, $003a
-  .word $ffaa, $003a
-  .word $ffaa, $0039
-  .word $ffab, $0039
-  .word $ffab, $0039
-  .word $ffac, $0038
-  .word $ffac, $0038
-  .word $ffad, $0038
-  .word $ffad, $0037
-  .word $ffae, $0037
-  .word $ffae, $0037
-  .word $ffaf, $0036
-  .word $ffaf, $0036
-  .word $ffb0, $0036
-  .word $ffb0, $0035
-  .word $ffb1, $0035
-  .word $ffb1, $0035
-  .word $ffb2, $0034
-  .word $ffb2, $0034
-  .word $ffb3, $0034
-  .word $ffb3, $0033
-  .word $ffb3, $0033
-  .word $ffb4, $0033
-  .word $ffb4, $0033
-  .word $ffb5, $0032
-  .word $ffb5, $0032
-  .word $ffb6, $0032
-  .word $ffb6, $0031
-  .word $ffb6, $0031
-  .word $ffb7, $0031
-  .word $ffb7, $0031
-  .word $ffb8, $0030
-  .word $ffb8, $0030
-  .word $ffb8, $0030
-  .word $ffb9, $0030
-  .word $ffb9, $002f
+  .word $0217
+  .word $01fa
+  .word $01df
+  .word $01c7
+  .word $01b1
+  .word $019e
+  .word $018c
+  .word $017b
+  .word $016c
+  .word $015e
+  .word $0151
+  .word $0145
+  .word $013a
+  .word $012f
+  .word $0126
+  .word $011c
+  .word $0114
+  .word $010c
+  .word $0104
+  .word $00fd
+  .word $00f6
+  .word $00f0
+  .word $00e9
+  .word $00e4
+  .word $00de
+  .word $00d9
+  .word $00d4
+  .word $00cf
+  .word $00ca
+  .word $00c6
+  .word $00c2
+  .word $00be
+  .word $00ba
+  .word $00b6
+  .word $00b2
+  .word $00af
+  .word $00ac
+  .word $00a9
+  .word $00a5
+  .word $00a3
+  .word $00a0
+  .word $009d
+  .word $009a
+  .word $0098
+  .word $0095
+  .word $0093
+  .word $0090
+  .word $008e
+  .word $008c
+  .word $008a
+  .word $0088
+  .word $0086
+  .word $0084
+  .word $0082
+  .word $0080
+  .word $007e
+  .word $007d
+  .word $007b
+  .word $0079
+  .word $0078
+  .word $0076
+  .word $0075
+  .word $0073
+  .word $0072
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0067
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+  .word $0046
+  .word $0045
+  .word $0045
+  .word $0044
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003e
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003c
+  .word $003c
+  .word $003b
+  .word $003b
+  .word $003b
+  .word $003a
+  .word $003a
+  .word $003a
+  .word $0039
+  .word $0039
+  .word $0039
+  .word $0038
+  .word $0038
+  .word $0038
+  .word $0037
+  .word $0037
+  .word $0037
+  .word $0036
+  .word $0036
+  .word $0036
+  .word $0035
+  .word $0035
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0032
+  .word $0032
+  .word $0032
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $0030
+  .word $0030
+  .word $002f
 .segment "Mode7TblAB"
 m7a_m7b_14:
-  .word $fc86, $0171
-  .word $fcb7, $015c
-  .word $fce3, $014a
-  .word $fd0b, $0139
-  .word $fd2f, $012b
-  .word $fd50, $011d
-  .word $fd6e, $0111
-  .word $fd89, $0105
-  .word $fda3, $00fb
-  .word $fdba, $00f1
-  .word $fdcf, $00e8
-  .word $fde3, $00e0
-  .word $fdf6, $00d8
-  .word $fe07, $00d1
-  .word $fe18, $00ca
-  .word $fe27, $00c4
-  .word $fe35, $00be
-  .word $fe43, $00b8
-  .word $fe50, $00b3
-  .word $fe5c, $00ae
-  .word $fe67, $00a9
-  .word $fe72, $00a5
-  .word $fe7c, $00a1
-  .word $fe86, $009d
-  .word $fe8f, $0099
-  .word $fe98, $0095
-  .word $fea0, $0092
-  .word $fea8, $008e
-  .word $feb0, $008b
-  .word $feb7, $0088
-  .word $febe, $0085
-  .word $fec5, $0083
-  .word $fecb, $0080
-  .word $fed1, $007d
-  .word $fed7, $007b
-  .word $fedd, $0079
-  .word $fee2, $0076
-  .word $fee8, $0074
-  .word $feed, $0072
-  .word $fef2, $0070
-  .word $fef6, $006e
-  .word $fefb, $006c
-  .word $feff, $006a
-  .word $ff04, $0068
-  .word $ff08, $0067
-  .word $ff0c, $0065
-  .word $ff10, $0064
-  .word $ff13, $0062
-  .word $ff17, $0060
-  .word $ff1b, $005f
-  .word $ff1e, $005e
-  .word $ff21, $005c
-  .word $ff25, $005b
-  .word $ff28, $005a
-  .word $ff2b, $0058
-  .word $ff2e, $0057
-  .word $ff31, $0056
-  .word $ff33, $0055
-  .word $ff36, $0054
-  .word $ff39, $0052
-  .word $ff3b, $0051
-  .word $ff3e, $0050
-  .word $ff40, $004f
-  .word $ff43, $004e
-  .word $ff45, $004d
-  .word $ff47, $004c
-  .word $ff4a, $004c
-  .word $ff4c, $004b
-  .word $ff4e, $004a
-  .word $ff50, $0049
-  .word $ff52, $0048
-  .word $ff54, $0047
-  .word $ff56, $0046
-  .word $ff58, $0046
-  .word $ff5a, $0045
-  .word $ff5b, $0044
-  .word $ff5d, $0043
-  .word $ff5f, $0043
-  .word $ff61, $0042
-  .word $ff62, $0041
-  .word $ff64, $0041
-  .word $ff66, $0040
-  .word $ff67, $003f
-  .word $ff69, $003f
-  .word $ff6a, $003e
-  .word $ff6c, $003d
-  .word $ff6d, $003d
-  .word $ff6e, $003c
-  .word $ff70, $003c
-  .word $ff71, $003b
-  .word $ff73, $003b
-  .word $ff74, $003a
-  .word $ff75, $003a
-  .word $ff76, $0039
-  .word $ff78, $0038
-  .word $ff79, $0038
-  .word $ff7a, $0037
-  .word $ff7b, $0037
-  .word $ff7c, $0037
-  .word $ff7e, $0036
-  .word $ff7f, $0036
-  .word $ff80, $0035
-  .word $ff81, $0035
-  .word $ff82, $0034
-  .word $ff83, $0034
-  .word $ff84, $0033
-  .word $ff85, $0033
-  .word $ff86, $0033
-  .word $ff87, $0032
-  .word $ff88, $0032
-  .word $ff89, $0031
-  .word $ff8a, $0031
-  .word $ff8b, $0031
-  .word $ff8c, $0030
-  .word $ff8c, $0030
-  .word $ff8d, $002f
-  .word $ff8e, $002f
-  .word $ff8f, $002f
-  .word $ff90, $002e
-  .word $ff91, $002e
-  .word $ff92, $002e
-  .word $ff92, $002d
-  .word $ff93, $002d
-  .word $ff94, $002d
-  .word $ff95, $002c
-  .word $ff95, $002c
-  .word $ff96, $002c
-  .word $ff97, $002c
-  .word $ff98, $002b
-  .word $ff98, $002b
-  .word $ff99, $002b
-  .word $ff9a, $002a
-  .word $ff9a, $002a
-  .word $ff9b, $002a
-  .word $ff9c, $002a
-  .word $ff9c, $0029
-  .word $ff9d, $0029
-  .word $ff9e, $0029
-  .word $ff9e, $0028
-  .word $ff9f, $0028
-  .word $ffa0, $0028
-  .word $ffa0, $0028
-  .word $ffa1, $0027
-  .word $ffa1, $0027
-  .word $ffa2, $0027
-  .word $ffa3, $0027
-  .word $ffa3, $0026
-  .word $ffa4, $0026
-  .word $ffa4, $0026
-  .word $ffa5, $0026
-  .word $ffa5, $0026
-  .word $ffa6, $0025
-  .word $ffa6, $0025
-  .word $ffa7, $0025
-  .word $ffa7, $0025
-  .word $ffa8, $0024
-  .word $ffa9, $0024
-  .word $ffa9, $0024
-  .word $ffaa, $0024
-  .word $ffaa, $0024
-  .word $ffaa, $0023
-  .word $ffab, $0023
-  .word $ffab, $0023
-  .word $ffac, $0023
-  .word $ffac, $0023
-  .word $ffad, $0022
-  .word $ffad, $0022
-  .word $ffae, $0022
-  .word $ffae, $0022
-  .word $ffaf, $0022
-  .word $ffaf, $0022
-  .word $ffaf, $0021
-  .word $ffb0, $0021
-  .word $ffb0, $0021
-  .word $ffb1, $0021
-  .word $ffb1, $0021
+  .word $0171
+  .word $015c
+  .word $014a
+  .word $0139
+  .word $012b
+  .word $011d
+  .word $0111
+  .word $0105
+  .word $00fb
+  .word $00f1
+  .word $00e8
+  .word $00e0
+  .word $00d8
+  .word $00d1
+  .word $00ca
+  .word $00c4
+  .word $00be
+  .word $00b8
+  .word $00b3
+  .word $00ae
+  .word $00a9
+  .word $00a5
+  .word $00a1
+  .word $009d
+  .word $0099
+  .word $0095
+  .word $0092
+  .word $008e
+  .word $008b
+  .word $0088
+  .word $0085
+  .word $0083
+  .word $0080
+  .word $007d
+  .word $007b
+  .word $0079
+  .word $0076
+  .word $0074
+  .word $0072
+  .word $0070
+  .word $006e
+  .word $006c
+  .word $006a
+  .word $0068
+  .word $0067
+  .word $0065
+  .word $0064
+  .word $0062
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005c
+  .word $005b
+  .word $005a
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0055
+  .word $0054
+  .word $0052
+  .word $0051
+  .word $0050
+  .word $004f
+  .word $004e
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004a
+  .word $0049
+  .word $0048
+  .word $0047
+  .word $0046
+  .word $0046
+  .word $0045
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003c
+  .word $003c
+  .word $003b
+  .word $003b
+  .word $003a
+  .word $003a
+  .word $0039
+  .word $0038
+  .word $0038
+  .word $0037
+  .word $0037
+  .word $0037
+  .word $0036
+  .word $0036
+  .word $0035
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0032
+  .word $0032
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $002f
+  .word $002f
+  .word $002f
+  .word $002e
+  .word $002e
+  .word $002e
+  .word $002d
+  .word $002d
+  .word $002d
+  .word $002c
+  .word $002c
+  .word $002c
+  .word $002c
+  .word $002b
+  .word $002b
+  .word $002b
+  .word $002a
+  .word $002a
+  .word $002a
+  .word $002a
+  .word $0029
+  .word $0029
+  .word $0029
+  .word $0028
+  .word $0028
+  .word $0028
+  .word $0028
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0025
+  .word $0025
+  .word $0025
+  .word $0025
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0021
 .segment "Mode7TblAB"
 m7a_m7b_15:
-  .word $fc4f, $00bc
-  .word $fc83, $00b2
-  .word $fcb2, $00a8
-  .word $fcdd, $00a0
-  .word $fd03, $0098
-  .word $fd26, $0091
-  .word $fd45, $008b
-  .word $fd62, $0085
-  .word $fd7d, $0080
-  .word $fd96, $007b
-  .word $fdad, $0076
-  .word $fdc2, $0072
-  .word $fdd6, $006e
-  .word $fde8, $006b
-  .word $fdfa, $0067
-  .word $fe0a, $0064
-  .word $fe19, $0061
-  .word $fe27, $005e
-  .word $fe35, $005b
-  .word $fe42, $0059
-  .word $fe4e, $0056
-  .word $fe59, $0054
-  .word $fe64, $0052
-  .word $fe6e, $0050
-  .word $fe78, $004e
-  .word $fe81, $004c
-  .word $fe8a, $004a
-  .word $fe93, $0049
-  .word $fe9b, $0047
-  .word $fea3, $0045
-  .word $feaa, $0044
-  .word $feb1, $0043
-  .word $feb8, $0041
-  .word $febf, $0040
-  .word $fec5, $003f
-  .word $fecb, $003d
-  .word $fed1, $003c
-  .word $fed6, $003b
-  .word $fedc, $003a
-  .word $fee1, $0039
-  .word $fee6, $0038
-  .word $feeb, $0037
-  .word $fef0, $0036
-  .word $fef4, $0035
-  .word $fef9, $0034
-  .word $fefd, $0034
-  .word $ff01, $0033
-  .word $ff05, $0032
-  .word $ff09, $0031
-  .word $ff0d, $0030
-  .word $ff10, $0030
-  .word $ff14, $002f
-  .word $ff17, $002e
-  .word $ff1a, $002e
-  .word $ff1e, $002d
-  .word $ff21, $002c
-  .word $ff24, $002c
-  .word $ff27, $002b
-  .word $ff2a, $002b
-  .word $ff2d, $002a
-  .word $ff2f, $002a
-  .word $ff32, $0029
-  .word $ff35, $0028
-  .word $ff37, $0028
-  .word $ff3a, $0027
-  .word $ff3c, $0027
-  .word $ff3e, $0027
-  .word $ff41, $0026
-  .word $ff43, $0026
-  .word $ff45, $0025
-  .word $ff47, $0025
-  .word $ff49, $0024
-  .word $ff4b, $0024
-  .word $ff4d, $0024
-  .word $ff4f, $0023
-  .word $ff51, $0023
-  .word $ff53, $0022
-  .word $ff55, $0022
-  .word $ff57, $0022
-  .word $ff59, $0021
-  .word $ff5a, $0021
-  .word $ff5c, $0021
-  .word $ff5e, $0020
-  .word $ff5f, $0020
-  .word $ff61, $0020
-  .word $ff62, $001f
-  .word $ff64, $001f
-  .word $ff65, $001f
-  .word $ff67, $001e
-  .word $ff68, $001e
-  .word $ff6a, $001e
-  .word $ff6b, $001e
-  .word $ff6d, $001d
-  .word $ff6e, $001d
-  .word $ff6f, $001d
-  .word $ff71, $001d
-  .word $ff72, $001c
-  .word $ff73, $001c
-  .word $ff74, $001c
-  .word $ff75, $001c
-  .word $ff77, $001b
-  .word $ff78, $001b
-  .word $ff79, $001b
-  .word $ff7a, $001b
-  .word $ff7b, $001a
-  .word $ff7c, $001a
-  .word $ff7d, $001a
-  .word $ff7e, $001a
-  .word $ff7f, $001a
-  .word $ff80, $0019
-  .word $ff81, $0019
-  .word $ff82, $0019
-  .word $ff83, $0019
-  .word $ff84, $0019
-  .word $ff85, $0018
-  .word $ff86, $0018
-  .word $ff87, $0018
-  .word $ff88, $0018
-  .word $ff89, $0018
-  .word $ff8a, $0018
-  .word $ff8b, $0017
-  .word $ff8c, $0017
-  .word $ff8c, $0017
-  .word $ff8d, $0017
-  .word $ff8e, $0017
-  .word $ff8f, $0017
-  .word $ff90, $0016
-  .word $ff90, $0016
-  .word $ff91, $0016
-  .word $ff92, $0016
-  .word $ff93, $0016
-  .word $ff93, $0016
-  .word $ff94, $0015
-  .word $ff95, $0015
-  .word $ff96, $0015
-  .word $ff96, $0015
-  .word $ff97, $0015
-  .word $ff98, $0015
-  .word $ff98, $0015
-  .word $ff99, $0014
-  .word $ff9a, $0014
-  .word $ff9a, $0014
-  .word $ff9b, $0014
-  .word $ff9c, $0014
-  .word $ff9c, $0014
-  .word $ff9d, $0014
-  .word $ff9d, $0014
-  .word $ff9e, $0013
-  .word $ff9f, $0013
-  .word $ff9f, $0013
-  .word $ffa0, $0013
-  .word $ffa0, $0013
-  .word $ffa1, $0013
-  .word $ffa1, $0013
-  .word $ffa2, $0013
-  .word $ffa3, $0013
-  .word $ffa3, $0012
-  .word $ffa4, $0012
-  .word $ffa4, $0012
-  .word $ffa5, $0012
-  .word $ffa5, $0012
-  .word $ffa6, $0012
-  .word $ffa6, $0012
-  .word $ffa7, $0012
-  .word $ffa7, $0012
-  .word $ffa8, $0012
-  .word $ffa8, $0011
-  .word $ffa9, $0011
-  .word $ffa9, $0011
-  .word $ffaa, $0011
-  .word $ffaa, $0011
-  .word $ffab, $0011
-  .word $ffab, $0011
-  .word $ffab, $0011
-  .word $ffac, $0011
-  .word $ffac, $0011
+  .word $00bc
+  .word $00b2
+  .word $00a8
+  .word $00a0
+  .word $0098
+  .word $0091
+  .word $008b
+  .word $0085
+  .word $0080
+  .word $007b
+  .word $0076
+  .word $0072
+  .word $006e
+  .word $006b
+  .word $0067
+  .word $0064
+  .word $0061
+  .word $005e
+  .word $005b
+  .word $0059
+  .word $0056
+  .word $0054
+  .word $0052
+  .word $0050
+  .word $004e
+  .word $004c
+  .word $004a
+  .word $0049
+  .word $0047
+  .word $0045
+  .word $0044
+  .word $0043
+  .word $0041
+  .word $0040
+  .word $003f
+  .word $003d
+  .word $003c
+  .word $003b
+  .word $003a
+  .word $0039
+  .word $0038
+  .word $0037
+  .word $0036
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0032
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $002f
+  .word $002e
+  .word $002e
+  .word $002d
+  .word $002c
+  .word $002c
+  .word $002b
+  .word $002b
+  .word $002a
+  .word $002a
+  .word $0029
+  .word $0028
+  .word $0028
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0026
+  .word $0026
+  .word $0025
+  .word $0025
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0023
+  .word $0023
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0020
+  .word $0020
+  .word $0020
+  .word $001f
+  .word $001f
+  .word $001f
+  .word $001e
+  .word $001e
+  .word $001e
+  .word $001e
+  .word $001d
+  .word $001d
+  .word $001d
+  .word $001d
+  .word $001c
+  .word $001c
+  .word $001c
+  .word $001c
+  .word $001b
+  .word $001b
+  .word $001b
+  .word $001b
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
 .segment "Mode7TblAB"
 m7a_m7b_16:
-  .word $fc3c, $0000
-  .word $fc72, $0000
-  .word $fca2, $0000
-  .word $fccd, $0000
-  .word $fcf4, $0000
-  .word $fd17, $0000
-  .word $fd38, $0000
-  .word $fd55, $0000
-  .word $fd71, $0000
-  .word $fd8a, $0000
-  .word $fda1, $0000
-  .word $fdb7, $0000
-  .word $fdcb, $0000
-  .word $fdde, $0000
-  .word $fdef, $0000
-  .word $fe00, $0000
-  .word $fe10, $0000
-  .word $fe1e, $0000
-  .word $fe2c, $0000
-  .word $fe39, $0000
-  .word $fe45, $0000
-  .word $fe51, $0000
-  .word $fe5c, $0000
-  .word $fe66, $0000
-  .word $fe70, $0000
-  .word $fe7a, $0000
-  .word $fe83, $0000
-  .word $fe8c, $0000
-  .word $fe94, $0000
-  .word $fe9c, $0000
-  .word $fea3, $0000
-  .word $feab, $0000
-  .word $feb2, $0000
-  .word $feb8, $0000
-  .word $febf, $0000
-  .word $fec5, $0000
-  .word $fecb, $0000
-  .word $fed1, $0000
-  .word $fed6, $0000
-  .word $fedb, $0000
-  .word $fee1, $0000
-  .word $fee6, $0000
-  .word $feea, $0000
-  .word $feef, $0000
-  .word $fef3, $0000
-  .word $fef8, $0000
-  .word $fefc, $0000
-  .word $ff00, $0000
-  .word $ff04, $0000
-  .word $ff08, $0000
-  .word $ff0b, $0000
-  .word $ff0f, $0000
-  .word $ff13, $0000
-  .word $ff16, $0000
-  .word $ff19, $0000
-  .word $ff1c, $0000
-  .word $ff20, $0000
-  .word $ff23, $0000
-  .word $ff26, $0000
-  .word $ff28, $0000
-  .word $ff2b, $0000
-  .word $ff2e, $0000
-  .word $ff31, $0000
-  .word $ff33, $0000
-  .word $ff36, $0000
-  .word $ff38, $0000
-  .word $ff3b, $0000
-  .word $ff3d, $0000
-  .word $ff3f, $0000
-  .word $ff41, $0000
-  .word $ff44, $0000
-  .word $ff46, $0000
-  .word $ff48, $0000
-  .word $ff4a, $0000
-  .word $ff4c, $0000
-  .word $ff4e, $0000
-  .word $ff50, $0000
-  .word $ff52, $0000
-  .word $ff54, $0000
-  .word $ff55, $0000
-  .word $ff57, $0000
-  .word $ff59, $0000
-  .word $ff5b, $0000
-  .word $ff5c, $0000
-  .word $ff5e, $0000
-  .word $ff5f, $0000
-  .word $ff61, $0000
-  .word $ff62, $0000
-  .word $ff64, $0000
-  .word $ff65, $0000
-  .word $ff67, $0000
-  .word $ff68, $0000
-  .word $ff6a, $0000
-  .word $ff6b, $0000
-  .word $ff6c, $0000
-  .word $ff6e, $0000
-  .word $ff6f, $0000
-  .word $ff70, $0000
-  .word $ff72, $0000
-  .word $ff73, $0000
-  .word $ff74, $0000
-  .word $ff75, $0000
-  .word $ff76, $0000
-  .word $ff77, $0000
-  .word $ff79, $0000
-  .word $ff7a, $0000
-  .word $ff7b, $0000
-  .word $ff7c, $0000
-  .word $ff7d, $0000
-  .word $ff7e, $0000
-  .word $ff7f, $0000
-  .word $ff80, $0000
-  .word $ff81, $0000
-  .word $ff82, $0000
-  .word $ff83, $0000
-  .word $ff84, $0000
-  .word $ff85, $0000
-  .word $ff86, $0000
-  .word $ff87, $0000
-  .word $ff88, $0000
-  .word $ff88, $0000
-  .word $ff89, $0000
-  .word $ff8a, $0000
-  .word $ff8b, $0000
-  .word $ff8c, $0000
-  .word $ff8d, $0000
-  .word $ff8d, $0000
-  .word $ff8e, $0000
-  .word $ff8f, $0000
-  .word $ff90, $0000
-  .word $ff91, $0000
-  .word $ff91, $0000
-  .word $ff92, $0000
-  .word $ff93, $0000
-  .word $ff93, $0000
-  .word $ff94, $0000
-  .word $ff95, $0000
-  .word $ff96, $0000
-  .word $ff96, $0000
-  .word $ff97, $0000
-  .word $ff98, $0000
-  .word $ff98, $0000
-  .word $ff99, $0000
-  .word $ff9a, $0000
-  .word $ff9a, $0000
-  .word $ff9b, $0000
-  .word $ff9b, $0000
-  .word $ff9c, $0000
-  .word $ff9d, $0000
-  .word $ff9d, $0000
-  .word $ff9e, $0000
-  .word $ff9e, $0000
-  .word $ff9f, $0000
-  .word $ffa0, $0000
-  .word $ffa0, $0000
-  .word $ffa1, $0000
-  .word $ffa1, $0000
-  .word $ffa2, $0000
-  .word $ffa2, $0000
-  .word $ffa3, $0000
-  .word $ffa3, $0000
-  .word $ffa4, $0000
-  .word $ffa4, $0000
-  .word $ffa5, $0000
-  .word $ffa5, $0000
-  .word $ffa6, $0000
-  .word $ffa6, $0000
-  .word $ffa7, $0000
-  .word $ffa7, $0000
-  .word $ffa8, $0000
-  .word $ffa8, $0000
-  .word $ffa9, $0000
-  .word $ffa9, $0000
-  .word $ffaa, $0000
-  .word $ffaa, $0000
-  .word $ffab, $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
 .segment "Mode7TblAB"
 m7a_m7b_17:
-  .word $fc4f, $ff44
-  .word $fc83, $ff4e
-  .word $fcb2, $ff58
-  .word $fcdd, $ff60
-  .word $fd03, $ff68
-  .word $fd26, $ff6f
-  .word $fd45, $ff75
-  .word $fd62, $ff7b
-  .word $fd7d, $ff80
-  .word $fd96, $ff85
-  .word $fdad, $ff8a
-  .word $fdc2, $ff8e
-  .word $fdd6, $ff92
-  .word $fde8, $ff95
-  .word $fdfa, $ff99
-  .word $fe0a, $ff9c
-  .word $fe19, $ff9f
-  .word $fe27, $ffa2
-  .word $fe35, $ffa5
-  .word $fe42, $ffa7
-  .word $fe4e, $ffaa
-  .word $fe59, $ffac
-  .word $fe64, $ffae
-  .word $fe6e, $ffb0
-  .word $fe78, $ffb2
-  .word $fe81, $ffb4
-  .word $fe8a, $ffb6
-  .word $fe93, $ffb7
-  .word $fe9b, $ffb9
-  .word $fea3, $ffbb
-  .word $feaa, $ffbc
-  .word $feb1, $ffbd
-  .word $feb8, $ffbf
-  .word $febf, $ffc0
-  .word $fec5, $ffc1
-  .word $fecb, $ffc3
-  .word $fed1, $ffc4
-  .word $fed6, $ffc5
-  .word $fedc, $ffc6
-  .word $fee1, $ffc7
-  .word $fee6, $ffc8
-  .word $feeb, $ffc9
-  .word $fef0, $ffca
-  .word $fef4, $ffcb
-  .word $fef9, $ffcc
-  .word $fefd, $ffcc
-  .word $ff01, $ffcd
-  .word $ff05, $ffce
-  .word $ff09, $ffcf
-  .word $ff0d, $ffd0
-  .word $ff10, $ffd0
-  .word $ff14, $ffd1
-  .word $ff17, $ffd2
-  .word $ff1a, $ffd2
-  .word $ff1e, $ffd3
-  .word $ff21, $ffd4
-  .word $ff24, $ffd4
-  .word $ff27, $ffd5
-  .word $ff2a, $ffd5
-  .word $ff2d, $ffd6
-  .word $ff2f, $ffd6
-  .word $ff32, $ffd7
-  .word $ff35, $ffd8
-  .word $ff37, $ffd8
-  .word $ff3a, $ffd9
-  .word $ff3c, $ffd9
-  .word $ff3e, $ffd9
-  .word $ff41, $ffda
-  .word $ff43, $ffda
-  .word $ff45, $ffdb
-  .word $ff47, $ffdb
-  .word $ff49, $ffdc
-  .word $ff4b, $ffdc
-  .word $ff4d, $ffdc
-  .word $ff4f, $ffdd
-  .word $ff51, $ffdd
-  .word $ff53, $ffde
-  .word $ff55, $ffde
-  .word $ff57, $ffde
-  .word $ff59, $ffdf
-  .word $ff5a, $ffdf
-  .word $ff5c, $ffdf
-  .word $ff5e, $ffe0
-  .word $ff5f, $ffe0
-  .word $ff61, $ffe0
-  .word $ff62, $ffe1
-  .word $ff64, $ffe1
-  .word $ff65, $ffe1
-  .word $ff67, $ffe2
-  .word $ff68, $ffe2
-  .word $ff6a, $ffe2
-  .word $ff6b, $ffe2
-  .word $ff6d, $ffe3
-  .word $ff6e, $ffe3
-  .word $ff6f, $ffe3
-  .word $ff71, $ffe3
-  .word $ff72, $ffe4
-  .word $ff73, $ffe4
-  .word $ff74, $ffe4
-  .word $ff75, $ffe4
-  .word $ff77, $ffe5
-  .word $ff78, $ffe5
-  .word $ff79, $ffe5
-  .word $ff7a, $ffe5
-  .word $ff7b, $ffe6
-  .word $ff7c, $ffe6
-  .word $ff7d, $ffe6
-  .word $ff7e, $ffe6
-  .word $ff7f, $ffe6
-  .word $ff80, $ffe7
-  .word $ff81, $ffe7
-  .word $ff82, $ffe7
-  .word $ff83, $ffe7
-  .word $ff84, $ffe7
-  .word $ff85, $ffe8
-  .word $ff86, $ffe8
-  .word $ff87, $ffe8
-  .word $ff88, $ffe8
-  .word $ff89, $ffe8
-  .word $ff8a, $ffe8
-  .word $ff8b, $ffe9
-  .word $ff8c, $ffe9
-  .word $ff8c, $ffe9
-  .word $ff8d, $ffe9
-  .word $ff8e, $ffe9
-  .word $ff8f, $ffe9
-  .word $ff90, $ffea
-  .word $ff90, $ffea
-  .word $ff91, $ffea
-  .word $ff92, $ffea
-  .word $ff93, $ffea
-  .word $ff93, $ffea
-  .word $ff94, $ffeb
-  .word $ff95, $ffeb
-  .word $ff96, $ffeb
-  .word $ff96, $ffeb
-  .word $ff97, $ffeb
-  .word $ff98, $ffeb
-  .word $ff98, $ffeb
-  .word $ff99, $ffec
-  .word $ff9a, $ffec
-  .word $ff9a, $ffec
-  .word $ff9b, $ffec
-  .word $ff9c, $ffec
-  .word $ff9c, $ffec
-  .word $ff9d, $ffec
-  .word $ff9d, $ffec
-  .word $ff9e, $ffed
-  .word $ff9f, $ffed
-  .word $ff9f, $ffed
-  .word $ffa0, $ffed
-  .word $ffa0, $ffed
-  .word $ffa1, $ffed
-  .word $ffa1, $ffed
-  .word $ffa2, $ffed
-  .word $ffa3, $ffed
-  .word $ffa3, $ffee
-  .word $ffa4, $ffee
-  .word $ffa4, $ffee
-  .word $ffa5, $ffee
-  .word $ffa5, $ffee
-  .word $ffa6, $ffee
-  .word $ffa6, $ffee
-  .word $ffa7, $ffee
-  .word $ffa7, $ffee
-  .word $ffa8, $ffee
-  .word $ffa8, $ffef
-  .word $ffa9, $ffef
-  .word $ffa9, $ffef
-  .word $ffaa, $ffef
-  .word $ffaa, $ffef
-  .word $ffab, $ffef
-  .word $ffab, $ffef
-  .word $ffab, $ffef
-  .word $ffac, $ffef
-  .word $ffac, $ffef
+  .word $ff44
+  .word $ff4e
+  .word $ff58
+  .word $ff60
+  .word $ff68
+  .word $ff6f
+  .word $ff75
+  .word $ff7b
+  .word $ff80
+  .word $ff85
+  .word $ff8a
+  .word $ff8e
+  .word $ff92
+  .word $ff95
+  .word $ff99
+  .word $ff9c
+  .word $ff9f
+  .word $ffa2
+  .word $ffa5
+  .word $ffa7
+  .word $ffaa
+  .word $ffac
+  .word $ffae
+  .word $ffb0
+  .word $ffb2
+  .word $ffb4
+  .word $ffb6
+  .word $ffb7
+  .word $ffb9
+  .word $ffbb
+  .word $ffbc
+  .word $ffbd
+  .word $ffbf
+  .word $ffc0
+  .word $ffc1
+  .word $ffc3
+  .word $ffc4
+  .word $ffc5
+  .word $ffc6
+  .word $ffc7
+  .word $ffc8
+  .word $ffc9
+  .word $ffca
+  .word $ffcb
+  .word $ffcc
+  .word $ffcc
+  .word $ffcd
+  .word $ffce
+  .word $ffcf
+  .word $ffd0
+  .word $ffd0
+  .word $ffd1
+  .word $ffd2
+  .word $ffd2
+  .word $ffd3
+  .word $ffd4
+  .word $ffd4
+  .word $ffd5
+  .word $ffd5
+  .word $ffd6
+  .word $ffd6
+  .word $ffd7
+  .word $ffd8
+  .word $ffd8
+  .word $ffd9
+  .word $ffd9
+  .word $ffd9
+  .word $ffda
+  .word $ffda
+  .word $ffdb
+  .word $ffdb
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdd
+  .word $ffdd
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
+  .word $ffe0
+  .word $ffe0
+  .word $ffe0
+  .word $ffe1
+  .word $ffe1
+  .word $ffe1
+  .word $ffe2
+  .word $ffe2
+  .word $ffe2
+  .word $ffe2
+  .word $ffe3
+  .word $ffe3
+  .word $ffe3
+  .word $ffe3
+  .word $ffe4
+  .word $ffe4
+  .word $ffe4
+  .word $ffe4
+  .word $ffe5
+  .word $ffe5
+  .word $ffe5
+  .word $ffe5
+  .word $ffe6
+  .word $ffe6
+  .word $ffe6
+  .word $ffe6
+  .word $ffe6
+  .word $ffe7
+  .word $ffe7
+  .word $ffe7
+  .word $ffe7
+  .word $ffe7
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
 .segment "Mode7TblAB"
 m7a_m7b_18:
-  .word $fc86, $fe8f
-  .word $fcb7, $fea4
-  .word $fce3, $feb6
-  .word $fd0b, $fec7
-  .word $fd2f, $fed5
-  .word $fd50, $fee3
-  .word $fd6e, $feef
-  .word $fd89, $fefb
-  .word $fda3, $ff05
-  .word $fdba, $ff0f
-  .word $fdcf, $ff18
-  .word $fde3, $ff20
-  .word $fdf6, $ff28
-  .word $fe07, $ff2f
-  .word $fe18, $ff36
-  .word $fe27, $ff3c
-  .word $fe35, $ff42
-  .word $fe43, $ff48
-  .word $fe50, $ff4d
-  .word $fe5c, $ff52
-  .word $fe67, $ff57
-  .word $fe72, $ff5b
-  .word $fe7c, $ff5f
-  .word $fe86, $ff63
-  .word $fe8f, $ff67
-  .word $fe98, $ff6b
-  .word $fea0, $ff6e
-  .word $fea8, $ff72
-  .word $feb0, $ff75
-  .word $feb7, $ff78
-  .word $febe, $ff7b
-  .word $fec5, $ff7d
-  .word $fecb, $ff80
-  .word $fed1, $ff83
-  .word $fed7, $ff85
-  .word $fedd, $ff87
-  .word $fee2, $ff8a
-  .word $fee8, $ff8c
-  .word $feed, $ff8e
-  .word $fef2, $ff90
-  .word $fef6, $ff92
-  .word $fefb, $ff94
-  .word $feff, $ff96
-  .word $ff04, $ff98
-  .word $ff08, $ff99
-  .word $ff0c, $ff9b
-  .word $ff10, $ff9c
-  .word $ff13, $ff9e
-  .word $ff17, $ffa0
-  .word $ff1b, $ffa1
-  .word $ff1e, $ffa2
-  .word $ff21, $ffa4
-  .word $ff25, $ffa5
-  .word $ff28, $ffa6
-  .word $ff2b, $ffa8
-  .word $ff2e, $ffa9
-  .word $ff31, $ffaa
-  .word $ff33, $ffab
-  .word $ff36, $ffac
-  .word $ff39, $ffae
-  .word $ff3b, $ffaf
-  .word $ff3e, $ffb0
-  .word $ff40, $ffb1
-  .word $ff43, $ffb2
-  .word $ff45, $ffb3
-  .word $ff47, $ffb4
-  .word $ff4a, $ffb4
-  .word $ff4c, $ffb5
-  .word $ff4e, $ffb6
-  .word $ff50, $ffb7
-  .word $ff52, $ffb8
-  .word $ff54, $ffb9
-  .word $ff56, $ffba
-  .word $ff58, $ffba
-  .word $ff5a, $ffbb
-  .word $ff5b, $ffbc
-  .word $ff5d, $ffbd
-  .word $ff5f, $ffbd
-  .word $ff61, $ffbe
-  .word $ff62, $ffbf
-  .word $ff64, $ffbf
-  .word $ff66, $ffc0
-  .word $ff67, $ffc1
-  .word $ff69, $ffc1
-  .word $ff6a, $ffc2
-  .word $ff6c, $ffc3
-  .word $ff6d, $ffc3
-  .word $ff6e, $ffc4
-  .word $ff70, $ffc4
-  .word $ff71, $ffc5
-  .word $ff73, $ffc5
-  .word $ff74, $ffc6
-  .word $ff75, $ffc6
-  .word $ff76, $ffc7
-  .word $ff78, $ffc8
-  .word $ff79, $ffc8
-  .word $ff7a, $ffc9
-  .word $ff7b, $ffc9
-  .word $ff7c, $ffc9
-  .word $ff7e, $ffca
-  .word $ff7f, $ffca
-  .word $ff80, $ffcb
-  .word $ff81, $ffcb
-  .word $ff82, $ffcc
-  .word $ff83, $ffcc
-  .word $ff84, $ffcd
-  .word $ff85, $ffcd
-  .word $ff86, $ffcd
-  .word $ff87, $ffce
-  .word $ff88, $ffce
-  .word $ff89, $ffcf
-  .word $ff8a, $ffcf
-  .word $ff8b, $ffcf
-  .word $ff8c, $ffd0
-  .word $ff8c, $ffd0
-  .word $ff8d, $ffd1
-  .word $ff8e, $ffd1
-  .word $ff8f, $ffd1
-  .word $ff90, $ffd2
-  .word $ff91, $ffd2
-  .word $ff92, $ffd2
-  .word $ff92, $ffd3
-  .word $ff93, $ffd3
-  .word $ff94, $ffd3
-  .word $ff95, $ffd4
-  .word $ff95, $ffd4
-  .word $ff96, $ffd4
-  .word $ff97, $ffd4
-  .word $ff98, $ffd5
-  .word $ff98, $ffd5
-  .word $ff99, $ffd5
-  .word $ff9a, $ffd6
-  .word $ff9a, $ffd6
-  .word $ff9b, $ffd6
-  .word $ff9c, $ffd6
-  .word $ff9c, $ffd7
-  .word $ff9d, $ffd7
-  .word $ff9e, $ffd7
-  .word $ff9e, $ffd8
-  .word $ff9f, $ffd8
-  .word $ffa0, $ffd8
-  .word $ffa0, $ffd8
-  .word $ffa1, $ffd9
-  .word $ffa1, $ffd9
-  .word $ffa2, $ffd9
-  .word $ffa3, $ffd9
-  .word $ffa3, $ffda
-  .word $ffa4, $ffda
-  .word $ffa4, $ffda
-  .word $ffa5, $ffda
-  .word $ffa5, $ffda
-  .word $ffa6, $ffdb
-  .word $ffa6, $ffdb
-  .word $ffa7, $ffdb
-  .word $ffa7, $ffdb
-  .word $ffa8, $ffdc
-  .word $ffa9, $ffdc
-  .word $ffa9, $ffdc
-  .word $ffaa, $ffdc
-  .word $ffaa, $ffdc
-  .word $ffaa, $ffdd
-  .word $ffab, $ffdd
-  .word $ffab, $ffdd
-  .word $ffac, $ffdd
-  .word $ffac, $ffdd
-  .word $ffad, $ffde
-  .word $ffad, $ffde
-  .word $ffae, $ffde
-  .word $ffae, $ffde
-  .word $ffaf, $ffde
-  .word $ffaf, $ffde
-  .word $ffaf, $ffdf
-  .word $ffb0, $ffdf
-  .word $ffb0, $ffdf
-  .word $ffb1, $ffdf
-  .word $ffb1, $ffdf
+  .word $fe8f
+  .word $fea4
+  .word $feb6
+  .word $fec7
+  .word $fed5
+  .word $fee3
+  .word $feef
+  .word $fefb
+  .word $ff05
+  .word $ff0f
+  .word $ff18
+  .word $ff20
+  .word $ff28
+  .word $ff2f
+  .word $ff36
+  .word $ff3c
+  .word $ff42
+  .word $ff48
+  .word $ff4d
+  .word $ff52
+  .word $ff57
+  .word $ff5b
+  .word $ff5f
+  .word $ff63
+  .word $ff67
+  .word $ff6b
+  .word $ff6e
+  .word $ff72
+  .word $ff75
+  .word $ff78
+  .word $ff7b
+  .word $ff7d
+  .word $ff80
+  .word $ff83
+  .word $ff85
+  .word $ff87
+  .word $ff8a
+  .word $ff8c
+  .word $ff8e
+  .word $ff90
+  .word $ff92
+  .word $ff94
+  .word $ff96
+  .word $ff98
+  .word $ff99
+  .word $ff9b
+  .word $ff9c
+  .word $ff9e
+  .word $ffa0
+  .word $ffa1
+  .word $ffa2
+  .word $ffa4
+  .word $ffa5
+  .word $ffa6
+  .word $ffa8
+  .word $ffa9
+  .word $ffaa
+  .word $ffab
+  .word $ffac
+  .word $ffae
+  .word $ffaf
+  .word $ffb0
+  .word $ffb1
+  .word $ffb2
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb6
+  .word $ffb7
+  .word $ffb8
+  .word $ffb9
+  .word $ffba
+  .word $ffba
+  .word $ffbb
+  .word $ffbc
+  .word $ffbd
+  .word $ffbd
+  .word $ffbe
+  .word $ffbf
+  .word $ffbf
+  .word $ffc0
+  .word $ffc1
+  .word $ffc1
+  .word $ffc2
+  .word $ffc3
+  .word $ffc3
+  .word $ffc4
+  .word $ffc4
+  .word $ffc5
+  .word $ffc5
+  .word $ffc6
+  .word $ffc6
+  .word $ffc7
+  .word $ffc8
+  .word $ffc8
+  .word $ffc9
+  .word $ffc9
+  .word $ffc9
+  .word $ffca
+  .word $ffca
+  .word $ffcb
+  .word $ffcb
+  .word $ffcc
+  .word $ffcc
+  .word $ffcd
+  .word $ffcd
+  .word $ffcd
+  .word $ffce
+  .word $ffce
+  .word $ffcf
+  .word $ffcf
+  .word $ffcf
+  .word $ffd0
+  .word $ffd0
+  .word $ffd1
+  .word $ffd1
+  .word $ffd1
+  .word $ffd2
+  .word $ffd2
+  .word $ffd2
+  .word $ffd3
+  .word $ffd3
+  .word $ffd3
+  .word $ffd4
+  .word $ffd4
+  .word $ffd4
+  .word $ffd4
+  .word $ffd5
+  .word $ffd5
+  .word $ffd5
+  .word $ffd6
+  .word $ffd6
+  .word $ffd6
+  .word $ffd6
+  .word $ffd7
+  .word $ffd7
+  .word $ffd7
+  .word $ffd8
+  .word $ffd8
+  .word $ffd8
+  .word $ffd8
+  .word $ffd9
+  .word $ffd9
+  .word $ffd9
+  .word $ffd9
+  .word $ffda
+  .word $ffda
+  .word $ffda
+  .word $ffda
+  .word $ffda
+  .word $ffdb
+  .word $ffdb
+  .word $ffdb
+  .word $ffdb
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdd
+  .word $ffdd
+  .word $ffdd
+  .word $ffdd
+  .word $ffdd
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
 .segment "Mode7TblAB"
 m7a_m7b_19:
-  .word $fcdf, $fde9
-  .word $fd0b, $fe06
-  .word $fd33, $fe21
-  .word $fd57, $fe39
-  .word $fd77, $fe4f
-  .word $fd95, $fe62
-  .word $fdb0, $fe74
-  .word $fdc8, $fe85
-  .word $fddf, $fe94
-  .word $fdf4, $fea2
-  .word $fe07, $feaf
-  .word $fe19, $febb
-  .word $fe2a, $fec6
-  .word $fe3a, $fed1
-  .word $fe49, $feda
-  .word $fe56, $fee4
-  .word $fe63, $feec
-  .word $fe6f, $fef4
-  .word $fe7b, $fefc
-  .word $fe86, $ff03
-  .word $fe90, $ff0a
-  .word $fe9a, $ff10
-  .word $fea3, $ff17
-  .word $feab, $ff1c
-  .word $feb4, $ff22
-  .word $febc, $ff27
-  .word $fec3, $ff2c
-  .word $feca, $ff31
-  .word $fed1, $ff36
-  .word $fed8, $ff3a
-  .word $fede, $ff3e
-  .word $fee4, $ff42
-  .word $feea, $ff46
-  .word $fef0, $ff4a
-  .word $fef5, $ff4e
-  .word $fefa, $ff51
-  .word $feff, $ff54
-  .word $ff04, $ff57
-  .word $ff08, $ff5b
-  .word $ff0d, $ff5d
-  .word $ff11, $ff60
-  .word $ff15, $ff63
-  .word $ff19, $ff66
-  .word $ff1d, $ff68
-  .word $ff21, $ff6b
-  .word $ff24, $ff6d
-  .word $ff28, $ff70
-  .word $ff2b, $ff72
-  .word $ff2e, $ff74
-  .word $ff32, $ff76
-  .word $ff35, $ff78
-  .word $ff38, $ff7a
-  .word $ff3b, $ff7c
-  .word $ff3d, $ff7e
-  .word $ff40, $ff80
-  .word $ff43, $ff82
-  .word $ff45, $ff83
-  .word $ff48, $ff85
-  .word $ff4a, $ff87
-  .word $ff4d, $ff88
-  .word $ff4f, $ff8a
-  .word $ff51, $ff8b
-  .word $ff54, $ff8d
-  .word $ff56, $ff8e
-  .word $ff58, $ff90
-  .word $ff5a, $ff91
-  .word $ff5c, $ff92
-  .word $ff5e, $ff94
-  .word $ff60, $ff95
-  .word $ff62, $ff96
-  .word $ff63, $ff97
-  .word $ff65, $ff99
-  .word $ff67, $ff9a
-  .word $ff69, $ff9b
-  .word $ff6a, $ff9c
-  .word $ff6c, $ff9d
-  .word $ff6e, $ff9e
-  .word $ff6f, $ff9f
-  .word $ff71, $ffa0
-  .word $ff72, $ffa1
-  .word $ff74, $ffa2
-  .word $ff75, $ffa3
-  .word $ff76, $ffa4
-  .word $ff78, $ffa5
-  .word $ff79, $ffa6
-  .word $ff7a, $ffa7
-  .word $ff7c, $ffa8
-  .word $ff7d, $ffa8
-  .word $ff7e, $ffa9
-  .word $ff7f, $ffaa
-  .word $ff81, $ffab
-  .word $ff82, $ffac
-  .word $ff83, $ffac
-  .word $ff84, $ffad
-  .word $ff85, $ffae
-  .word $ff86, $ffaf
-  .word $ff87, $ffaf
-  .word $ff89, $ffb0
-  .word $ff8a, $ffb1
-  .word $ff8b, $ffb2
-  .word $ff8c, $ffb2
-  .word $ff8d, $ffb3
-  .word $ff8e, $ffb4
-  .word $ff8e, $ffb4
-  .word $ff8f, $ffb5
-  .word $ff90, $ffb5
-  .word $ff91, $ffb6
-  .word $ff92, $ffb7
-  .word $ff93, $ffb7
-  .word $ff94, $ffb8
-  .word $ff95, $ffb8
-  .word $ff96, $ffb9
-  .word $ff96, $ffb9
-  .word $ff97, $ffba
-  .word $ff98, $ffbb
-  .word $ff99, $ffbb
-  .word $ff9a, $ffbc
-  .word $ff9a, $ffbc
-  .word $ff9b, $ffbd
-  .word $ff9c, $ffbd
-  .word $ff9d, $ffbe
-  .word $ff9d, $ffbe
-  .word $ff9e, $ffbf
-  .word $ff9f, $ffbf
-  .word $ff9f, $ffbf
-  .word $ffa0, $ffc0
-  .word $ffa1, $ffc0
-  .word $ffa1, $ffc1
-  .word $ffa2, $ffc1
-  .word $ffa3, $ffc2
-  .word $ffa3, $ffc2
-  .word $ffa4, $ffc2
-  .word $ffa5, $ffc3
-  .word $ffa5, $ffc3
-  .word $ffa6, $ffc4
-  .word $ffa6, $ffc4
-  .word $ffa7, $ffc5
-  .word $ffa8, $ffc5
-  .word $ffa8, $ffc5
-  .word $ffa9, $ffc6
-  .word $ffa9, $ffc6
-  .word $ffaa, $ffc6
-  .word $ffaa, $ffc7
-  .word $ffab, $ffc7
-  .word $ffab, $ffc7
-  .word $ffac, $ffc8
-  .word $ffac, $ffc8
-  .word $ffad, $ffc8
-  .word $ffad, $ffc9
-  .word $ffae, $ffc9
-  .word $ffae, $ffc9
-  .word $ffaf, $ffca
-  .word $ffaf, $ffca
-  .word $ffb0, $ffca
-  .word $ffb0, $ffcb
-  .word $ffb1, $ffcb
-  .word $ffb1, $ffcb
-  .word $ffb2, $ffcc
-  .word $ffb2, $ffcc
-  .word $ffb3, $ffcc
-  .word $ffb3, $ffcd
-  .word $ffb3, $ffcd
-  .word $ffb4, $ffcd
-  .word $ffb4, $ffcd
-  .word $ffb5, $ffce
-  .word $ffb5, $ffce
-  .word $ffb6, $ffce
-  .word $ffb6, $ffcf
-  .word $ffb6, $ffcf
-  .word $ffb7, $ffcf
-  .word $ffb7, $ffcf
-  .word $ffb8, $ffd0
-  .word $ffb8, $ffd0
-  .word $ffb8, $ffd0
-  .word $ffb9, $ffd0
-  .word $ffb9, $ffd1
+  .word $fde9
+  .word $fe06
+  .word $fe21
+  .word $fe39
+  .word $fe4f
+  .word $fe62
+  .word $fe74
+  .word $fe85
+  .word $fe94
+  .word $fea2
+  .word $feaf
+  .word $febb
+  .word $fec6
+  .word $fed1
+  .word $feda
+  .word $fee4
+  .word $feec
+  .word $fef4
+  .word $fefc
+  .word $ff03
+  .word $ff0a
+  .word $ff10
+  .word $ff17
+  .word $ff1c
+  .word $ff22
+  .word $ff27
+  .word $ff2c
+  .word $ff31
+  .word $ff36
+  .word $ff3a
+  .word $ff3e
+  .word $ff42
+  .word $ff46
+  .word $ff4a
+  .word $ff4e
+  .word $ff51
+  .word $ff54
+  .word $ff57
+  .word $ff5b
+  .word $ff5d
+  .word $ff60
+  .word $ff63
+  .word $ff66
+  .word $ff68
+  .word $ff6b
+  .word $ff6d
+  .word $ff70
+  .word $ff72
+  .word $ff74
+  .word $ff76
+  .word $ff78
+  .word $ff7a
+  .word $ff7c
+  .word $ff7e
+  .word $ff80
+  .word $ff82
+  .word $ff83
+  .word $ff85
+  .word $ff87
+  .word $ff88
+  .word $ff8a
+  .word $ff8b
+  .word $ff8d
+  .word $ff8e
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff97
+  .word $ff99
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ffa0
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa4
+  .word $ffa5
+  .word $ffa6
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffaa
+  .word $ffab
+  .word $ffac
+  .word $ffac
+  .word $ffad
+  .word $ffae
+  .word $ffaf
+  .word $ffaf
+  .word $ffb0
+  .word $ffb1
+  .word $ffb2
+  .word $ffb2
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb5
+  .word $ffb6
+  .word $ffb7
+  .word $ffb7
+  .word $ffb8
+  .word $ffb8
+  .word $ffb9
+  .word $ffb9
+  .word $ffba
+  .word $ffbb
+  .word $ffbb
+  .word $ffbc
+  .word $ffbc
+  .word $ffbd
+  .word $ffbd
+  .word $ffbe
+  .word $ffbe
+  .word $ffbf
+  .word $ffbf
+  .word $ffbf
+  .word $ffc0
+  .word $ffc0
+  .word $ffc1
+  .word $ffc1
+  .word $ffc2
+  .word $ffc2
+  .word $ffc2
+  .word $ffc3
+  .word $ffc3
+  .word $ffc4
+  .word $ffc4
+  .word $ffc5
+  .word $ffc5
+  .word $ffc5
+  .word $ffc6
+  .word $ffc6
+  .word $ffc6
+  .word $ffc7
+  .word $ffc7
+  .word $ffc7
+  .word $ffc8
+  .word $ffc8
+  .word $ffc8
+  .word $ffc9
+  .word $ffc9
+  .word $ffc9
+  .word $ffca
+  .word $ffca
+  .word $ffca
+  .word $ffcb
+  .word $ffcb
+  .word $ffcb
+  .word $ffcc
+  .word $ffcc
+  .word $ffcc
+  .word $ffcd
+  .word $ffcd
+  .word $ffcd
+  .word $ffcd
+  .word $ffce
+  .word $ffce
+  .word $ffce
+  .word $ffcf
+  .word $ffcf
+  .word $ffcf
+  .word $ffcf
+  .word $ffd0
+  .word $ffd0
+  .word $ffd0
+  .word $ffd0
+  .word $ffd1
 .segment "Mode7TblAB"
 m7a_m7b_20:
-  .word $fd57, $fd57
-  .word $fd7c, $fd7c
-  .word $fd9e, $fd9e
-  .word $fdbd, $fdbd
-  .word $fdd8, $fdd8
-  .word $fdf1, $fdf1
-  .word $fe08, $fe08
-  .word $fe1d, $fe1d
-  .word $fe31, $fe31
-  .word $fe42, $fe42
-  .word $fe53, $fe53
-  .word $fe62, $fe62
-  .word $fe71, $fe71
-  .word $fe7e, $fe7e
-  .word $fe8a, $fe8a
-  .word $fe96, $fe96
-  .word $fea1, $fea1
-  .word $feab, $feab
-  .word $feb5, $feb5
-  .word $febe, $febe
-  .word $fec7, $fec7
-  .word $fecf, $fecf
-  .word $fed7, $fed7
-  .word $fede, $fede
-  .word $fee5, $fee5
-  .word $feec, $feec
-  .word $fef3, $fef3
-  .word $fef9, $fef9
-  .word $feff, $feff
-  .word $ff04, $ff04
-  .word $ff0a, $ff0a
-  .word $ff0f, $ff0f
-  .word $ff14, $ff14
-  .word $ff18, $ff18
-  .word $ff1d, $ff1d
-  .word $ff21, $ff21
-  .word $ff25, $ff25
-  .word $ff29, $ff29
-  .word $ff2d, $ff2d
-  .word $ff31, $ff31
-  .word $ff35, $ff35
-  .word $ff38, $ff38
-  .word $ff3c, $ff3c
-  .word $ff3f, $ff3f
-  .word $ff42, $ff42
-  .word $ff45, $ff45
-  .word $ff48, $ff48
-  .word $ff4b, $ff4b
-  .word $ff4e, $ff4e
-  .word $ff50, $ff50
-  .word $ff53, $ff53
-  .word $ff56, $ff56
-  .word $ff58, $ff58
-  .word $ff5a, $ff5a
-  .word $ff5d, $ff5d
-  .word $ff5f, $ff5f
-  .word $ff61, $ff61
-  .word $ff63, $ff63
-  .word $ff66, $ff66
-  .word $ff68, $ff68
-  .word $ff6a, $ff6a
-  .word $ff6b, $ff6b
-  .word $ff6d, $ff6d
-  .word $ff6f, $ff6f
-  .word $ff71, $ff71
-  .word $ff73, $ff73
-  .word $ff74, $ff74
-  .word $ff76, $ff76
-  .word $ff78, $ff78
-  .word $ff79, $ff79
-  .word $ff7b, $ff7b
-  .word $ff7c, $ff7c
-  .word $ff7e, $ff7e
-  .word $ff7f, $ff7f
-  .word $ff81, $ff81
-  .word $ff82, $ff82
-  .word $ff83, $ff83
-  .word $ff85, $ff85
-  .word $ff86, $ff86
-  .word $ff87, $ff87
-  .word $ff89, $ff89
-  .word $ff8a, $ff8a
-  .word $ff8b, $ff8b
-  .word $ff8c, $ff8c
-  .word $ff8d, $ff8d
-  .word $ff8e, $ff8e
-  .word $ff90, $ff90
-  .word $ff91, $ff91
-  .word $ff92, $ff92
-  .word $ff93, $ff93
-  .word $ff94, $ff94
-  .word $ff95, $ff95
-  .word $ff96, $ff96
-  .word $ff97, $ff97
-  .word $ff98, $ff98
-  .word $ff99, $ff99
-  .word $ff99, $ff99
-  .word $ff9a, $ff9a
-  .word $ff9b, $ff9b
-  .word $ff9c, $ff9c
-  .word $ff9d, $ff9d
-  .word $ff9e, $ff9e
-  .word $ff9f, $ff9f
-  .word $ff9f, $ff9f
-  .word $ffa0, $ffa0
-  .word $ffa1, $ffa1
-  .word $ffa2, $ffa2
-  .word $ffa3, $ffa3
-  .word $ffa3, $ffa3
-  .word $ffa4, $ffa4
-  .word $ffa5, $ffa5
-  .word $ffa5, $ffa5
-  .word $ffa6, $ffa6
-  .word $ffa7, $ffa7
-  .word $ffa8, $ffa8
-  .word $ffa8, $ffa8
-  .word $ffa9, $ffa9
-  .word $ffaa, $ffaa
-  .word $ffaa, $ffaa
-  .word $ffab, $ffab
-  .word $ffab, $ffab
-  .word $ffac, $ffac
-  .word $ffad, $ffad
-  .word $ffad, $ffad
-  .word $ffae, $ffae
-  .word $ffae, $ffae
-  .word $ffaf, $ffaf
-  .word $ffb0, $ffb0
-  .word $ffb0, $ffb0
-  .word $ffb1, $ffb1
-  .word $ffb1, $ffb1
-  .word $ffb2, $ffb2
-  .word $ffb2, $ffb2
-  .word $ffb3, $ffb3
-  .word $ffb3, $ffb3
-  .word $ffb4, $ffb4
-  .word $ffb4, $ffb4
-  .word $ffb5, $ffb5
-  .word $ffb5, $ffb5
-  .word $ffb6, $ffb6
-  .word $ffb6, $ffb6
-  .word $ffb7, $ffb7
-  .word $ffb7, $ffb7
-  .word $ffb8, $ffb8
-  .word $ffb8, $ffb8
-  .word $ffb8, $ffb8
-  .word $ffb9, $ffb9
-  .word $ffb9, $ffb9
-  .word $ffba, $ffba
-  .word $ffba, $ffba
-  .word $ffbb, $ffbb
-  .word $ffbb, $ffbb
-  .word $ffbb, $ffbb
-  .word $ffbc, $ffbc
-  .word $ffbc, $ffbc
-  .word $ffbd, $ffbd
-  .word $ffbd, $ffbd
-  .word $ffbd, $ffbd
-  .word $ffbe, $ffbe
-  .word $ffbe, $ffbe
-  .word $ffbf, $ffbf
-  .word $ffbf, $ffbf
-  .word $ffbf, $ffbf
-  .word $ffc0, $ffc0
-  .word $ffc0, $ffc0
-  .word $ffc0, $ffc0
-  .word $ffc1, $ffc1
-  .word $ffc1, $ffc1
-  .word $ffc1, $ffc1
-  .word $ffc2, $ffc2
-  .word $ffc2, $ffc2
-  .word $ffc2, $ffc2
-  .word $ffc3, $ffc3
-  .word $ffc3, $ffc3
-  .word $ffc3, $ffc3
-  .word $ffc4, $ffc4
+  .word $fd57
+  .word $fd7c
+  .word $fd9e
+  .word $fdbd
+  .word $fdd8
+  .word $fdf1
+  .word $fe08
+  .word $fe1d
+  .word $fe31
+  .word $fe42
+  .word $fe53
+  .word $fe62
+  .word $fe71
+  .word $fe7e
+  .word $fe8a
+  .word $fe96
+  .word $fea1
+  .word $feab
+  .word $feb5
+  .word $febe
+  .word $fec7
+  .word $fecf
+  .word $fed7
+  .word $fede
+  .word $fee5
+  .word $feec
+  .word $fef3
+  .word $fef9
+  .word $feff
+  .word $ff04
+  .word $ff0a
+  .word $ff0f
+  .word $ff14
+  .word $ff18
+  .word $ff1d
+  .word $ff21
+  .word $ff25
+  .word $ff29
+  .word $ff2d
+  .word $ff31
+  .word $ff35
+  .word $ff38
+  .word $ff3c
+  .word $ff3f
+  .word $ff42
+  .word $ff45
+  .word $ff48
+  .word $ff4b
+  .word $ff4e
+  .word $ff50
+  .word $ff53
+  .word $ff56
+  .word $ff58
+  .word $ff5a
+  .word $ff5d
+  .word $ff5f
+  .word $ff61
+  .word $ff63
+  .word $ff66
+  .word $ff68
+  .word $ff6a
+  .word $ff6b
+  .word $ff6d
+  .word $ff6f
+  .word $ff71
+  .word $ff73
+  .word $ff74
+  .word $ff76
+  .word $ff78
+  .word $ff79
+  .word $ff7b
+  .word $ff7c
+  .word $ff7e
+  .word $ff7f
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff99
+  .word $ff99
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ff9f
+  .word $ffa0
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffad
+  .word $ffad
+  .word $ffae
+  .word $ffae
+  .word $ffaf
+  .word $ffb0
+  .word $ffb0
+  .word $ffb1
+  .word $ffb1
+  .word $ffb2
+  .word $ffb2
+  .word $ffb3
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb5
+  .word $ffb6
+  .word $ffb6
+  .word $ffb7
+  .word $ffb7
+  .word $ffb8
+  .word $ffb8
+  .word $ffb8
+  .word $ffb9
+  .word $ffb9
+  .word $ffba
+  .word $ffba
+  .word $ffbb
+  .word $ffbb
+  .word $ffbb
+  .word $ffbc
+  .word $ffbc
+  .word $ffbd
+  .word $ffbd
+  .word $ffbd
+  .word $ffbe
+  .word $ffbe
+  .word $ffbf
+  .word $ffbf
+  .word $ffbf
+  .word $ffc0
+  .word $ffc0
+  .word $ffc0
+  .word $ffc1
+  .word $ffc1
+  .word $ffc1
+  .word $ffc2
+  .word $ffc2
+  .word $ffc2
+  .word $ffc3
+  .word $ffc3
+  .word $ffc3
+  .word $ffc4
 .segment "Mode7TblAB"
 m7a_m7b_21:
-  .word $fde9, $fcdf
-  .word $fe06, $fd0b
-  .word $fe21, $fd33
-  .word $fe39, $fd57
-  .word $fe4f, $fd77
-  .word $fe62, $fd95
-  .word $fe74, $fdb0
-  .word $fe85, $fdc8
-  .word $fe94, $fddf
-  .word $fea2, $fdf4
-  .word $feaf, $fe07
-  .word $febb, $fe19
-  .word $fec6, $fe2a
-  .word $fed1, $fe3a
-  .word $feda, $fe49
-  .word $fee4, $fe56
-  .word $feec, $fe63
-  .word $fef4, $fe6f
-  .word $fefc, $fe7b
-  .word $ff03, $fe86
-  .word $ff0a, $fe90
-  .word $ff10, $fe9a
-  .word $ff17, $fea3
-  .word $ff1c, $feab
-  .word $ff22, $feb4
-  .word $ff27, $febc
-  .word $ff2c, $fec3
-  .word $ff31, $feca
-  .word $ff36, $fed1
-  .word $ff3a, $fed8
-  .word $ff3e, $fede
-  .word $ff42, $fee4
-  .word $ff46, $feea
-  .word $ff4a, $fef0
-  .word $ff4e, $fef5
-  .word $ff51, $fefa
-  .word $ff54, $feff
-  .word $ff57, $ff04
-  .word $ff5b, $ff08
-  .word $ff5d, $ff0d
-  .word $ff60, $ff11
-  .word $ff63, $ff15
-  .word $ff66, $ff19
-  .word $ff68, $ff1d
-  .word $ff6b, $ff21
-  .word $ff6d, $ff24
-  .word $ff70, $ff28
-  .word $ff72, $ff2b
-  .word $ff74, $ff2e
-  .word $ff76, $ff32
-  .word $ff78, $ff35
-  .word $ff7a, $ff38
-  .word $ff7c, $ff3b
-  .word $ff7e, $ff3d
-  .word $ff80, $ff40
-  .word $ff82, $ff43
-  .word $ff83, $ff45
-  .word $ff85, $ff48
-  .word $ff87, $ff4a
-  .word $ff88, $ff4d
-  .word $ff8a, $ff4f
-  .word $ff8b, $ff51
-  .word $ff8d, $ff54
-  .word $ff8e, $ff56
-  .word $ff90, $ff58
-  .word $ff91, $ff5a
-  .word $ff92, $ff5c
-  .word $ff94, $ff5e
-  .word $ff95, $ff60
-  .word $ff96, $ff62
-  .word $ff97, $ff63
-  .word $ff99, $ff65
-  .word $ff9a, $ff67
-  .word $ff9b, $ff69
-  .word $ff9c, $ff6a
-  .word $ff9d, $ff6c
-  .word $ff9e, $ff6e
-  .word $ff9f, $ff6f
-  .word $ffa0, $ff71
-  .word $ffa1, $ff72
-  .word $ffa2, $ff74
-  .word $ffa3, $ff75
-  .word $ffa4, $ff76
-  .word $ffa5, $ff78
-  .word $ffa6, $ff79
-  .word $ffa7, $ff7a
-  .word $ffa8, $ff7c
-  .word $ffa8, $ff7d
-  .word $ffa9, $ff7e
-  .word $ffaa, $ff7f
-  .word $ffab, $ff81
-  .word $ffac, $ff82
-  .word $ffac, $ff83
-  .word $ffad, $ff84
-  .word $ffae, $ff85
-  .word $ffaf, $ff86
-  .word $ffaf, $ff87
-  .word $ffb0, $ff89
-  .word $ffb1, $ff8a
-  .word $ffb2, $ff8b
-  .word $ffb2, $ff8c
-  .word $ffb3, $ff8d
-  .word $ffb4, $ff8e
-  .word $ffb4, $ff8e
-  .word $ffb5, $ff8f
-  .word $ffb5, $ff90
-  .word $ffb6, $ff91
-  .word $ffb7, $ff92
-  .word $ffb7, $ff93
-  .word $ffb8, $ff94
-  .word $ffb8, $ff95
-  .word $ffb9, $ff96
-  .word $ffb9, $ff96
-  .word $ffba, $ff97
-  .word $ffbb, $ff98
-  .word $ffbb, $ff99
-  .word $ffbc, $ff9a
-  .word $ffbc, $ff9a
-  .word $ffbd, $ff9b
-  .word $ffbd, $ff9c
-  .word $ffbe, $ff9d
-  .word $ffbe, $ff9d
-  .word $ffbf, $ff9e
-  .word $ffbf, $ff9f
-  .word $ffbf, $ff9f
-  .word $ffc0, $ffa0
-  .word $ffc0, $ffa1
-  .word $ffc1, $ffa1
-  .word $ffc1, $ffa2
-  .word $ffc2, $ffa3
-  .word $ffc2, $ffa3
-  .word $ffc2, $ffa4
-  .word $ffc3, $ffa5
-  .word $ffc3, $ffa5
-  .word $ffc4, $ffa6
-  .word $ffc4, $ffa6
-  .word $ffc5, $ffa7
-  .word $ffc5, $ffa8
-  .word $ffc5, $ffa8
-  .word $ffc6, $ffa9
-  .word $ffc6, $ffa9
-  .word $ffc6, $ffaa
-  .word $ffc7, $ffaa
-  .word $ffc7, $ffab
-  .word $ffc7, $ffab
-  .word $ffc8, $ffac
-  .word $ffc8, $ffac
-  .word $ffc8, $ffad
-  .word $ffc9, $ffad
-  .word $ffc9, $ffae
-  .word $ffc9, $ffae
-  .word $ffca, $ffaf
-  .word $ffca, $ffaf
-  .word $ffca, $ffb0
-  .word $ffcb, $ffb0
-  .word $ffcb, $ffb1
-  .word $ffcb, $ffb1
-  .word $ffcc, $ffb2
-  .word $ffcc, $ffb2
-  .word $ffcc, $ffb3
-  .word $ffcd, $ffb3
-  .word $ffcd, $ffb3
-  .word $ffcd, $ffb4
-  .word $ffcd, $ffb4
-  .word $ffce, $ffb5
-  .word $ffce, $ffb5
-  .word $ffce, $ffb6
-  .word $ffcf, $ffb6
-  .word $ffcf, $ffb6
-  .word $ffcf, $ffb7
-  .word $ffcf, $ffb7
-  .word $ffd0, $ffb8
-  .word $ffd0, $ffb8
-  .word $ffd0, $ffb8
-  .word $ffd0, $ffb9
-  .word $ffd1, $ffb9
+  .word $fcdf
+  .word $fd0b
+  .word $fd33
+  .word $fd57
+  .word $fd77
+  .word $fd95
+  .word $fdb0
+  .word $fdc8
+  .word $fddf
+  .word $fdf4
+  .word $fe07
+  .word $fe19
+  .word $fe2a
+  .word $fe3a
+  .word $fe49
+  .word $fe56
+  .word $fe63
+  .word $fe6f
+  .word $fe7b
+  .word $fe86
+  .word $fe90
+  .word $fe9a
+  .word $fea3
+  .word $feab
+  .word $feb4
+  .word $febc
+  .word $fec3
+  .word $feca
+  .word $fed1
+  .word $fed8
+  .word $fede
+  .word $fee4
+  .word $feea
+  .word $fef0
+  .word $fef5
+  .word $fefa
+  .word $feff
+  .word $ff04
+  .word $ff08
+  .word $ff0d
+  .word $ff11
+  .word $ff15
+  .word $ff19
+  .word $ff1d
+  .word $ff21
+  .word $ff24
+  .word $ff28
+  .word $ff2b
+  .word $ff2e
+  .word $ff32
+  .word $ff35
+  .word $ff38
+  .word $ff3b
+  .word $ff3d
+  .word $ff40
+  .word $ff43
+  .word $ff45
+  .word $ff48
+  .word $ff4a
+  .word $ff4d
+  .word $ff4f
+  .word $ff51
+  .word $ff54
+  .word $ff56
+  .word $ff58
+  .word $ff5a
+  .word $ff5c
+  .word $ff5e
+  .word $ff60
+  .word $ff62
+  .word $ff63
+  .word $ff65
+  .word $ff67
+  .word $ff69
+  .word $ff6a
+  .word $ff6c
+  .word $ff6e
+  .word $ff6f
+  .word $ff71
+  .word $ff72
+  .word $ff74
+  .word $ff75
+  .word $ff76
+  .word $ff78
+  .word $ff79
+  .word $ff7a
+  .word $ff7c
+  .word $ff7d
+  .word $ff7e
+  .word $ff7f
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ff9f
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffac
+  .word $ffad
+  .word $ffad
+  .word $ffae
+  .word $ffae
+  .word $ffaf
+  .word $ffaf
+  .word $ffb0
+  .word $ffb0
+  .word $ffb1
+  .word $ffb1
+  .word $ffb2
+  .word $ffb2
+  .word $ffb3
+  .word $ffb3
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb5
+  .word $ffb6
+  .word $ffb6
+  .word $ffb6
+  .word $ffb7
+  .word $ffb7
+  .word $ffb8
+  .word $ffb8
+  .word $ffb8
+  .word $ffb9
+  .word $ffb9
 .segment "Mode7TblAB"
 m7a_m7b_22:
-  .word $fe8f, $fc86
-  .word $fea4, $fcb7
-  .word $feb6, $fce3
-  .word $fec7, $fd0b
-  .word $fed5, $fd2f
-  .word $fee3, $fd50
-  .word $feef, $fd6e
-  .word $fefb, $fd89
-  .word $ff05, $fda3
-  .word $ff0f, $fdba
-  .word $ff18, $fdcf
-  .word $ff20, $fde3
-  .word $ff28, $fdf6
-  .word $ff2f, $fe07
-  .word $ff36, $fe18
-  .word $ff3c, $fe27
-  .word $ff42, $fe35
-  .word $ff48, $fe43
-  .word $ff4d, $fe50
-  .word $ff52, $fe5c
-  .word $ff57, $fe67
-  .word $ff5b, $fe72
-  .word $ff5f, $fe7c
-  .word $ff63, $fe86
-  .word $ff67, $fe8f
-  .word $ff6b, $fe98
-  .word $ff6e, $fea0
-  .word $ff72, $fea8
-  .word $ff75, $feb0
-  .word $ff78, $feb7
-  .word $ff7b, $febe
-  .word $ff7d, $fec5
-  .word $ff80, $fecb
-  .word $ff83, $fed1
-  .word $ff85, $fed7
-  .word $ff87, $fedd
-  .word $ff8a, $fee2
-  .word $ff8c, $fee8
-  .word $ff8e, $feed
-  .word $ff90, $fef2
-  .word $ff92, $fef6
-  .word $ff94, $fefb
-  .word $ff96, $feff
-  .word $ff98, $ff04
-  .word $ff99, $ff08
-  .word $ff9b, $ff0c
-  .word $ff9c, $ff10
-  .word $ff9e, $ff13
-  .word $ffa0, $ff17
-  .word $ffa1, $ff1b
-  .word $ffa2, $ff1e
-  .word $ffa4, $ff21
-  .word $ffa5, $ff25
-  .word $ffa6, $ff28
-  .word $ffa8, $ff2b
-  .word $ffa9, $ff2e
-  .word $ffaa, $ff31
-  .word $ffab, $ff33
-  .word $ffac, $ff36
-  .word $ffae, $ff39
-  .word $ffaf, $ff3b
-  .word $ffb0, $ff3e
-  .word $ffb1, $ff40
-  .word $ffb2, $ff43
-  .word $ffb3, $ff45
-  .word $ffb4, $ff47
-  .word $ffb4, $ff4a
-  .word $ffb5, $ff4c
-  .word $ffb6, $ff4e
-  .word $ffb7, $ff50
-  .word $ffb8, $ff52
-  .word $ffb9, $ff54
-  .word $ffba, $ff56
-  .word $ffba, $ff58
-  .word $ffbb, $ff5a
-  .word $ffbc, $ff5b
-  .word $ffbd, $ff5d
-  .word $ffbd, $ff5f
-  .word $ffbe, $ff61
-  .word $ffbf, $ff62
-  .word $ffbf, $ff64
-  .word $ffc0, $ff66
-  .word $ffc1, $ff67
-  .word $ffc1, $ff69
-  .word $ffc2, $ff6a
-  .word $ffc3, $ff6c
-  .word $ffc3, $ff6d
-  .word $ffc4, $ff6e
-  .word $ffc4, $ff70
-  .word $ffc5, $ff71
-  .word $ffc5, $ff73
-  .word $ffc6, $ff74
-  .word $ffc6, $ff75
-  .word $ffc7, $ff76
-  .word $ffc8, $ff78
-  .word $ffc8, $ff79
-  .word $ffc9, $ff7a
-  .word $ffc9, $ff7b
-  .word $ffc9, $ff7c
-  .word $ffca, $ff7e
-  .word $ffca, $ff7f
-  .word $ffcb, $ff80
-  .word $ffcb, $ff81
-  .word $ffcc, $ff82
-  .word $ffcc, $ff83
-  .word $ffcd, $ff84
-  .word $ffcd, $ff85
-  .word $ffcd, $ff86
-  .word $ffce, $ff87
-  .word $ffce, $ff88
-  .word $ffcf, $ff89
-  .word $ffcf, $ff8a
-  .word $ffcf, $ff8b
-  .word $ffd0, $ff8c
-  .word $ffd0, $ff8c
-  .word $ffd1, $ff8d
-  .word $ffd1, $ff8e
-  .word $ffd1, $ff8f
-  .word $ffd2, $ff90
-  .word $ffd2, $ff91
-  .word $ffd2, $ff92
-  .word $ffd3, $ff92
-  .word $ffd3, $ff93
-  .word $ffd3, $ff94
-  .word $ffd4, $ff95
-  .word $ffd4, $ff95
-  .word $ffd4, $ff96
-  .word $ffd4, $ff97
-  .word $ffd5, $ff98
-  .word $ffd5, $ff98
-  .word $ffd5, $ff99
-  .word $ffd6, $ff9a
-  .word $ffd6, $ff9a
-  .word $ffd6, $ff9b
-  .word $ffd6, $ff9c
-  .word $ffd7, $ff9c
-  .word $ffd7, $ff9d
-  .word $ffd7, $ff9e
-  .word $ffd8, $ff9e
-  .word $ffd8, $ff9f
-  .word $ffd8, $ffa0
-  .word $ffd8, $ffa0
-  .word $ffd9, $ffa1
-  .word $ffd9, $ffa1
-  .word $ffd9, $ffa2
-  .word $ffd9, $ffa3
-  .word $ffda, $ffa3
-  .word $ffda, $ffa4
-  .word $ffda, $ffa4
-  .word $ffda, $ffa5
-  .word $ffda, $ffa5
-  .word $ffdb, $ffa6
-  .word $ffdb, $ffa6
-  .word $ffdb, $ffa7
-  .word $ffdb, $ffa7
-  .word $ffdc, $ffa8
-  .word $ffdc, $ffa9
-  .word $ffdc, $ffa9
-  .word $ffdc, $ffaa
-  .word $ffdc, $ffaa
-  .word $ffdd, $ffaa
-  .word $ffdd, $ffab
-  .word $ffdd, $ffab
-  .word $ffdd, $ffac
-  .word $ffdd, $ffac
-  .word $ffde, $ffad
-  .word $ffde, $ffad
-  .word $ffde, $ffae
-  .word $ffde, $ffae
-  .word $ffde, $ffaf
-  .word $ffde, $ffaf
-  .word $ffdf, $ffaf
-  .word $ffdf, $ffb0
-  .word $ffdf, $ffb0
-  .word $ffdf, $ffb1
-  .word $ffdf, $ffb1
+  .word $fc86
+  .word $fcb7
+  .word $fce3
+  .word $fd0b
+  .word $fd2f
+  .word $fd50
+  .word $fd6e
+  .word $fd89
+  .word $fda3
+  .word $fdba
+  .word $fdcf
+  .word $fde3
+  .word $fdf6
+  .word $fe07
+  .word $fe18
+  .word $fe27
+  .word $fe35
+  .word $fe43
+  .word $fe50
+  .word $fe5c
+  .word $fe67
+  .word $fe72
+  .word $fe7c
+  .word $fe86
+  .word $fe8f
+  .word $fe98
+  .word $fea0
+  .word $fea8
+  .word $feb0
+  .word $feb7
+  .word $febe
+  .word $fec5
+  .word $fecb
+  .word $fed1
+  .word $fed7
+  .word $fedd
+  .word $fee2
+  .word $fee8
+  .word $feed
+  .word $fef2
+  .word $fef6
+  .word $fefb
+  .word $feff
+  .word $ff04
+  .word $ff08
+  .word $ff0c
+  .word $ff10
+  .word $ff13
+  .word $ff17
+  .word $ff1b
+  .word $ff1e
+  .word $ff21
+  .word $ff25
+  .word $ff28
+  .word $ff2b
+  .word $ff2e
+  .word $ff31
+  .word $ff33
+  .word $ff36
+  .word $ff39
+  .word $ff3b
+  .word $ff3e
+  .word $ff40
+  .word $ff43
+  .word $ff45
+  .word $ff47
+  .word $ff4a
+  .word $ff4c
+  .word $ff4e
+  .word $ff50
+  .word $ff52
+  .word $ff54
+  .word $ff56
+  .word $ff58
+  .word $ff5a
+  .word $ff5b
+  .word $ff5d
+  .word $ff5f
+  .word $ff61
+  .word $ff62
+  .word $ff64
+  .word $ff66
+  .word $ff67
+  .word $ff69
+  .word $ff6a
+  .word $ff6c
+  .word $ff6d
+  .word $ff6e
+  .word $ff70
+  .word $ff71
+  .word $ff73
+  .word $ff74
+  .word $ff75
+  .word $ff76
+  .word $ff78
+  .word $ff79
+  .word $ff7a
+  .word $ff7b
+  .word $ff7c
+  .word $ff7e
+  .word $ff7f
+  .word $ff80
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff88
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff92
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff95
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9c
+  .word $ff9d
+  .word $ff9e
+  .word $ff9e
+  .word $ff9f
+  .word $ffa0
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa7
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffac
+  .word $ffad
+  .word $ffad
+  .word $ffae
+  .word $ffae
+  .word $ffaf
+  .word $ffaf
+  .word $ffaf
+  .word $ffb0
+  .word $ffb0
+  .word $ffb1
+  .word $ffb1
 .segment "Mode7TblAB"
 m7a_m7b_23:
-  .word $ff44, $fc4f
-  .word $ff4e, $fc83
-  .word $ff58, $fcb2
-  .word $ff60, $fcdd
-  .word $ff68, $fd03
-  .word $ff6f, $fd26
-  .word $ff75, $fd45
-  .word $ff7b, $fd62
-  .word $ff80, $fd7d
-  .word $ff85, $fd96
-  .word $ff8a, $fdad
-  .word $ff8e, $fdc2
-  .word $ff92, $fdd6
-  .word $ff95, $fde8
-  .word $ff99, $fdfa
-  .word $ff9c, $fe0a
-  .word $ff9f, $fe19
-  .word $ffa2, $fe27
-  .word $ffa5, $fe35
-  .word $ffa7, $fe42
-  .word $ffaa, $fe4e
-  .word $ffac, $fe59
-  .word $ffae, $fe64
-  .word $ffb0, $fe6e
-  .word $ffb2, $fe78
-  .word $ffb4, $fe81
-  .word $ffb6, $fe8a
-  .word $ffb7, $fe93
-  .word $ffb9, $fe9b
-  .word $ffbb, $fea3
-  .word $ffbc, $feaa
-  .word $ffbd, $feb1
-  .word $ffbf, $feb8
-  .word $ffc0, $febf
-  .word $ffc1, $fec5
-  .word $ffc3, $fecb
-  .word $ffc4, $fed1
-  .word $ffc5, $fed6
-  .word $ffc6, $fedc
-  .word $ffc7, $fee1
-  .word $ffc8, $fee6
-  .word $ffc9, $feeb
-  .word $ffca, $fef0
-  .word $ffcb, $fef4
-  .word $ffcc, $fef9
-  .word $ffcc, $fefd
-  .word $ffcd, $ff01
-  .word $ffce, $ff05
-  .word $ffcf, $ff09
-  .word $ffd0, $ff0d
-  .word $ffd0, $ff10
-  .word $ffd1, $ff14
-  .word $ffd2, $ff17
-  .word $ffd2, $ff1a
-  .word $ffd3, $ff1e
-  .word $ffd4, $ff21
-  .word $ffd4, $ff24
-  .word $ffd5, $ff27
-  .word $ffd5, $ff2a
-  .word $ffd6, $ff2d
-  .word $ffd6, $ff2f
-  .word $ffd7, $ff32
-  .word $ffd8, $ff35
-  .word $ffd8, $ff37
-  .word $ffd9, $ff3a
-  .word $ffd9, $ff3c
-  .word $ffd9, $ff3e
-  .word $ffda, $ff41
-  .word $ffda, $ff43
-  .word $ffdb, $ff45
-  .word $ffdb, $ff47
-  .word $ffdc, $ff49
-  .word $ffdc, $ff4b
-  .word $ffdc, $ff4d
-  .word $ffdd, $ff4f
-  .word $ffdd, $ff51
-  .word $ffde, $ff53
-  .word $ffde, $ff55
-  .word $ffde, $ff57
-  .word $ffdf, $ff59
-  .word $ffdf, $ff5a
-  .word $ffdf, $ff5c
-  .word $ffe0, $ff5e
-  .word $ffe0, $ff5f
-  .word $ffe0, $ff61
-  .word $ffe1, $ff62
-  .word $ffe1, $ff64
-  .word $ffe1, $ff65
-  .word $ffe2, $ff67
-  .word $ffe2, $ff68
-  .word $ffe2, $ff6a
-  .word $ffe2, $ff6b
-  .word $ffe3, $ff6d
-  .word $ffe3, $ff6e
-  .word $ffe3, $ff6f
-  .word $ffe3, $ff71
-  .word $ffe4, $ff72
-  .word $ffe4, $ff73
-  .word $ffe4, $ff74
-  .word $ffe4, $ff75
-  .word $ffe5, $ff77
-  .word $ffe5, $ff78
-  .word $ffe5, $ff79
-  .word $ffe5, $ff7a
-  .word $ffe6, $ff7b
-  .word $ffe6, $ff7c
-  .word $ffe6, $ff7d
-  .word $ffe6, $ff7e
-  .word $ffe6, $ff7f
-  .word $ffe7, $ff80
-  .word $ffe7, $ff81
-  .word $ffe7, $ff82
-  .word $ffe7, $ff83
-  .word $ffe7, $ff84
-  .word $ffe8, $ff85
-  .word $ffe8, $ff86
-  .word $ffe8, $ff87
-  .word $ffe8, $ff88
-  .word $ffe8, $ff89
-  .word $ffe8, $ff8a
-  .word $ffe9, $ff8b
-  .word $ffe9, $ff8c
-  .word $ffe9, $ff8c
-  .word $ffe9, $ff8d
-  .word $ffe9, $ff8e
-  .word $ffe9, $ff8f
-  .word $ffea, $ff90
-  .word $ffea, $ff90
-  .word $ffea, $ff91
-  .word $ffea, $ff92
-  .word $ffea, $ff93
-  .word $ffea, $ff93
-  .word $ffeb, $ff94
-  .word $ffeb, $ff95
-  .word $ffeb, $ff96
-  .word $ffeb, $ff96
-  .word $ffeb, $ff97
-  .word $ffeb, $ff98
-  .word $ffeb, $ff98
-  .word $ffec, $ff99
-  .word $ffec, $ff9a
-  .word $ffec, $ff9a
-  .word $ffec, $ff9b
-  .word $ffec, $ff9c
-  .word $ffec, $ff9c
-  .word $ffec, $ff9d
-  .word $ffec, $ff9d
-  .word $ffed, $ff9e
-  .word $ffed, $ff9f
-  .word $ffed, $ff9f
-  .word $ffed, $ffa0
-  .word $ffed, $ffa0
-  .word $ffed, $ffa1
-  .word $ffed, $ffa1
-  .word $ffed, $ffa2
-  .word $ffed, $ffa3
-  .word $ffee, $ffa3
-  .word $ffee, $ffa4
-  .word $ffee, $ffa4
-  .word $ffee, $ffa5
-  .word $ffee, $ffa5
-  .word $ffee, $ffa6
-  .word $ffee, $ffa6
-  .word $ffee, $ffa7
-  .word $ffee, $ffa7
-  .word $ffee, $ffa8
-  .word $ffef, $ffa8
-  .word $ffef, $ffa9
-  .word $ffef, $ffa9
-  .word $ffef, $ffaa
-  .word $ffef, $ffaa
-  .word $ffef, $ffab
-  .word $ffef, $ffab
-  .word $ffef, $ffab
-  .word $ffef, $ffac
-  .word $ffef, $ffac
+  .word $fc4f
+  .word $fc83
+  .word $fcb2
+  .word $fcdd
+  .word $fd03
+  .word $fd26
+  .word $fd45
+  .word $fd62
+  .word $fd7d
+  .word $fd96
+  .word $fdad
+  .word $fdc2
+  .word $fdd6
+  .word $fde8
+  .word $fdfa
+  .word $fe0a
+  .word $fe19
+  .word $fe27
+  .word $fe35
+  .word $fe42
+  .word $fe4e
+  .word $fe59
+  .word $fe64
+  .word $fe6e
+  .word $fe78
+  .word $fe81
+  .word $fe8a
+  .word $fe93
+  .word $fe9b
+  .word $fea3
+  .word $feaa
+  .word $feb1
+  .word $feb8
+  .word $febf
+  .word $fec5
+  .word $fecb
+  .word $fed1
+  .word $fed6
+  .word $fedc
+  .word $fee1
+  .word $fee6
+  .word $feeb
+  .word $fef0
+  .word $fef4
+  .word $fef9
+  .word $fefd
+  .word $ff01
+  .word $ff05
+  .word $ff09
+  .word $ff0d
+  .word $ff10
+  .word $ff14
+  .word $ff17
+  .word $ff1a
+  .word $ff1e
+  .word $ff21
+  .word $ff24
+  .word $ff27
+  .word $ff2a
+  .word $ff2d
+  .word $ff2f
+  .word $ff32
+  .word $ff35
+  .word $ff37
+  .word $ff3a
+  .word $ff3c
+  .word $ff3e
+  .word $ff41
+  .word $ff43
+  .word $ff45
+  .word $ff47
+  .word $ff49
+  .word $ff4b
+  .word $ff4d
+  .word $ff4f
+  .word $ff51
+  .word $ff53
+  .word $ff55
+  .word $ff57
+  .word $ff59
+  .word $ff5a
+  .word $ff5c
+  .word $ff5e
+  .word $ff5f
+  .word $ff61
+  .word $ff62
+  .word $ff64
+  .word $ff65
+  .word $ff67
+  .word $ff68
+  .word $ff6a
+  .word $ff6b
+  .word $ff6d
+  .word $ff6e
+  .word $ff6f
+  .word $ff71
+  .word $ff72
+  .word $ff73
+  .word $ff74
+  .word $ff75
+  .word $ff77
+  .word $ff78
+  .word $ff79
+  .word $ff7a
+  .word $ff7b
+  .word $ff7c
+  .word $ff7d
+  .word $ff7e
+  .word $ff7f
+  .word $ff80
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff88
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9c
+  .word $ff9d
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ff9f
+  .word $ffa0
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffac
 .segment "Mode7TblAB"
 m7a_m7b_24:
-  .word $0000, $fc3c
-  .word $0000, $fc72
-  .word $0000, $fca2
-  .word $0000, $fccd
-  .word $0000, $fcf4
-  .word $0000, $fd17
-  .word $0000, $fd38
-  .word $0000, $fd55
-  .word $0000, $fd71
-  .word $0000, $fd8a
-  .word $0000, $fda1
-  .word $0000, $fdb7
-  .word $0000, $fdcb
-  .word $0000, $fdde
-  .word $0000, $fdef
-  .word $0000, $fe00
-  .word $0000, $fe10
-  .word $0000, $fe1e
-  .word $0000, $fe2c
-  .word $0000, $fe39
-  .word $0000, $fe45
-  .word $0000, $fe51
-  .word $0000, $fe5c
-  .word $0000, $fe66
-  .word $0000, $fe70
-  .word $0000, $fe7a
-  .word $0000, $fe83
-  .word $0000, $fe8c
-  .word $0000, $fe94
-  .word $0000, $fe9c
-  .word $0000, $fea3
-  .word $0000, $feab
-  .word $0000, $feb2
-  .word $0000, $feb8
-  .word $0000, $febf
-  .word $0000, $fec5
-  .word $0000, $fecb
-  .word $0000, $fed1
-  .word $0000, $fed6
-  .word $0000, $fedb
-  .word $0000, $fee1
-  .word $0000, $fee6
-  .word $0000, $feea
-  .word $0000, $feef
-  .word $0000, $fef3
-  .word $0000, $fef8
-  .word $0000, $fefc
-  .word $0000, $ff00
-  .word $0000, $ff04
-  .word $0000, $ff08
-  .word $0000, $ff0b
-  .word $0000, $ff0f
-  .word $0000, $ff13
-  .word $0000, $ff16
-  .word $0000, $ff19
-  .word $0000, $ff1c
-  .word $0000, $ff20
-  .word $0000, $ff23
-  .word $0000, $ff26
-  .word $0000, $ff28
-  .word $0000, $ff2b
-  .word $0000, $ff2e
-  .word $0000, $ff31
-  .word $0000, $ff33
-  .word $0000, $ff36
-  .word $0000, $ff38
-  .word $0000, $ff3b
-  .word $0000, $ff3d
-  .word $0000, $ff3f
-  .word $0000, $ff41
-  .word $0000, $ff44
-  .word $0000, $ff46
-  .word $0000, $ff48
-  .word $0000, $ff4a
-  .word $0000, $ff4c
-  .word $0000, $ff4e
-  .word $0000, $ff50
-  .word $0000, $ff52
-  .word $0000, $ff54
-  .word $0000, $ff55
-  .word $0000, $ff57
-  .word $0000, $ff59
-  .word $0000, $ff5b
-  .word $0000, $ff5c
-  .word $0000, $ff5e
-  .word $0000, $ff5f
-  .word $0000, $ff61
-  .word $0000, $ff62
-  .word $0000, $ff64
-  .word $0000, $ff65
-  .word $0000, $ff67
-  .word $0000, $ff68
-  .word $0000, $ff6a
-  .word $0000, $ff6b
-  .word $0000, $ff6c
-  .word $0000, $ff6e
-  .word $0000, $ff6f
-  .word $0000, $ff70
-  .word $0000, $ff72
-  .word $0000, $ff73
-  .word $0000, $ff74
-  .word $0000, $ff75
-  .word $0000, $ff76
-  .word $0000, $ff77
-  .word $0000, $ff79
-  .word $0000, $ff7a
-  .word $0000, $ff7b
-  .word $0000, $ff7c
-  .word $0000, $ff7d
-  .word $0000, $ff7e
-  .word $0000, $ff7f
-  .word $0000, $ff80
-  .word $0000, $ff81
-  .word $0000, $ff82
-  .word $0000, $ff83
-  .word $0000, $ff84
-  .word $0000, $ff85
-  .word $0000, $ff86
-  .word $0000, $ff87
-  .word $0000, $ff88
-  .word $0000, $ff88
-  .word $0000, $ff89
-  .word $0000, $ff8a
-  .word $0000, $ff8b
-  .word $0000, $ff8c
-  .word $0000, $ff8d
-  .word $0000, $ff8d
-  .word $0000, $ff8e
-  .word $0000, $ff8f
-  .word $0000, $ff90
-  .word $0000, $ff91
-  .word $0000, $ff91
-  .word $0000, $ff92
-  .word $0000, $ff93
-  .word $0000, $ff93
-  .word $0000, $ff94
-  .word $0000, $ff95
-  .word $0000, $ff96
-  .word $0000, $ff96
-  .word $0000, $ff97
-  .word $0000, $ff98
-  .word $0000, $ff98
-  .word $0000, $ff99
-  .word $0000, $ff9a
-  .word $0000, $ff9a
-  .word $0000, $ff9b
-  .word $0000, $ff9b
-  .word $0000, $ff9c
-  .word $0000, $ff9d
-  .word $0000, $ff9d
-  .word $0000, $ff9e
-  .word $0000, $ff9e
-  .word $0000, $ff9f
-  .word $0000, $ffa0
-  .word $0000, $ffa0
-  .word $0000, $ffa1
-  .word $0000, $ffa1
-  .word $0000, $ffa2
-  .word $0000, $ffa2
-  .word $0000, $ffa3
-  .word $0000, $ffa3
-  .word $0000, $ffa4
-  .word $0000, $ffa4
-  .word $0000, $ffa5
-  .word $0000, $ffa5
-  .word $0000, $ffa6
-  .word $0000, $ffa6
-  .word $0000, $ffa7
-  .word $0000, $ffa7
-  .word $0000, $ffa8
-  .word $0000, $ffa8
-  .word $0000, $ffa9
-  .word $0000, $ffa9
-  .word $0000, $ffaa
-  .word $0000, $ffaa
-  .word $0000, $ffab
+  .word $fc3c
+  .word $fc72
+  .word $fca2
+  .word $fccd
+  .word $fcf4
+  .word $fd17
+  .word $fd38
+  .word $fd55
+  .word $fd71
+  .word $fd8a
+  .word $fda1
+  .word $fdb7
+  .word $fdcb
+  .word $fdde
+  .word $fdef
+  .word $fe00
+  .word $fe10
+  .word $fe1e
+  .word $fe2c
+  .word $fe39
+  .word $fe45
+  .word $fe51
+  .word $fe5c
+  .word $fe66
+  .word $fe70
+  .word $fe7a
+  .word $fe83
+  .word $fe8c
+  .word $fe94
+  .word $fe9c
+  .word $fea3
+  .word $feab
+  .word $feb2
+  .word $feb8
+  .word $febf
+  .word $fec5
+  .word $fecb
+  .word $fed1
+  .word $fed6
+  .word $fedb
+  .word $fee1
+  .word $fee6
+  .word $feea
+  .word $feef
+  .word $fef3
+  .word $fef8
+  .word $fefc
+  .word $ff00
+  .word $ff04
+  .word $ff08
+  .word $ff0b
+  .word $ff0f
+  .word $ff13
+  .word $ff16
+  .word $ff19
+  .word $ff1c
+  .word $ff20
+  .word $ff23
+  .word $ff26
+  .word $ff28
+  .word $ff2b
+  .word $ff2e
+  .word $ff31
+  .word $ff33
+  .word $ff36
+  .word $ff38
+  .word $ff3b
+  .word $ff3d
+  .word $ff3f
+  .word $ff41
+  .word $ff44
+  .word $ff46
+  .word $ff48
+  .word $ff4a
+  .word $ff4c
+  .word $ff4e
+  .word $ff50
+  .word $ff52
+  .word $ff54
+  .word $ff55
+  .word $ff57
+  .word $ff59
+  .word $ff5b
+  .word $ff5c
+  .word $ff5e
+  .word $ff5f
+  .word $ff61
+  .word $ff62
+  .word $ff64
+  .word $ff65
+  .word $ff67
+  .word $ff68
+  .word $ff6a
+  .word $ff6b
+  .word $ff6c
+  .word $ff6e
+  .word $ff6f
+  .word $ff70
+  .word $ff72
+  .word $ff73
+  .word $ff74
+  .word $ff75
+  .word $ff76
+  .word $ff77
+  .word $ff79
+  .word $ff7a
+  .word $ff7b
+  .word $ff7c
+  .word $ff7d
+  .word $ff7e
+  .word $ff7f
+  .word $ff80
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff88
+  .word $ff88
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8d
+  .word $ff8d
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff91
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9d
+  .word $ff9e
+  .word $ff9e
+  .word $ff9f
+  .word $ffa0
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
 .segment "Mode7TblAB"
 m7a_m7b_25:
-  .word $00bc, $fc4f
-  .word $00b2, $fc83
-  .word $00a8, $fcb2
-  .word $00a0, $fcdd
-  .word $0098, $fd03
-  .word $0091, $fd26
-  .word $008b, $fd45
-  .word $0085, $fd62
-  .word $0080, $fd7d
-  .word $007b, $fd96
-  .word $0076, $fdad
-  .word $0072, $fdc2
-  .word $006e, $fdd6
-  .word $006b, $fde8
-  .word $0067, $fdfa
-  .word $0064, $fe0a
-  .word $0061, $fe19
-  .word $005e, $fe27
-  .word $005b, $fe35
-  .word $0059, $fe42
-  .word $0056, $fe4e
-  .word $0054, $fe59
-  .word $0052, $fe64
-  .word $0050, $fe6e
-  .word $004e, $fe78
-  .word $004c, $fe81
-  .word $004a, $fe8a
-  .word $0049, $fe93
-  .word $0047, $fe9b
-  .word $0045, $fea3
-  .word $0044, $feaa
-  .word $0043, $feb1
-  .word $0041, $feb8
-  .word $0040, $febf
-  .word $003f, $fec5
-  .word $003d, $fecb
-  .word $003c, $fed1
-  .word $003b, $fed6
-  .word $003a, $fedc
-  .word $0039, $fee1
-  .word $0038, $fee6
-  .word $0037, $feeb
-  .word $0036, $fef0
-  .word $0035, $fef4
-  .word $0034, $fef9
-  .word $0034, $fefd
-  .word $0033, $ff01
-  .word $0032, $ff05
-  .word $0031, $ff09
-  .word $0030, $ff0d
-  .word $0030, $ff10
-  .word $002f, $ff14
-  .word $002e, $ff17
-  .word $002e, $ff1a
-  .word $002d, $ff1e
-  .word $002c, $ff21
-  .word $002c, $ff24
-  .word $002b, $ff27
-  .word $002b, $ff2a
-  .word $002a, $ff2d
-  .word $002a, $ff2f
-  .word $0029, $ff32
-  .word $0028, $ff35
-  .word $0028, $ff37
-  .word $0027, $ff3a
-  .word $0027, $ff3c
-  .word $0027, $ff3e
-  .word $0026, $ff41
-  .word $0026, $ff43
-  .word $0025, $ff45
-  .word $0025, $ff47
-  .word $0024, $ff49
-  .word $0024, $ff4b
-  .word $0024, $ff4d
-  .word $0023, $ff4f
-  .word $0023, $ff51
-  .word $0022, $ff53
-  .word $0022, $ff55
-  .word $0022, $ff57
-  .word $0021, $ff59
-  .word $0021, $ff5a
-  .word $0021, $ff5c
-  .word $0020, $ff5e
-  .word $0020, $ff5f
-  .word $0020, $ff61
-  .word $001f, $ff62
-  .word $001f, $ff64
-  .word $001f, $ff65
-  .word $001e, $ff67
-  .word $001e, $ff68
-  .word $001e, $ff6a
-  .word $001e, $ff6b
-  .word $001d, $ff6d
-  .word $001d, $ff6e
-  .word $001d, $ff6f
-  .word $001d, $ff71
-  .word $001c, $ff72
-  .word $001c, $ff73
-  .word $001c, $ff74
-  .word $001c, $ff75
-  .word $001b, $ff77
-  .word $001b, $ff78
-  .word $001b, $ff79
-  .word $001b, $ff7a
-  .word $001a, $ff7b
-  .word $001a, $ff7c
-  .word $001a, $ff7d
-  .word $001a, $ff7e
-  .word $001a, $ff7f
-  .word $0019, $ff80
-  .word $0019, $ff81
-  .word $0019, $ff82
-  .word $0019, $ff83
-  .word $0019, $ff84
-  .word $0018, $ff85
-  .word $0018, $ff86
-  .word $0018, $ff87
-  .word $0018, $ff88
-  .word $0018, $ff89
-  .word $0018, $ff8a
-  .word $0017, $ff8b
-  .word $0017, $ff8c
-  .word $0017, $ff8c
-  .word $0017, $ff8d
-  .word $0017, $ff8e
-  .word $0017, $ff8f
-  .word $0016, $ff90
-  .word $0016, $ff90
-  .word $0016, $ff91
-  .word $0016, $ff92
-  .word $0016, $ff93
-  .word $0016, $ff93
-  .word $0015, $ff94
-  .word $0015, $ff95
-  .word $0015, $ff96
-  .word $0015, $ff96
-  .word $0015, $ff97
-  .word $0015, $ff98
-  .word $0015, $ff98
-  .word $0014, $ff99
-  .word $0014, $ff9a
-  .word $0014, $ff9a
-  .word $0014, $ff9b
-  .word $0014, $ff9c
-  .word $0014, $ff9c
-  .word $0014, $ff9d
-  .word $0014, $ff9d
-  .word $0013, $ff9e
-  .word $0013, $ff9f
-  .word $0013, $ff9f
-  .word $0013, $ffa0
-  .word $0013, $ffa0
-  .word $0013, $ffa1
-  .word $0013, $ffa1
-  .word $0013, $ffa2
-  .word $0013, $ffa3
-  .word $0012, $ffa3
-  .word $0012, $ffa4
-  .word $0012, $ffa4
-  .word $0012, $ffa5
-  .word $0012, $ffa5
-  .word $0012, $ffa6
-  .word $0012, $ffa6
-  .word $0012, $ffa7
-  .word $0012, $ffa7
-  .word $0012, $ffa8
-  .word $0011, $ffa8
-  .word $0011, $ffa9
-  .word $0011, $ffa9
-  .word $0011, $ffaa
-  .word $0011, $ffaa
-  .word $0011, $ffab
-  .word $0011, $ffab
-  .word $0011, $ffab
-  .word $0011, $ffac
-  .word $0011, $ffac
+  .word $fc4f
+  .word $fc83
+  .word $fcb2
+  .word $fcdd
+  .word $fd03
+  .word $fd26
+  .word $fd45
+  .word $fd62
+  .word $fd7d
+  .word $fd96
+  .word $fdad
+  .word $fdc2
+  .word $fdd6
+  .word $fde8
+  .word $fdfa
+  .word $fe0a
+  .word $fe19
+  .word $fe27
+  .word $fe35
+  .word $fe42
+  .word $fe4e
+  .word $fe59
+  .word $fe64
+  .word $fe6e
+  .word $fe78
+  .word $fe81
+  .word $fe8a
+  .word $fe93
+  .word $fe9b
+  .word $fea3
+  .word $feaa
+  .word $feb1
+  .word $feb8
+  .word $febf
+  .word $fec5
+  .word $fecb
+  .word $fed1
+  .word $fed6
+  .word $fedc
+  .word $fee1
+  .word $fee6
+  .word $feeb
+  .word $fef0
+  .word $fef4
+  .word $fef9
+  .word $fefd
+  .word $ff01
+  .word $ff05
+  .word $ff09
+  .word $ff0d
+  .word $ff10
+  .word $ff14
+  .word $ff17
+  .word $ff1a
+  .word $ff1e
+  .word $ff21
+  .word $ff24
+  .word $ff27
+  .word $ff2a
+  .word $ff2d
+  .word $ff2f
+  .word $ff32
+  .word $ff35
+  .word $ff37
+  .word $ff3a
+  .word $ff3c
+  .word $ff3e
+  .word $ff41
+  .word $ff43
+  .word $ff45
+  .word $ff47
+  .word $ff49
+  .word $ff4b
+  .word $ff4d
+  .word $ff4f
+  .word $ff51
+  .word $ff53
+  .word $ff55
+  .word $ff57
+  .word $ff59
+  .word $ff5a
+  .word $ff5c
+  .word $ff5e
+  .word $ff5f
+  .word $ff61
+  .word $ff62
+  .word $ff64
+  .word $ff65
+  .word $ff67
+  .word $ff68
+  .word $ff6a
+  .word $ff6b
+  .word $ff6d
+  .word $ff6e
+  .word $ff6f
+  .word $ff71
+  .word $ff72
+  .word $ff73
+  .word $ff74
+  .word $ff75
+  .word $ff77
+  .word $ff78
+  .word $ff79
+  .word $ff7a
+  .word $ff7b
+  .word $ff7c
+  .word $ff7d
+  .word $ff7e
+  .word $ff7f
+  .word $ff80
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff88
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9c
+  .word $ff9d
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ff9f
+  .word $ffa0
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffac
 .segment "Mode7TblAB"
 m7a_m7b_26:
-  .word $0171, $fc86
-  .word $015c, $fcb7
-  .word $014a, $fce3
-  .word $0139, $fd0b
-  .word $012b, $fd2f
-  .word $011d, $fd50
-  .word $0111, $fd6e
-  .word $0105, $fd89
-  .word $00fb, $fda3
-  .word $00f1, $fdba
-  .word $00e8, $fdcf
-  .word $00e0, $fde3
-  .word $00d8, $fdf6
-  .word $00d1, $fe07
-  .word $00ca, $fe18
-  .word $00c4, $fe27
-  .word $00be, $fe35
-  .word $00b8, $fe43
-  .word $00b3, $fe50
-  .word $00ae, $fe5c
-  .word $00a9, $fe67
-  .word $00a5, $fe72
-  .word $00a1, $fe7c
-  .word $009d, $fe86
-  .word $0099, $fe8f
-  .word $0095, $fe98
-  .word $0092, $fea0
-  .word $008e, $fea8
-  .word $008b, $feb0
-  .word $0088, $feb7
-  .word $0085, $febe
-  .word $0083, $fec5
-  .word $0080, $fecb
-  .word $007d, $fed1
-  .word $007b, $fed7
-  .word $0079, $fedd
-  .word $0076, $fee2
-  .word $0074, $fee8
-  .word $0072, $feed
-  .word $0070, $fef2
-  .word $006e, $fef6
-  .word $006c, $fefb
-  .word $006a, $feff
-  .word $0068, $ff04
-  .word $0067, $ff08
-  .word $0065, $ff0c
-  .word $0064, $ff10
-  .word $0062, $ff13
-  .word $0060, $ff17
-  .word $005f, $ff1b
-  .word $005e, $ff1e
-  .word $005c, $ff21
-  .word $005b, $ff25
-  .word $005a, $ff28
-  .word $0058, $ff2b
-  .word $0057, $ff2e
-  .word $0056, $ff31
-  .word $0055, $ff33
-  .word $0054, $ff36
-  .word $0052, $ff39
-  .word $0051, $ff3b
-  .word $0050, $ff3e
-  .word $004f, $ff40
-  .word $004e, $ff43
-  .word $004d, $ff45
-  .word $004c, $ff47
-  .word $004c, $ff4a
-  .word $004b, $ff4c
-  .word $004a, $ff4e
-  .word $0049, $ff50
-  .word $0048, $ff52
-  .word $0047, $ff54
-  .word $0046, $ff56
-  .word $0046, $ff58
-  .word $0045, $ff5a
-  .word $0044, $ff5b
-  .word $0043, $ff5d
-  .word $0043, $ff5f
-  .word $0042, $ff61
-  .word $0041, $ff62
-  .word $0041, $ff64
-  .word $0040, $ff66
-  .word $003f, $ff67
-  .word $003f, $ff69
-  .word $003e, $ff6a
-  .word $003d, $ff6c
-  .word $003d, $ff6d
-  .word $003c, $ff6e
-  .word $003c, $ff70
-  .word $003b, $ff71
-  .word $003b, $ff73
-  .word $003a, $ff74
-  .word $003a, $ff75
-  .word $0039, $ff76
-  .word $0038, $ff78
-  .word $0038, $ff79
-  .word $0037, $ff7a
-  .word $0037, $ff7b
-  .word $0037, $ff7c
-  .word $0036, $ff7e
-  .word $0036, $ff7f
-  .word $0035, $ff80
-  .word $0035, $ff81
-  .word $0034, $ff82
-  .word $0034, $ff83
-  .word $0033, $ff84
-  .word $0033, $ff85
-  .word $0033, $ff86
-  .word $0032, $ff87
-  .word $0032, $ff88
-  .word $0031, $ff89
-  .word $0031, $ff8a
-  .word $0031, $ff8b
-  .word $0030, $ff8c
-  .word $0030, $ff8c
-  .word $002f, $ff8d
-  .word $002f, $ff8e
-  .word $002f, $ff8f
-  .word $002e, $ff90
-  .word $002e, $ff91
-  .word $002e, $ff92
-  .word $002d, $ff92
-  .word $002d, $ff93
-  .word $002d, $ff94
-  .word $002c, $ff95
-  .word $002c, $ff95
-  .word $002c, $ff96
-  .word $002c, $ff97
-  .word $002b, $ff98
-  .word $002b, $ff98
-  .word $002b, $ff99
-  .word $002a, $ff9a
-  .word $002a, $ff9a
-  .word $002a, $ff9b
-  .word $002a, $ff9c
-  .word $0029, $ff9c
-  .word $0029, $ff9d
-  .word $0029, $ff9e
-  .word $0028, $ff9e
-  .word $0028, $ff9f
-  .word $0028, $ffa0
-  .word $0028, $ffa0
-  .word $0027, $ffa1
-  .word $0027, $ffa1
-  .word $0027, $ffa2
-  .word $0027, $ffa3
-  .word $0026, $ffa3
-  .word $0026, $ffa4
-  .word $0026, $ffa4
-  .word $0026, $ffa5
-  .word $0026, $ffa5
-  .word $0025, $ffa6
-  .word $0025, $ffa6
-  .word $0025, $ffa7
-  .word $0025, $ffa7
-  .word $0024, $ffa8
-  .word $0024, $ffa9
-  .word $0024, $ffa9
-  .word $0024, $ffaa
-  .word $0024, $ffaa
-  .word $0023, $ffaa
-  .word $0023, $ffab
-  .word $0023, $ffab
-  .word $0023, $ffac
-  .word $0023, $ffac
-  .word $0022, $ffad
-  .word $0022, $ffad
-  .word $0022, $ffae
-  .word $0022, $ffae
-  .word $0022, $ffaf
-  .word $0022, $ffaf
-  .word $0021, $ffaf
-  .word $0021, $ffb0
-  .word $0021, $ffb0
-  .word $0021, $ffb1
-  .word $0021, $ffb1
+  .word $fc86
+  .word $fcb7
+  .word $fce3
+  .word $fd0b
+  .word $fd2f
+  .word $fd50
+  .word $fd6e
+  .word $fd89
+  .word $fda3
+  .word $fdba
+  .word $fdcf
+  .word $fde3
+  .word $fdf6
+  .word $fe07
+  .word $fe18
+  .word $fe27
+  .word $fe35
+  .word $fe43
+  .word $fe50
+  .word $fe5c
+  .word $fe67
+  .word $fe72
+  .word $fe7c
+  .word $fe86
+  .word $fe8f
+  .word $fe98
+  .word $fea0
+  .word $fea8
+  .word $feb0
+  .word $feb7
+  .word $febe
+  .word $fec5
+  .word $fecb
+  .word $fed1
+  .word $fed7
+  .word $fedd
+  .word $fee2
+  .word $fee8
+  .word $feed
+  .word $fef2
+  .word $fef6
+  .word $fefb
+  .word $feff
+  .word $ff04
+  .word $ff08
+  .word $ff0c
+  .word $ff10
+  .word $ff13
+  .word $ff17
+  .word $ff1b
+  .word $ff1e
+  .word $ff21
+  .word $ff25
+  .word $ff28
+  .word $ff2b
+  .word $ff2e
+  .word $ff31
+  .word $ff33
+  .word $ff36
+  .word $ff39
+  .word $ff3b
+  .word $ff3e
+  .word $ff40
+  .word $ff43
+  .word $ff45
+  .word $ff47
+  .word $ff4a
+  .word $ff4c
+  .word $ff4e
+  .word $ff50
+  .word $ff52
+  .word $ff54
+  .word $ff56
+  .word $ff58
+  .word $ff5a
+  .word $ff5b
+  .word $ff5d
+  .word $ff5f
+  .word $ff61
+  .word $ff62
+  .word $ff64
+  .word $ff66
+  .word $ff67
+  .word $ff69
+  .word $ff6a
+  .word $ff6c
+  .word $ff6d
+  .word $ff6e
+  .word $ff70
+  .word $ff71
+  .word $ff73
+  .word $ff74
+  .word $ff75
+  .word $ff76
+  .word $ff78
+  .word $ff79
+  .word $ff7a
+  .word $ff7b
+  .word $ff7c
+  .word $ff7e
+  .word $ff7f
+  .word $ff80
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff88
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff92
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff95
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9c
+  .word $ff9d
+  .word $ff9e
+  .word $ff9e
+  .word $ff9f
+  .word $ffa0
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa7
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffac
+  .word $ffad
+  .word $ffad
+  .word $ffae
+  .word $ffae
+  .word $ffaf
+  .word $ffaf
+  .word $ffaf
+  .word $ffb0
+  .word $ffb0
+  .word $ffb1
+  .word $ffb1
 .segment "Mode7TblAB"
 m7a_m7b_27:
-  .word $0217, $fcdf
-  .word $01fa, $fd0b
-  .word $01df, $fd33
-  .word $01c7, $fd57
-  .word $01b1, $fd77
-  .word $019e, $fd95
-  .word $018c, $fdb0
-  .word $017b, $fdc8
-  .word $016c, $fddf
-  .word $015e, $fdf4
-  .word $0151, $fe07
-  .word $0145, $fe19
-  .word $013a, $fe2a
-  .word $012f, $fe3a
-  .word $0126, $fe49
-  .word $011c, $fe56
-  .word $0114, $fe63
-  .word $010c, $fe6f
-  .word $0104, $fe7b
-  .word $00fd, $fe86
-  .word $00f6, $fe90
-  .word $00f0, $fe9a
-  .word $00e9, $fea3
-  .word $00e4, $feab
-  .word $00de, $feb4
-  .word $00d9, $febc
-  .word $00d4, $fec3
-  .word $00cf, $feca
-  .word $00ca, $fed1
-  .word $00c6, $fed8
-  .word $00c2, $fede
-  .word $00be, $fee4
-  .word $00ba, $feea
-  .word $00b6, $fef0
-  .word $00b2, $fef5
-  .word $00af, $fefa
-  .word $00ac, $feff
-  .word $00a9, $ff04
-  .word $00a5, $ff08
-  .word $00a3, $ff0d
-  .word $00a0, $ff11
-  .word $009d, $ff15
-  .word $009a, $ff19
-  .word $0098, $ff1d
-  .word $0095, $ff21
-  .word $0093, $ff24
-  .word $0090, $ff28
-  .word $008e, $ff2b
-  .word $008c, $ff2e
-  .word $008a, $ff32
-  .word $0088, $ff35
-  .word $0086, $ff38
-  .word $0084, $ff3b
-  .word $0082, $ff3d
-  .word $0080, $ff40
-  .word $007e, $ff43
-  .word $007d, $ff45
-  .word $007b, $ff48
-  .word $0079, $ff4a
-  .word $0078, $ff4d
-  .word $0076, $ff4f
-  .word $0075, $ff51
-  .word $0073, $ff54
-  .word $0072, $ff56
-  .word $0070, $ff58
-  .word $006f, $ff5a
-  .word $006e, $ff5c
-  .word $006c, $ff5e
-  .word $006b, $ff60
-  .word $006a, $ff62
-  .word $0069, $ff63
-  .word $0067, $ff65
-  .word $0066, $ff67
-  .word $0065, $ff69
-  .word $0064, $ff6a
-  .word $0063, $ff6c
-  .word $0062, $ff6e
-  .word $0061, $ff6f
-  .word $0060, $ff71
-  .word $005f, $ff72
-  .word $005e, $ff74
-  .word $005d, $ff75
-  .word $005c, $ff76
-  .word $005b, $ff78
-  .word $005a, $ff79
-  .word $0059, $ff7a
-  .word $0058, $ff7c
-  .word $0058, $ff7d
-  .word $0057, $ff7e
-  .word $0056, $ff7f
-  .word $0055, $ff81
-  .word $0054, $ff82
-  .word $0054, $ff83
-  .word $0053, $ff84
-  .word $0052, $ff85
-  .word $0051, $ff86
-  .word $0051, $ff87
-  .word $0050, $ff89
-  .word $004f, $ff8a
-  .word $004e, $ff8b
-  .word $004e, $ff8c
-  .word $004d, $ff8d
-  .word $004c, $ff8e
-  .word $004c, $ff8e
-  .word $004b, $ff8f
-  .word $004b, $ff90
-  .word $004a, $ff91
-  .word $0049, $ff92
-  .word $0049, $ff93
-  .word $0048, $ff94
-  .word $0048, $ff95
-  .word $0047, $ff96
-  .word $0047, $ff96
-  .word $0046, $ff97
-  .word $0045, $ff98
-  .word $0045, $ff99
-  .word $0044, $ff9a
-  .word $0044, $ff9a
-  .word $0043, $ff9b
-  .word $0043, $ff9c
-  .word $0042, $ff9d
-  .word $0042, $ff9d
-  .word $0041, $ff9e
-  .word $0041, $ff9f
-  .word $0041, $ff9f
-  .word $0040, $ffa0
-  .word $0040, $ffa1
-  .word $003f, $ffa1
-  .word $003f, $ffa2
-  .word $003e, $ffa3
-  .word $003e, $ffa3
-  .word $003e, $ffa4
-  .word $003d, $ffa5
-  .word $003d, $ffa5
-  .word $003c, $ffa6
-  .word $003c, $ffa6
-  .word $003b, $ffa7
-  .word $003b, $ffa8
-  .word $003b, $ffa8
-  .word $003a, $ffa9
-  .word $003a, $ffa9
-  .word $003a, $ffaa
-  .word $0039, $ffaa
-  .word $0039, $ffab
-  .word $0039, $ffab
-  .word $0038, $ffac
-  .word $0038, $ffac
-  .word $0038, $ffad
-  .word $0037, $ffad
-  .word $0037, $ffae
-  .word $0037, $ffae
-  .word $0036, $ffaf
-  .word $0036, $ffaf
-  .word $0036, $ffb0
-  .word $0035, $ffb0
-  .word $0035, $ffb1
-  .word $0035, $ffb1
-  .word $0034, $ffb2
-  .word $0034, $ffb2
-  .word $0034, $ffb3
-  .word $0033, $ffb3
-  .word $0033, $ffb3
-  .word $0033, $ffb4
-  .word $0033, $ffb4
-  .word $0032, $ffb5
-  .word $0032, $ffb5
-  .word $0032, $ffb6
-  .word $0031, $ffb6
-  .word $0031, $ffb6
-  .word $0031, $ffb7
-  .word $0031, $ffb7
-  .word $0030, $ffb8
-  .word $0030, $ffb8
-  .word $0030, $ffb8
-  .word $0030, $ffb9
-  .word $002f, $ffb9
+  .word $fcdf
+  .word $fd0b
+  .word $fd33
+  .word $fd57
+  .word $fd77
+  .word $fd95
+  .word $fdb0
+  .word $fdc8
+  .word $fddf
+  .word $fdf4
+  .word $fe07
+  .word $fe19
+  .word $fe2a
+  .word $fe3a
+  .word $fe49
+  .word $fe56
+  .word $fe63
+  .word $fe6f
+  .word $fe7b
+  .word $fe86
+  .word $fe90
+  .word $fe9a
+  .word $fea3
+  .word $feab
+  .word $feb4
+  .word $febc
+  .word $fec3
+  .word $feca
+  .word $fed1
+  .word $fed8
+  .word $fede
+  .word $fee4
+  .word $feea
+  .word $fef0
+  .word $fef5
+  .word $fefa
+  .word $feff
+  .word $ff04
+  .word $ff08
+  .word $ff0d
+  .word $ff11
+  .word $ff15
+  .word $ff19
+  .word $ff1d
+  .word $ff21
+  .word $ff24
+  .word $ff28
+  .word $ff2b
+  .word $ff2e
+  .word $ff32
+  .word $ff35
+  .word $ff38
+  .word $ff3b
+  .word $ff3d
+  .word $ff40
+  .word $ff43
+  .word $ff45
+  .word $ff48
+  .word $ff4a
+  .word $ff4d
+  .word $ff4f
+  .word $ff51
+  .word $ff54
+  .word $ff56
+  .word $ff58
+  .word $ff5a
+  .word $ff5c
+  .word $ff5e
+  .word $ff60
+  .word $ff62
+  .word $ff63
+  .word $ff65
+  .word $ff67
+  .word $ff69
+  .word $ff6a
+  .word $ff6c
+  .word $ff6e
+  .word $ff6f
+  .word $ff71
+  .word $ff72
+  .word $ff74
+  .word $ff75
+  .word $ff76
+  .word $ff78
+  .word $ff79
+  .word $ff7a
+  .word $ff7c
+  .word $ff7d
+  .word $ff7e
+  .word $ff7f
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff84
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff8e
+  .word $ff8f
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff99
+  .word $ff9a
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ff9f
+  .word $ffa0
+  .word $ffa1
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa6
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffac
+  .word $ffad
+  .word $ffad
+  .word $ffae
+  .word $ffae
+  .word $ffaf
+  .word $ffaf
+  .word $ffb0
+  .word $ffb0
+  .word $ffb1
+  .word $ffb1
+  .word $ffb2
+  .word $ffb2
+  .word $ffb3
+  .word $ffb3
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb5
+  .word $ffb6
+  .word $ffb6
+  .word $ffb6
+  .word $ffb7
+  .word $ffb7
+  .word $ffb8
+  .word $ffb8
+  .word $ffb8
+  .word $ffb9
+  .word $ffb9
 .segment "Mode7TblAB"
 m7a_m7b_28:
-  .word $02a9, $fd57
-  .word $0284, $fd7c
-  .word $0262, $fd9e
-  .word $0243, $fdbd
-  .word $0228, $fdd8
-  .word $020f, $fdf1
-  .word $01f8, $fe08
-  .word $01e3, $fe1d
-  .word $01cf, $fe31
-  .word $01be, $fe42
-  .word $01ad, $fe53
-  .word $019e, $fe62
-  .word $018f, $fe71
-  .word $0182, $fe7e
-  .word $0176, $fe8a
-  .word $016a, $fe96
-  .word $015f, $fea1
-  .word $0155, $feab
-  .word $014b, $feb5
-  .word $0142, $febe
-  .word $0139, $fec7
-  .word $0131, $fecf
-  .word $0129, $fed7
-  .word $0122, $fede
-  .word $011b, $fee5
-  .word $0114, $feec
-  .word $010d, $fef3
-  .word $0107, $fef9
-  .word $0101, $feff
-  .word $00fc, $ff04
-  .word $00f6, $ff0a
-  .word $00f1, $ff0f
-  .word $00ec, $ff14
-  .word $00e8, $ff18
-  .word $00e3, $ff1d
-  .word $00df, $ff21
-  .word $00db, $ff25
-  .word $00d7, $ff29
-  .word $00d3, $ff2d
-  .word $00cf, $ff31
-  .word $00cb, $ff35
-  .word $00c8, $ff38
-  .word $00c4, $ff3c
-  .word $00c1, $ff3f
-  .word $00be, $ff42
-  .word $00bb, $ff45
-  .word $00b8, $ff48
-  .word $00b5, $ff4b
-  .word $00b2, $ff4e
-  .word $00b0, $ff50
-  .word $00ad, $ff53
-  .word $00aa, $ff56
-  .word $00a8, $ff58
-  .word $00a6, $ff5a
-  .word $00a3, $ff5d
-  .word $00a1, $ff5f
-  .word $009f, $ff61
-  .word $009d, $ff63
-  .word $009a, $ff66
-  .word $0098, $ff68
-  .word $0096, $ff6a
-  .word $0095, $ff6b
-  .word $0093, $ff6d
-  .word $0091, $ff6f
-  .word $008f, $ff71
-  .word $008d, $ff73
-  .word $008c, $ff74
-  .word $008a, $ff76
-  .word $0088, $ff78
-  .word $0087, $ff79
-  .word $0085, $ff7b
-  .word $0084, $ff7c
-  .word $0082, $ff7e
-  .word $0081, $ff7f
-  .word $007f, $ff81
-  .word $007e, $ff82
-  .word $007d, $ff83
-  .word $007b, $ff85
-  .word $007a, $ff86
-  .word $0079, $ff87
-  .word $0077, $ff89
-  .word $0076, $ff8a
-  .word $0075, $ff8b
-  .word $0074, $ff8c
-  .word $0073, $ff8d
-  .word $0072, $ff8e
-  .word $0070, $ff90
-  .word $006f, $ff91
-  .word $006e, $ff92
-  .word $006d, $ff93
-  .word $006c, $ff94
-  .word $006b, $ff95
-  .word $006a, $ff96
-  .word $0069, $ff97
-  .word $0068, $ff98
-  .word $0067, $ff99
-  .word $0067, $ff99
-  .word $0066, $ff9a
-  .word $0065, $ff9b
-  .word $0064, $ff9c
-  .word $0063, $ff9d
-  .word $0062, $ff9e
-  .word $0061, $ff9f
-  .word $0061, $ff9f
-  .word $0060, $ffa0
-  .word $005f, $ffa1
-  .word $005e, $ffa2
-  .word $005d, $ffa3
-  .word $005d, $ffa3
-  .word $005c, $ffa4
-  .word $005b, $ffa5
-  .word $005b, $ffa5
-  .word $005a, $ffa6
-  .word $0059, $ffa7
-  .word $0058, $ffa8
-  .word $0058, $ffa8
-  .word $0057, $ffa9
-  .word $0056, $ffaa
-  .word $0056, $ffaa
-  .word $0055, $ffab
-  .word $0055, $ffab
-  .word $0054, $ffac
-  .word $0053, $ffad
-  .word $0053, $ffad
-  .word $0052, $ffae
-  .word $0052, $ffae
-  .word $0051, $ffaf
-  .word $0050, $ffb0
-  .word $0050, $ffb0
-  .word $004f, $ffb1
-  .word $004f, $ffb1
-  .word $004e, $ffb2
-  .word $004e, $ffb2
-  .word $004d, $ffb3
-  .word $004d, $ffb3
-  .word $004c, $ffb4
-  .word $004c, $ffb4
-  .word $004b, $ffb5
-  .word $004b, $ffb5
-  .word $004a, $ffb6
-  .word $004a, $ffb6
-  .word $0049, $ffb7
-  .word $0049, $ffb7
-  .word $0048, $ffb8
-  .word $0048, $ffb8
-  .word $0048, $ffb8
-  .word $0047, $ffb9
-  .word $0047, $ffb9
-  .word $0046, $ffba
-  .word $0046, $ffba
-  .word $0045, $ffbb
-  .word $0045, $ffbb
-  .word $0045, $ffbb
-  .word $0044, $ffbc
-  .word $0044, $ffbc
-  .word $0043, $ffbd
-  .word $0043, $ffbd
-  .word $0043, $ffbd
-  .word $0042, $ffbe
-  .word $0042, $ffbe
-  .word $0041, $ffbf
-  .word $0041, $ffbf
-  .word $0041, $ffbf
-  .word $0040, $ffc0
-  .word $0040, $ffc0
-  .word $0040, $ffc0
-  .word $003f, $ffc1
-  .word $003f, $ffc1
-  .word $003f, $ffc1
-  .word $003e, $ffc2
-  .word $003e, $ffc2
-  .word $003e, $ffc2
-  .word $003d, $ffc3
-  .word $003d, $ffc3
-  .word $003d, $ffc3
-  .word $003c, $ffc4
+  .word $fd57
+  .word $fd7c
+  .word $fd9e
+  .word $fdbd
+  .word $fdd8
+  .word $fdf1
+  .word $fe08
+  .word $fe1d
+  .word $fe31
+  .word $fe42
+  .word $fe53
+  .word $fe62
+  .word $fe71
+  .word $fe7e
+  .word $fe8a
+  .word $fe96
+  .word $fea1
+  .word $feab
+  .word $feb5
+  .word $febe
+  .word $fec7
+  .word $fecf
+  .word $fed7
+  .word $fede
+  .word $fee5
+  .word $feec
+  .word $fef3
+  .word $fef9
+  .word $feff
+  .word $ff04
+  .word $ff0a
+  .word $ff0f
+  .word $ff14
+  .word $ff18
+  .word $ff1d
+  .word $ff21
+  .word $ff25
+  .word $ff29
+  .word $ff2d
+  .word $ff31
+  .word $ff35
+  .word $ff38
+  .word $ff3c
+  .word $ff3f
+  .word $ff42
+  .word $ff45
+  .word $ff48
+  .word $ff4b
+  .word $ff4e
+  .word $ff50
+  .word $ff53
+  .word $ff56
+  .word $ff58
+  .word $ff5a
+  .word $ff5d
+  .word $ff5f
+  .word $ff61
+  .word $ff63
+  .word $ff66
+  .word $ff68
+  .word $ff6a
+  .word $ff6b
+  .word $ff6d
+  .word $ff6f
+  .word $ff71
+  .word $ff73
+  .word $ff74
+  .word $ff76
+  .word $ff78
+  .word $ff79
+  .word $ff7b
+  .word $ff7c
+  .word $ff7e
+  .word $ff7f
+  .word $ff81
+  .word $ff82
+  .word $ff83
+  .word $ff85
+  .word $ff86
+  .word $ff87
+  .word $ff89
+  .word $ff8a
+  .word $ff8b
+  .word $ff8c
+  .word $ff8d
+  .word $ff8e
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff93
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff97
+  .word $ff98
+  .word $ff99
+  .word $ff99
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ff9f
+  .word $ffa0
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa3
+  .word $ffa4
+  .word $ffa5
+  .word $ffa5
+  .word $ffa6
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffaa
+  .word $ffaa
+  .word $ffab
+  .word $ffab
+  .word $ffac
+  .word $ffad
+  .word $ffad
+  .word $ffae
+  .word $ffae
+  .word $ffaf
+  .word $ffb0
+  .word $ffb0
+  .word $ffb1
+  .word $ffb1
+  .word $ffb2
+  .word $ffb2
+  .word $ffb3
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb5
+  .word $ffb6
+  .word $ffb6
+  .word $ffb7
+  .word $ffb7
+  .word $ffb8
+  .word $ffb8
+  .word $ffb8
+  .word $ffb9
+  .word $ffb9
+  .word $ffba
+  .word $ffba
+  .word $ffbb
+  .word $ffbb
+  .word $ffbb
+  .word $ffbc
+  .word $ffbc
+  .word $ffbd
+  .word $ffbd
+  .word $ffbd
+  .word $ffbe
+  .word $ffbe
+  .word $ffbf
+  .word $ffbf
+  .word $ffbf
+  .word $ffc0
+  .word $ffc0
+  .word $ffc0
+  .word $ffc1
+  .word $ffc1
+  .word $ffc1
+  .word $ffc2
+  .word $ffc2
+  .word $ffc2
+  .word $ffc3
+  .word $ffc3
+  .word $ffc3
+  .word $ffc4
 .segment "Mode7TblAB"
 m7a_m7b_29:
-  .word $0321, $fde9
-  .word $02f5, $fe06
-  .word $02cd, $fe21
-  .word $02a9, $fe39
-  .word $0289, $fe4f
-  .word $026b, $fe62
-  .word $0250, $fe74
-  .word $0238, $fe85
-  .word $0221, $fe94
-  .word $020c, $fea2
-  .word $01f9, $feaf
-  .word $01e7, $febb
-  .word $01d6, $fec6
-  .word $01c6, $fed1
-  .word $01b7, $feda
-  .word $01aa, $fee4
-  .word $019d, $feec
-  .word $0191, $fef4
-  .word $0185, $fefc
-  .word $017a, $ff03
-  .word $0170, $ff0a
-  .word $0166, $ff10
-  .word $015d, $ff17
-  .word $0155, $ff1c
-  .word $014c, $ff22
-  .word $0144, $ff27
-  .word $013d, $ff2c
-  .word $0136, $ff31
-  .word $012f, $ff36
-  .word $0128, $ff3a
-  .word $0122, $ff3e
-  .word $011c, $ff42
-  .word $0116, $ff46
-  .word $0110, $ff4a
-  .word $010b, $ff4e
-  .word $0106, $ff51
-  .word $0101, $ff54
-  .word $00fc, $ff57
-  .word $00f8, $ff5b
-  .word $00f3, $ff5d
-  .word $00ef, $ff60
-  .word $00eb, $ff63
-  .word $00e7, $ff66
-  .word $00e3, $ff68
-  .word $00df, $ff6b
-  .word $00dc, $ff6d
-  .word $00d8, $ff70
-  .word $00d5, $ff72
-  .word $00d2, $ff74
-  .word $00ce, $ff76
-  .word $00cb, $ff78
-  .word $00c8, $ff7a
-  .word $00c5, $ff7c
-  .word $00c3, $ff7e
-  .word $00c0, $ff80
-  .word $00bd, $ff82
-  .word $00bb, $ff83
-  .word $00b8, $ff85
-  .word $00b6, $ff87
-  .word $00b3, $ff88
-  .word $00b1, $ff8a
-  .word $00af, $ff8b
-  .word $00ac, $ff8d
-  .word $00aa, $ff8e
-  .word $00a8, $ff90
-  .word $00a6, $ff91
-  .word $00a4, $ff92
-  .word $00a2, $ff94
-  .word $00a0, $ff95
-  .word $009e, $ff96
-  .word $009d, $ff97
-  .word $009b, $ff99
-  .word $0099, $ff9a
-  .word $0097, $ff9b
-  .word $0096, $ff9c
-  .word $0094, $ff9d
-  .word $0092, $ff9e
-  .word $0091, $ff9f
-  .word $008f, $ffa0
-  .word $008e, $ffa1
-  .word $008c, $ffa2
-  .word $008b, $ffa3
-  .word $008a, $ffa4
-  .word $0088, $ffa5
-  .word $0087, $ffa6
-  .word $0086, $ffa7
-  .word $0084, $ffa8
-  .word $0083, $ffa8
-  .word $0082, $ffa9
-  .word $0081, $ffaa
-  .word $007f, $ffab
-  .word $007e, $ffac
-  .word $007d, $ffac
-  .word $007c, $ffad
-  .word $007b, $ffae
-  .word $007a, $ffaf
-  .word $0079, $ffaf
-  .word $0077, $ffb0
-  .word $0076, $ffb1
-  .word $0075, $ffb2
-  .word $0074, $ffb2
-  .word $0073, $ffb3
-  .word $0072, $ffb4
-  .word $0072, $ffb4
-  .word $0071, $ffb5
-  .word $0070, $ffb5
-  .word $006f, $ffb6
-  .word $006e, $ffb7
-  .word $006d, $ffb7
-  .word $006c, $ffb8
-  .word $006b, $ffb8
-  .word $006a, $ffb9
-  .word $006a, $ffb9
-  .word $0069, $ffba
-  .word $0068, $ffbb
-  .word $0067, $ffbb
-  .word $0066, $ffbc
-  .word $0066, $ffbc
-  .word $0065, $ffbd
-  .word $0064, $ffbd
-  .word $0063, $ffbe
-  .word $0063, $ffbe
-  .word $0062, $ffbf
-  .word $0061, $ffbf
-  .word $0061, $ffbf
-  .word $0060, $ffc0
-  .word $005f, $ffc0
-  .word $005f, $ffc1
-  .word $005e, $ffc1
-  .word $005d, $ffc2
-  .word $005d, $ffc2
-  .word $005c, $ffc2
-  .word $005b, $ffc3
-  .word $005b, $ffc3
-  .word $005a, $ffc4
-  .word $005a, $ffc4
-  .word $0059, $ffc5
-  .word $0058, $ffc5
-  .word $0058, $ffc5
-  .word $0057, $ffc6
-  .word $0057, $ffc6
-  .word $0056, $ffc6
-  .word $0056, $ffc7
-  .word $0055, $ffc7
-  .word $0055, $ffc7
-  .word $0054, $ffc8
-  .word $0054, $ffc8
-  .word $0053, $ffc8
-  .word $0053, $ffc9
-  .word $0052, $ffc9
-  .word $0052, $ffc9
-  .word $0051, $ffca
-  .word $0051, $ffca
-  .word $0050, $ffca
-  .word $0050, $ffcb
-  .word $004f, $ffcb
-  .word $004f, $ffcb
-  .word $004e, $ffcc
-  .word $004e, $ffcc
-  .word $004d, $ffcc
-  .word $004d, $ffcd
-  .word $004d, $ffcd
-  .word $004c, $ffcd
-  .word $004c, $ffcd
-  .word $004b, $ffce
-  .word $004b, $ffce
-  .word $004a, $ffce
-  .word $004a, $ffcf
-  .word $004a, $ffcf
-  .word $0049, $ffcf
-  .word $0049, $ffcf
-  .word $0048, $ffd0
-  .word $0048, $ffd0
-  .word $0048, $ffd0
-  .word $0047, $ffd0
-  .word $0047, $ffd1
+  .word $fde9
+  .word $fe06
+  .word $fe21
+  .word $fe39
+  .word $fe4f
+  .word $fe62
+  .word $fe74
+  .word $fe85
+  .word $fe94
+  .word $fea2
+  .word $feaf
+  .word $febb
+  .word $fec6
+  .word $fed1
+  .word $feda
+  .word $fee4
+  .word $feec
+  .word $fef4
+  .word $fefc
+  .word $ff03
+  .word $ff0a
+  .word $ff10
+  .word $ff17
+  .word $ff1c
+  .word $ff22
+  .word $ff27
+  .word $ff2c
+  .word $ff31
+  .word $ff36
+  .word $ff3a
+  .word $ff3e
+  .word $ff42
+  .word $ff46
+  .word $ff4a
+  .word $ff4e
+  .word $ff51
+  .word $ff54
+  .word $ff57
+  .word $ff5b
+  .word $ff5d
+  .word $ff60
+  .word $ff63
+  .word $ff66
+  .word $ff68
+  .word $ff6b
+  .word $ff6d
+  .word $ff70
+  .word $ff72
+  .word $ff74
+  .word $ff76
+  .word $ff78
+  .word $ff7a
+  .word $ff7c
+  .word $ff7e
+  .word $ff80
+  .word $ff82
+  .word $ff83
+  .word $ff85
+  .word $ff87
+  .word $ff88
+  .word $ff8a
+  .word $ff8b
+  .word $ff8d
+  .word $ff8e
+  .word $ff90
+  .word $ff91
+  .word $ff92
+  .word $ff94
+  .word $ff95
+  .word $ff96
+  .word $ff97
+  .word $ff99
+  .word $ff9a
+  .word $ff9b
+  .word $ff9c
+  .word $ff9d
+  .word $ff9e
+  .word $ff9f
+  .word $ffa0
+  .word $ffa1
+  .word $ffa2
+  .word $ffa3
+  .word $ffa4
+  .word $ffa5
+  .word $ffa6
+  .word $ffa7
+  .word $ffa8
+  .word $ffa8
+  .word $ffa9
+  .word $ffaa
+  .word $ffab
+  .word $ffac
+  .word $ffac
+  .word $ffad
+  .word $ffae
+  .word $ffaf
+  .word $ffaf
+  .word $ffb0
+  .word $ffb1
+  .word $ffb2
+  .word $ffb2
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb5
+  .word $ffb6
+  .word $ffb7
+  .word $ffb7
+  .word $ffb8
+  .word $ffb8
+  .word $ffb9
+  .word $ffb9
+  .word $ffba
+  .word $ffbb
+  .word $ffbb
+  .word $ffbc
+  .word $ffbc
+  .word $ffbd
+  .word $ffbd
+  .word $ffbe
+  .word $ffbe
+  .word $ffbf
+  .word $ffbf
+  .word $ffbf
+  .word $ffc0
+  .word $ffc0
+  .word $ffc1
+  .word $ffc1
+  .word $ffc2
+  .word $ffc2
+  .word $ffc2
+  .word $ffc3
+  .word $ffc3
+  .word $ffc4
+  .word $ffc4
+  .word $ffc5
+  .word $ffc5
+  .word $ffc5
+  .word $ffc6
+  .word $ffc6
+  .word $ffc6
+  .word $ffc7
+  .word $ffc7
+  .word $ffc7
+  .word $ffc8
+  .word $ffc8
+  .word $ffc8
+  .word $ffc9
+  .word $ffc9
+  .word $ffc9
+  .word $ffca
+  .word $ffca
+  .word $ffca
+  .word $ffcb
+  .word $ffcb
+  .word $ffcb
+  .word $ffcc
+  .word $ffcc
+  .word $ffcc
+  .word $ffcd
+  .word $ffcd
+  .word $ffcd
+  .word $ffcd
+  .word $ffce
+  .word $ffce
+  .word $ffce
+  .word $ffcf
+  .word $ffcf
+  .word $ffcf
+  .word $ffcf
+  .word $ffd0
+  .word $ffd0
+  .word $ffd0
+  .word $ffd0
+  .word $ffd1
 .segment "Mode7TblAB"
 m7a_m7b_30:
-  .word $037a, $fe8f
-  .word $0349, $fea4
-  .word $031d, $feb6
-  .word $02f5, $fec7
-  .word $02d1, $fed5
-  .word $02b0, $fee3
-  .word $0292, $feef
-  .word $0277, $fefb
-  .word $025d, $ff05
-  .word $0246, $ff0f
-  .word $0231, $ff18
-  .word $021d, $ff20
-  .word $020a, $ff28
-  .word $01f9, $ff2f
-  .word $01e8, $ff36
-  .word $01d9, $ff3c
-  .word $01cb, $ff42
-  .word $01bd, $ff48
-  .word $01b0, $ff4d
-  .word $01a4, $ff52
-  .word $0199, $ff57
-  .word $018e, $ff5b
-  .word $0184, $ff5f
-  .word $017a, $ff63
-  .word $0171, $ff67
-  .word $0168, $ff6b
-  .word $0160, $ff6e
-  .word $0158, $ff72
-  .word $0150, $ff75
-  .word $0149, $ff78
-  .word $0142, $ff7b
-  .word $013b, $ff7d
-  .word $0135, $ff80
-  .word $012f, $ff83
-  .word $0129, $ff85
-  .word $0123, $ff87
-  .word $011e, $ff8a
-  .word $0118, $ff8c
-  .word $0113, $ff8e
-  .word $010e, $ff90
-  .word $010a, $ff92
-  .word $0105, $ff94
-  .word $0101, $ff96
-  .word $00fc, $ff98
-  .word $00f8, $ff99
-  .word $00f4, $ff9b
-  .word $00f0, $ff9c
-  .word $00ed, $ff9e
-  .word $00e9, $ffa0
-  .word $00e5, $ffa1
-  .word $00e2, $ffa2
-  .word $00df, $ffa4
-  .word $00db, $ffa5
-  .word $00d8, $ffa6
-  .word $00d5, $ffa8
-  .word $00d2, $ffa9
-  .word $00cf, $ffaa
-  .word $00cd, $ffab
-  .word $00ca, $ffac
-  .word $00c7, $ffae
-  .word $00c5, $ffaf
-  .word $00c2, $ffb0
-  .word $00c0, $ffb1
-  .word $00bd, $ffb2
-  .word $00bb, $ffb3
-  .word $00b9, $ffb4
-  .word $00b6, $ffb4
-  .word $00b4, $ffb5
-  .word $00b2, $ffb6
-  .word $00b0, $ffb7
-  .word $00ae, $ffb8
-  .word $00ac, $ffb9
-  .word $00aa, $ffba
-  .word $00a8, $ffba
-  .word $00a6, $ffbb
-  .word $00a5, $ffbc
-  .word $00a3, $ffbd
-  .word $00a1, $ffbd
-  .word $009f, $ffbe
-  .word $009e, $ffbf
-  .word $009c, $ffbf
-  .word $009a, $ffc0
-  .word $0099, $ffc1
-  .word $0097, $ffc1
-  .word $0096, $ffc2
-  .word $0094, $ffc3
-  .word $0093, $ffc3
-  .word $0092, $ffc4
-  .word $0090, $ffc4
-  .word $008f, $ffc5
-  .word $008d, $ffc5
-  .word $008c, $ffc6
-  .word $008b, $ffc6
-  .word $008a, $ffc7
-  .word $0088, $ffc8
-  .word $0087, $ffc8
-  .word $0086, $ffc9
-  .word $0085, $ffc9
-  .word $0084, $ffc9
-  .word $0082, $ffca
-  .word $0081, $ffca
-  .word $0080, $ffcb
-  .word $007f, $ffcb
-  .word $007e, $ffcc
-  .word $007d, $ffcc
-  .word $007c, $ffcd
-  .word $007b, $ffcd
-  .word $007a, $ffcd
-  .word $0079, $ffce
-  .word $0078, $ffce
-  .word $0077, $ffcf
-  .word $0076, $ffcf
-  .word $0075, $ffcf
-  .word $0074, $ffd0
-  .word $0074, $ffd0
-  .word $0073, $ffd1
-  .word $0072, $ffd1
-  .word $0071, $ffd1
-  .word $0070, $ffd2
-  .word $006f, $ffd2
-  .word $006e, $ffd2
-  .word $006e, $ffd3
-  .word $006d, $ffd3
-  .word $006c, $ffd3
-  .word $006b, $ffd4
-  .word $006b, $ffd4
-  .word $006a, $ffd4
-  .word $0069, $ffd4
-  .word $0068, $ffd5
-  .word $0068, $ffd5
-  .word $0067, $ffd5
-  .word $0066, $ffd6
-  .word $0066, $ffd6
-  .word $0065, $ffd6
-  .word $0064, $ffd6
-  .word $0064, $ffd7
-  .word $0063, $ffd7
-  .word $0062, $ffd7
-  .word $0062, $ffd8
-  .word $0061, $ffd8
-  .word $0060, $ffd8
-  .word $0060, $ffd8
-  .word $005f, $ffd9
-  .word $005f, $ffd9
-  .word $005e, $ffd9
-  .word $005d, $ffd9
-  .word $005d, $ffda
-  .word $005c, $ffda
-  .word $005c, $ffda
-  .word $005b, $ffda
-  .word $005b, $ffda
-  .word $005a, $ffdb
-  .word $005a, $ffdb
-  .word $0059, $ffdb
-  .word $0059, $ffdb
-  .word $0058, $ffdc
-  .word $0057, $ffdc
-  .word $0057, $ffdc
-  .word $0056, $ffdc
-  .word $0056, $ffdc
-  .word $0056, $ffdd
-  .word $0055, $ffdd
-  .word $0055, $ffdd
-  .word $0054, $ffdd
-  .word $0054, $ffdd
-  .word $0053, $ffde
-  .word $0053, $ffde
-  .word $0052, $ffde
-  .word $0052, $ffde
-  .word $0051, $ffde
-  .word $0051, $ffde
-  .word $0051, $ffdf
-  .word $0050, $ffdf
-  .word $0050, $ffdf
-  .word $004f, $ffdf
-  .word $004f, $ffdf
+  .word $fe8f
+  .word $fea4
+  .word $feb6
+  .word $fec7
+  .word $fed5
+  .word $fee3
+  .word $feef
+  .word $fefb
+  .word $ff05
+  .word $ff0f
+  .word $ff18
+  .word $ff20
+  .word $ff28
+  .word $ff2f
+  .word $ff36
+  .word $ff3c
+  .word $ff42
+  .word $ff48
+  .word $ff4d
+  .word $ff52
+  .word $ff57
+  .word $ff5b
+  .word $ff5f
+  .word $ff63
+  .word $ff67
+  .word $ff6b
+  .word $ff6e
+  .word $ff72
+  .word $ff75
+  .word $ff78
+  .word $ff7b
+  .word $ff7d
+  .word $ff80
+  .word $ff83
+  .word $ff85
+  .word $ff87
+  .word $ff8a
+  .word $ff8c
+  .word $ff8e
+  .word $ff90
+  .word $ff92
+  .word $ff94
+  .word $ff96
+  .word $ff98
+  .word $ff99
+  .word $ff9b
+  .word $ff9c
+  .word $ff9e
+  .word $ffa0
+  .word $ffa1
+  .word $ffa2
+  .word $ffa4
+  .word $ffa5
+  .word $ffa6
+  .word $ffa8
+  .word $ffa9
+  .word $ffaa
+  .word $ffab
+  .word $ffac
+  .word $ffae
+  .word $ffaf
+  .word $ffb0
+  .word $ffb1
+  .word $ffb2
+  .word $ffb3
+  .word $ffb4
+  .word $ffb4
+  .word $ffb5
+  .word $ffb6
+  .word $ffb7
+  .word $ffb8
+  .word $ffb9
+  .word $ffba
+  .word $ffba
+  .word $ffbb
+  .word $ffbc
+  .word $ffbd
+  .word $ffbd
+  .word $ffbe
+  .word $ffbf
+  .word $ffbf
+  .word $ffc0
+  .word $ffc1
+  .word $ffc1
+  .word $ffc2
+  .word $ffc3
+  .word $ffc3
+  .word $ffc4
+  .word $ffc4
+  .word $ffc5
+  .word $ffc5
+  .word $ffc6
+  .word $ffc6
+  .word $ffc7
+  .word $ffc8
+  .word $ffc8
+  .word $ffc9
+  .word $ffc9
+  .word $ffc9
+  .word $ffca
+  .word $ffca
+  .word $ffcb
+  .word $ffcb
+  .word $ffcc
+  .word $ffcc
+  .word $ffcd
+  .word $ffcd
+  .word $ffcd
+  .word $ffce
+  .word $ffce
+  .word $ffcf
+  .word $ffcf
+  .word $ffcf
+  .word $ffd0
+  .word $ffd0
+  .word $ffd1
+  .word $ffd1
+  .word $ffd1
+  .word $ffd2
+  .word $ffd2
+  .word $ffd2
+  .word $ffd3
+  .word $ffd3
+  .word $ffd3
+  .word $ffd4
+  .word $ffd4
+  .word $ffd4
+  .word $ffd4
+  .word $ffd5
+  .word $ffd5
+  .word $ffd5
+  .word $ffd6
+  .word $ffd6
+  .word $ffd6
+  .word $ffd6
+  .word $ffd7
+  .word $ffd7
+  .word $ffd7
+  .word $ffd8
+  .word $ffd8
+  .word $ffd8
+  .word $ffd8
+  .word $ffd9
+  .word $ffd9
+  .word $ffd9
+  .word $ffd9
+  .word $ffda
+  .word $ffda
+  .word $ffda
+  .word $ffda
+  .word $ffda
+  .word $ffdb
+  .word $ffdb
+  .word $ffdb
+  .word $ffdb
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdd
+  .word $ffdd
+  .word $ffdd
+  .word $ffdd
+  .word $ffdd
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
 .segment "Mode7TblAB"
 m7a_m7b_31:
-  .word $03b1, $ff44
-  .word $037d, $ff4e
-  .word $034e, $ff58
-  .word $0323, $ff60
-  .word $02fd, $ff68
-  .word $02da, $ff6f
-  .word $02bb, $ff75
-  .word $029e, $ff7b
-  .word $0283, $ff80
-  .word $026a, $ff85
-  .word $0253, $ff8a
-  .word $023e, $ff8e
-  .word $022a, $ff92
-  .word $0218, $ff95
-  .word $0206, $ff99
-  .word $01f6, $ff9c
-  .word $01e7, $ff9f
-  .word $01d9, $ffa2
-  .word $01cb, $ffa5
-  .word $01be, $ffa7
-  .word $01b2, $ffaa
-  .word $01a7, $ffac
-  .word $019c, $ffae
-  .word $0192, $ffb0
-  .word $0188, $ffb2
-  .word $017f, $ffb4
-  .word $0176, $ffb6
-  .word $016d, $ffb7
-  .word $0165, $ffb9
-  .word $015d, $ffbb
-  .word $0156, $ffbc
-  .word $014f, $ffbd
-  .word $0148, $ffbf
-  .word $0141, $ffc0
-  .word $013b, $ffc1
-  .word $0135, $ffc3
-  .word $012f, $ffc4
-  .word $012a, $ffc5
-  .word $0124, $ffc6
-  .word $011f, $ffc7
-  .word $011a, $ffc8
-  .word $0115, $ffc9
-  .word $0110, $ffca
-  .word $010c, $ffcb
-  .word $0107, $ffcc
-  .word $0103, $ffcc
-  .word $00ff, $ffcd
-  .word $00fb, $ffce
-  .word $00f7, $ffcf
-  .word $00f3, $ffd0
-  .word $00f0, $ffd0
-  .word $00ec, $ffd1
-  .word $00e9, $ffd2
-  .word $00e6, $ffd2
-  .word $00e2, $ffd3
-  .word $00df, $ffd4
-  .word $00dc, $ffd4
-  .word $00d9, $ffd5
-  .word $00d6, $ffd5
-  .word $00d3, $ffd6
-  .word $00d1, $ffd6
-  .word $00ce, $ffd7
-  .word $00cb, $ffd8
-  .word $00c9, $ffd8
-  .word $00c6, $ffd9
-  .word $00c4, $ffd9
-  .word $00c2, $ffd9
-  .word $00bf, $ffda
-  .word $00bd, $ffda
-  .word $00bb, $ffdb
-  .word $00b9, $ffdb
-  .word $00b7, $ffdc
-  .word $00b5, $ffdc
-  .word $00b3, $ffdc
-  .word $00b1, $ffdd
-  .word $00af, $ffdd
-  .word $00ad, $ffde
-  .word $00ab, $ffde
-  .word $00a9, $ffde
-  .word $00a7, $ffdf
-  .word $00a6, $ffdf
-  .word $00a4, $ffdf
-  .word $00a2, $ffe0
-  .word $00a1, $ffe0
-  .word $009f, $ffe0
-  .word $009e, $ffe1
-  .word $009c, $ffe1
-  .word $009b, $ffe1
-  .word $0099, $ffe2
-  .word $0098, $ffe2
-  .word $0096, $ffe2
-  .word $0095, $ffe2
-  .word $0093, $ffe3
-  .word $0092, $ffe3
-  .word $0091, $ffe3
-  .word $008f, $ffe3
-  .word $008e, $ffe4
-  .word $008d, $ffe4
-  .word $008c, $ffe4
-  .word $008b, $ffe4
-  .word $0089, $ffe5
-  .word $0088, $ffe5
-  .word $0087, $ffe5
-  .word $0086, $ffe5
-  .word $0085, $ffe6
-  .word $0084, $ffe6
-  .word $0083, $ffe6
-  .word $0082, $ffe6
-  .word $0081, $ffe6
-  .word $0080, $ffe7
-  .word $007f, $ffe7
-  .word $007e, $ffe7
-  .word $007d, $ffe7
-  .word $007c, $ffe7
-  .word $007b, $ffe8
-  .word $007a, $ffe8
-  .word $0079, $ffe8
-  .word $0078, $ffe8
-  .word $0077, $ffe8
-  .word $0076, $ffe8
-  .word $0075, $ffe9
-  .word $0074, $ffe9
-  .word $0074, $ffe9
-  .word $0073, $ffe9
-  .word $0072, $ffe9
-  .word $0071, $ffe9
-  .word $0070, $ffea
-  .word $0070, $ffea
-  .word $006f, $ffea
-  .word $006e, $ffea
-  .word $006d, $ffea
-  .word $006d, $ffea
-  .word $006c, $ffeb
-  .word $006b, $ffeb
-  .word $006a, $ffeb
-  .word $006a, $ffeb
-  .word $0069, $ffeb
-  .word $0068, $ffeb
-  .word $0068, $ffeb
-  .word $0067, $ffec
-  .word $0066, $ffec
-  .word $0066, $ffec
-  .word $0065, $ffec
-  .word $0064, $ffec
-  .word $0064, $ffec
-  .word $0063, $ffec
-  .word $0063, $ffec
-  .word $0062, $ffed
-  .word $0061, $ffed
-  .word $0061, $ffed
-  .word $0060, $ffed
-  .word $0060, $ffed
-  .word $005f, $ffed
-  .word $005f, $ffed
-  .word $005e, $ffed
-  .word $005d, $ffed
-  .word $005d, $ffee
-  .word $005c, $ffee
-  .word $005c, $ffee
-  .word $005b, $ffee
-  .word $005b, $ffee
-  .word $005a, $ffee
-  .word $005a, $ffee
-  .word $0059, $ffee
-  .word $0059, $ffee
-  .word $0058, $ffee
-  .word $0058, $ffef
-  .word $0057, $ffef
-  .word $0057, $ffef
-  .word $0056, $ffef
-  .word $0056, $ffef
-  .word $0055, $ffef
-  .word $0055, $ffef
-  .word $0055, $ffef
-  .word $0054, $ffef
-  .word $0054, $ffef
+  .word $ff44
+  .word $ff4e
+  .word $ff58
+  .word $ff60
+  .word $ff68
+  .word $ff6f
+  .word $ff75
+  .word $ff7b
+  .word $ff80
+  .word $ff85
+  .word $ff8a
+  .word $ff8e
+  .word $ff92
+  .word $ff95
+  .word $ff99
+  .word $ff9c
+  .word $ff9f
+  .word $ffa2
+  .word $ffa5
+  .word $ffa7
+  .word $ffaa
+  .word $ffac
+  .word $ffae
+  .word $ffb0
+  .word $ffb2
+  .word $ffb4
+  .word $ffb6
+  .word $ffb7
+  .word $ffb9
+  .word $ffbb
+  .word $ffbc
+  .word $ffbd
+  .word $ffbf
+  .word $ffc0
+  .word $ffc1
+  .word $ffc3
+  .word $ffc4
+  .word $ffc5
+  .word $ffc6
+  .word $ffc7
+  .word $ffc8
+  .word $ffc9
+  .word $ffca
+  .word $ffcb
+  .word $ffcc
+  .word $ffcc
+  .word $ffcd
+  .word $ffce
+  .word $ffcf
+  .word $ffd0
+  .word $ffd0
+  .word $ffd1
+  .word $ffd2
+  .word $ffd2
+  .word $ffd3
+  .word $ffd4
+  .word $ffd4
+  .word $ffd5
+  .word $ffd5
+  .word $ffd6
+  .word $ffd6
+  .word $ffd7
+  .word $ffd8
+  .word $ffd8
+  .word $ffd9
+  .word $ffd9
+  .word $ffd9
+  .word $ffda
+  .word $ffda
+  .word $ffdb
+  .word $ffdb
+  .word $ffdc
+  .word $ffdc
+  .word $ffdc
+  .word $ffdd
+  .word $ffdd
+  .word $ffde
+  .word $ffde
+  .word $ffde
+  .word $ffdf
+  .word $ffdf
+  .word $ffdf
+  .word $ffe0
+  .word $ffe0
+  .word $ffe0
+  .word $ffe1
+  .word $ffe1
+  .word $ffe1
+  .word $ffe2
+  .word $ffe2
+  .word $ffe2
+  .word $ffe2
+  .word $ffe3
+  .word $ffe3
+  .word $ffe3
+  .word $ffe3
+  .word $ffe4
+  .word $ffe4
+  .word $ffe4
+  .word $ffe4
+  .word $ffe5
+  .word $ffe5
+  .word $ffe5
+  .word $ffe5
+  .word $ffe6
+  .word $ffe6
+  .word $ffe6
+  .word $ffe6
+  .word $ffe6
+  .word $ffe7
+  .word $ffe7
+  .word $ffe7
+  .word $ffe7
+  .word $ffe7
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe8
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffe9
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffea
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffeb
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffec
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffed
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffee
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+  .word $ffef
+.segment "Mode7TblAB"
+m7a_m7b_32:
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+  .word $0000
+.segment "Mode7TblAB"
+m7a_m7b_33:
+  .word $00bc
+  .word $00b2
+  .word $00a8
+  .word $00a0
+  .word $0098
+  .word $0091
+  .word $008b
+  .word $0085
+  .word $0080
+  .word $007b
+  .word $0076
+  .word $0072
+  .word $006e
+  .word $006b
+  .word $0067
+  .word $0064
+  .word $0061
+  .word $005e
+  .word $005b
+  .word $0059
+  .word $0056
+  .word $0054
+  .word $0052
+  .word $0050
+  .word $004e
+  .word $004c
+  .word $004a
+  .word $0049
+  .word $0047
+  .word $0045
+  .word $0044
+  .word $0043
+  .word $0041
+  .word $0040
+  .word $003f
+  .word $003d
+  .word $003c
+  .word $003b
+  .word $003a
+  .word $0039
+  .word $0038
+  .word $0037
+  .word $0036
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0032
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $002f
+  .word $002e
+  .word $002e
+  .word $002d
+  .word $002c
+  .word $002c
+  .word $002b
+  .word $002b
+  .word $002a
+  .word $002a
+  .word $0029
+  .word $0028
+  .word $0028
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0026
+  .word $0026
+  .word $0025
+  .word $0025
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0023
+  .word $0023
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0020
+  .word $0020
+  .word $0020
+  .word $001f
+  .word $001f
+  .word $001f
+  .word $001e
+  .word $001e
+  .word $001e
+  .word $001e
+  .word $001d
+  .word $001d
+  .word $001d
+  .word $001d
+  .word $001c
+  .word $001c
+  .word $001c
+  .word $001c
+  .word $001b
+  .word $001b
+  .word $001b
+  .word $001b
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $001a
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0019
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0018
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0017
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0016
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0015
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0014
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0013
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0012
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+  .word $0011
+.segment "Mode7TblAB"
+m7a_m7b_34:
+  .word $0171
+  .word $015c
+  .word $014a
+  .word $0139
+  .word $012b
+  .word $011d
+  .word $0111
+  .word $0105
+  .word $00fb
+  .word $00f1
+  .word $00e8
+  .word $00e0
+  .word $00d8
+  .word $00d1
+  .word $00ca
+  .word $00c4
+  .word $00be
+  .word $00b8
+  .word $00b3
+  .word $00ae
+  .word $00a9
+  .word $00a5
+  .word $00a1
+  .word $009d
+  .word $0099
+  .word $0095
+  .word $0092
+  .word $008e
+  .word $008b
+  .word $0088
+  .word $0085
+  .word $0083
+  .word $0080
+  .word $007d
+  .word $007b
+  .word $0079
+  .word $0076
+  .word $0074
+  .word $0072
+  .word $0070
+  .word $006e
+  .word $006c
+  .word $006a
+  .word $0068
+  .word $0067
+  .word $0065
+  .word $0064
+  .word $0062
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005c
+  .word $005b
+  .word $005a
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0055
+  .word $0054
+  .word $0052
+  .word $0051
+  .word $0050
+  .word $004f
+  .word $004e
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004a
+  .word $0049
+  .word $0048
+  .word $0047
+  .word $0046
+  .word $0046
+  .word $0045
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003c
+  .word $003c
+  .word $003b
+  .word $003b
+  .word $003a
+  .word $003a
+  .word $0039
+  .word $0038
+  .word $0038
+  .word $0037
+  .word $0037
+  .word $0037
+  .word $0036
+  .word $0036
+  .word $0035
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0032
+  .word $0032
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $002f
+  .word $002f
+  .word $002f
+  .word $002e
+  .word $002e
+  .word $002e
+  .word $002d
+  .word $002d
+  .word $002d
+  .word $002c
+  .word $002c
+  .word $002c
+  .word $002c
+  .word $002b
+  .word $002b
+  .word $002b
+  .word $002a
+  .word $002a
+  .word $002a
+  .word $002a
+  .word $0029
+  .word $0029
+  .word $0029
+  .word $0028
+  .word $0028
+  .word $0028
+  .word $0028
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0027
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0026
+  .word $0025
+  .word $0025
+  .word $0025
+  .word $0025
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0024
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0023
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0022
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0021
+  .word $0021
+.segment "Mode7TblAB"
+m7a_m7b_35:
+  .word $0217
+  .word $01fa
+  .word $01df
+  .word $01c7
+  .word $01b1
+  .word $019e
+  .word $018c
+  .word $017b
+  .word $016c
+  .word $015e
+  .word $0151
+  .word $0145
+  .word $013a
+  .word $012f
+  .word $0126
+  .word $011c
+  .word $0114
+  .word $010c
+  .word $0104
+  .word $00fd
+  .word $00f6
+  .word $00f0
+  .word $00e9
+  .word $00e4
+  .word $00de
+  .word $00d9
+  .word $00d4
+  .word $00cf
+  .word $00ca
+  .word $00c6
+  .word $00c2
+  .word $00be
+  .word $00ba
+  .word $00b6
+  .word $00b2
+  .word $00af
+  .word $00ac
+  .word $00a9
+  .word $00a5
+  .word $00a3
+  .word $00a0
+  .word $009d
+  .word $009a
+  .word $0098
+  .word $0095
+  .word $0093
+  .word $0090
+  .word $008e
+  .word $008c
+  .word $008a
+  .word $0088
+  .word $0086
+  .word $0084
+  .word $0082
+  .word $0080
+  .word $007e
+  .word $007d
+  .word $007b
+  .word $0079
+  .word $0078
+  .word $0076
+  .word $0075
+  .word $0073
+  .word $0072
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0067
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+  .word $0046
+  .word $0045
+  .word $0045
+  .word $0044
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003e
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003c
+  .word $003c
+  .word $003b
+  .word $003b
+  .word $003b
+  .word $003a
+  .word $003a
+  .word $003a
+  .word $0039
+  .word $0039
+  .word $0039
+  .word $0038
+  .word $0038
+  .word $0038
+  .word $0037
+  .word $0037
+  .word $0037
+  .word $0036
+  .word $0036
+  .word $0036
+  .word $0035
+  .word $0035
+  .word $0035
+  .word $0034
+  .word $0034
+  .word $0034
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0033
+  .word $0032
+  .word $0032
+  .word $0032
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0031
+  .word $0030
+  .word $0030
+  .word $0030
+  .word $0030
+  .word $002f
+.segment "Mode7TblAB"
+m7a_m7b_36:
+  .word $02a9
+  .word $0284
+  .word $0262
+  .word $0243
+  .word $0228
+  .word $020f
+  .word $01f8
+  .word $01e3
+  .word $01cf
+  .word $01be
+  .word $01ad
+  .word $019e
+  .word $018f
+  .word $0182
+  .word $0176
+  .word $016a
+  .word $015f
+  .word $0155
+  .word $014b
+  .word $0142
+  .word $0139
+  .word $0131
+  .word $0129
+  .word $0122
+  .word $011b
+  .word $0114
+  .word $010d
+  .word $0107
+  .word $0101
+  .word $00fc
+  .word $00f6
+  .word $00f1
+  .word $00ec
+  .word $00e8
+  .word $00e3
+  .word $00df
+  .word $00db
+  .word $00d7
+  .word $00d3
+  .word $00cf
+  .word $00cb
+  .word $00c8
+  .word $00c4
+  .word $00c1
+  .word $00be
+  .word $00bb
+  .word $00b8
+  .word $00b5
+  .word $00b2
+  .word $00b0
+  .word $00ad
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a3
+  .word $00a1
+  .word $009f
+  .word $009d
+  .word $009a
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0093
+  .word $0091
+  .word $008f
+  .word $008d
+  .word $008c
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0085
+  .word $0084
+  .word $0082
+  .word $0081
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0067
+  .word $0067
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+  .word $0046
+  .word $0046
+  .word $0045
+  .word $0045
+  .word $0045
+  .word $0044
+  .word $0044
+  .word $0043
+  .word $0043
+  .word $0043
+  .word $0042
+  .word $0042
+  .word $0041
+  .word $0041
+  .word $0041
+  .word $0040
+  .word $0040
+  .word $0040
+  .word $003f
+  .word $003f
+  .word $003f
+  .word $003e
+  .word $003e
+  .word $003e
+  .word $003d
+  .word $003d
+  .word $003d
+  .word $003c
+.segment "Mode7TblAB"
+m7a_m7b_37:
+  .word $0321
+  .word $02f5
+  .word $02cd
+  .word $02a9
+  .word $0289
+  .word $026b
+  .word $0250
+  .word $0238
+  .word $0221
+  .word $020c
+  .word $01f9
+  .word $01e7
+  .word $01d6
+  .word $01c6
+  .word $01b7
+  .word $01aa
+  .word $019d
+  .word $0191
+  .word $0185
+  .word $017a
+  .word $0170
+  .word $0166
+  .word $015d
+  .word $0155
+  .word $014c
+  .word $0144
+  .word $013d
+  .word $0136
+  .word $012f
+  .word $0128
+  .word $0122
+  .word $011c
+  .word $0116
+  .word $0110
+  .word $010b
+  .word $0106
+  .word $0101
+  .word $00fc
+  .word $00f8
+  .word $00f3
+  .word $00ef
+  .word $00eb
+  .word $00e7
+  .word $00e3
+  .word $00df
+  .word $00dc
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00ce
+  .word $00cb
+  .word $00c8
+  .word $00c5
+  .word $00c3
+  .word $00c0
+  .word $00bd
+  .word $00bb
+  .word $00b8
+  .word $00b6
+  .word $00b3
+  .word $00b1
+  .word $00af
+  .word $00ac
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a4
+  .word $00a2
+  .word $00a0
+  .word $009e
+  .word $009d
+  .word $009b
+  .word $0099
+  .word $0097
+  .word $0096
+  .word $0094
+  .word $0092
+  .word $0091
+  .word $008f
+  .word $008e
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+  .word $004e
+  .word $004e
+  .word $004d
+  .word $004d
+  .word $004d
+  .word $004c
+  .word $004c
+  .word $004b
+  .word $004b
+  .word $004a
+  .word $004a
+  .word $004a
+  .word $0049
+  .word $0049
+  .word $0048
+  .word $0048
+  .word $0048
+  .word $0047
+  .word $0047
+.segment "Mode7TblAB"
+m7a_m7b_38:
+  .word $037a
+  .word $0349
+  .word $031d
+  .word $02f5
+  .word $02d1
+  .word $02b0
+  .word $0292
+  .word $0277
+  .word $025d
+  .word $0246
+  .word $0231
+  .word $021d
+  .word $020a
+  .word $01f9
+  .word $01e8
+  .word $01d9
+  .word $01cb
+  .word $01bd
+  .word $01b0
+  .word $01a4
+  .word $0199
+  .word $018e
+  .word $0184
+  .word $017a
+  .word $0171
+  .word $0168
+  .word $0160
+  .word $0158
+  .word $0150
+  .word $0149
+  .word $0142
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $0129
+  .word $0123
+  .word $011e
+  .word $0118
+  .word $0113
+  .word $010e
+  .word $010a
+  .word $0105
+  .word $0101
+  .word $00fc
+  .word $00f8
+  .word $00f4
+  .word $00f0
+  .word $00ed
+  .word $00e9
+  .word $00e5
+  .word $00e2
+  .word $00df
+  .word $00db
+  .word $00d8
+  .word $00d5
+  .word $00d2
+  .word $00cf
+  .word $00cd
+  .word $00ca
+  .word $00c7
+  .word $00c5
+  .word $00c2
+  .word $00c0
+  .word $00bd
+  .word $00bb
+  .word $00b9
+  .word $00b6
+  .word $00b4
+  .word $00b2
+  .word $00b0
+  .word $00ae
+  .word $00ac
+  .word $00aa
+  .word $00a8
+  .word $00a6
+  .word $00a5
+  .word $00a3
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009a
+  .word $0099
+  .word $0097
+  .word $0096
+  .word $0094
+  .word $0093
+  .word $0092
+  .word $0090
+  .word $008f
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $008a
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006e
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006b
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0064
+  .word $0063
+  .word $0062
+  .word $0062
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054
+  .word $0053
+  .word $0053
+  .word $0052
+  .word $0052
+  .word $0051
+  .word $0051
+  .word $0051
+  .word $0050
+  .word $0050
+  .word $004f
+  .word $004f
+.segment "Mode7TblAB"
+m7a_m7b_39:
+  .word $03b1
+  .word $037d
+  .word $034e
+  .word $0323
+  .word $02fd
+  .word $02da
+  .word $02bb
+  .word $029e
+  .word $0283
+  .word $026a
+  .word $0253
+  .word $023e
+  .word $022a
+  .word $0218
+  .word $0206
+  .word $01f6
+  .word $01e7
+  .word $01d9
+  .word $01cb
+  .word $01be
+  .word $01b2
+  .word $01a7
+  .word $019c
+  .word $0192
+  .word $0188
+  .word $017f
+  .word $0176
+  .word $016d
+  .word $0165
+  .word $015d
+  .word $0156
+  .word $014f
+  .word $0148
+  .word $0141
+  .word $013b
+  .word $0135
+  .word $012f
+  .word $012a
+  .word $0124
+  .word $011f
+  .word $011a
+  .word $0115
+  .word $0110
+  .word $010c
+  .word $0107
+  .word $0103
+  .word $00ff
+  .word $00fb
+  .word $00f7
+  .word $00f3
+  .word $00f0
+  .word $00ec
+  .word $00e9
+  .word $00e6
+  .word $00e2
+  .word $00df
+  .word $00dc
+  .word $00d9
+  .word $00d6
+  .word $00d3
+  .word $00d1
+  .word $00ce
+  .word $00cb
+  .word $00c9
+  .word $00c6
+  .word $00c4
+  .word $00c2
+  .word $00bf
+  .word $00bd
+  .word $00bb
+  .word $00b9
+  .word $00b7
+  .word $00b5
+  .word $00b3
+  .word $00b1
+  .word $00af
+  .word $00ad
+  .word $00ab
+  .word $00a9
+  .word $00a7
+  .word $00a6
+  .word $00a4
+  .word $00a2
+  .word $00a1
+  .word $009f
+  .word $009e
+  .word $009c
+  .word $009b
+  .word $0099
+  .word $0098
+  .word $0096
+  .word $0095
+  .word $0093
+  .word $0092
+  .word $0091
+  .word $008f
+  .word $008e
+  .word $008d
+  .word $008c
+  .word $008b
+  .word $0089
+  .word $0088
+  .word $0087
+  .word $0086
+  .word $0085
+  .word $0084
+  .word $0083
+  .word $0082
+  .word $0081
+  .word $0080
+  .word $007f
+  .word $007e
+  .word $007d
+  .word $007c
+  .word $007b
+  .word $007a
+  .word $0079
+  .word $0078
+  .word $0077
+  .word $0076
+  .word $0075
+  .word $0074
+  .word $0074
+  .word $0073
+  .word $0072
+  .word $0071
+  .word $0070
+  .word $0070
+  .word $006f
+  .word $006e
+  .word $006d
+  .word $006d
+  .word $006c
+  .word $006b
+  .word $006a
+  .word $006a
+  .word $0069
+  .word $0068
+  .word $0068
+  .word $0067
+  .word $0066
+  .word $0066
+  .word $0065
+  .word $0064
+  .word $0064
+  .word $0063
+  .word $0063
+  .word $0062
+  .word $0061
+  .word $0061
+  .word $0060
+  .word $0060
+  .word $005f
+  .word $005f
+  .word $005e
+  .word $005d
+  .word $005d
+  .word $005c
+  .word $005c
+  .word $005b
+  .word $005b
+  .word $005a
+  .word $005a
+  .word $0059
+  .word $0059
+  .word $0058
+  .word $0058
+  .word $0057
+  .word $0057
+  .word $0056
+  .word $0056
+  .word $0055
+  .word $0055
+  .word $0055
+  .word $0054
+  .word $0054

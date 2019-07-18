@@ -556,10 +556,10 @@ WasRotation:
     ldx #1+2048
   :
 BuildHDMALoop:
-  lda $0,y ; M7A
+  lda 2*176*8,y ; M7A
   sta f:M7A_M7B_Buffer1+0,x
   sta f:M7C_M7D_Buffer1+2,x
-  lda $2,y ; M7B
+  lda 0,y ; M7B
   sta f:M7A_M7B_Buffer1+2,x
   eor #$ffff
   ina
@@ -571,8 +571,6 @@ BuildHDMALoop:
   inx
   inx
   iny ; Next perspective table entry
-  iny
-  iny
   iny
   dec 0
   bne BuildHDMALoop
