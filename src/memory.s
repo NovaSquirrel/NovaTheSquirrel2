@@ -52,6 +52,9 @@
 
   ForceControllerBits: .res 2
   ForceControllerTime: .res 1
+
+  PlayerAbility:    .res 1     ; ability the player currently has
+
   PlayerWasRunning: .res 1     ; was the player running when they jumped?
   PlayerDir:        .res 1     ; currently facing left?
   PlayerJumping:    .res 1     ; true if jumping (not falling)
@@ -172,6 +175,8 @@ LevelZeroWhenLoad_Start:
 
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the edit
 LevelZeroWhenLoad_End:
+  NeedAbilityChange:       .res 1
+  NeedAbilityChangeSilent: .res 1
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)

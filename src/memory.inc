@@ -40,6 +40,10 @@
 .globalzp ForceControllerBits
 .globalzp ForceControllerTime
 
+.globalzp PlayerAbility
+.global   NeedAbilityChange
+.global   NeedAbilityChangeSilent
+
 .global PlayerJumpCancel
 .global PlayerJumpCancelLock
 .global PlayerWantsToJump

@@ -73,6 +73,47 @@
   lda #%00000010
   sta COPYSTART
 
+  ; -----------------------------------
+  ; Is there an ability icon to copy in?
+  lda NeedAbilityChange
+  beq NoNeedAbilityChange
+    lda #^AbilityIcons
+    sta DMAADDRBANK+$00
+    sta DMAADDRBANK+$10
+
+    seta16
+    lda PlayerAbility
+    and #255
+    xba ; Multiply by 256
+    lsr ; Divide by 2 to get 128
+    add #.loword(AbilityIcons)
+    sta DMAADDR+$00
+    add #64
+    sta DMAADDR+$10
+
+    lda #32*2 ; 2 tiles for each DMA
+    sta DMALEN+$00
+    sta DMALEN+$10
+
+    ; Top row ----------------------
+    lda #($8100)>>1
+    sta PPUADDR
+    seta8
+    lda #%00000001
+    sta COPYSTART
+
+    ; Bottom row -------------------
+    seta16
+    lda #($8300)>>1
+    sta PPUADDR
+    seta8
+    lda #%00000010
+    sta COPYSTART
+
+    stz NeedAbilityChange
+    stz NeedAbilityChangeSilent
+  NoNeedAbilityChange:
+
   plp
   rtl
 .endproc
@@ -818,6 +859,7 @@ OfferJumpFromGracePeriod:
   sta OAMHI+(4*1),x
   sta OAMHI+(4*2),x
   sta OAMHI+(4*3),x
+  sta OAMHI+(4*4),x
 
   seta8
   lda 0
@@ -842,6 +884,11 @@ OfferJumpFromGracePeriod:
   sta OAM_YPOS+(4*0),x
   sta OAM_YPOS+(4*1),x
 
+  ; Ability icon
+  lda #15
+  sta OAM_XPOS+(4*4),x
+  lda #8
+  sta OAM_YPOS+(4*4),x
 
   ; Tile numbers
   lda #0
@@ -852,6 +899,8 @@ OfferJumpFromGracePeriod:
   sta OAM_TILE+(4*2),x
   lda #6
   sta OAM_TILE+(4*3),x
+  lda #8 ; Ability icon
+  sta OAM_TILE+(4*4),x
 
   ; Horizontal flip
   lda PlayerDir
@@ -874,6 +923,10 @@ OfferJumpFromGracePeriod:
   sta OAM_ATTR+(4*1),x
   sta OAM_ATTR+(4*2),x
   sta OAM_ATTR+(4*3),x
+
+  ; Ability icon has top priority
+  lda #>(OAM_PRIORITY_3|OAM_COLOR_0)
+  sta OAM_ATTR+(4*4),x
 
   ; Do a vertical flip (possibly on top of a horizontal flip) if requested
   lda PlayerFrameYFlip
@@ -904,13 +957,40 @@ OfferJumpFromGracePeriod:
 
  
   seta16
-  ; Four sprites
+  ; Five sprites
   txa
   clc
-  adc #4*4
-  sta OamPtr
+  adc #5*4
+  tax
 
   ; -----------------------------------
+  ; But we still need to draw the health meter
+  HealthCount = 0
+  HealthX = 1
+  seta8
+  lda #15
+  sta HealthX
+
+  lda PlayerHealth
+  lsr
+  php
+  sta HealthCount
+HealthLoop:
+  lda HealthCount
+  beq HealthLoopEnd
+  lda #$6e
+  jsr MakeHealthIcon
+  dec HealthCount
+  bne HealthLoop
+HealthLoopEnd:
+  plp 
+  bcc :+
+    lda #$6f
+    jsr MakeHealthIcon
+  :
+
+  ; -----------------------------------
+  stx OamPtr
 
   ; Automatically cycle through the walk animation
   seta8
@@ -985,7 +1065,6 @@ OfferJumpFromGracePeriod:
       inc PlayerFrameYFlip
   NoRoll:
   setaxy16
-
   rtl
 
 XToPixels:
@@ -998,5 +1077,28 @@ XToPixels:
   lsr
   sta 0
   rts
+
+.a8
+MakeHealthIcon:
+  sta OAM_TILE,x
+  lda HealthX
+  sta OAM_XPOS,x
+  add #8
+  sta HealthX
+  lda #>(OAM_PRIORITY_2|OAM_COLOR_0)
+  sta OAM_ATTR,x
+  lda #16+8
+  sta OAM_YPOS,x
+  stz OAMHI+0,x
+  stz OAMHI+1,x
+
+  ; Next sprite
+  inx
+  inx
+  inx
+  inx
+  rts
 .endproc
 
+AbilityIcons:
+  .incbin "../tilesets4/AbilityIcons.chrsfc"

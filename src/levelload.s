@@ -31,6 +31,10 @@
 .a16
 .i16
 .proc StartLevel
+  seta8
+  lda #4
+  sta PlayerHealth
+
   setaxy16
   sta StartedLevelNumber
 
@@ -104,6 +108,11 @@
 : stz LevelZeroWhenLoad_Start,x
   dex
   bpl :-
+
+  ; Load in the ability graphics
+  lda #1
+  sta NeedAbilityChange
+  sta NeedAbilityChangeSilent
 
   ; Clear FirstActorOnScreen list too
   ldy #15
