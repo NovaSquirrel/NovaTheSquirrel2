@@ -7,6 +7,8 @@ ForegroundBG = $C000
 BackgroundBG = $D000
 ExtraBG = $E000
 
+PlayerHeight = 16*16+14*16
+
 ; ------------------------------------
 
 ; Include handy macros

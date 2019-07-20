@@ -140,6 +140,7 @@ MaxSpeedRight = 12
   countdown PlayerWantsToJump
   countdown PlayerJumpCancelLock
   countdown PlayerOnLadder
+  countdown PlayerInvincible
   stz PlayerOnSlope
 
   lda ForceControllerTime
@@ -515,7 +516,8 @@ SkipGroundCheck:
 
   ; Above
   lda PlayerPY
-  sub #16*16+14*16 ; Top of the head
+  sub #PlayerHeight ; Top of the head
+  sta PlayerPYTop
   tay
   lda PlayerPX
   jsr TryBelowInteraction
@@ -955,6 +957,17 @@ OfferJumpFromGracePeriod:
     sta OAM_ATTR+(4*3),x
   :
 
+
+  ; Invincibility effect
+  lda PlayerInvincible
+  lsr
+  bcc :+
+    lda #225 ; Move offscreen every other frame
+    sta OAM_YPOS+(4*0),x
+    sta OAM_YPOS+(4*1),x
+    sta OAM_YPOS+(4*2),x
+    sta OAM_YPOS+(4*3),x
+  :
  
   seta16
   ; Five sprites
@@ -1102,3 +1115,20 @@ MakeHealthIcon:
 
 AbilityIcons:
   .incbin "../tilesets4/AbilityIcons.chrsfc"
+
+; Damages the player
+.export HurtPlayer
+.proc HurtPlayer
+  php
+  seta8
+  lda PlayerHealth
+  beq :+
+  lda PlayerInvincible
+  bne :+
+    dec PlayerHealth
+    lda #160
+    sta PlayerInvincible
+  :
+  plp
+  rtl
+.endproc

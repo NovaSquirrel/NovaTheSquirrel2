@@ -15,6 +15,7 @@
 
 .globalzp PlayerPX
 .globalzp PlayerPY
+.globalzp PlayerPYTop
 .globalzp PlayerVX
 .globalzp PlayerVY
 .globalzp PlayerFrame
@@ -29,6 +30,7 @@
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
+.globalzp PlayerInvincible
 .globalzp PlayerWalkLock
 .globalzp PlayerDownTimer
 .globalzp PlayerJumping
@@ -36,6 +38,7 @@
 .globalzp TempVal
 .globalzp TempX
 .globalzp TempY
+.globalzp TouchTemp
 .globalzp DecodePointer
 .globalzp ForceControllerBits
 .globalzp ForceControllerTime

@@ -44,6 +44,7 @@
 
   PlayerPX:        .res 2 ; \ player X and Y positions
   PlayerPY:        .res 2 ; /
+  PlayerPYTop:     .res 2 ; Y position for the top of the player
   PlayerVX:        .res 2 ; \
   PlayerVY:        .res 2 ; /
   PlayerFrame:     .res 1 ; Player animation frame
@@ -65,6 +66,7 @@
                                ; (used for fallthrough platforms)
   PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
   PlayerHealth:     .res 1     ; current health, measured in half hearts
+  PlayerInvincible: .res 1     ; timer for player invincibility
 
   LevelNumber:           .res 2 ; Current level number (actual map number from the game)
   StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
@@ -76,6 +78,7 @@
   TempVal:          .res 4
   TempX:            .res 1 ; for saving the X register
   TempY:            .res 1 ; for saving the Y register
+  TouchTemp:        .res 8
 
   LevelColumnSize:  .res 2 ; for moving left and right in a level buffer
   DecodePointer:    .res 3 ; multipurpose 24-bit pointer

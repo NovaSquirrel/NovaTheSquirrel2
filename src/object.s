@@ -1207,3 +1207,151 @@ Steep   = 4
 .endrep
 .endproc
 .popseg
+
+
+; Tests if two actors overlap
+; Inputs: Actor pointers X and Y
+.export TwoActorCollision
+.a16
+.i16
+.proc TwoActorCollision
+AWidth   = TouchTemp+0
+AHeight1 = TouchTemp+2
+AHeight2 = TouchTemp+4
+AYPos    = TouchTemp+6
+  ; Test X positions
+
+  ; Add the two widths together
+  phx
+  lda ActorType,x
+  tax
+  lda f:ActorHeight,x
+  sta AHeight1
+
+  ; The two actors' widths are added together, so just do this math now
+  lda f:ActorWidth,x
+  ldx ActorType,y
+  add f:ActorWidth,x
+  sta AWidth
+
+  lda f:ActorHeight,x
+  sta AHeight2
+  plx
+
+  ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
+  lda ActorPX,x
+  sub ActorPX,y
+  bpl :+       ; Take the absolute value
+    eor #$ffff
+    ina
+  :
+  asl
+  cmp AWidth
+  bcs No
+
+  ; -----------------------------------
+
+  ; Test Y positions
+  ; Y positions of actors are the bottom, so get the top of the actors
+  lda ActorPY,x
+  sub AHeight1
+  pha
+
+  lda ActorPY,y
+  sub AHeight2
+  sta AYPos
+
+  dec AHeight2 ; For satisfying the SIZE2-1
+  lda AHeight2
+  add AHeight1 ; And now it's modified so it'll have the -1 for SIZE1+SIZE2-1
+  sta AHeight1
+
+  pla
+  clc
+  sbc AYPos    ; Note will subtract n-1
+  sbc AHeight2 ; #SIZE2-1
+  adc AHeight1 ; #SIZE1+SIZE2-1; Carry set if overlap
+  bcc No
+
+Yes:
+  sec
+  rtl
+No:
+  clc
+  rtl
+.endproc
+
+
+.export PlayerActorCollision
+.a16
+.i16
+.proc PlayerActorCollision
+AWidth   = TouchTemp+0
+AHeight1 = TouchTemp+2
+AYPos    = TouchTemp+4
+  ; Test X positions
+
+  ; Add the two widths together
+  phx
+  lda ActorType,x
+  tax
+  lda f:ActorHeight,x
+  sta AHeight1
+
+  ; Player and actor width are added together
+  lda f:ActorWidth,x
+  add #13<<4 ; Player width
+  sta AWidth
+  plx
+
+  ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
+  lda PlayerPX
+  sub ActorPX,x
+  bpl :+       ; Take the absolute value
+    eor #$ffff
+    ina
+  :
+  asl
+  cmp AWidth
+  bcs No
+
+  ; -----------------------------------
+
+  ; Test Y positions
+  ; Y positions of actors are the bottom, so get the top of the actor
+  lda ActorPY,x
+  sub AHeight1
+  pha
+
+  ; And we also need the two heights added together
+  lda AHeight1
+  add #PlayerHeight-1
+  sta AHeight1
+
+  pla
+  clc
+  sbc PlayerPYTop     ; Note will subtract n-1
+  sbc #PlayerHeight-1 ; #SIZE2-1
+  adc AHeight1        ; #SIZE1+SIZE2-1; Carry set if overlap
+  bcc No
+
+Yes:
+  sec
+  rtl
+No:
+  clc
+  rtl
+.endproc
+
+
+.export PlayerActorCollisionHurt
+.a16
+.i16
+.proc PlayerActorCollisionHurt
+  jsl PlayerActorCollision
+  bcc :+
+    .import HurtPlayer
+    jml HurtPlayer
+  :
+  rtl
+.endproc
