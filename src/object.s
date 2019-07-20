@@ -1300,7 +1300,7 @@ AYPos    = TouchTemp+4
 
   ; Player and actor width are added together
   lda f:ActorWidth,x
-  add #13<<4 ; Player width
+  add #8<<4 ; Player width
   sta AWidth
   plx
 
