@@ -200,6 +200,8 @@ MaxSpeedRight = 12
   lda keydown
   and #KEY_X
   beq :+
+    lda PlayerRolling
+    bne :+
     lda TailAttackTimer
     bne :+
       inc TailAttackTimer
@@ -1122,26 +1124,26 @@ HealthLoopEnd:
 
   lda TailAttackTimer
   beq NoTailAttack
-   dea
+    dea
 
-   ; Divide by 3
-   sta  0
-   lsr
-   adc  #21
-   lsr
-   adc  0
-   ror
-   lsr
-   adc  0
-   ror
-   lsr
-   adc  0
-   ror
-   lsr
+    ; Divide by 3
+    sta  0
+    lsr
+    adc  #21
+    lsr
+    adc  0
+    ror
+    lsr
+    adc  0
+    ror
+    lsr
+    adc  0
+    ror
+    lsr
 
-   add #PlayerFrame::ATTACK1
-   sta PlayerFrame
-   bra Exit
+    add #PlayerFrame::ATTACK1
+    sta PlayerFrame
+    bra Exit
   NoTailAttack:
 
   lda PlayerOnLadder
