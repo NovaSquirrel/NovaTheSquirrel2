@@ -192,13 +192,13 @@ MaxSpeedRight = 12
   lda TailAttackTimer
   beq :+
     inc TailAttackTimer
-    cmp #9*3
+    cmp #AttackAnimationSequenceEnd-AttackAnimationSequence
     bne :+
       stz TailAttackTimer
   :
 
   lda TailAttackTimer
-  cmp #5*3
+  cmp #4*2
   bne :+
     seta16
     jsl FindFreeActorX
@@ -1159,6 +1159,10 @@ HealthLoopEnd:
   beq NoTailAttack
     dea
 
+    tax
+    lda AttackAnimationSequence,x
+
+.if 0
     ; Divide by 3
     sta  0
     lsr
@@ -1175,6 +1179,8 @@ HealthLoopEnd:
     lsr
 
     add #PlayerFrame::ATTACK1
+.endif
+
     sta PlayerFrame
     bra Exit
   NoTailAttack:
@@ -1250,7 +1256,20 @@ MakeHealthIcon:
   inx
   inx
   rts
+
 .endproc
+
+AttackAnimationSequence:
+  .byt PlayerFrame::ATTACK1, PlayerFrame::ATTACK1
+  .byt PlayerFrame::ATTACK2, PlayerFrame::ATTACK2
+  .byt PlayerFrame::ATTACK3, PlayerFrame::ATTACK3
+  .byt PlayerFrame::ATTACK4, PlayerFrame::ATTACK4
+  .byt PlayerFrame::ATTACK5, PlayerFrame::ATTACK5
+  .byt PlayerFrame::ATTACK6, PlayerFrame::ATTACK6, PlayerFrame::ATTACK6, PlayerFrame::ATTACK6
+  .byt PlayerFrame::ATTACK7, PlayerFrame::ATTACK7, PlayerFrame::ATTACK7, PlayerFrame::ATTACK7
+  .byt PlayerFrame::ATTACK8, PlayerFrame::ATTACK8, PlayerFrame::ATTACK8, PlayerFrame::ATTACK8
+  .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9, PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
+AttackAnimationSequenceEnd:
 
 AbilityIcons:
   .incbin "../tilesets4/AbilityIcons.chrsfc"

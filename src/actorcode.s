@@ -185,9 +185,7 @@ CommonTileBase = $40
 
   jsl ActorFall
 
-
-;  jsl PlayerActorCollisionHurt
-  rtl
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
