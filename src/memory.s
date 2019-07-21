@@ -186,6 +186,15 @@ LevelZeroWhenLoad_End:
   ; Multiply by 4 to use it.
   FirstActorOnScreen:     .res 16
 
+
+  ; Tap-run state
+  UseTapRun: .res 1
+  TapReleaseTimer: .res 1 ; Starts a countdown once left/right are released
+  TapReleaseButton: .res 1 ; Indicates if left or right was released
+  IsTapRun: .res 1 ; Current run is from a tap
+
+  TailAttackTimer: .res 1
+
 .segment "BSS7E"
 
 

@@ -9,3 +9,4 @@ PlayerGraphics:
 .incbin "../tilesets4/NovaFall.chrsfc"
 .incbin "../tilesets4/NovaClimb.chrsfc"
 .incbin "../tilesets4/NovaRoll.chrsfc"
+.incbin "../tilesets4/NovaAttack.chrsfc"

@@ -143,6 +143,70 @@ MaxSpeedRight = 12
   countdown PlayerInvincible
   stz PlayerOnSlope
 
+
+  ; Tap run
+  lda UseTapRun
+  ; don't branch
+    countdown TapReleaseTimer
+
+    ; Set off a timer when you release left/right
+    lda keydown+1
+    eor #$ff
+    and keylast+1
+    and #>(KEY_LEFT|KEY_RIGHT)
+    beq :+
+      sta TapReleaseButton
+      lda #14
+      sta TapReleaseTimer
+    :
+
+    ; Allow the tap run to start
+    lda keynew+1
+    and #>(KEY_LEFT|KEY_RIGHT)
+    beq :+
+      ; Same button?
+      and TapReleaseButton
+      beq :+
+      lda TapReleaseTimer
+      beq :+
+        lda #1
+        sta PlayerWasRunning
+        sta IsTapRun
+    :
+
+    ; Release a tap run
+    lda IsTapRun
+    beq :+
+      lda keydown+1
+      and #>(KEY_LEFT|KEY_RIGHT)
+      bne :+
+        lda PlayerOnGround
+        beq :+
+          stz PlayerWasRunning 
+          stz IsTapRun
+    :
+  NoTapRun:
+
+
+
+  lda TailAttackTimer
+  beq :+
+    inc TailAttackTimer
+    cmp #9*3
+    bne :+
+      stz TailAttackTimer
+  :
+
+  lda keydown
+  and #KEY_X
+  beq :+
+    lda TailAttackTimer
+    bne :+
+      inc TailAttackTimer
+  :
+
+
+
   lda ForceControllerTime
   beq :+
      seta16
@@ -586,7 +650,7 @@ SkipGroundCheck:
   seta8
   lda PlayerOnGround
   seta16
-  beq :+
+  beq @NotOnGround
     jsr OfferJump
 
     seta8
@@ -597,14 +661,17 @@ SkipGroundCheck:
     @NoCancelRoll:
 
     ; Update run status
-    lda keydown
-    and #KEY_R|KEY_L
-    sta PlayerWasRunning
-    lda keydown+1
-    and #KEY_Y>>8
-    tsb PlayerWasRunning
+    lda IsTapRun
+    bne :+
+      lda keydown
+      and #KEY_R|KEY_L
+      sta PlayerWasRunning
+      lda keydown+1
+      and #KEY_Y>>8
+      tsb PlayerWasRunning
+    :
     seta16
-  :
+  @NotOnGround:
 
   rtl
 
@@ -813,6 +880,15 @@ OfferJumpFromGracePeriod:
   ROLL2
   ROLL3
   ROLL4
+  ATTACK1
+  ATTACK2
+  ATTACK3
+  ATTACK4
+  ATTACK5
+  ATTACK6
+  ATTACK7
+  ATTACK8
+  ATTACK9
 .endenum
 
 .a16
@@ -1043,6 +1119,31 @@ HealthLoopEnd:
       dec PlayerFrame
   OnGround:
 
+
+  lda TailAttackTimer
+  beq NoTailAttack
+   dea
+
+   ; Divide by 3
+   sta  0
+   lsr
+   adc  #21
+   lsr
+   adc  0
+   ror
+   lsr
+   adc  0
+   ror
+   lsr
+   adc  0
+   ror
+   lsr
+
+   add #PlayerFrame::ATTACK1
+   sta PlayerFrame
+   bra Exit
+  NoTailAttack:
+
   lda PlayerOnLadder
   beq OffLadder
     lda retraces
@@ -1077,6 +1178,9 @@ HealthLoopEnd:
       inc PlayerFrameXFlip
       inc PlayerFrameYFlip
   NoRoll:
+
+
+Exit:
   setaxy16
   rtl
 
