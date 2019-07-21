@@ -197,6 +197,33 @@ MaxSpeedRight = 12
       stz TailAttackTimer
   :
 
+  lda TailAttackTimer
+  cmp #5*3
+  bne :+
+    seta16
+    jsl FindFreeActorX
+    bcc :+
+    lda #Actor::PlayerProjectile*2
+    sta ActorType,x
+
+    lda #13<<4
+    jsr PlayerNegIfLeft
+    add PlayerPX
+    sta ActorPX,x
+
+    lda PlayerPY
+    sub #7<<4
+    sta ActorPY,x
+
+    stz ActorTimer,x
+
+    lda #4*16
+    jsr PlayerNegIfLeft
+    sta ActorVX,x
+  :
+  seta8
+
+
   lda keydown
   and #KEY_X
   beq :+
@@ -270,8 +297,11 @@ NotWalkSpeed:
   and #KEY_RIGHT
   bne NotLeft
     seta8
-    lda #1
-    sta PlayerDir
+    lda TailAttackTimer
+    bne :+
+      lda #1
+      sta PlayerDir
+    :
     seta16
     lda PlayerVX
     bpl :+
@@ -290,7 +320,10 @@ NotLeft:
   and #KEY_LEFT
   bne NotRight
     seta8
-    stz PlayerDir
+    lda TailAttackTimer
+    bne :+
+      stz PlayerDir
+    :
     seta16
     lda PlayerVX
     bmi :+
@@ -1237,4 +1270,20 @@ AbilityIcons:
   :
   plp
   rtl
+.endproc
+
+; Takes a speed in the accumulator, and negates it if Actor facing left
+.a16
+.proc PlayerNegIfLeft
+  pha
+  lda PlayerDir ; Ignore high byte
+  lsr
+  bcs Left
+Right:
+  pla ; No change
+  rts
+Left:
+  pla ; Negate
+  negw
+  rts
 .endproc

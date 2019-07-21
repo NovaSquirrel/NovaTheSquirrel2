@@ -22,17 +22,42 @@
 .segment "ActorData"
 CommonTileBase = $40
 
-.import DispActor16x16, DispParticle8x8
-.import ActorWalk, ActorFall, ActorAutoBump
+.import DispActor16x16, DispActor8x8, DispParticle8x8
+.import ActorWalk, ActorFall, ActorAutoBump, ActorApplyXVelocity
+.import PlayerActorCollision, TwoActorCollision
+.import PlayerActorCollisionHurt
 
 ; -------------------------------------
 
 .a16
 .i16
+.export RunPlayerProjectile
+.proc RunPlayerProjectile
+  jsl ActorApplyXVelocity
+
+  inc ActorTimer,x
+  lda ActorTimer,x
+  cmp #20
+  bne :+
+    stz ActorType,x
+  :
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawPlayerProjectile
+.proc DrawPlayerProjectile
+  stz SpriteTileBase
+  lda #CommonTileBase+$2c+OAM_PRIORITY_2
+  jml DispActor8x8
+.endproc
+
+
+.a16
+.i16
 .export DrawBurger
 .proc DrawBurger
-;  lda PlayerOnGround
-;  and #255
   lda #0
   jml DispActor16x16
 .endproc
@@ -153,11 +178,15 @@ CommonTileBase = $40
 .i16
 .export RunSneaker
 .proc RunSneaker
-  lda #$40
-  jsl ActorWalk
-  jsl ActorAutoBump
+;  lda #$40
+;  jsl ActorWalk
+;  jsl ActorAutoBump
 
-  jml ActorFall
+  jsl ActorFall
+
+
+;  jsl PlayerActorCollisionHurt
+  rtl
 .endproc
 
 .a16

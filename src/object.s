@@ -549,6 +549,7 @@ Left:
   rtl
 .endproc
 
+.export ActorApplyVelocity
 .proc ActorApplyVelocity
   lda ActorPX,x
   add ActorVX,x
@@ -561,6 +562,8 @@ YOnly:
 .endproc
 ActorApplyYVelocity = ActorApplyVelocity::YOnly
 
+.export ActorApplyXVelocity
+.export ActorApplyYVelocity
 .proc ActorApplyXVelocity
   lda ActorPX,x
   add ActorVX,x
@@ -1002,6 +1005,53 @@ Invalid:
   lda 1
   cmp #%00001000
   lda #1 ; 16x16 sprites
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  tya
+  add #4
+  sta OamPtr
+  rtl
+.endproc
+
+; A = tile to draw
+.a16
+.export DispActor8x8
+.proc DispActor8x8
+  sta 4
+
+  ; If facing left, set the X flip bit
+  lda ActorDirection,x ; Ignore high byte
+  lsr
+  bcc :+
+    lda #OAM_XFLIP
+    tsb 4
+  :
+
+  ldy OamPtr
+
+  jsr ActorDrawPosition
+  bcs :+
+    rtl
+  :  
+
+  lda 4
+  ora SpriteTileBase
+  sta OAM_TILE,y ; 16-bit, combined with attribute
+
+  seta8
+  lda 0
+  add #4
+  sta OAM_XPOS,y
+  lda 2
+  add #8
+  sta OAM_YPOS,y
+
+  ; Get the high bit of the calculated position and plug it in
+  lda 1
+  cmp #%00001000
+  lda #0 ; 8x8 sprites
   rol
   sta OAMHI+1,y
   seta16

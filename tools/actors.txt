@@ -50,6 +50,11 @@ run RunCheckpoint
 draw DrawCheckpoint
 size 16x16
 
++PlayerProjectile
+run RunPlayerProjectile
+draw DrawPlayerProjectile
+size 8x8
+
 # ---------- cannon stuff ----------
 +Burger
 flag AutoRemove GetShot
