@@ -19,7 +19,7 @@
 .include "global.inc"
 .include "blockenum.s"
 .import ActorRun, ActorDraw, ActorFlags, ActorWidth, ActorHeight, ActorBank, ActorGraphic, ActorPalette
-.import ParticleRun, ParticleDraw
+.import ParticleRun, ParticleDraw, ActorGetShot
 .smart
 
 .segment "ActorData"
@@ -78,7 +78,9 @@ Loop:
 
   lsr ; GetShot
   bcc NotGetShot
-
+    pha
+    jsl ActorGetShot
+    pla
   NotGetShot:
 
   lsr ; AutoReset
@@ -984,6 +986,16 @@ Invalid:
     tsb 4
   :
 
+  ; If stunned, flip upside down
+  lda ActorState,x
+  and #$00ff
+  cmp #ActorStateValue::Stunned
+  bne :+
+    lda #OAM_YFLIP
+    tsb 4
+  :
+
+
   ldy OamPtr
 
   jsr ActorDrawPosition
@@ -1398,10 +1410,17 @@ No:
 .a16
 .i16
 .proc PlayerActorCollisionHurt
+  ; Don't hurt the player if the actor is stunned
+  lda ActorState,x
+  and #$00ff
+  cmp #ActorStateValue::Stunned
+  beq Exit
+
   jsl PlayerActorCollision
   bcc :+
     .import HurtPlayer
     jml HurtPlayer
   :
+Exit:
   rtl
 .endproc

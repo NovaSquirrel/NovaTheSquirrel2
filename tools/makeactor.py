@@ -85,7 +85,7 @@ outfile.write('.export ParticleRun, ParticleDraw\n')
 outfile.write('.import %s\n' % str(", ".join(all_subroutines)))
 outfile.write('\n.segment "ActorData"\n\n')
 
-outfile.write('.proc ActorFlags\n')
+outfile.write('.proc ActorFlags\n  .word 0\n')
 for b in all_actors:
 	if b["essential"]:
 		b["flags"].append("Essential")
@@ -93,7 +93,7 @@ for b in all_actors:
 		b["flags"].append("Secondary")
 	else:
 		b["flags"].append("Primary")
-	outfile.write('  .word %s\n' % " | ".join(["ActorFlag::"+f for f in b["flags"]]))
+	outfile.write('  .word %s ; %s\n' % (" | ".join(["ActorFlag::"+f for f in b["flags"]]), b["name"]))
 outfile.write('.endproc\n\n')
 
 # no-operation routine

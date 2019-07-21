@@ -17,6 +17,7 @@
 
 .include "snes.inc"
 .include "global.inc"
+.include "actorenum.s"
 .smart
 
 .segment "ActorData"
@@ -340,3 +341,68 @@ CommonTileBase = $40
 
   rts
 .endproc
+
+
+
+
+
+; Check for a collision with a player projectile
+; and run the default handler for it
+.export ActorGetShot
+.proc ActorGetShot
+  jsl ActorGetShotTest
+  bcc :+
+  jsl ActorGotShot
+: rtl
+.endproc
+
+.a16
+.proc ActorGetShotTest
+ProjectileIndex = TempVal
+ProjectileType  = 0
+  ldy #ActorStart
+Loop:
+  lda ActorType,y
+  cmp #Actor::PlayerProjectile*2
+  bne NotProjectile  
+
+  jsl TwoActorCollision
+  bcc :+
+    lda ActorType,y
+    sta ProjectileType
+    sty ProjectileIndex
+    sec
+    rtl
+  :
+
+NotProjectile:
+  tya
+  add #ActorSize
+  tay
+  cpy #ActorEnd
+  bne Loop
+
+  clc
+  rtl
+.endproc
+
+.proc ActorGotShot
+ProjectileIndex = ActorGetShotTest::ProjectileIndex
+ProjectileType  = ActorGetShotTest::ProjectileType
+  ; Use ProjectileType to decide what to do.
+  ; For now just stun.
+  seta8
+  lda #ActorStateValue::Stunned
+  sta ActorState,x
+  seta16
+
+  lda #180
+  sta ActorTimer,x
+
+  ldy ProjectileIndex
+  lda #0
+  sta ActorType,y
+  rtl
+.endproc
+
+
