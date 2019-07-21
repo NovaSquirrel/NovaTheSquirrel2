@@ -146,7 +146,7 @@ MaxSpeedRight = 12
 
   ; Tap run
   lda UseTapRun
-  ; don't branch
+  beq NoTapRun
     countdown TapReleaseTimer
 
     ; Set off a timer when you release left/right
@@ -225,7 +225,7 @@ MaxSpeedRight = 12
 
 
   lda keydown
-  and #KEY_X
+  and #KEY_X|KEY_A|KEY_L|KEY_R
   beq :+
     lda PlayerRolling
     bne :+
@@ -698,12 +698,15 @@ SkipGroundCheck:
     ; Update run status
     lda IsTapRun
     bne :+
-      lda keydown
-      and #KEY_R|KEY_L
-      sta PlayerWasRunning
+      ;lda keydown
+      ;and #KEY_R|KEY_L
+      ;sta PlayerWasRunning
+      ;lda keydown+1
+      ;and #KEY_Y>>8
+      ;tsb PlayerWasRunning
       lda keydown+1
-      and #KEY_Y>>8
-      tsb PlayerWasRunning
+      and #>KEY_Y
+      sta PlayerWasRunning
     :
     seta16
   @NotOnGround:
