@@ -396,6 +396,8 @@ CheckExistsLoop:
   stz ActorTimer,x
   lda #ActorStateValue::Init
   sta ActorState,x
+  tya
+  sta ActorIndexInLevel,x
 
   ; Actor list organized as XXXXXXXX D..YYYYY tttttttt abcdTTTT
   seta8
