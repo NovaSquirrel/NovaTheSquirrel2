@@ -192,7 +192,7 @@ MaxSpeedRight = 12
   lda TailAttackTimer
   beq :+
     inc TailAttackTimer
-    cmp #AttackAnimationSequenceEnd-AttackAnimationSequence
+    cmp #(AttackAnimationSequenceEnd-AttackAnimationSequence)*2
     bne :+
       stz TailAttackTimer
   :
@@ -1161,29 +1161,9 @@ HealthLoopEnd:
   lda TailAttackTimer
   beq NoTailAttack
     dea
-
+    lsr
     tax
     lda AttackAnimationSequence,x
-
-.if 0
-    ; Divide by 3
-    sta  0
-    lsr
-    adc  #21
-    lsr
-    adc  0
-    ror
-    lsr
-    adc  0
-    ror
-    lsr
-    adc  0
-    ror
-    lsr
-
-    add #PlayerFrame::ATTACK1
-.endif
-
     sta PlayerFrame
     bra Exit
   NoTailAttack:
@@ -1263,15 +1243,15 @@ MakeHealthIcon:
 .endproc
 
 AttackAnimationSequence:
-  .byt PlayerFrame::ATTACK1, PlayerFrame::ATTACK1
-  .byt PlayerFrame::ATTACK2, PlayerFrame::ATTACK2
-  .byt PlayerFrame::ATTACK3, PlayerFrame::ATTACK3
-  .byt PlayerFrame::ATTACK4, PlayerFrame::ATTACK4
-  .byt PlayerFrame::ATTACK5, PlayerFrame::ATTACK5
-  .byt PlayerFrame::ATTACK6, PlayerFrame::ATTACK6, PlayerFrame::ATTACK6, PlayerFrame::ATTACK6
-  .byt PlayerFrame::ATTACK7, PlayerFrame::ATTACK7, PlayerFrame::ATTACK7, PlayerFrame::ATTACK7
-  .byt PlayerFrame::ATTACK8, PlayerFrame::ATTACK8, PlayerFrame::ATTACK8, PlayerFrame::ATTACK8
-  .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9, PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
+  .byt PlayerFrame::ATTACK1
+  .byt PlayerFrame::ATTACK2
+  .byt PlayerFrame::ATTACK3
+  .byt PlayerFrame::ATTACK4
+  .byt PlayerFrame::ATTACK5
+  .byt PlayerFrame::ATTACK6, PlayerFrame::ATTACK6
+  .byt PlayerFrame::ATTACK7, PlayerFrame::ATTACK7
+  .byt PlayerFrame::ATTACK8, PlayerFrame::ATTACK8
+  .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
 AttackAnimationSequenceEnd:
 
 AbilityIcons:
