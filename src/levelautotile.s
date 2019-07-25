@@ -271,7 +271,7 @@ Loop:
 Nope:
   dey
   dey
-  lda [LeftPointer],y
+  lda [RightPointer],y
   cmp #Block::Ledge
   bne :+
     lda #Block::LedgeSolidRightSideCorner

@@ -87,12 +87,13 @@ def encode_slope(r, offset):
 		lr = 'L'
 		y += r.h - 1
 
+	# Currently do not encode a height
 	if ratio == 1:
-		return "LObjN LO::Slope%s_Steep, %d, %d, %d, %d" % (lr, offset, y, r.w-1, r.h-1), 3
+		return "LObjN LO::Slope%s_Steep, %d, %d, %d, %d" % (lr, offset, y, r.w-1, 0), 3
 	elif ratio == 2:
-		return "LObjN LO::Slope%s_Medium, %d, %d, %d, %d" % (lr, offset, y, r.w//2-1, r.h-1), 3
+		return "LObjN LO::Slope%s_Medium, %d, %d, %d, %d" % (lr, offset, y, r.w//2-1, 0), 3
 	elif ratio == 4:
-		return "LObjN LO::Slope%s_Gradual, %d, %d, %d, %d" % (lr, offset, y, r.w//4-1, r.h-1), 3
+		return "LObjN LO::Slope%s_Gradual, %d, %d, %d, %d" % (lr, offset, y, r.w//4-1, 0), 3
 	else:
 		print("Unhandled slope ratio %f" % ratio)
 available_special['LedgeSlope'] = encode_slope
