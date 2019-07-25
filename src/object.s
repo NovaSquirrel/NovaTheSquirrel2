@@ -100,7 +100,9 @@ Loop:
 
   lsr ; WaitUntilNear
   bcc NotWaitUntilNear
-
+    pha
+    jsl ActorActivateIfNear
+    pla
   NotWaitUntilNear:
 
   ; Reset the "init" state
@@ -1000,6 +1002,9 @@ Invalid:
 
   jsr ActorDrawPosition
   bcs :+
+    seta8
+    stz ActorOnScreen,x
+    seta16
     rtl
   :  
 
@@ -1017,6 +1022,7 @@ Invalid:
   lda 1
   cmp #%00001000
   lda #1 ; 16x16 sprites
+  sta ActorOnScreen,x
   rol
   sta OAMHI+1,y
   seta16
@@ -1422,5 +1428,38 @@ No:
     jml HurtPlayer
   :
 Exit:
+  rtl
+.endproc
+
+
+; If an actor is initializing, change it to the paused state
+; and hold it in the paused state until the player is near
+.export ActorActivateIfNear
+.proc ActorActivateIfNear
+  seta8
+  ; If already activated, just exit
+  lda ActorState,x
+  beq Exit
+  cmp #ActorStateValue::Stunned
+  beq Exit
+  ; If it's initializing, automatically start pausing
+  cmp #ActorStateValue::Init
+  bne :+ ; change it to paused
+    lda #ActorStateValue::Paused
+    sta ActorState,x
+  :
+
+  ; Stop pausing if close enough
+  lda PlayerPX+1
+  sub ActorPX+1,x
+  abs
+  cmp #7
+  bcs Exit
+
+Yes: ; Change to normal state
+  lda #ActorStateValue::None
+  sta ActorState,x
+Exit:
+  seta16
   rtl
 .endproc

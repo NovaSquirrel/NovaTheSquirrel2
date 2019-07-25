@@ -67,14 +67,26 @@ CommonTileBase = $40
 .i16
 .export RunBurger
 .proc RunBurger
-;  lda PlayerPX
-;  sta ActorPX,x
-;  lda PlayerPY
-;  sub #$400
-;  sta ActorPY,x
   lda #3
   jml ActorWalk
 .endproc
+
+.a16
+.i16
+.export DrawSpikedHat
+.proc DrawSpikedHat
+  lda #3*2
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunSpikedHat
+.proc RunSpikedHat
+  rtl
+.endproc
+
+
 
 .a16
 .i16
@@ -152,7 +164,9 @@ CommonTileBase = $40
 .proc DrawSlowSneaker
   lda retraces
   lsr
+  lsr
   and #2
+  add #2*3
   ora #OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
@@ -161,7 +175,13 @@ CommonTileBase = $40
 .i16
 .export RunSlowSneaker
 .proc RunSlowSneaker
-  jml ActorFall
+  lda #20
+  jsl ActorWalk
+  jsl ActorAutoBump
+
+  jsl ActorFall
+
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
@@ -180,12 +200,33 @@ CommonTileBase = $40
 .i16
 .export RunSneaker
 .proc RunSneaker
-;  lda #$40
-;  jsl ActorWalk
-;  jsl ActorAutoBump
+  ; Gradually get faster
+  lda ActorState,x
+  and #255
+  bne :+
+  lda ActorVarC,x
+  cmp #$20
+  bcc :+
+  sub #$20
+  asl
+  jsl ActorWalk
+  jsl ActorAutoBump
+:
+
+  ; Count up a timer before starting to move
+  seta8
+  lda ActorState,x
+  bne :+
+    lda ActorOnScreen,x
+    beq :+
+      lda ActorVarC,x
+      cmp #$20+$30/2
+      beq :+
+        inc ActorVarC,x
+  :
+  seta16
 
   jsl ActorFall
-
   jml PlayerActorCollisionHurt
 .endproc
 

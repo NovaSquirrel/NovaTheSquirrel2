@@ -14,7 +14,7 @@
 	"Header":	{
 		"Music":	null,
 		"Background":	null,
-		"SpriteGFX":	["SPWalker", "SPWalker2", "SPCannon"],
+		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	["FGCommon", "FGGrassy", null, null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest"],
@@ -184,7 +184,7 @@
 					"X":	79,
 					"Y":	22,
 					"W":	1,
-					"H":	10
+					"H":	7
 				}, {
 					"Id":	"Spring",
 					"X":	66,
@@ -233,19 +233,48 @@
 					"Y":	13,
 					"W":	14,
 					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	80,
+					"Y":	28,
+					"W":	10,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	80,
+					"Y":	22,
+					"W":	1,
+					"H":	6
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	90,
+					"Y":	22,
+					"W":	12,
+					"H":	6
+				}, {
+					"Id":	"Ledge",
+					"X":	102,
+					"Y":	22,
+					"W":	10,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	112,
+					"Y":	22,
+					"W":	1,
+					"H":	10
+				}, {
+					"Id":	"Ledge",
+					"X":	68,
+					"Y":	20,
+					"W":	4,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",
 			"Type":	"Sprite",
 			"Tileset":	"nova2sp",
 			"Data":	[{
-					"Id":	"Sneaker",
-					"X":	17,
-					"Y":	29,
-					"W":	1,
-					"H":	1,
-					"XFlip":	true
-				}, {
 					"Id":	"Sneaker",
 					"X":	74,
 					"Y":	21,
@@ -260,14 +289,35 @@
 					"H":	1
 				}, {
 					"Id":	"Sneaker",
-					"X":	15,
-					"Y":	20,
+					"X":	3,
+					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"Sneaker",
-					"X":	3,
-					"Y":	25,
+					"Id":	"SlowSneaker",
+					"X":	15,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	31,
+					"Y":	9,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Bunny",
+					"X":	42,
+					"Y":	19,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SpikedHat",
+					"X":	70,
+					"Y":	19,
 					"W":	1,
 					"H":	1
 				}]

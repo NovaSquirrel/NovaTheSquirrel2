@@ -25,6 +25,14 @@ run RunBunny
 draw DrawBunny
 size 16x16
 
++SpikedHat
+flag AutoRemove AutoReset GetShot
+pal SPWalker
+gfx SPWalker2
+run RunSpikedHat
+draw DrawSpikedHat
+size 16x16
+
 +MovingPlatformHoriz
 essential
 run RunMovingPlatformH

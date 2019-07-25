@@ -85,7 +85,7 @@
   LevelActorPointer: .res 3 ; actor pointer for this level
 
 .segment "BSS" ; First 8KB of RAM
-  ActorSize = 10*2+3
+  ActorSize = 10*2+4
   ActorStart: .res ActorLen*ActorSize
   ActorEnd:
 
@@ -102,6 +102,7 @@
   ActorDirection    = 20 ; 0 (Right) or 1 (Left). Other bits may be used later. Good place for parameters from level?
   ActorState        = 21 ; Nonzero usually means stunned
   ActorOnGround     = 22 ; Nonzero means on ground
+  ActorOnScreen     = 23 ; Nonzero means on screen
 
   ; For less important, light entities
   ParticleSize = 7*2

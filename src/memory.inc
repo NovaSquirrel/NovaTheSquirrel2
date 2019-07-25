@@ -107,6 +107,7 @@ ActorLen = 20
 .globalzp ActorTimer
 .globalzp ActorState
 .globalzp ActorOnGround
+.globalzp ActorOnScreen
 
 ParticleLen = 32
 .global ParticleStart
