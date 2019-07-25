@@ -134,22 +134,22 @@ CommonTileBase = $40
 
 .a16
 .i16
-.export DrawOwl
-.proc DrawOwl
+.export DrawBunny
+.proc DrawBunny
   rtl
 .endproc
 
 .a16
 .i16
-.export RunOwl
-.proc RunOwl
+.export RunBunny
+.proc RunBunny
   rtl
 .endproc
 
 .a16
 .i16
-.export DrawPlodder
-.proc DrawPlodder
+.export DrawSlowSneaker
+.proc DrawSlowSneaker
   lda retraces
   lsr
   and #2
@@ -159,8 +159,8 @@ CommonTileBase = $40
 
 .a16
 .i16
-.export RunPlodder
-.proc RunPlodder
+.export RunSlowSneaker
+.proc RunSlowSneaker
   jml ActorFall
 .endproc
 
@@ -171,6 +171,7 @@ CommonTileBase = $40
   lda retraces
   lsr
   and #2
+  add #2
   ora #OAM_PRIORITY_2
   jml DispActor16x16
 .endproc

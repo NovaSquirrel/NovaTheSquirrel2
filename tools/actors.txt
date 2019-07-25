@@ -1,12 +1,12 @@
 # This is the list of entities in the game, automatically inserted and formatted.
 # The "Empty" entity type is created automatically, no need to specify here.
 
-+Plodder
++SlowSneaker
 flag AutoRemove AutoReset GetShot WaitUntilNear
 pal SPWalker
 gfx SPWalker
-run RunPlodder
-draw DrawPlodder
+run RunSlowSneaker
+draw DrawSlowSneaker
 size 16x16
 
 +Sneaker
@@ -17,12 +17,12 @@ run RunSneaker
 draw DrawSneaker
 size 16x16
 
-+Owl
++Bunny
 flag AutoRemove AutoReset GetShot
 pal SPWalker
 gfx SPWalker
-run RunOwl
-draw DrawOwl
+run RunBunny
+draw DrawBunny
 size 16x16
 
 +MovingPlatformHoriz

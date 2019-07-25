@@ -126,6 +126,8 @@ ParticleLen = 32
 .global PaletteRequestIndex
 .global PaletteRequestValue
 
+.global GraphicUploadOffset
+
 
 .globalzp LevelNumber
 .globalzp StartedLevelNumber
@@ -152,4 +154,3 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer
-

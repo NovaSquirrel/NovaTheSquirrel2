@@ -14,7 +14,7 @@
 	"Header":	{
 		"Music":	null,
 		"Background":	null,
-		"SpriteGFX":	["SPWalker", "SPCannon"],
+		"SpriteGFX":	["SPWalker", "SPWalker2", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	["FGCommon", "FGGrassy", null, null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest"],

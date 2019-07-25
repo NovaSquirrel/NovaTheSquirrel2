@@ -5,6 +5,7 @@
   FGTropicalWood
   SPCommon
   SPWalker
+  SPWalker2
   SPCannon
   BGForest
   MapBGForest

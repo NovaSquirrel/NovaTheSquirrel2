@@ -120,6 +120,8 @@
   SpriteTileSlots:     .res 2*8
   SpritePaletteSlots:  .res 2*4
 
+  GraphicUploadOffset: .res 2
+
   IRQHandler: .res 3
 
   OAM:   .res 512

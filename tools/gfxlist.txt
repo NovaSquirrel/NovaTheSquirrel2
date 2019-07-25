@@ -3,6 +3,7 @@
 2000 FGTropicalWood
 8800 SPCommon
 A000 SPWalker
-A800 SPCannon
+A000 SPWalker2
+A000 SPCannon
 6000 BGForest
 D000 MapBGForest

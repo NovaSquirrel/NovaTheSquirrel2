@@ -241,7 +241,16 @@
   stz SpriteTileSlots+1,x
   cmp #255
   beq :+
-    jsl DoGraphicUpload
+    pha
+    ; Sprite graphic slots are 1KB, and X is already
+    ; the slot number multiplied by 2. So we need to
+    ; multiply by 256 to find the word offset, which
+    ; requires no shifting.
+    txa
+    sta GraphicUploadOffset+1
+    stz GraphicUploadOffset+0
+    pla
+    jsl DoGraphicUploadWithOffset
   : 
   inx
   inx

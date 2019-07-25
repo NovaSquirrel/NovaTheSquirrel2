@@ -152,7 +152,9 @@ loop2:
   phx
   php
   setaxy16
+  stz GraphicUploadOffset
 
+KeepOffset:
   ; Calculate the address
   and #255
   ; Multiply by 7 by subtracting the original value from value*8
@@ -176,6 +178,7 @@ loop2:
 
   ; Destination address
   lda f:GraphicsDirectory+3,x
+  add GraphicUploadOffset
   sta PPUADDR
 
   ; Size
@@ -194,8 +197,14 @@ loop2:
   plp
   plx
   rtl
-.endproc
 
+WithOffset: ; Alternate entrance for using destination address offsets
+  phx
+  php
+  setaxy16
+  bra KeepOffset
+.endproc
+DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
 ;;
 ; Uploads a specific palette asset to CGRAM
 ; locals: 0, 1
