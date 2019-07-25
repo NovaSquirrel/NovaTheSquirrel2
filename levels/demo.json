@@ -14,7 +14,7 @@
 	"Header":	{
 		"Music":	null,
 		"Background":	null,
-		"SpriteGFX":	["SPWalker", "SPCannon"],
+		"SpriteGFX":	["SPWalker", "SPWalker2", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	["FGCommon", "FGGrassy", null, null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest"],
@@ -269,6 +269,65 @@
 					"Y":	20,
 					"W":	4,
 					"H":	1
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	115,
+					"Y":	23,
+					"W":	12,
+					"H":	6,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	130,
+					"Y":	24,
+					"W":	10,
+					"H":	5,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	144,
+					"Y":	25,
+					"W":	8,
+					"H":	4,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	156,
+					"Y":	26,
+					"W":	6,
+					"H":	3,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	166,
+					"Y":	27,
+					"W":	4,
+					"H":	2,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	173,
+					"Y":	23,
+					"W":	6,
+					"H":	6
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	182,
+					"Y":	22,
+					"W":	7,
+					"H":	7
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	193,
+					"Y":	21,
+					"W":	8,
+					"H":	8
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	205,
+					"Y":	20,
+					"W":	9,
+					"H":	9
 				}]
 		}, {
 			"Name":	"Sprites",
@@ -320,6 +379,13 @@
 					"Y":	19,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"SpikedHat",
+					"X":	6,
+					"Y":	25,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
 				}]
 		}, {
 			"Name":	"Control",

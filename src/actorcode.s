@@ -24,9 +24,9 @@
 CommonTileBase = $40
 
 .import DispActor16x16, DispActor8x8, DispParticle8x8
-.import ActorWalk, ActorFall, ActorAutoBump, ActorApplyXVelocity
+.import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import PlayerActorCollision, TwoActorCollision
-.import PlayerActorCollisionHurt
+.import PlayerActorCollisionHurt, ActorLookAtPlayer
 
 ; -------------------------------------
 
@@ -75,7 +75,7 @@ CommonTileBase = $40
 .i16
 .export DrawSpikedHat
 .proc DrawSpikedHat
-  lda #3*2
+  lda #(3*2)|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
 
@@ -83,7 +83,10 @@ CommonTileBase = $40
 .i16
 .export RunSpikedHat
 .proc RunSpikedHat
-  rtl
+  lda #$20
+  jsl ActorWalkOnPlatform
+  jsl ActorFall
+  jml PlayerActorCollisionHurt
 .endproc
 
 
@@ -148,14 +151,38 @@ CommonTileBase = $40
 .i16
 .export DrawBunny
 .proc DrawBunny
-  rtl
+  lda ActorOnGround,x
+  and #255
+  bne :+
+    lda #(2*7)|OAM_PRIORITY_2
+    jml DispActor16x16
+  :
+  lda retraces
+  lsr
+  lsr
+  and #2
+  add #2*5
+  ora #OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
 .i16
 .export RunBunny
 .proc RunBunny
-  rtl
+  lda framecount
+  and #15
+  bne :+
+    jsl ActorLookAtPlayer
+  :
+
+  lda #10
+  jsl ActorWalk
+  jsl ActorAutoBump
+
+  jsl ActorFall
+
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
@@ -188,6 +215,13 @@ CommonTileBase = $40
 .i16
 .export DrawSneaker
 .proc DrawSneaker
+  ; "Sleeping" frame
+  lda ActorVarC,x
+  cmp #$20
+  bcs :+
+    lda #OAM_PRIORITY_2
+    jml DispActor16x16
+  :
   lda retraces
   lsr
   and #2
