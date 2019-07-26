@@ -161,7 +161,7 @@ $(srcdir)/actorenum.s: tools/actors.txt
 	$(PY) tools/makeactor.py
 $(srcdir)/leveldata.s: $(levels)
 	$(PY) tools/levelconvert.py
-$(srcdir)/perspective_data.s: $(levels) tools/perspective.py
+$(srcdir)/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
 m7levels/%.hfm: m7levels/%.bin
 	tools/huffmunch -B $< $@
