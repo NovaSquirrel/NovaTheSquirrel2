@@ -18,3 +18,11 @@ You'll need the following:
 * [Huffmunch](https://github.com/bbbradsmith/huffmunch) compressor (Windows build included)
 
 With that in place, just enter `make`.
+
+License
+=======
+
+All game and tool code is available under GPL version 3.
+
+Ask before using any art in anything else.
+Generally, fan works (like romhacks with new levels) are okay, whereas using it as stock art is not.
