@@ -53,9 +53,16 @@
   LedgeSolidBottom
   LedgeSolidLeft
   LedgeSolidRight
+  FloatingPlatform
+  FloatingPlatformFallthrough
 .endenum
 
 .enum LN2
+  RopeLadder
+  Bridge
+  WoodPlatform
+  Pier
+  Fence
 .endenum
 
 .enum LN3

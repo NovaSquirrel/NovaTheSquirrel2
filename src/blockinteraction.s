@@ -25,6 +25,7 @@
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
 .export BlockSign, BlockSpikes, BlockSpring, BlockLadder, BlockLadderTop
+.export BlockFallthrough
 
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -388,6 +389,23 @@ GetOnLadder:
     sta ForceControllerBits
     stz BlockFlag
     jmp BlockLadder::GetOnLadder
+  :
+  seta16
+  rts
+.endproc
+
+.a16
+.proc BlockFallthrough
+  seta8
+  lda PlayerDownTimer
+  cmp #4
+  bcc :+
+    lda #2
+    sta ForceControllerTime
+    seta16
+    lda #KEY_DOWN
+    sta ForceControllerBits
+    stz BlockFlag
   :
   seta16
   rts

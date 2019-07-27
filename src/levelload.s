@@ -132,11 +132,12 @@
   ; (Replace with a lookup later)
   .import level_demo
   .import level_autodirttest
-  lda #<level_demo
+  .import level_woodtest
+  lda #<level_woodtest
   sta DecodePointer+0
-  lda #>level_demo
+  lda #>level_woodtest
   sta DecodePointer+1
-  lda #^level_demo
+  lda #^level_woodtest
   sta DecodePointer+2
 
   ; Music and starting player direction
@@ -515,14 +516,14 @@ SpecialConfig:
   .word Block::LedgeSolidBottom
   .word Block::LedgeSolidLeft
   .word Block::LedgeSolidRight
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::FloatingPlatform
+  .word Block::FloatingPlatformFallthrough
 ; Set 2
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::RopeLadder
+  .word Block::Bridge
+  .word Block::WoodPlatform
+  .word Block::Pier
+  .word Block::Fence
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty

@@ -320,3 +320,210 @@ Yes:
   rts
 .endproc
 
+.export AutotileFence
+.proc AutotileFence
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsFence
+  rol 0
+  lda [RightPointer],y
+  jsr IsFence
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  lda #Block::Fence
+  add 0
+  sta [MidPointer],y
+  rts
+
+IsFence:
+  cmp #Block::FenceMiddle+1
+  bcs No
+  cmp #Block::Fence
+  bcc No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc
+
+.export AutotileFloatingPlatform
+.proc AutotileFloatingPlatform
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsPlatform
+  rol 0
+  lda [RightPointer],y
+  jsr IsPlatform
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  lda #Block::FloatingPlatform
+  add 0
+  sta [MidPointer],y
+  rts
+
+IsPlatform:
+  cmp #Block::FloatingPlatformMiddle+1
+  bcs No
+  cmp #Block::FloatingPlatform
+  bcc No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc
+
+.export AutotileFloatingPlatformFallthrough
+.proc AutotileFloatingPlatformFallthrough
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsPlatform
+  rol 0
+  lda [RightPointer],y
+  jsr IsPlatform
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  lda #Block::FloatingPlatformFallthrough
+  add 0
+  sta [MidPointer],y
+  rts
+
+IsPlatform:
+  cmp #Block::FloatingPlatformMiddleFallthrough+1
+  bcs No
+  cmp #Block::FloatingPlatformFallthrough
+  bcc No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc
+
+.export AutotilePier
+.proc AutotilePier
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsPier
+  rol 0
+  lda [RightPointer],y
+  jsr IsPier
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  dey
+  dey
+  lda #Block::PierTop
+  add 0
+  sta [MidPointer],y
+  iny
+  iny
+
+  lda #Block::PierPole
+  jmp AutotileExpandOther
+
+IsPier:
+  cmp #Block::Pier
+  bne No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc
+
+.export AutotileRopeLadder
+.proc AutotileRopeLadder
+  dey
+  dey
+  lda [MidPointer],y
+  iny
+  iny
+  cmp #Block::RopeLadder
+  beq No
+  cmp #Block::RopeLadderTop
+  beq No
+  lda #Block::RopeLadderTop
+  sta [MidPointer],y
+No:
+  rts
+.endproc
+
+.export AutotileWoodPlatform
+.proc AutotileWoodPlatform
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsWoodPlatform
+  rol 0
+  lda [RightPointer],y
+  jsr IsWoodPlatform
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  lda #Block::WoodPlatform
+  add 0
+  sta [MidPointer],y
+
+  lda #Block::WoodPlatformPole
+  jmp AutotileExpandOther
+
+IsWoodPlatform:
+  cmp #Block::WoodPlatformMiddle+1
+  bcs No
+  cmp #Block::WoodPlatform
+  bcc No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc
+
+.export AutotileBridge
+.proc AutotileBridge
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsBridge
+  rol 0
+  lda [RightPointer],y
+  jsr IsBridge
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  ; Use the table
+  ldx 0
+  lda Table,x
+  sta [MidPointer],y
+  dey
+  dey
+  lda TopTable,x
+  sta [MidPointer],y
+  iny
+  iny
+  rts
+Table:
+  .word Block::Bridge, Block::BridgeLeft, Block::BridgeRight, Block::Bridge
+TopTable:
+  .word Block::BridgeTop, Block::BridgeLeftTop, Block::BridgeRightTop, Block::BridgeTop
+
+IsBridge:
+  cmp #Block::BridgeRight+1
+  bcs No
+  cmp #Block::Bridge
+  bcc No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc

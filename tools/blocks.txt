@@ -140,6 +140,18 @@ when InsideBody, BlockLadder
 t 0,1 1,1
 t 0,1 1,1
 
++RopeLadderTop
+solid_top
+when InsideBody, BlockLadder
+when Above, BlockLadderTop
+t 4,1 5,1
+t 6,1 7,1
+
++RopeLadder
+autotile AutotileRopeLadder
+when InsideBody, BlockLadder
+q 6,0
+
 +MoaiRight
 solid
 q 6,2
@@ -151,6 +163,159 @@ q 8,2
 +Rock
 solid
 q 10,2
+
++FloatingPlatform
+autotile AutotileFloatingPlatform
+solid_top
+t 0,2 2,2
+t 0:0 0:0
+
++FloatingPlatformLeft
+solid_top
+t 0,2 1,2
+t 0:0 0:0
+
++FloatingPlatformRight
+solid_top
+t 1,2 2,2
+t 0:0 0:0
+
++FloatingPlatformMiddle
+solid_top
+t 1,2 1,2
+t 0:0 0:0
+
++FloatingPlatformFallthrough
+autotile AutotileFloatingPlatformFallthrough
+when Above, BlockFallthrough
+solid_top
+t 0,3 2,3
+t 0:0 0:0
+
++FloatingPlatformLeftFallthrough
+when Above, BlockFallthrough
+solid_top
+t 0,3 1,3
+t 0:0 0:0
+
++FloatingPlatformRightFallthrough
+when Above, BlockFallthrough
+solid_top
+t 1,3 2,3
+t 0:0 0:0
+
++FloatingPlatformMiddleFallthrough
+when Above, BlockFallthrough
+solid_top
+t 1,3 1,3
+t 0:0 0:0
+
++Bridge
+autotile AutotileBridge
+solid_top
+t 4,3 4,3
+t 0:0 0:0
+
++BridgeLeft
+solid_top
+t 3,3 4,3
+t 0:0 0:0
+
++BridgeRight
+solid_top
+t 4,3 5,3
+t 0:0 0:0
+
++BridgeTop
+priority
+t 0:0 0:0
+t 4,2 4,2
+
++BridgeLeftTop
+priority
+t 0:0 0:0
+t 3,2 4,2
+
++BridgeRightTop
+priority
+t 0:0 0:0
+t 4,2 5,2
+
++WoodPlatform
+autotile AutotileWoodPlatform
+solid_top
+t 2,0 5,0
+t 2,1 3,1
+
++WoodPlatformLeft
+solid_top
+t 2,0 3,0
+t 2,1 3,1
+
++WoodPlatformRight
+solid_top
+t 4,0 5,0
+t 2,1 3,1
+
++WoodPlatformMiddle
+solid_top
+t 4,0 3,0
+t 2,1 3,1
+
++WoodPlatformPole
+t 2,1 3,1
+t 2,1 3,1
+
++Fence
+priority
+autotile AutotileFence
+t 12,0 14,0
+t 12,1 14,1
+
++FenceLeft
+priority
+t 12,0 13,0
+t 12,1 13,1
+
++FenceRight
+priority
+t 13,0 14,0
+t 13,1 14,1
+
++FenceMiddle
+priority
+t 13,0 13,0
+t 13,1 13,1
+
++Pier
+autotile AutotilePier
+solid_top
+q 8,0
+
++PierPole
+t 8,1 9,1
+t 8,1 9,1
+
++PierTop
+priority
+t 0:0 0:0
+t 10,0 11,0
+
++PierTopLeft
+priority
+t 0:0 0:0
+t 10,0 11,1
+
++PierTopRight
+priority
+t 0:0 0:0
+t 10,1 11,0
+
++PierTopMiddle
+priority
+t 0:0 0:0
+t 10,1 11,1
+
 
 #######################################
 # Terrain
