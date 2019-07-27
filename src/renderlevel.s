@@ -109,7 +109,8 @@ BlockNum = 0
 BlocksLeft = 2
 YPos = 4
   ; Start rendering
-  xba      ; Get the column number in blocks (A still the value written to ScrollX)
+  lda ScrollX+1 ; Get the column number in blocks
+  and #$ff
   sub #4   ; Render out past the left side a bit
   sta BlockNum
   jsl GetLevelColumnPtr
