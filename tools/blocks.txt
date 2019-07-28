@@ -3,6 +3,7 @@
 
 alias common $0000
 alias terrain $1000
+alias terrain_rocks $1c00
 alias wood $2000
 alias global_palette 0
 alias terrain_palette 1
@@ -589,3 +590,128 @@ t 10,4 11,4
 +GradualSlopeR_U4_Dirt
 t 3,3 3,3
 t 12,4 13,4
+
+#######################################
+# Terrain rocks/sand
+#######################################
+base terrain_rocks
+palette global_palette
+
++SandLeft
+solid
+t 6,0 7,0
+t 6,0 7,0
+
++Sand
+autotile AutotileSand
+solid
+t 7,0 7,0
+t 7,0 7,0
+
++SandRight
+solid
+t 7,0 8,0
+t 7,0 8,0
+
++SandTopLeft
+solid
+t 3,1 4,1
+t 6,0 7,0
+
++SandTop
+solid
+t 4,1 4,1
+t 7,0 7,0
+
++SandTopRight
+solid
+t 4,1 5,1
+t 7,0 8,0
+
++SandBottomLeft
+solid
+t 6,0 7,0
+t 6,1 7,1
+
++SandBottom
+solid
+t 7,0 7,0
+t 7,1 7,1
+
++SandBottomRight
+solid
+t 7,0 8,0
+t 7,1 8,1
+
+
+
+
++StoneLeft
+solid
+t 0,1 1,1
+t 0,1 1,1
+
++Stone
+autotile AutotileStone
+solid
+t 1,1 1,1
+t 1,1 1,1
+
++StoneRight
+solid
+t 1,1 2,1
+t 1,1 2,1
+
++StoneTopLeft
+solid
+q 0,0
+
++StoneTop
+solid
+t 1,0 1,0
+t 1,1 1,1
+
++StoneTopRight
+solid
+q 1,0
+
++StoneBottomLeft
+solid
+t 0,1 1,1
+t 3,0 4,0
+
++StoneBottom
+solid
+t 1,1 1,1
+t 4,0 4,0
+
++StoneBottomRight
+solid
+t 1,1 2,1
+t 4,0 5,0
+
++StoneCornerTopLeft
+solid
+t 1,1 1,1
+t 1,1 9,0
+
++StoneCornerTopRight
+solid
+t 1,1 1,1
+t 10,0 1,1
+
++StoneCornerBottomLeft
+solid
+t 1,1 9,1
+t 1,1 1,1
+
++StoneCornerBottomRight
+solid
+t 10,1 1,1
+t 1,1 1,1
+
++StoneSingle
+solid
+t 0,0 2,0
+t 3,0 5,0
+

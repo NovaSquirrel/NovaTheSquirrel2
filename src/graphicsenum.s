@@ -2,6 +2,7 @@
 .enum GraphicsUpload
   FGCommon
   FGGrassy
+  FGForestStone
   FGTropicalWood
   SPCommon
   SPWalker

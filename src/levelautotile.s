@@ -421,9 +421,12 @@ No:
 
   dey
   dey
-  lda #Block::PierTop
-  add 0
-  sta [MidPointer],y
+  lda [MidPointer],y
+  bne :+
+    lda #Block::PierTop
+    add 0
+    sta [MidPointer],y
+  :
   iny
   iny
 
@@ -480,11 +483,10 @@ IsWoodPlatform:
   cmp #Block::WoodPlatformMiddle+1
   bcs No
   cmp #Block::WoodPlatform
-  bcc No
-  ; Carry set
-  rts
+  bcs Yes
 No:
   clc
+Yes:
   rts
 .endproc
 
@@ -525,5 +527,141 @@ IsBridge:
   rts
 No:
   clc
+  rts
+.endproc
+
+.export AutotileSand
+.proc AutotileSand
+  stz 0
+
+  ; Up
+  dey
+  dey
+  lda [MidPointer],y
+  jsr IsSand
+  rol 0
+  iny
+  iny
+
+  ; Down
+  iny
+  iny
+  lda [MidPointer],y
+  jsr IsSand
+  rol 0
+  dey
+  dey
+
+  ; Right
+  lda [RightPointer],y
+  jsr IsSand
+  rol 0
+
+  ; Left
+  lda [LeftPointer],y
+  jsr IsSand
+  rol 0
+
+  asl 0
+  ldx 0
+  lda SandTable,x
+  sta [MidPointer],y
+  rts
+
+SandTable:
+  .word Block::Sand            ; ....
+  .word Block::Sand            ; ...L
+  .word Block::Sand            ; ..R.
+  .word Block::Sand            ; ..RL
+  .word Block::Sand            ; .D..
+  .word Block::SandTopRight    ; .D.L
+  .word Block::SandTopLeft     ; .DR.
+  .word Block::SandTop         ; .DRL
+  .word Block::Sand            ; U...
+  .word Block::SandBottomRight ; U..L
+  .word Block::SandBottomLeft  ; U.R.
+  .word Block::SandBottom      ; U.RL
+  .word Block::Sand            ; UD..
+  .word Block::SandRight       ; UD.L
+  .word Block::SandLeft        ; UDR.
+  .word Block::Sand            ; UDRL
+
+IsSand:
+  cmp #Block::SandBottomRight+1
+  bcs No
+  cmp #Block::SandLeft
+  bcs Yes
+No:
+  clc
+Yes:
+  rts
+.endproc
+
+.export AutotileStone
+.proc AutotileStone
+  ; Maybe make it generate the corner blocks later,
+  ; though it really doesn't look too bad without them
+  stz 0
+
+  ; Up
+  dey
+  dey
+  lda [MidPointer],y
+  jsr IsStone
+  rol 0
+  iny
+  iny
+
+  ; Down
+  iny
+  iny
+  lda [MidPointer],y
+  jsr IsStone
+  rol 0
+  dey
+  dey
+
+  ; Right
+  lda [RightPointer],y
+  jsr IsStone
+  rol 0
+
+  ; Left
+  lda [LeftPointer],y
+  jsr IsStone
+  rol 0
+
+  asl 0
+  ldx 0
+  lda StoneTable,x
+  sta [MidPointer],y
+  rts
+
+StoneTable:
+  .word Block::StoneSingle      ; ....
+  .word Block::Stone            ; ...L
+  .word Block::Stone            ; ..R.
+  .word Block::Stone            ; ..RL
+  .word Block::Stone            ; .D..
+  .word Block::StoneTopRight    ; .D.L
+  .word Block::StoneTopLeft     ; .DR.
+  .word Block::StoneTop         ; .DRL
+  .word Block::Stone            ; U...
+  .word Block::StoneBottomRight ; U..L
+  .word Block::StoneBottomLeft  ; U.R.
+  .word Block::StoneBottom      ; U.RL
+  .word Block::Stone            ; UD..
+  .word Block::StoneRight       ; UD.L
+  .word Block::StoneLeft        ; UDR.
+  .word Block::Stone            ; UDRL
+
+IsStone:
+  cmp #Block::StoneSingle+1
+  bcs No
+  cmp #Block::StoneLeft
+  bcs Yes
+No:
+  clc
+Yes:
   rts
 .endproc

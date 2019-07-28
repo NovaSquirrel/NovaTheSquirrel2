@@ -15,6 +15,8 @@
   R_SolidBlock
   R_Ice
   R_LedgeMiddle
+  R_Stone
+  R_Sand
   S_Bricks
   S_Prize
   S_SolidBlock
@@ -63,6 +65,8 @@
   WoodPlatform
   Pier
   Fence
+  Stone
+  Sand
 .endenum
 
 .enum LN3

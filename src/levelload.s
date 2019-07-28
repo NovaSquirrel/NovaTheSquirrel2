@@ -474,6 +474,9 @@ SpecialConfig:
   .word $ffff&BlockRectangle,       Block::SolidBlock
   .word $ffff&BlockRectangle,       Block::Ice
   .word $ffff&BlockRectangle,       Block::LedgeMiddle
+  .word $ffff&BlockRectangle,       Block::Stone
+  .word $ffff&BlockRectangle,       Block::Sand
+
   .word $ffff&BlockSingle,          Block::Bricks
   .word $ffff&BlockSingle,          Block::Prize
   .word $ffff&BlockSingle,          Block::SolidBlock
@@ -524,8 +527,8 @@ SpecialConfig:
   .word Block::WoodPlatform
   .word Block::Pier
   .word Block::Fence
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::Stone
+  .word Block::Sand
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty
