@@ -35,12 +35,8 @@ imgdir4 := tilesets4
 imgdir2 := tilesets2
 bgdir := backgrounds
 
-# If it's not bsnes, it's just BS.  But I acknowledge that being
-# stuck on an old Atom laptop is BS.  Atom N450 can't run bsnes at
-# full speed, but the Atom-based Pentium N3710 can.
 ifndef SNESEMU
-#SNESEMU := xterm -e zsnes -d
-SNESEMU := bsnes
+SNESEMU := ./mesen-s
 endif
 
 # game-music-emu by blargg et al.
