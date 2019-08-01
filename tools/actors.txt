@@ -31,7 +31,7 @@ pal SPWalker
 gfx SPWalker2
 run RunSpikedHat
 draw DrawSpikedHat
-size 16x16
+size 16x13
 
 +MovingPlatformHoriz
 essential

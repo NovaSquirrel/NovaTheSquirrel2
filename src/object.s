@@ -988,16 +988,6 @@ Invalid:
     tsb 4
   :
 
-  ; If stunned, flip upside down
-  lda ActorState,x
-  and #$00ff
-  cmp #ActorStateValue::Stunned
-  bne :+
-    lda #OAM_YFLIP
-    tsb 4
-  :
-
-
   ldy OamPtr
 
   jsr ActorDrawPosition
@@ -1007,6 +997,30 @@ Invalid:
     seta16
     rtl
   :  
+
+  ; If stunned, flip upside down
+  lda ActorState,x
+  and #$00ff
+  cmp #ActorStateValue::Stunned
+  bne :+
+    phx
+    ; Adjust Y position, for actors that are not the full 16 pixels tall
+    lda ActorType,x
+    tax
+    lda #16<<4
+    sub f:ActorHeight,x
+    lsr
+    lsr
+    lsr
+    lsr
+    add 2
+    sta 2
+
+    ; Use Y flip
+    lda #OAM_YFLIP
+    tsb 4
+    plx
+  :
 
   lda 4
   ora SpriteTileBase
