@@ -8,3 +8,5 @@ A000 SPWalker2
 A000 SPCannon
 6000 BGForest
 D000 MapBGForest
+0200 InventoryBG
+8000 InventorySprite

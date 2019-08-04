@@ -47,11 +47,11 @@
   rti
 .endproc
 
-;;
-; This program doesn't use IRQs either.
-.proc irq_handler
+.export dummy_interrupt
+.proc dummy_interrupt
   rti
 .endproc
+
 
 .segment "CODE"
 ; init.s sends us here
@@ -94,6 +94,9 @@
   dec
   sta random2
 
+  .import Mode7Test
+;  jml Mode7Test
+
   lda #0
   jml StartLevel
 .endproc
@@ -116,6 +119,24 @@ forever:
   eor #$ffff
   and keydown
   sta keynew
+
+  lda keynew
+  and #KEY_START
+  beq :+
+    .import OpenInventory
+    jsl OpenInventory
+    phk
+    plb
+  :
+
+  lda NeedLevelRerender
+  lsr
+  bcc :+
+    jsl RenderLevelScreens
+    seta8
+    stz NeedLevelRerender
+    seta16
+  :
 
   ; Handle delayed block changes
   ldx #(MaxDelayedBlockEdits-1)*2

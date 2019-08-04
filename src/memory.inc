@@ -122,6 +122,8 @@ ParticleLen = 32
 
 .global SpriteTileSlots
 .global SpritePaletteSlots
+.global BackgroundPaletteSlots
+.global GraphicalAssets
 .global PaletteInUse        ; For dynamically allocating palette slots
 .global PaletteInUseLast
 .global PaletteRequestIndex
@@ -132,7 +134,9 @@ ParticleLen = 32
 
 .globalzp LevelNumber
 .globalzp StartedLevelNumber
-.globalzp NeedLevelReload
+.global NeedLevelReload
+.global NeedLevelRerender
+.global RerenderInitEntities
 
 ; ScreenFlags stores flags for each screen in the level; so far there's just one flag:
 SCREEN_BOUNDARY = 1 ; boundary on left side of screen

@@ -45,6 +45,14 @@
 
   ; -------------------
 
+  lda RerenderInitEntities
+  and #255
+  beq NoInitEntities
+
+  seta8
+  stz RerenderInitEntities
+  seta16
+
   ; Init actors
   ldx #ActorStart
 : stz 0,x
@@ -60,7 +68,6 @@
   inx
   cpx #ParticleEnd
   bne :-
-
 
   seta8
   Low = 4
@@ -99,6 +106,8 @@ Nope:
   iny
   bne EnemyLoop
 Exit:
+
+NoInitEntities:
   seta16
 
 

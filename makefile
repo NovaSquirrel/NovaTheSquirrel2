@@ -20,7 +20,7 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7 perspective_data huffmunch
+  mode7 perspective_data huffmunch inventory
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

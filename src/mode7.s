@@ -386,25 +386,8 @@ SkipBlock:
   xba
   sta M7Y
 
-  seta8
-  ; Wait for the controller to be ready
-  lda #$01
-padwait:
-  bit VBLSTATUS
-  bne padwait
+  jsl WaitKeysReady
   seta16
-
-  ; -----------------------------------
-
-  lda keydown
-  sta keylast
-  lda JOY1CUR
-  sta keydown
-  lda keylast
-  eor #$ffff
-  and keydown
-  sta keynew
-  stz OamPtr
 
   lda Mode7Turning
   bne AlreadyTurning

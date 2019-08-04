@@ -17,8 +17,6 @@
 
 .include "snes.inc"
 .include "global.inc"
-.include "graphicsenum.s"
-.include "paletteenum.s"
 .include "blockenum.s"
 .include "leveldata.inc"
 .smart
@@ -41,20 +39,9 @@
   jsl DecompressLevel
   jsl AutotileLevel
 
-  lda #Palette::FGCommon
-  ldy #8
-  jsl DoPaletteUpload
-  lda #Palette::SPNova
-  ldy #9
-  jsl DoPaletteUpload
-
-  lda #GraphicsUpload::MapBGForest
-  jsl DoGraphicUpload
-  lda #GraphicsUpload::SPCommon
-  jsl DoGraphicUpload
-
-
-  jsl RenderLevelScreens
+  inc RerenderInitEntities
+  .import UploadLevelGraphics
+  jsl UploadLevelGraphics
 
   jml GameMainLoop
 .endproc
@@ -108,11 +95,6 @@
 : stz LevelZeroWhenLoad_Start,x
   dex
   bpl :-
-
-  ; Load in the ability graphics
-  lda #1
-  sta NeedAbilityChange
-  sta NeedAbilityChangeSilent
 
   ; Clear FirstActorOnScreen list too
   ldy #15
@@ -240,44 +222,28 @@
   iny
   sta SpriteTileSlots+0,x
   stz SpriteTileSlots+1,x
-  cmp #255
-  beq :+
-    pha
-    ; Sprite graphic slots are 1KB, and X is already
-    ; the slot number multiplied by 2. So we need to
-    ; multiply by 256 to find the word offset, which
-    ; requires no shifting.
-    txa
-    sta GraphicUploadOffset+1
-    stz GraphicUploadOffset+0
-    pla
-    jsl DoGraphicUploadWithOffset
-  : 
   inx
   inx
   cpx #8*2
-  bne :--
+  bne :-
 
   ; Background palettes
   ldx #0
 : lda [DecodePointer],y
-  iny
-  phy
-  txy
-  jsl DoPaletteUpload
-  ply
+  sta BackgroundPaletteSlots,x
   inx
+  iny
   cpx #8
   bne :-
 
   ; Graphical assets
+  ldx #0
 : lda [DecodePointer],y
+  sta GraphicalAssets,x
+  inx
   iny
   cmp #255
-  beq :+
-  jsl DoGraphicUpload
-  bra :-
-:
+  bne :-
 
   ; Level data pointer
   lda [DecodePointer],y

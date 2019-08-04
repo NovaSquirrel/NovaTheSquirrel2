@@ -1,5 +1,7 @@
 .include "snes.inc"
 .include "global.inc"
+.include "graphicsenum.s"
+.include "paletteenum.s"
 .smart
 .i16
 
@@ -258,4 +260,71 @@ DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
 
   plp
   rtl
+.endproc
+
+; Upload level graphics and palettes
+.export UploadLevelGraphics
+.proc UploadLevelGraphics
+  seta8
+
+  ; Upload level sprite graphics
+  ldx #0
+SpriteLoop:
+  lda SpriteTileSlots,x
+  cmp #255
+  beq :+
+    pha
+    ; Sprite graphic slots are 1KB, and X is already
+    ; the slot number multiplied by 2. So we need to
+    ; multiply by 256 to find the word offset, which
+    ; requires no shifting.
+    txa
+    sta GraphicUploadOffset+1
+    stz GraphicUploadOffset+0
+    pla
+    jsl DoGraphicUploadWithOffset
+  :
+  inx
+  inx
+  cpx #8*2
+  bne :-
+
+  ; Upload background palettes
+  ldy #0
+: lda BackgroundPaletteSlots,y
+  phy
+  jsl DoPaletteUpload
+  ply
+  iny
+  cpy #8
+  bne :-
+
+  ; Upload graphical assets
+  ldx #0
+: lda GraphicalAssets,x
+  inx
+  cmp #255
+  beq :+
+  jsl DoGraphicUpload
+  bra :-
+:
+
+  lda #1
+  sta NeedAbilityChange
+  sta NeedAbilityChangeSilent
+
+  setaxy16
+  lda #Palette::FGCommon
+  ldy #8
+  jsl DoPaletteUpload
+  lda #Palette::SPNova
+  ldy #9
+  jsl DoPaletteUpload
+
+  lda #GraphicsUpload::MapBGForest
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::SPCommon
+  jsl DoGraphicUpload
+
+  jml RenderLevelScreens
 .endproc

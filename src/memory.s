@@ -70,7 +70,6 @@
 
   LevelNumber:           .res 2 ; Current level number (actual map number from the game)
   StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
-  NeedLevelReload:       .res 1 ; If set, decode LevelNumber again
 
   SpriteTileBase:   .res 2 ; Detected tile base for the current entity (includes palette index)
 
@@ -120,8 +119,15 @@
   ; For automatically detecting which tile slot or palette has the right data
   SpriteTileSlots:     .res 2*8
   SpritePaletteSlots:  .res 2*4
+  ; For reuploading palette information
+  BackgroundPaletteSlots: .res 8
+  GraphicalAssets:     .res 30
 
   GraphicUploadOffset: .res 2
+
+  NeedLevelReload:       .res 1 ; If set, decode LevelNumber again
+  NeedLevelRerender:     .res 1 ; If set, rerender the level again
+  RerenderInitEntities:  .res 1 ; If set, init entity lists for next rerender
 
   IRQHandler: .res 3
 
@@ -197,6 +203,18 @@ LevelZeroWhenLoad_End:
   IsTapRun: .res 1 ; Current run is from a tap
 
   TailAttackTimer: .res 1
+
+GameStateStart:
+
+GameStateEnd:
+SaveDataStart:
+  Money:            .res 3   ; 5 BCD digits
+  LevelCleared:     .res 8   ; 64 levels, bit = enabled
+  LevelAvailable:   .res 8   ; 64 levels, bit = enabled
+  CollectibleBits:  .res 8   ; 64 levels, bit = gotten
+  EventFlag:        .res 32  ; 256 event flags
+SaveDataEnd:
+
 
 .segment "BSS7E"
 

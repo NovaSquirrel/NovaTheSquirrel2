@@ -10,5 +10,7 @@
   SPCannon
   BGForest
   MapBGForest
+  InventoryBG
+  InventorySprite
 .endenum
 
