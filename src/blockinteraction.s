@@ -211,7 +211,38 @@ Skip:
   rts
 .endproc
 
+.export GetOneCoin
+.proc GetOneCoin
+  ; Don't add coins if you have the maximum amount already
+  seta8
+  lda MoneyAmount+2
+  cmp #$09
+  bcc OK
+  lda #$99
+  cmp MoneyAmount+1
+  bne OK
+  cmp MoneyAmount+0
+  beq Skip
+OK:
+  sed
+  lda MoneyAmount
+  add #1
+  sta MoneyAmount
+  lda MoneyAmount+1
+  adc #0
+  sta MoneyAmount+1
+  lda MoneyAmount+2
+  adc #0
+  sta MoneyAmount+2
+  cld
+Skip:
+  seta16
+  rtl
+.endproc
+
 .proc BlockMoney
+  jsl GetOneCoin
+
   lda #Block::Empty
   jsl ChangeBlock
 
@@ -234,6 +265,8 @@ Skip:
 
 .a16
 .proc BlockPrize
+  jsl GetOneCoin
+
   lda #Block::PrizeAnimation1
   jsl ChangeBlock
 

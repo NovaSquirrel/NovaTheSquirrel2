@@ -107,12 +107,14 @@
   sta PPUDATA
   ina
   sta PPUDATA
-  lda #$50
+  lda MoneyAmount+2
+  and #255
+  ora #$50
   sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
+  lda MoneyAmount+1
+  jsr MoneyTop
+  lda MoneyAmount+0
+  jsr MoneyTop
 
   ; Money (Bottom row)
   lda #(ForegroundBG + (2*64 + 4*2))>>1
@@ -121,12 +123,14 @@
   sta PPUDATA
   ina
   sta PPUDATA
-  lda #$60
+  lda MoneyAmount+2
+  and #255
+  ora #$60
   sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
-  sta PPUDATA
+  lda MoneyAmount+1
+  jsr MoneyBottom
+  lda MoneyAmount+0
+  jsr MoneyBottom
 
   ; Action icons
   lda #(ForegroundBG + (1*64 + 14*2))>>1
@@ -328,6 +332,40 @@ Exit:
   jml UploadLevelGraphics
 .endproc
 
+
+.a16
+.proc MoneyTop
+  and #255
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  ora #$50
+  sta PPUDATA
+  pla
+  and #$0f
+  ora #$50
+  sta PPUDATA
+  rts
+.endproc
+
+.a16
+.proc MoneyBottom
+  and #255
+  pha
+  lsr
+  lsr
+  lsr
+  lsr
+  ora #$60
+  sta PPUDATA
+  pla
+  and #$0f
+  ora #$60
+  sta PPUDATA
+  rts
+.endproc
 
 .a16
 .proc MakeWindow

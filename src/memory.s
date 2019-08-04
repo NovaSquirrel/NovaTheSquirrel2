@@ -208,7 +208,7 @@ GameStateStart:
 
 GameStateEnd:
 SaveDataStart:
-  Money:            .res 3   ; 5 BCD digits
+  MoneyAmount:      .res 3   ; 5 BCD digits
   LevelCleared:     .res 8   ; 64 levels, bit = enabled
   LevelAvailable:   .res 8   ; 64 levels, bit = enabled
   CollectibleBits:  .res 8   ; 64 levels, bit = gotten

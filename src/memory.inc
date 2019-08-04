@@ -159,3 +159,10 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer
+
+; Save stuff
+.global MoneyAmount
+.global LevelCleared
+.global LevelAvailable
+.global CollectibleBits
+.global EventFlag
