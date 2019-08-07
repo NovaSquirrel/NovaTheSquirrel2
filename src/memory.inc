@@ -156,6 +156,8 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global IRQHandler ; For changing what IRQ does for different effects
 .global HDMA_Buffer1
 .global HDMA_Buffer2
+.global Scratchpad
+.global RenderBuffer
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer

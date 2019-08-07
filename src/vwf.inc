@@ -1,0 +1,4 @@
+.enum TextCommand
+
+
+.endenum

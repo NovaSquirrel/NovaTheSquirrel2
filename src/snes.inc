@@ -166,7 +166,11 @@ PPUCTRL = $2115
 ; Corresponds to bit 2 of $2000 on NES
 VRAM_DOWN   = $01
 VRAM_M7DOWN = $02
+INC_DATALO  = $00
 INC_DATAHI  = $80
+VRAM_BITMAP2 = %0100
+VRAM_BITMAP4 = %1000
+VRAM_BITMAP8 = %1100
 
 PPUADDR = $2116  ; Word address, not double-write anymore
 PPUDATA = $2118

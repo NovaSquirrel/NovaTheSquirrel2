@@ -217,7 +217,8 @@ SaveDataEnd:
 
 
 .segment "BSS7E"
-
+  RenderBuffer:
+  Scratchpad:  .res 4096
 
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer

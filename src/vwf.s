@@ -1,0 +1,275 @@
+; Super Princess Engine
+; Copyright (C) 2019 NovaSquirrel
+;
+; This program is free software: you can redistribute it and/or
+; modify it under the terms of the GNU General Public License as
+; published by the Free Software Foundation; either version 3 of the
+; License, or (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;
+.include "snes.inc"
+.include "global.inc"
+.include "vwf.inc"
+.include "graphicsenum.s"
+.include "paletteenum.s"
+.smart
+
+; First plane
+RenderBuffer1 = RenderBuffer
+; Second plane
+RenderBuffer2 = RenderBuffer + 2048
+
+FontDataPointer  = TouchTemp + 0
+FontWidthPointer = TouchTemp + 2
+FontDrawX        = TouchTemp + 4
+FontDrawY        = TouchTemp + 5
+TextPointer      = DecodePointer
+.segment "VWF"
+
+.export InitVWF
+.proc InitVWF
+  setaxy16
+  ldx #.loword(Scratchpad)
+  ldy #4096
+  jsl MemClear
+
+  lda #.loword(chrData-(' '*8))
+  sta FontDataPointer
+  lda #.loword(chrWidths-' ')
+  sta FontWidthPointer
+
+  stz FontDrawX ; Also gets FontDrawY
+  rtl
+.endproc
+
+
+StringTest:
+  .byt "Hello world!",0
+
+.export DrawVWF
+.a16
+.i16
+.proc DrawVWF
+  phb
+  phk
+  plb
+
+  seta8
+  lda #<StringTest
+  sta DecodePointer+0
+  lda #>StringTest
+  sta DecodePointer+1
+  lda #^StringTest
+  sta DecodePointer+2
+
+  ldx #0
+
+CharacterLoop:
+  seta8
+  ; Draw
+  lda [DecodePointer]
+  jeq Exit
+  jsr GlyphShift
+
+  lda #^RenderBuffer
+  pha
+  plb
+
+  seta16
+  .repeat 8, I
+    lda I*2
+    asl
+    xba
+    ora a:RenderBuffer1+(32*I),x
+    sta a:RenderBuffer1+(32*I),x
+  .endrep
+
+  ; Step forward by the width amount
+  phk
+  plb
+  seta8
+  lda #0
+  xba
+  lda [DecodePointer]
+  tay
+  lda (FontWidthPointer),y
+  add FontDrawX
+  sta FontDrawX
+  seta16
+
+  ; Convert to tile index
+  and #255
+  lsr
+  lsr
+  lsr
+  tax
+
+  inc DecodePointer
+  jmp CharacterLoop
+
+Exit:
+
+
+  setaxy16
+
+  plb
+  rtl
+.endproc
+
+.export CopyVWF
+.i16
+.proc CopyVWF
+  jsl WaitVblank
+  seta8
+  lda #INC_DATALO|VRAM_BITMAP2 ; +1 on PPUDATA low byte write
+  sta PPUCTRL
+
+  ldx .loword(RenderBuffer1)
+  stx DMAADDR+$00
+  ldx .loword(RenderBuffer1)
+  stx DMAADDR+$10
+  ldx #DMAMODE_PPULODATA
+  stx DMAMODE+$00
+  ldx #DMAMODE_PPUHIDATA
+  stx DMAMODE+$10
+  ldx #2048
+  stx DMALEN+$00
+  stx DMALEN+$10
+  lda #^RenderBuffer1
+  sta DMAADDRBANK+$00
+  sta DMAADDRBANK+$10
+
+  ; -----------------------------------
+
+  ldx #$f000>>1
+  stx PPUADDR
+  lda #$01
+  sta COPYSTART
+
+  ; -----------------------------------
+
+  lda #INC_DATAHI|VRAM_BITMAP2  ; +1 on PPUDATA high byte write
+  sta PPUCTRL
+
+  stx PPUADDR
+  lda #$02
+  sta COPYSTART
+
+  ; -----------------------------------
+
+  lda #INC_DATAHI  ; +1 on PPUDATA high byte write
+  sta PPUCTRL
+  seta16
+  rtl
+.endproc
+
+; Input: A (Glyph to draw)
+; Output: 0-15 (The shifted glyph's rows)
+.proc GlyphShift
+  phk
+  plb
+
+  phy
+  phx
+  php
+  setaxy16
+  ; Calculate the start of the glyph's data
+  and #255
+  asl
+  asl
+  asl
+  tay
+  lda #0 ; Clear high byte for the TAX
+  seta8
+  lda FontDrawX
+  and #7
+  tax    ; High byte (zero) is transferred too
+  lda ShiftTable,x
+  sta CPUMCAND ; Keep this constant for the whole glyph
+
+  ; Start shifting!
+  lda (FontDataPointer),y
+  .repeat 8, I
+    sta CPUMUL              ; Kick off the multiplier
+    iny                     ; 2 cycles
+    lda (FontDataPointer),y ; 6 cycles
+    ldx CPUPROD             ; 3 cycles before the read
+    stx I*2                 ; =11 cycles waiting
+  .endrep
+  plp
+  plx
+  ply
+  rts
+
+ShiftTable:
+  .byt 128, 64, 32, 16, 8, 4, 2, 1
+.endproc
+
+chrData:
+  .byt   0,  0,  0,  0,  0,  0,  0,  0,  0,128,128,128,128,  0,128,  0
+  .byt   0,160,160,  0,  0,  0,  0,  0,  0, 80,248, 80,248, 80,  0,  0
+  .byt   0, 32,112,160, 96, 80,224, 64,  0,208,208, 32, 96, 64,176,176
+  .byt   0, 64,160, 64,168,144,104,  0,  0,128,128,  0,  0,  0,  0,  0
+  .byt   0, 32, 64,128,128,128, 64, 32,  0,128, 64, 32, 32, 32, 64,128
+  .byt   0, 32,168,112,168, 32,  0,  0,  0, 32, 32,248, 32, 32,  0,  0
+  .byt   0,  0,  0,  0,  0,  0,128,128,  0,  0,  0,240,  0,  0,  0,  0
+  .byt   0,  0,  0,  0,  0,  0,128,  0,  0, 16, 16, 32, 96, 64,128,128
+  .byt   0, 96,144,144,144,144, 96,  0,  0, 32, 96, 32, 32, 32, 32,  0
+  .byt   0, 96,144, 16, 96,128,240,  0,  0, 96, 16, 96, 16,144, 96,  0
+  .byt   0, 48, 80,144,240, 16, 16,  0,  0,112,128,224, 16,144, 96,  0
+  .byt   0, 96,128,224,144,144, 96,  0,  0,240, 16, 32, 32, 64, 64,  0
+  .byt   0, 96,144, 96,144,144, 96,  0,  0, 96,144,144,112, 16, 96,  0
+  .byt   0,  0,128,  0,  0,  0,128,  0,  0,  0,128,  0,  0,  0,128,128
+  .byt   0,  0, 16, 96,128, 96, 16,  0,  0,  0,240,  0,  0,240,  0,  0
+  .byt   0,  0,128, 96, 16, 96,128,  0,  0, 96,144, 16, 32,  0, 32,  0
+  .byt   0, 56, 68,154,170,170,158, 64,  0, 32, 80, 80,248,136,136,  0
+  .byt   0,240,136,240,136,136,240,  0,  0,112,136,128,128,136,112,  0
+  .byt   0,240,136,136,136,136,240,  0,  0,248,128,240,128,128,248,  0
+  .byt   0,248,128,240,128,128,128,  0,  0,112,136,128,152,136,120,  0
+  .byt   0,136,136,248,136,136,136,  0,  0,128,128,128,128,128,128,  0
+  .byt   0, 64, 64, 64, 64, 64, 64,128,  0,136,144,160,224,144,136,  0
+  .byt   0,128,128,128,128,128,248,  0,  0,132,204,204,180,180,132,  0
+  .byt   0,136,200,168,168,152,136,  0,  0,112,136,136,136,136,112,  0
+  .byt   0,240,136,136,240,128,128,  0,  0,112,136,136,136,136,112,  8
+  .byt   0,240,136,136,240,144,136,  0,  0,112,136, 96, 16,136,112,  0
+  .byt   0,248, 32, 32, 32, 32, 32,  0,  0,136,136,136,136,136,112,  0
+  .byt   0,136,136,136, 80, 80, 32,  0,  0,132,180,180,180, 72, 72,  0
+  .byt   0,136, 80, 32, 32, 80,136,  0,  0,136, 80, 32, 32, 32, 32,  0
+  .byt   0,248,  8, 16, 96,128,248,  0,  0,224,128,128,128,128,128,224
+  .byt   0,128,128, 64, 96, 32, 16, 16,  0,224, 32, 32, 32, 32, 32,224
+  .byt   0, 32, 80,136,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,248
+  .byt   0,128, 64,  0,  0,  0,  0,  0,  0,  0, 96, 16,112,144,112,  0
+  .byt   0,128,224,144,144,144,224,  0,  0,  0, 96,144,128,144, 96,  0
+  .byt   0, 16,112,144,144,144,112,  0,  0,  0, 96,144,240,128,112,  0
+  .byt   0, 48, 64,224, 64, 64, 64,  0,  0,  0,112,144,144,112, 16, 96
+  .byt   0,128,224,144,144,144,144,  0,  0,128,  0,128,128,128,128,  0
+  .byt   0, 64,  0, 64, 64, 64, 64,128,  0,128,144,160,192,160,144,  0
+  .byt   0,128,128,128,128,128, 64,  0,  0,  0,208,168,168,168,168,  0
+  .byt   0,  0,224,144,144,144,144,  0,  0,  0, 96,144,144,144, 96,  0
+  .byt   0,  0,224,144,144,224,128,128,  0,  0,112,144,144,112, 16, 16
+  .byt   0,  0,224,128,128,128,128,  0,  0,  0,112,128, 96, 16,224,  0
+  .byt   0, 64,224, 64, 64, 64, 32,  0,  0,  0,144,144,144,144,112,  0
+  .byt   0,  0,144,144,144, 96, 96,  0,  0,  0,136,168,168, 80, 80,  0
+  .byt   0,  0,144,144, 96,144,144,  0,  0,  0,144,144, 96, 32, 64,128
+  .byt   0,  0,240, 16, 96,128,240,  0,  0, 48, 64, 64,128, 64, 64, 48
+  .byt   0,128,128,128,128,128,128,128,  0,192, 32, 32, 16, 32, 32,192
+  .byt   0, 80,160,  0,  0,  0,  0,  0,  0,  0, 32, 80,136,136,248,  0
+  .byt   0, 56, 68,146,162,138, 68, 56,  0, 56, 68,154,162,154, 68, 56
+  .byt   0,108,146,130,130, 68, 40, 16,  0,240,144,144,144,144,240,  0
+  .byt   0, 32,112,168, 32, 32, 32,  0,  0, 32, 32, 32,168,112, 32,  0
+  .byt   0,  0, 32, 64,248, 64, 32,  0,  0,  0, 32, 16,248, 16, 32,  0
+chrWidths:
+  .byt   3,  2,  4,  6,  5,  5,  6,  2,  4,  4,  6,  5,  2,  5,  2,  5
+  .byt   5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  2,  2,  5,  5,  5,  5
+  .byt   8,  6,  6,  6,  6,  6,  6,  6,  6,  2,  3,  6,  6,  7,  6,  6
+  .byt   6,  6,  6,  6,  6,  6,  6,  7,  6,  6,  6,  4,  5,  4,  6,  5
+  .byt   3,  5,  5,  5,  5,  5,  4,  5,  5,  2,  3,  5,  3,  6,  5,  5
+  .byt   5,  5,  4,  5,  4,  5,  5,  6,  5,  5,  5,  5,  2,  5,  5,  6
+  .byt   8,  8,  8,  5,  6,  6,  6,  6

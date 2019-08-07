@@ -21,6 +21,7 @@
 .smart
 
 .segment "Inventory"
+.import InitVWF, DrawVWF, CopyVWF
 
 .i16
 .a16
@@ -210,6 +211,7 @@
   dey
   bne :-
 
+.if 0
   ; Maffi platform
   lda #(ForegroundBG + (22*64 + 26*2))>>1
   sta PPUADDR
@@ -221,7 +223,11 @@
   sta PPUDATA
   lda #$2f
   sta PPUDATA
+.endif
 
+  jsl InitVWF
+  jsl DrawVWF
+  jsl CopyVWF
 
   ; -----------------------------------
   ; Main inventory loop
@@ -235,19 +241,20 @@ Loop:
 
 
   seta8
+MAFFI_LEFT = 13*8
   ; Draw Maffi
-  lda #208
+  lda #208-MAFFI_LEFT
   sta 0
-  lda #179
+  lda #179-16
   sta 1
   lda #$1b
   sta 2
   lda #5
   jsr HorizontalSpriteStrip
 
-  lda #208
+  lda #208-MAFFI_LEFT
   sta 0
-  lda #179-8
+  lda #179-8-16
   sta 1
   lda #$0b
   sta 2
@@ -258,18 +265,18 @@ Loop:
   and #64
   beq ZZZAlternate
 
-  lda #208+8
+  lda #208+8-MAFFI_LEFT
   sta 0
-  lda #179-16
+  lda #179-16-16
   sta 1
   lda #$17
   sta 2
   lda #4
   jsr HorizontalSpriteStrip
 
-  lda #208+8
+  lda #208+8-MAFFI_LEFT
   sta 0
-  lda #179-24
+  lda #179-24-16
   sta 1
   lda #$07
   sta 2
@@ -279,25 +286,25 @@ Loop:
   bra NotZZZAlternate
 ZZZAlternate:
 
-  lda #208+8
+  lda #208+8-MAFFI_LEFT
   sta 0
-  lda #179-16
+  lda #179-16-16
   sta 1
   lda #$14
   sta 2
   lda #3
   jsr HorizontalSpriteStrip
 
-  lda #240
+  lda #240-MAFFI_LEFT
   sta 0
   lda #$1a
   sta 2
   lda #1
   jsr HorizontalSpriteStrip
 
-  lda #208+8
+  lda #208+8-MAFFI_LEFT
   sta 0
-  lda #179-24
+  lda #179-24-16
   sta 1
   lda #$04
   sta 2
