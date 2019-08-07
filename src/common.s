@@ -440,3 +440,41 @@ padwait:
   plp
   rtl
 .endproc
+
+; Quickly clears a section of WRAM
+; Inputs: X (address), Y (size)
+.i16
+.proc MemClear
+  php
+  seta8
+  stz WMADDH ; high bit of WRAM address
+UseHighHalf:
+  stx WMADDL ; WRAM address, bottom 16 bits
+  sty DMALEN
+
+  ldx #DMA_CONST|DMA_LINEAR|(<WMDATA << 8)
+ZeroSource:
+  stx DMAMODE
+
+  ldx #.loword(ZeroSource+1)
+  stx DMAADDR
+  lda #^MemClear
+  sta DMAADDRBANK
+
+  lda #$01
+  sta COPYSTART
+  plp
+  rtl
+.endproc
+
+; Quickly clears a section of the second 64KB of RAM
+; Inputs: X (address), Y (size)
+.i16
+.a16
+.proc MemClear7F
+  php
+  seta8
+  lda #1
+  sta WMADDH
+  bra MemClear::UseHighHalf
+.endproc

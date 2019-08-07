@@ -38,6 +38,7 @@ PlayerHeight = 16*16+14*16
 .global RenderLevelRowBottom
 .global PlayerFrameUpload
 .global FadeIn, FadeOut, WaitKeysReady
+.global MemClear, MemClear7F
 
 .global RunPlayer, DrawPlayer, AdjustCamera
 .global BlockFlags

@@ -70,11 +70,19 @@
   phk
   plb
 
-  ; Clear the first 8KB of RAM
-  ldx #8192-1
+  ; Clear the first 512 bytes manually here
+  ldx #512-1
 : stz 0, x
   dex
   bpl :-
+
+  ; Clear the rest of the first 64KB
+  ldx #512
+  ldy #$10000 - 512
+  jsl MemClear
+  ldx #0
+  txy
+  jsl MemClear7F
 
   ; Clear three screens
   ldx #$c000 >> 1

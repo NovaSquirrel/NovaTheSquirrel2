@@ -55,19 +55,13 @@
 
   ; Init actors
   ldx #ActorStart
-: stz 0,x
-  inx
-  inx
-  cpx #ActorEnd
-  bne :-
+  ldy #ActorEnd-ActorStart
+  jsl MemClear
 
   ; Init particles
   ldx #ParticleStart
-: stz 0,x
-  inx
-  inx
-  cpx #ParticleEnd
-  bne :-
+  ldy #ParticleEnd-ParticleStart
+  jsl MemClear
 
   seta8
   Low = 4

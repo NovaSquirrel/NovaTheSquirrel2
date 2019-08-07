@@ -60,13 +60,10 @@
   ; Don't clear any entities, that'll be done when rendering
 
   ; Clear level buffer
-  lda #0
-  ldx #256*32*2-2
-: sta f:LevelBuf,x
-  sta f:LevelBufAlt,x
-  dex
-  dex
-  bpl :-
+  ldx #.loword(LevelBuf)
+  ldy #(256*32*2)*2
+  jsl MemClear7F
+
 
   ; Clear sprite palette slots
   lda #$ffff
@@ -75,13 +72,9 @@
   sta SpritePaletteSlots+2*2
   sta SpritePaletteSlots+2*3
 
-  ; Clear ColumnBytes
-  ; lda #0 <--- not needed, still zero
-  ldx #256-2
-: sta f:ColumnBytes,x
-  dex
-  dex
-  bpl :-
+  ldx #.loword(ColumnBytes)
+  ldy #256
+  jsl MemClear7F
 
   ; Set defaults for horizontal levels
   lda #.loword(GetLevelPtrXY_Horizontal)
