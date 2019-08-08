@@ -26,10 +26,11 @@ RenderBuffer1 = RenderBuffer
 ; Second plane
 RenderBuffer2 = RenderBuffer + 2048
 
+FontColorRoutine = TempVal       ; Address to JMP to
 FontDataPointer  = TouchTemp + 0
 FontWidthPointer = TouchTemp + 2
-FontDrawX        = TouchTemp + 4
-FontDrawY        = TouchTemp + 5
+FontDrawX        = TouchTemp + 4 ; 8-bit
+FontDrawY        = TouchTemp + 5 ; 16-bit
 TextPointer      = DecodePointer
 .segment "VWF"
 
@@ -44,14 +45,15 @@ TextPointer      = DecodePointer
   sta FontDataPointer
   lda #.loword(chrWidths-' ')
   sta FontWidthPointer
+  lda #.loword(DoFontColor1)
+  sta FontColorRoutine
 
-  stz FontDrawX ; Also gets FontDrawY
+  stz FontDrawX ; Also gets the first byte of FontDrawY, don't care though
+  stz FontDrawY
   rtl
 .endproc
 
 
-StringTest:
-  .byt "Hello world!",0
 
 .export DrawVWF
 .a16
@@ -61,35 +63,34 @@ StringTest:
   phk
   plb
 
-  seta8
-  lda #<StringTest
-  sta DecodePointer+0
-  lda #>StringTest
-  sta DecodePointer+1
-  lda #^StringTest
-  sta DecodePointer+2
-
-  ldx #0
+  ; Initialize the render index
+PreCharacterLoop:
+  seta16
+  lda FontDrawX
+  and #255
+  lsr
+  lsr
+  lsr
+  add FontDrawY
+  tax
 
 CharacterLoop:
   seta8
   ; Draw
   lda [DecodePointer]
-  jeq Exit
+  cmp #$20
+  jcc SpecialCommand
   jsr GlyphShift
 
+  ; Push the render buffer bank first
   lda #^RenderBuffer
   pha
-  plb
 
   seta16
-  .repeat 8, I
-    lda I*2
-    asl
-    xba
-    ora a:RenderBuffer1+(32*I),x
-    sta a:RenderBuffer1+(32*I),x
-  .endrep
+  phk
+  plb
+  jmp (FontColorRoutine)
+AfterFontColor:
 
   ; Step forward by the width amount
   phk
@@ -109,31 +110,141 @@ CharacterLoop:
   lsr
   lsr
   lsr
+  add FontDrawY
   tax
 
   inc DecodePointer
   jmp CharacterLoop
 
-Exit:
+; -------------------------------------
 
+SpecialCommand:
+  ; $00-$1f execute a special command
+  phk
+  plb
+  seta16
+  inc DecodePointer ; Step past the command
+  and #255
+  asl
+  tay
+  lda SpecialCommandTable,y
+  pha
+  seta8
+  rts
 
+SpecialCommandTable:
+  .addr EndScript-1
+  .addr EndPage-1
+  .addr EndLine-1
+  .addr CallASM-1
+  .addr EscapeCode-1
+  .addr ExtendedChar-1
+  .addr Color1-1
+  .addr Color2-1
+  .addr Color3-1
+
+; -------------------------------------
+
+.a8
+Color1:
+  seta16
+  lda #.loword(DoFontColor1)
+  sta FontColorRoutine
+  jmp PreCharacterLoop
+
+.a8
+Color2:
+  seta16
+  lda #.loword(DoFontColor2)
+  sta FontColorRoutine
+  jmp PreCharacterLoop
+
+.a8
+Color3:
+  seta16
+  lda #.loword(DoFontColor3)
+  sta FontColorRoutine
+  jmp PreCharacterLoop
+
+.a8
+ExtendedChar:
+  jmp PreCharacterLoop
+
+.a8
+EscapeCode:
+  jmp PreCharacterLoop
+
+.a8
+CallASM:
+  jmp PreCharacterLoop
+
+.a8
+EndLine:
+  stz FontDrawX
+  seta16
+  lda FontDrawY
+  add #32*8
+  sta FontDrawY
+  jmp PreCharacterLoop
+
+.a8
+EndPage:
+  jmp PreCharacterLoop
+
+EndScript:
   setaxy16
 
   plb
   rtl
 .endproc
 
+.proc DoFontColor1
+  plb
+  .repeat 8, I
+    lda I*2
+    asl
+    xba
+    ora a:RenderBuffer1+(32*I),x
+    sta a:RenderBuffer1+(32*I),x
+  .endrep
+  jmp DrawVWF::AfterFontColor
+.endproc
+
+.proc DoFontColor2
+  plb
+  .repeat 8, I
+    lda I*2
+    asl
+    xba
+    ora a:RenderBuffer2+(32*I),x
+    sta a:RenderBuffer2+(32*I),x
+  .endrep
+  jmp DrawVWF::AfterFontColor
+.endproc
+
+.proc DoFontColor3
+  plb
+  .repeat 8, I
+    lda I*2
+    asl
+    xba
+    ora a:RenderBuffer1+(32*I),x
+    sta a:RenderBuffer1+(32*I),x
+  .endrep
+  jmp DrawVWF::AfterFontColor
+.endproc
+
+
 .export CopyVWF
 .i16
 .proc CopyVWF
-  jsl WaitVblank
   seta8
   lda #INC_DATALO|VRAM_BITMAP2 ; +1 on PPUDATA low byte write
   sta PPUCTRL
 
-  ldx .loword(RenderBuffer1)
+  ldx #.loword(RenderBuffer1)
   stx DMAADDR+$00
-  ldx .loword(RenderBuffer1)
+  ldx #.loword(RenderBuffer2)
   stx DMAADDR+$10
   ldx #DMAMODE_PPULODATA
   stx DMAMODE+$00
