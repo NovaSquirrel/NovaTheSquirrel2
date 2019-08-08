@@ -228,8 +228,12 @@ EndScript:
     lda I*2
     asl
     xba
+    pha
     ora a:RenderBuffer1+(32*I),x
     sta a:RenderBuffer1+(32*I),x
+    pla
+    ora a:RenderBuffer2+(32*I),x
+    sta a:RenderBuffer2+(32*I),x
   .endrep
   jmp DrawVWF::AfterFontColor
 .endproc
