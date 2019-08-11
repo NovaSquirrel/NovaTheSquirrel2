@@ -204,6 +204,12 @@ LevelZeroWhenLoad_End:
 
   TailAttackTimer: .res 1
 
+  VWFStackL:     .res VWFStackLen
+  VWFStackH:     .res VWFStackLen
+  VWFStackB:     .res VWFStackLen
+  VWFStackIndex: .res 1
+
+
 GameStateStart:
 
 GameStateEnd:

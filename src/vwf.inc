@@ -8,4 +8,8 @@
   Color1
   Color2
   Color3
+  SetX
+  SetXY
+  WideText
+  BigText
 .endenum

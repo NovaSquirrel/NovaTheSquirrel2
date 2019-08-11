@@ -14,6 +14,23 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
+
+;
+; API:
+;
+; ----- InitVWF
+; Initializes the VWF engine and sets defaults for everything
+;
+; ----- DrawVWF
+; Interprets the string pointed to via DecodePointer and renders into the text bitmap
+;
+; ----- PushVWF
+; Pushes the current DecodePointer on the VWF engine's stack
+;
+; ----- CopyVWF
+; Copies the text bitmap into VRAM
+;
+
 .include "snes.inc"
 .include "global.inc"
 .include "vwf.inc"
@@ -32,10 +49,16 @@ FontWidthPointer = TouchTemp + 2
 FontDrawX        = TouchTemp + 4 ; 8-bit
 FontDrawY        = TouchTemp + 5 ; 16-bit
 TextPointer      = DecodePointer
+DoubleWideBuffer1 = 8  ; First half
+DoubleWideBuffer2 = 10 ; Second half
 .segment "VWF"
 
 .export InitVWF
 .proc InitVWF
+  seta8
+  stz FontDrawX
+  stz VWFStackIndex
+
   setaxy16
   ldx #.loword(Scratchpad)
   ldy #4096
@@ -48,12 +71,9 @@ TextPointer      = DecodePointer
   lda #.loword(DoFontColor1)
   sta FontColorRoutine
 
-  stz FontDrawX ; Also gets the first byte of FontDrawY, don't care though
   stz FontDrawY
   rtl
 .endproc
-
-
 
 .export DrawVWF
 .a16
@@ -80,6 +100,7 @@ CharacterLoop:
   lda [DecodePointer]
   cmp #$20
   jcc SpecialCommand
+HaveCharacter:
   jsr GlyphShift
 
   ; Push the render buffer bank first
@@ -98,7 +119,7 @@ AfterFontColor:
   seta8
   lda #0
   xba
-  lda [DecodePointer]
+  lda [DecodePointer] ; Reread the character
   tay
   lda (FontWidthPointer),y
   add FontDrawX
@@ -142,8 +163,40 @@ SpecialCommandTable:
   .addr Color1-1
   .addr Color2-1
   .addr Color3-1
+  .addr SetX-1
+  .addr SetXY-1
+  .addr WideText-1
+  .addr BigText-1
 
 ; -------------------------------------
+
+; Move the cursor horizontally and vertically to a given position
+.a8
+SetXY:
+  lda [DecodePointer]
+  sta FontDrawX
+  ; Get Y too
+  seta16
+  inc DecodePointer
+  lda [DecodePointer]
+  and #255
+  asl ; Multiply by 32
+  asl
+  asl
+  asl
+  asl
+  sta FontDrawY
+
+  inc DecodePointer
+  jmp PreCharacterLoop
+
+; Move the cursor horizontally to a given position
+.a8
+SetX:
+  lda [DecodePointer]
+  sta FontDrawX
+  lda #1
+  jmp TookParameters
 
 .a8
 Color1:
@@ -167,16 +220,32 @@ Color3:
   jmp PreCharacterLoop
 
 .a8
-ExtendedChar:
-  jmp PreCharacterLoop
+ExtendedChar: ; Interpret the next byte as a character code
+  lda [DecodePointer]
+  jmp HaveCharacter
 
 .a8
 EscapeCode:
   jmp PreCharacterLoop
 
 .a8
+.i16
 CallASM:
-  jmp PreCharacterLoop
+  ; Read the pointer for the routine to call
+  lda [DecodePointer]
+  sta 0
+  ldy #1
+  lda [DecodePointer],y
+  sta 1
+  iny
+  lda [DecodePointer],y
+  sta 2
+
+  jsl @Call
+  lda #3
+  jmp TookParameters
+@Call:
+  jml [0]
 
 .a8
 EndLine:
@@ -191,7 +260,36 @@ EndLine:
 EndPage:
   jmp PreCharacterLoop
 
+.a8
 EndScript:
+  ; Exit if the stack is empty
+  lda VWFStackIndex
+  beq ReallyExit
+
+  dec VWFStackIndex
+
+  ; Pop the text decode pointer off the stack
+  lda #0 ; Clear high byte
+  xba
+  lda VWFStackIndex
+  tay
+  lda VWFStackL,y
+  sta DecodePointer+0
+  lda VWFStackH,y
+  sta DecodePointer+1
+  lda VWFStackB,y
+  sta DecodePointer+2
+  ; Keep going!
+  jmp PreCharacterLoop
+
+TookParameters: ; Step DecodePointer forward by a given number
+  seta16
+  and #255
+  add DecodePointer
+  sta DecodePointer
+  jmp PreCharacterLoop
+
+ReallyExit:
   setaxy16
 
   plb
@@ -238,7 +336,204 @@ EndScript:
   jmp DrawVWF::AfterFontColor
 .endproc
 
+; Draws text that's twice as wide
+.proc WideText
+  seta16
+  lda FontDrawX
+  and #255
+  lsr
+  lsr
+  lsr
+  add FontDrawY
+  tax
 
+CharacterLoop:
+  seta8
+  lda [DecodePointer]
+  cmp #$20
+  jcc DrawVWF::SpecialCommand ; Bail out of wide mode
+
+  jsr Common1
+
+  seta16
+  .repeat 8, I
+    lda I
+    jsr DoubleWide
+    lda DoubleWideBuffer1
+    ora a:RenderBuffer1+(32*I),x
+    sta a:RenderBuffer1+(32*I),x
+    lda DoubleWideBuffer2
+    ora a:RenderBuffer1+(32*I+2),x
+    sta a:RenderBuffer1+(32*I+2),x
+  .endrep
+
+  jsr Common2
+  jmp CharacterLoop
+
+Common1:
+  ; Compute the address of the character's glyph
+  seta16
+  and #255
+  asl
+  asl
+  asl
+  tay
+  phk ; All the glyphs are in this bank
+  plb
+  seta8
+
+  ; Get the tile data
+  phx
+  ldx #0
+: lda (FontDataPointer),y
+  sta 0,x
+  iny
+  inx
+  cpx #8
+  bne :-
+  plx
+
+  ; Set the render buffer bank now
+  lda #^RenderBuffer
+  pha
+  plb
+  rts
+
+Common2:
+  ; Step forward by double the width amount
+  phk
+  plb
+  seta8
+  lda #0
+  xba
+  lda [DecodePointer] ; Reread the character
+  tay
+  ; Add double the width
+  lda (FontWidthPointer),y
+  asl
+  add FontDrawX
+  sta FontDrawX
+  seta16
+
+  ; Convert to tile index
+  and #255
+  lsr
+  lsr
+  lsr
+  add FontDrawY
+  tax
+
+  inc DecodePointer
+  rts
+
+; Doubles the pixel values of a glyph
+DoubleWide:
+  phx ; Index size is temporarily 8-bit, so preserve X
+  setaxy8
+  ; .... oooo
+  ldy #4
+  phy
+: lsr
+  php
+  ror DoubleWideBuffer1+1
+  plp
+  ror DoubleWideBuffer1+1
+  dey
+  bne :-
+
+  ; oooo ....
+  ply
+: lsr
+  php
+  ror DoubleWideBuffer1+0
+  plp
+  ror DoubleWideBuffer1+0
+  dey
+  bne :-
+
+  stz DoubleWideBuffer2+0
+  stz DoubleWideBuffer2+1
+
+  lda FontDrawX
+  and #7
+  beq @Skip
+  tay
+: lsr DoubleWideBuffer1+0
+  ror DoubleWideBuffer1+1
+  ror DoubleWideBuffer2+0
+  ror DoubleWideBuffer2+1
+  dey
+  bne :-
+@Skip:
+
+  setaxy16
+  plx
+  rts
+.endproc
+
+; Draws text that's twice as wide and tall
+.proc BigText
+  seta16
+  lda FontDrawX
+  and #255
+  lsr
+  lsr
+  lsr
+  add FontDrawY
+  tax
+
+CharacterLoop:
+  seta8
+  lda [DecodePointer]
+  cmp #$20
+  jcc DrawVWF::SpecialCommand ; Bail out of wide mode
+
+  jsr WideText::Common1
+
+  seta16
+  .repeat 8, I
+    lda I
+    jsr WideText::DoubleWide
+    lda DoubleWideBuffer1
+    ora a:RenderBuffer1+(64*I+0),x
+    sta a:RenderBuffer1+(64*I+0),x
+    lda DoubleWideBuffer1
+    ora a:RenderBuffer1+(64*I+32),x
+    sta a:RenderBuffer1+(64*I+32),x
+    lda DoubleWideBuffer2
+    ora a:RenderBuffer1+(64*I+2+0),x
+    sta a:RenderBuffer1+(64*I+2+0),x
+    lda DoubleWideBuffer2
+    ora a:RenderBuffer1+(64*I+2+32),x
+    sta a:RenderBuffer1+(64*I+2+32),x
+  .endrep
+
+  jsr WideText::Common2
+  jmp CharacterLoop
+.endproc
+
+; Push the current DecodePointer value
+.export PushVWF
+.i16
+.proc PushVWF
+  seta8
+  ; Push the text decode pointer on the stack
+  lda #0 ; Clear high byte
+  xba
+  lda VWFStackIndex
+  tay
+  lda DecodePointer+0
+  sta VWFStackL,y
+  lda DecodePointer+1
+  sta VWFStackH,y
+  lda DecodePointer+2
+  sta VWFStackB,y
+
+  inc VWFStackIndex
+  rtl
+.endproc
+
+; Copy the bitmap buffer to VRAM
 .export CopyVWF
 .i16
 .proc CopyVWF

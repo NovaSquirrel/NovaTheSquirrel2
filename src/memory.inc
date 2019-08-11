@@ -168,3 +168,10 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global LevelAvailable
 .global CollectibleBits
 .global EventFlag
+
+VWFStackLen   = 4
+.global VWFStackL
+.global VWFStackH
+.global VWFStackB
+.global VWFStackIndex
+
