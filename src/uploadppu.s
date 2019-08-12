@@ -326,5 +326,15 @@ SpriteLoop:
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
 
+  ; Clear layer 3
+  ldx #$e000 >> 1
+  ldy #32*4
+  jsl ppu_clear_nt
+  ; Including the graphics?
+  ldx #$e800 >> 1
+  ldy #0
+  jsl ppu_clear_nt
+  seta16
+
   jml RenderLevelScreens
 .endproc
