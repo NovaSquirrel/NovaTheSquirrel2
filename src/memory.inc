@@ -169,6 +169,15 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global CollectibleBits
 .global EventFlag
 
+.global GameStateStart
+.global GameStateEnd
+GameStateSize = GameStateEnd-GameStateStart
+InventoryLen = 25
+
+.global CursorX
+.global CursorY
+.global AutoRepeatTimer
+
 VWFStackLen   = 4
 .global VWFStackL
 .global VWFStackH

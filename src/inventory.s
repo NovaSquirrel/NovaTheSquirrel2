@@ -21,7 +21,43 @@
 .smart
 
 .segment "Inventory"
-.import InitVWF, DrawVWF, CopyVWF
+.import InitVWF, DrawVWF, CopyVWF, KeyRepeat
+CursorTopMenu = CursorX + 1
+.include "vwf.inc"
+
+
+TopMenuStrings:
+  .addr StringReset, StringToss, StringOptions, StringHelp, StringExitLevel
+
+StringReset:
+  .byt TextCommand::WideText, "Reset"
+  .byt TextCommand::EndLine, "Reset to the most recent"
+  .byt TextCommand::EndLine, "checkpoint and try again"
+  .byt 0
+
+StringToss:
+  .byt TextCommand::WideText, "Toss"
+  .byt TextCommand::EndLine, "Remove items from your"
+  .byt TextCommand::EndLine, "inventory"
+  .byt 0
+
+StringOptions:
+  .byt TextCommand::WideText, "Options"
+  .byt TextCommand::EndLine, "Change the control scheme"
+  .byt TextCommand::EndLine, "and other options"
+  .byt 0
+
+StringHelp:
+  .byt TextCommand::WideText, "Help"
+  .byt TextCommand::EndLine, "Check out the enclosed"
+  .byt TextCommand::EndLine, "instruction book"
+  .byt 0
+
+StringExitLevel:
+  .byt TextCommand::WideText, "Exit level"
+  .byt TextCommand::EndLine, "Return to the overworld map"
+  .byt 0
+
 
 .i16
 .a16
@@ -31,9 +67,15 @@
   plb
   jsl WaitVblank
 
+  stz CursorX
+  lda #1
+  sta CursorY
+
   seta8
   lda #FORCEBLANK
   sta PPUBRIGHT
+  lda #1|BG3_PRIORITY
+  sta BGMODE
 
   ; Reset all scrolling
   ldx #2*3-1
@@ -43,9 +85,22 @@
   bpl :-
 
   lda #<(-4)
-  sta BGSCROLLY
+  sta BGSCROLLY+0
   lda #>(-4)
-  sta BGSCROLLY
+  sta BGSCROLLY+0
+
+  ; Text layer is offset a little different
+  lda #<(-1)
+  sta BGSCROLLX+4
+  lda #>(-1)
+  stz BGSCROLLX+4
+  lda #<(-4)
+  sta BGSCROLLY+4
+  lda #>(-4)
+  sta BGSCROLLY+4
+
+  lda #%00010111  ; enable sprites, plane 0, 1 and 2
+  sta BLENDMAIN
 
   seta16
   ; Write graphics
@@ -62,11 +117,57 @@
   ldy #0
   jsl ppu_clear_nt
   ldx #$e000 >> 1
-  ldy #0
+  ldy #32*8+31
   jsl ppu_clear_nt
 
+  ; Prep the VWF area
   seta16
-  ; Write palettes
+  .repeat 5, I
+    lda #($e000>>1)|(8+(21+I)*32)
+    sta PPUADDR
+    lda #8*32+(I*32)+(4<<10|$2000) ; priority, palette 4
+    ldx #16
+    jsr WritePPUIncreasing
+  .endrep
+
+  ; Put in background for the VWF area
+  lda #$c550>>1
+  sta PPUADDR
+  ldy #5
+VWFBackLoop:
+  ldx #16
+  lda #$3e
+: sta PPUDATA
+  dex
+  bne :-
+
+  ldx #16
+: lda PPUDATARD
+  dex
+  bne :-
+
+  dey
+  bne VWFBackLoop
+
+  ; Set palette for text
+  seta8
+  lda #17
+  sta CGADDR
+  lda #<RGB(0,0,0)
+  sta CGDATA
+  lda #>RGB(0,0,0)
+  sta CGDATA
+  lda #<RGB(31,0,0)
+  sta CGDATA
+  lda #>RGB(31,0,0)
+  sta CGDATA
+  lda #<RGB(0,0,31)
+  sta CGDATA
+  lda #>RGB(0,0,31)
+  sta CGDATA
+
+  seta16
+  ; Write palettes for everything else
   lda #Palette::InventoryBG
   ldy #0
   jsl DoPaletteUpload
@@ -74,7 +175,7 @@
   ldy #8
   jsl DoPaletteUpload
 
-
+  ; ---------------
 
   lda #$0a0c
   sta 0
@@ -225,22 +326,169 @@
   sta PPUDATA
 .endif
 
-  jsl InitVWF
-  jsl DrawVWF
-  jsl CopyVWF
-
   ; -----------------------------------
   ; Main inventory loop
 Loop:
   setaxy16
   jsl WaitKeysReady
-
-  lda keynew
-  and #KEY_START
-  jne Exit
-
+  jsl KeyRepeat
 
   seta8
+  ; Handle vertical cursor movement
+  lda keynew+1
+  and #>KEY_UP
+  beq :+
+    dec CursorY
+    bpl :+
+      lda #5
+      sta CursorY
+  :
+
+  lda keynew+1
+  and #>KEY_DOWN
+  beq :+
+    inc CursorY
+    lda CursorY
+    cmp #6
+    bne :+
+      stz CursorY
+  :
+
+  ; Handle horizontal cursor movement
+  lda CursorY
+  beq CursorTopRow
+CursorNotTopRow:
+
+  lda keynew+1
+  and #>KEY_LEFT
+  beq :+
+    dec CursorX
+    bpl :+
+      lda #9
+      sta CursorX
+  :
+
+  lda keynew+1
+  and #>KEY_RIGHT
+  beq :+
+    inc CursorX
+    lda CursorX
+    cmp #10
+    bne :+
+      stz CursorX
+  :
+
+  bra CursorWasNotTopRow
+CursorTopRow:
+
+  lda keynew+1
+  and #>KEY_LEFT
+  beq :+
+    dec CursorTopMenu
+    bpl :+
+      lda #4
+      sta CursorTopMenu
+  :
+
+  lda keynew+1
+  and #>KEY_RIGHT
+  beq :+
+    inc CursorTopMenu
+    lda CursorTopMenu
+    cmp #5
+    bne :+
+      stz CursorTopMenu
+  :
+
+CursorWasNotTopRow:
+
+  ; Display the cursor
+  lda CursorX
+  cmp #5
+  bcc :+
+    ina
+    ina
+  :
+  asl
+  asl
+  asl
+  asl
+  adc #<-3 ; Carry always zero here
+  add #4*8
+  sta 0
+
+  lda CursorY
+  asl
+  asl
+  asl
+  asl
+  add #(8-2)*8
+  sta 1
+
+  ; Top row displays differently
+  lda CursorY
+  bne :+
+    lda CursorTopMenu
+    asl
+    adc CursorTopMenu
+    asl
+    asl
+    asl
+    add #14*8-3
+    sta 0
+
+    lda #1*8
+    sta 1
+  :
+
+  lda 0
+  sta OAM_XPOS+(4*0)
+  sta OAM_XPOS+(4*2)
+  add #6
+  sta OAM_XPOS+(4*1)
+  sta OAM_XPOS+(4*3)
+
+  lda 1
+  sta OAM_YPOS+(4*0)
+  sta OAM_YPOS+(4*1)
+  add #6
+  sta OAM_YPOS+(4*2)
+  sta OAM_YPOS+(4*3)
+
+  stz OAM_TILE+(4*0)
+  stz OAM_TILE+(4*1)
+  stz OAM_TILE+(4*2)
+  stz OAM_TILE+(4*3)
+  lda #>(OAM_PRIORITY_2)
+  sta OAM_ATTR+(4*0)
+  lda #>(OAM_PRIORITY_2|OAM_XFLIP)
+  sta OAM_ATTR+(4*1)
+  lda #>(OAM_PRIORITY_2|OAM_YFLIP)
+  sta OAM_ATTR+(4*2)
+  lda #>(OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP)
+  sta OAM_ATTR+(4*3)
+
+  stz OAMHI+0+(4*0)
+  stz OAMHI+0+(4*1)
+  stz OAMHI+0+(4*2)
+  stz OAMHI+0+(4*3)
+  lda #$02
+  sta OAMHI+1+(4*0)
+  sta OAMHI+1+(4*1)
+  sta OAMHI+1+(4*2)
+  sta OAMHI+1+(4*3)
+
+  ldx #4*4
+  stx OamPtr
+
+
+
+
+
+  lda keynew+1
+  and #>KEY_START
+  jne Exit
+
 MAFFI_LEFT = 13*8
   ; Draw Maffi
   lda #208-MAFFI_LEFT
@@ -312,9 +560,15 @@ ZZZAlternate:
   jsr HorizontalSpriteStrip
 
 NotZZZAlternate:
+
+  ; Refresh the description if needed
+  lda keynew+1
+  and #>(KEY_LEFT|KEY_RIGHT|KEY_DOWN|KEY_UP)
+  beq :+
+    jsr RefreshItemDescription
+  :
+
   seta16
-
-
 
   ldx OamPtr
   jsl ppu_clear_oam
@@ -322,6 +576,7 @@ NotZZZAlternate:
 
   setaxy16
   jsl WaitVblank
+  jsl CopyVWF
   jsl ppu_copy_oam
 
   ; Turn rendering on
@@ -337,6 +592,31 @@ Exit:
   sta PPUBRIGHT
   .import UploadLevelGraphics
   jml UploadLevelGraphics
+.endproc
+
+; Redraw the item description for whatever the player is currently pointing at
+.proc RefreshItemDescription
+  jsl InitVWF
+  seta8
+
+  lda CursorY
+  bne ItemDescription
+  lda #0
+  xba
+  lda CursorTopMenu
+  asl
+  tax
+  lda TopMenuStrings+0,x
+  sta DecodePointer+0
+  lda TopMenuStrings+1,x
+  sta DecodePointer+1
+  lda #^StringReset
+  sta DecodePointer+2
+  jsl DrawVWF
+  rts
+
+ItemDescription:
+  rts
 .endproc
 
 

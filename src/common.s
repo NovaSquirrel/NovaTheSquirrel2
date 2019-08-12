@@ -478,3 +478,34 @@ ZeroSource:
   sta WMADDH
   bra MemClear::UseHighHalf
 .endproc
+
+.export KeyRepeat
+.proc KeyRepeat
+  php
+  seta8
+  lda keydown+1
+  beq NoAutorepeat
+  cmp keylast+1
+  bne NoAutorepeat
+  inc AutoRepeatTimer
+  lda AutoRepeatTimer
+  cmp #12
+  bcc SkipNoAutorepeat
+
+  lda retraces
+  and #3
+  bne :+
+    lda keydown+1
+    and #>(KEY_LEFT|KEY_RIGHT|KEY_UP|KEY_DOWN)
+    sta keynew+1
+  :
+
+  ; Keep it from going up to 255 and resetting
+  dec AutoRepeatTimer
+  bne SkipNoAutorepeat
+NoAutorepeat:
+  stz AutoRepeatTimer
+SkipNoAutorepeat:
+  plp
+  rtl
+.endproc

@@ -209,11 +209,16 @@ LevelZeroWhenLoad_End:
   VWFStackB:     .res VWFStackLen
   VWFStackIndex: .res 1
 
+  CursorX:       .res 2
+  CursorY:       .res 2
+  AutoRepeatTimer: .res 1
 
 GameStateStart:
-
+  YourInventory:    .res InventoryLen*2
+  LevelInventory:   .res InventoryLen*2
 GameStateEnd:
 SaveDataStart:
+  SavedGameState:   .res GameStateEnd-GameStateStart
   MoneyAmount:      .res 3   ; 5 BCD digits
   LevelCleared:     .res 8   ; 64 levels, bit = enabled
   LevelAvailable:   .res 8   ; 64 levels, bit = enabled

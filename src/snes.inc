@@ -104,6 +104,7 @@ BGMODE = $2105
 ; +-------- Plane 3 tile size (0: 8x8, 1: 16x16)
 ;           Modes 5 and 6 use 16x8 instead of 8x8
 ;           Mode 7 always uses 8x8
+BG3_PRIORITY = 8
 
 MOSAIC = $2106
 ; 76543210
