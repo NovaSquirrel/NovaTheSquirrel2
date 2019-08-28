@@ -20,7 +20,7 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7 perspective_data huffmunch inventory vwf
+  mode7 perspective_data huffmunch inventory vwf overworldblockdata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -130,6 +130,7 @@ $(objdir)/spcimage.o: $(brrlisto)
 
 # Block data relies on the enum
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
+$(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 
 # Reliance on the block enum
 $(objdir)/player.o: $(srcdir)/blockenum.s
@@ -146,6 +147,12 @@ $(srcdir)/graphics.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.t
 $(srcdir)/blockdata.s: tools/blocks.txt
 $(srcdir)/blockenum.s: tools/blocks.txt
 	$(PY) tools/makeblocks.py
+
+# Automatically create the list of overworld blocks from a description
+$(srcdir)/overworldblockdata.s: tools/overworldblocks.txt
+$(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
+	$(PY) tools/makeoverworldblocks.py
+
 
 $(objdir)/uploadppu.o: $(palettes)
 $(srcdir)/palettedata.s: $(palettes)

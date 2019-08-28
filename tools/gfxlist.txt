@@ -10,3 +10,7 @@ A000 SPCannon
 D000 MapBGForest
 0200 InventoryBG
 8000 InventorySprite
+0200 OWGrassy
+8400 OWLevel
+8800 OWGreenery
+8C00 OWStone

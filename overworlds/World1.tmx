@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="54">
+ <tileset firstgid="1" source="tiles/Background.tsx"/>
+ <tileset firstgid="65" source="tiles/Path.tsx"/>
+ <tileset firstgid="129" source="tiles/Sprites.tsx"/>
+ <layer id="5" name="Background" width="16" height="14">
+  <data encoding="csv">
+29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
+29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
+29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
+29,29,29,29,29,29,29,29,29,29,29,20,21,3,29,29,
+29,29,29,29,20,21,2,22,23,29,29,28,10,11,29,29,
+29,29,29,29,28,10,10,10,31,29,29,9,10,11,29,29,
+29,29,29,29,9,10,10,10,11,29,29,9,10,11,29,29,
+29,1,2,2,13,10,10,10,11,29,29,9,10,11,29,29,
+29,9,4,18,18,18,18,18,19,29,29,17,18,19,29,29,
+29,9,11,26,26,26,30,26,35,29,29,25,34,27,29,29,
+29,17,19,29,29,29,29,29,29,29,29,29,29,29,29,29,
+29,25,27,29,29,29,29,29,29,29,29,29,29,29,29,29,
+29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
+29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29
+</data>
+ </layer>
+ <layer id="6" name="Paths" width="16" height="14">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,80,0,0,0,0,0,69,66,66,66,
+0,0,0,0,0,0,65,0,0,0,0,0,65,0,0,0,
+0,0,0,0,0,0,76,66,70,0,0,0,65,0,0,0,
+0,0,0,0,0,0,65,0,65,0,0,0,65,0,0,0,
+0,0,69,66,66,66,68,0,65,0,0,0,65,0,0,0,
+0,0,65,0,0,0,71,0,97,98,0,99,100,0,0,0,
+66,66,78,0,0,0,0,0,105,106,66,107,108,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="8" name="Level markers">
+  <object id="37" gid="138" x="32" y="144" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1A"/>
+   </properties>
+  </object>
+  <object id="38" gid="138" x="64" y="144" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1B"/>
+   </properties>
+  </object>
+  <object id="39" gid="138" x="96" y="112" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1C"/>
+   </properties>
+  </object>
+  <object id="40" gid="138" x="160" y="176" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1F"/>
+   </properties>
+  </object>
+  <object id="41" gid="138" x="192" y="144" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1G"/>
+   </properties>
+  </object>
+  <object id="42" gid="139" x="192" y="112" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1MC"/>
+   </properties>
+  </object>
+  <object id="43" gid="139" x="96" y="96" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1MB"/>
+   </properties>
+  </object>
+  <object id="44" gid="139" x="96" y="144" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1MA"/>
+   </properties>
+  </object>
+  <object id="45" gid="140" x="192" y="80" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1Boss"/>
+   </properties>
+  </object>
+  <object id="46" gid="137" x="96" y="80" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1Top"/>
+   </properties>
+  </object>
+  <object id="47" gid="137" x="32" y="176" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1Intro"/>
+   </properties>
+  </object>
+  <object id="48" gid="137" x="96" y="160" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1Pier"/>
+   </properties>
+  </object>
+  <object id="49" gid="138" x="128" y="112" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1D"/>
+   </properties>
+  </object>
+  <object id="50" gid="138" x="128" y="144" width="16" height="16">
+   <properties>
+    <property name="Level" value="World1E"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="2" name="Sprites">
+  <object id="1" gid="129" x="17" y="131" width="16" height="16"/>
+  <object id="2" gid="129" x="32" y="130" width="16" height="16"/>
+  <object id="5" gid="129" x="47" y="131" width="16" height="16"/>
+  <object id="6" gid="129" x="62" y="130" width="16" height="16"/>
+  <object id="7" gid="129" x="79" y="131" width="16" height="16"/>
+  <object id="8" gid="129" x="71" y="123" width="16" height="16"/>
+  <object id="9" gid="129" x="80" y="116" width="16" height="16"/>
+  <object id="10" gid="129" x="62" y="114" width="16" height="16"/>
+  <object id="11" gid="129" x="71" y="108" width="16" height="16"/>
+  <object id="12" gid="129" x="201" y="62" width="16" height="16"/>
+  <object id="13" gid="129" x="62" y="99" width="16" height="16"/>
+  <object id="14" gid="129" x="71" y="92" width="16" height="16"/>
+  <object id="16" gid="133" x="112" y="151" width="16" height="16"/>
+  <object id="17" gid="129" x="113" y="130" width="16" height="16"/>
+  <object id="18" gid="130" x="111" y="99" width="16" height="16"/>
+  <object id="19" gid="130" x="126" y="99" width="16" height="16"/>
+  <object id="20" gid="131" x="87" y="78" width="16" height="16"/>
+  <object id="21" gid="131" x="96" y="72" width="16" height="16"/>
+  <object id="22" gid="131" x="105" y="77" width="16" height="16"/>
+  <object id="23" gid="129" x="54" y="123" width="16" height="16"/>
+  <object id="24" gid="129" x="39" y="122" width="16" height="16"/>
+  <object id="25" gid="129" x="23" y="122" width="16" height="16"/>
+  <object id="26" gid="131" x="26" y="169" width="16" height="16"/>
+  <object id="27" gid="131" x="35" y="178" width="16" height="16">
+   <properties>
+    <property name="Priority" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="28" gid="129" x="176" y="130" width="16" height="16"/>
+  <object id="29" gid="129" x="208" y="130" width="16" height="16"/>
+  <object id="30" gid="129" x="81" y="100" width="16" height="16"/>
+  <object id="31" gid="129" x="186" y="67" width="16" height="16"/>
+  <object id="32" gid="129" x="176" y="77" width="16" height="16"/>
+  <object id="33" gid="129" x="174" y="90" width="16" height="16"/>
+  <object id="34" gid="130" x="203" y="91" width="16" height="16"/>
+  <object id="35" gid="132" x="207" y="116" width="16" height="16"/>
+  <object id="36" gid="132" x="177" y="116" width="16" height="16">
+   <properties>
+    <property name="Level" value=""/>
+   </properties>
+  </object>
+  <object id="51" gid="134" x="16" y="159" width="16" height="16"/>
+  <object id="52" gid="2147483782" x="19" y="144" width="16" height="16"/>
+  <object id="53" gid="134" x="116" y="84" width="16" height="16"/>
+ </objectgroup>
+</map>

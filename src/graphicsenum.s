@@ -12,5 +12,9 @@
   MapBGForest
   InventoryBG
   InventorySprite
+  OWGrassy
+  OWLevel
+  OWGreenery
+  OWStone
 .endenum
 

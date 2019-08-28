@@ -40,3 +40,5 @@ tools/M7Tileset.chrm7
 src/m7palettedata.s
 *.hfm
 Mesen-S.exe
+src/overworldblockenum.s
+src/overworldblockdata.s

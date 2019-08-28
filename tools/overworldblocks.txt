@@ -1,0 +1,120 @@
+alias grassy $0200
+alias grassy_palette 0
+
+#######################################
+# Grassy stuff
+#######################################
+base grassy
+palette grassy_palette
+
++Empty
+t 0:0 0:0
+t 0:0 0:0
+
++GrassUL
+t 8,0 5,0
+t 6,1 1,1
+
++GrassUM
+t 4,0 5,0
+t 0,1 1,1
+
++GrassUR
+t 4,0 9,0
+t 0,1 7,1
+
++GrassML
+t 6,0 1,0
+t 6,1 1,1
+
++GrassMM
+t 0,0 1,0
+t 0,1 1,1
+
++GrassMR
+t 0,0 7,0
+t 0,1 7,1
+
++GrassDL
+t 6,0 1,0
+t 8,1 5,1
+
++GrassDM
+t 0,0 1,0
+t 4,1 5,1
+
++GrassDR
+t 0,0 7,0
+t 4,1 9,1
+
++GrassCornerUL
+t 2,0 1,0
+t 0,1 1,1
+
++GrassCornerUR
+t 0,0 3,0
+t 0,1 1,1
+
++GrassCornerDL
+t 0,0 1,0
+t 2,1 1,1
+
++GrassCornerDR
+t 0,0 1,0
+t 0,1 3,1
+
++Water
+t 0,2 1,2
+t 0,3 1,3
+
++WaterCliffL
+t 11,2 12,2
+t 0,3 1,3
+
++WaterCliffM
+t 12,2 12,2
+t 0,3 1,3
+
++WaterCliffR
+t 12,2 11,2h
+t 0,3 1,3
+
++WaterRampL
+t 7,3 6,3h
+t 0,3 1,3
+
++WaterRampM
+t 6,3 6,3h
+t 0,3 1,3
+
++WaterRampR
+t 6,3 7,3h
+t 0,3 1,3
+
++WaterPier
+t 12,3 12,3h
+t 8,3 9,3
+
++GrassCurveLDL
+t 2,2 1,0
+t 2,3 1,1
+
++GrassCurveLUL
+t 0,2 5,2
+t 4,3 5,3
+
++GrassCurveLUR
+t 6,2 7,2
+t 0,1 1,1
+
++GrassCurveRDR
+t 0,0 3,2
+t 0,1 3,3
+
++GrassCurveRUR
+t 10,2 1,2
+t 10,3 11,3
+
++GrassCurveRUL
+t 8,2 9,2
+t 0,1 1,1
