@@ -137,10 +137,10 @@ $(objdir)/player.o: $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
 
 # Level loading relies on palette indexes and graphic directory
-$(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphics.s
+$(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 
 # Automatically insert graphics into the ROM
-$(srcdir)/graphics.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt
+$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
@@ -154,7 +154,7 @@ $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 	$(PY) tools/makeoverworldblocks.py
 
 
-$(objdir)/uploadppu.o: $(palettes)
+$(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py
@@ -162,7 +162,7 @@ $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(srcdir)/actorenum.s: tools/actors.txt
 	$(PY) tools/makeactor.py
-$(srcdir)/leveldata.s: $(levels)
+$(srcdir)/leveldata.s: $(levels) $(srcdir)/graphicsenum.s
 	$(PY) tools/levelconvert.py
 $(srcdir)/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
