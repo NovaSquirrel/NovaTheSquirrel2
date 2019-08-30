@@ -20,7 +20,8 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7 perspective_data huffmunch inventory vwf overworldblockdata
+  mode7 perspective_data huffmunch inventory vwf \
+  overworldblockdata overworlddata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -100,6 +101,7 @@ chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 palettes := $(wildcard palettes/*.png)
 levels := $(wildcard levels/*.json)
+overworlds := $(wildcard overworlds/*.tmx)
 m7levels := $(patsubst %.bin,%.hfm,$(wildcard m7levels/*.bin))
 
 # Background conversion
@@ -160,10 +162,12 @@ $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
-$(srcdir)/actorenum.s: tools/actors.txt
+$(srcdir)/actorenum.s: tools/actors.txt tools/makeactor.py
 	$(PY) tools/makeactor.py
-$(srcdir)/leveldata.s: $(levels) $(srcdir)/graphicsenum.s
+$(srcdir)/leveldata.s: $(levels) $(srcdir)/graphicsenum.s tools/levelconvert.py
 	$(PY) tools/levelconvert.py
+$(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
+	$(PY) tools/overworld.py
 $(srcdir)/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
 m7levels/%.hfm: m7levels/%.bin

@@ -42,3 +42,4 @@ src/m7palettedata.s
 Mesen-S.exe
 src/overworldblockenum.s
 src/overworldblockdata.s
+src/overworlddata.s

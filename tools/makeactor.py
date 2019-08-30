@@ -23,6 +23,7 @@ aliases = {}
 actor = None
 all_actors = []
 all_particles = []
+all_owdecorations = []
 all_subroutines = []
 
 # Read and process the file
@@ -35,6 +36,8 @@ def saveActor():
 	# Put it in the appropriate list
 	if actor["particle"]:
 		all_particles.append(actor)
+	elif actor["owdecoration"]:
+		all_owdecorations.append(actor)
 	else:
 		all_actors.append(actor)
 
@@ -47,7 +50,9 @@ for line in text:
 		saveActor()
 		# Reset to prepare for the new actor
 		priority = False
-		actor = {"name": line[1:], "particle": False, "size": [16, 16], "run": "ActorNothing", "draw": "ActorNothing", "flags": [], "gfx": None, "pal": None, "essential": False, "secondary": False}
+		actor = {"name": line[1:], "particle": False, "owdecoration": False, "pic": 0, "size": [16, 16],
+			"run": "ActorNothing", "draw": "ActorNothing", "flags": [],
+			"gfx": None, "pal": None, "essential": False, "secondary": False}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -60,12 +65,12 @@ for line in text:
 		actor["size"] = arg.split("x")
 	elif word == "flag":
 		actor["flags"] = arg.split()
-	elif word in ["gfx", "pal"]:
+	elif word in ["gfx", "pal", "pic"]:
 		actor[word] = arg
 	elif word in ["run", "draw"]:
 		actor[word] = arg
 		all_subroutines.append(arg)
-	elif word in ["essential", "secondary", "particle"]:
+	elif word in ["essential", "secondary", "particle", "owdecoration"]:
 		actor[word] = True
 
 # Save the last one
@@ -81,6 +86,7 @@ outfile.write('.include "snes.inc"\n.include "actorenum.s"\n.include "global.inc
 
 outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidth, ActorHeight, ActorPalette, ActorGraphic\n')
 outfile.write('.export ParticleRun, ParticleDraw\n')
+outfile.write('.export OWDecorationGraphic, OWDecorationPalette, OWDecorationPic\n')
 
 outfile.write('.import %s\n' % str(", ".join(all_subroutines)))
 outfile.write('\n.segment "ActorData"\n\n')
@@ -154,6 +160,32 @@ for b in all_particles:
 outfile.write('.endproc\n\n')
 
 
+# Overworld decorations
+outfile.write('.proc OWDecorationGraphic\n')
+for b in all_owdecorations:
+	if b["gfx"]:
+		outfile.write('  .byt GraphicsUpload::%s\n' % (b["gfx"]))
+	else:
+		outfile.write('  .byt $ff\n')
+outfile.write('.endproc\n\n')
+
+outfile.write('.proc OWDecorationPalette\n')
+for b in all_owdecorations:
+	if b["pal"]:
+		outfile.write('  .byt Palette::%s\n' % (b["pal"]))
+	else:
+		outfile.write('  .byt $ff\n')
+outfile.write('.endproc\n\n')
+
+outfile.write('.proc OWDecorationPic\n')
+for b in all_owdecorations:
+	if b["pal"]:
+		outfile.write('  .byt %s\n' % (b["pic"]))
+	else:
+		outfile.write('  .byt $ff\n')
+outfile.write('.endproc\n\n')
+
+
 
 
 
@@ -169,6 +201,11 @@ outfile.write('.endenum\n\n')
 
 outfile.write('.enum Particle\n  Empty\n')
 for b in all_particles:
+	outfile.write('  %s\n' % b['name'])
+outfile.write('.endenum\n\n')
+
+outfile.write('.enum OWDecoration\n')
+for b in all_owdecorations:
 	outfile.write('  %s\n' % b['name'])
 outfile.write('.endenum\n\n')
 

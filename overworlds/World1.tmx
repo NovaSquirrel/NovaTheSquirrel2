@@ -4,6 +4,10 @@
  <tileset firstgid="65" source="tiles/Path.tsx"/>
  <tileset firstgid="129" source="tiles/Sprites.tsx"/>
  <layer id="5" name="Background" width="16" height="14">
+  <properties>
+   <property name="Graphics" value="OWGrassy"/>
+   <property name="Palettes" value="OWGrassy"/>
+  </properties>
   <data encoding="csv">
 29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
 29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
@@ -148,11 +152,7 @@
   <object id="33" gid="129" x="174" y="90" width="16" height="16"/>
   <object id="34" gid="130" x="203" y="91" width="16" height="16"/>
   <object id="35" gid="132" x="207" y="116" width="16" height="16"/>
-  <object id="36" gid="132" x="177" y="116" width="16" height="16">
-   <properties>
-    <property name="Level" value=""/>
-   </properties>
-  </object>
+  <object id="36" gid="132" x="177" y="116" width="16" height="16"/>
   <object id="51" gid="134" x="16" y="159" width="16" height="16"/>
   <object id="52" gid="2147483782" x="19" y="144" width="16" height="16"/>
   <object id="53" gid="134" x="116" y="84" width="16" height="16"/>

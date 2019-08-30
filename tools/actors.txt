@@ -124,3 +124,40 @@ draw DrawPrizeParticle
 particle
 run RunBricksParticle
 draw DrawBricksParticle
+
+# ---------- static overworld sprites ----------
++Tree
+owdecoration
+pal OWGreenery
+gfx OWGreenery
+pic 0
+
++Pebbles
+owdecoration
+pal OWStone
+gfx OWStone
+pic 0
+
++House
+owdecoration
+pal OWGreenery
+gfx OWGreenery
+pic 4
+
++HorizBarrier
+owdecoration
+pal OWStone
+gfx OWStone
+pic 2
+
++Fence
+owdecoration
+pal OWGreenery
+gfx OWGreenery
+pic 2
+
++Flowers
+owdecoration
+pal OWGreenery
+gfx OWGreenery
+pic 6
