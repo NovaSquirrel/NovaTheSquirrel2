@@ -21,7 +21,7 @@ objlist = \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data huffmunch inventory vwf \
-  overworldblockdata overworlddata
+  overworldblockdata overworlddata overworldcode
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
