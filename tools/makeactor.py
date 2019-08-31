@@ -161,6 +161,8 @@ outfile.write('.endproc\n\n')
 
 
 # Overworld decorations
+outfile.write('.segment "Overworld"\n\n')
+
 outfile.write('.proc OWDecorationGraphic\n')
 for b in all_owdecorations:
 	if b["gfx"]:

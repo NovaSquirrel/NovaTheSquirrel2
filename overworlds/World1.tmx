@@ -7,6 +7,7 @@
   <properties>
    <property name="Graphics" value="OWGrassy"/>
    <property name="Palettes" value="OWGrassy"/>
+   <property name="SpriteGraphics" value="OWGreenery OWStone"/>
   </properties>
   <data encoding="csv">
 29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,
@@ -46,46 +47,55 @@
  <objectgroup id="8" name="Level markers">
   <object id="37" gid="138" x="32" y="144" width="16" height="16">
    <properties>
+    <property name="Directions" value="R"/>
     <property name="Level" value="World1A"/>
    </properties>
   </object>
   <object id="38" gid="138" x="64" y="144" width="16" height="16">
    <properties>
+    <property name="Directions" value="R"/>
     <property name="Level" value="World1B"/>
    </properties>
   </object>
   <object id="39" gid="138" x="96" y="112" width="16" height="16">
    <properties>
+    <property name="Directions" value="RU"/>
     <property name="Level" value="World1C"/>
    </properties>
   </object>
   <object id="40" gid="138" x="160" y="176" width="16" height="16">
    <properties>
+    <property name="Directions" value="R"/>
     <property name="Level" value="World1F"/>
    </properties>
   </object>
   <object id="41" gid="138" x="192" y="144" width="16" height="16">
    <properties>
+    <property name="Directions" value="U"/>
     <property name="Level" value="World1G"/>
    </properties>
   </object>
   <object id="42" gid="139" x="192" y="112" width="16" height="16">
    <properties>
+    <property name="Directions" value="U"/>
     <property name="Level" value="World1MC"/>
    </properties>
   </object>
   <object id="43" gid="139" x="96" y="96" width="16" height="16">
    <properties>
+    <property name="Directions" value="U"/>
     <property name="Level" value="World1MB"/>
    </properties>
   </object>
   <object id="44" gid="139" x="96" y="144" width="16" height="16">
    <properties>
+    <property name="Directions" value="UD"/>
     <property name="Level" value="World1MA"/>
    </properties>
   </object>
   <object id="45" gid="140" x="192" y="80" width="16" height="16">
    <properties>
+    <property name="Directions" value="R"/>
     <property name="Level" value="World1Boss"/>
    </properties>
   </object>
@@ -96,6 +106,7 @@
   </object>
   <object id="47" gid="137" x="32" y="176" width="16" height="16">
    <properties>
+    <property name="Directions" value="U"/>
     <property name="Level" value="World1Intro"/>
    </properties>
   </object>
@@ -106,11 +117,13 @@
   </object>
   <object id="49" gid="138" x="128" y="112" width="16" height="16">
    <properties>
+    <property name="Directions" value="D"/>
     <property name="Level" value="World1D"/>
    </properties>
   </object>
   <object id="50" gid="138" x="128" y="144" width="16" height="16">
    <properties>
+    <property name="Directions" value="D"/>
     <property name="Level" value="World1E"/>
    </properties>
   </object>

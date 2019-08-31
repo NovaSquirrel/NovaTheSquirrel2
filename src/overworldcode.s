@@ -19,8 +19,16 @@
 .include "global.inc"
 .smart
 
+
+MapMetatileBuffer    = Scratchpad             ; 224 bytes
+MapDecorationSprites = Scratchpad + 256       ; 512 bytes
+MapPrioritySprites   = Scratchpad + 256 + 512 ; ? bytes
+MapDecorationLength  = TouchTemp     ; number of bytes
+MapPriorityLength    = TouchTemp + 2 ; number of bytes
+
 .import Overworld_Pointers
 .import OWBlockTopLeft, OWBlockTopRight, OWBlockBottomLeft, OWBlockBottomRight
+.import OWDecorationGraphic, OWDecorationPalette, OWDecorationPic
 .export OpenOverworld
 
 .segment "Overworld"
@@ -40,12 +48,22 @@
   ; Can actually treat it as a 16-bit pointer, overworld data is limited to this bank
   sta DecodePointer
 
+  lda #$ffff
+  sta SpriteTileSlots+2*0
+  sta SpriteTileSlots+2*1
+  sta SpriteTileSlots+2*2
+  sta SpriteTileSlots+2*3
+  sta SpritePaletteSlots+2*0
+  sta SpritePaletteSlots+2*1
+  sta SpritePaletteSlots+2*2
+  sta SpritePaletteSlots+2*3
+
   ; Start reading the overworld
   ldy #0
   seta8
 
 
-  ; ---------------
+  ; -------------------------
 
   ldx #0
 UploadGraphicLoop:
@@ -57,7 +75,7 @@ UploadGraphicLoop:
   bra UploadGraphicLoop
 ExitGraphicLoop:
 
-  ; ---------------
+  ; -------------------------
 
   ldx #0
 UploadPaletteLoop:
@@ -69,10 +87,49 @@ UploadPaletteLoop:
   txy
   jsl DoPaletteUpload
   ply
+  inx
   bra UploadPaletteLoop
 ExitPaletteLoop:
 
-  ; ---------------
+  ; -------------------------
+
+  ldx #0
+UploadSpriteGraphicLoop:
+  lda (DecodePointer),y
+  sta SpriteTileSlots,x
+  iny
+  cmp #255
+  beq ExitSpriteGraphicLoop
+
+  pha
+  txa
+  asl
+  sta GraphicUploadOffset+1
+  stz GraphicUploadOffset+0
+  pla
+  jsl DoGraphicUploadWithOffset
+  inx
+  bra UploadSpriteGraphicLoop
+ExitSpriteGraphicLoop:
+
+  ; -------------------------
+
+  ldx #8
+UploadSpritePaletteLoop:
+  lda (DecodePointer),y
+  sta SpritePaletteSlots-8,x
+  iny
+  cmp #255
+  beq ExitSpritePaletteLoop
+  phy
+  txy
+  jsl DoPaletteUpload
+  ply
+  inx
+  bra UploadSpritePaletteLoop
+ExitSpritePaletteLoop:
+
+  ; -------------------------
 
   ldx #0
   stz 0 ; Initialize the repeat counter
@@ -93,7 +150,7 @@ DecompressMapLoop:
 
   ; Repeat for counter + 1 times
   inc 0
-: sta f:Scratchpad,x
+: sta f:MapMetatileBuffer,x
   inx
   dec 0
   bne :-
@@ -102,12 +159,83 @@ DecompressMapLoop:
 
 ExitMapLoop:
 
+  ; -------------------------
+
+  ldx #0
+ReadPrioritySpriteLoop:
+  lda (DecodePointer),y
+  iny
+  cmp #255
+  beq ExitPrioritySpriteLoop
+  jsr GetOverworldSpriteTile
+  lda 0
+  sta f:MapPrioritySprites+2,x
+  ; Also returns 1, use it later
+
+  ; Get X
+  lda (DecodePointer),y
+  iny
+  sta f:MapPrioritySprites+0,x
+
+  ; Get Y
+  lda (DecodePointer),y
+  iny
+  sta f:MapPrioritySprites+1,x
+
+  ; Get attributes
+  lda (DecodePointer),y
+  iny
+  ora 1
+  sta f:MapPrioritySprites+3,x
+  inx
+  inx
+  inx
+  inx
+  bra ReadPrioritySpriteLoop
+ExitPrioritySpriteLoop:
+  stx MapPriorityLength
+
+  ; -------------------------
+
+  ldx #0
+ReadDecorationSpriteLoop:
+  lda (DecodePointer),y
+  iny
+  cmp #255
+  beq ExitDecorationSpriteLoop
+  jsr GetOverworldSpriteTile
+  lda 0
+  sta f:MapDecorationSprites+2,x
+  ; Also returns 1, use it later
+
+  ; Get X
+  lda (DecodePointer),y
+  iny
+  sta f:MapDecorationSprites+0,x
+
+  ; Get Y
+  lda (DecodePointer),y
+  iny
+  sta f:MapDecorationSprites+1,x
+
+  ; Get attributes
+  lda (DecodePointer),y
+  iny
+  ora 1
+  sta f:MapDecorationSprites+3,x
+  inx
+  inx
+  inx
+  inx
+  bra ReadDecorationSpriteLoop
+ExitDecorationSpriteLoop:
+  stx MapDecorationLength
+
   ; ---------------
 
+  ; Render the overworld
   lda #INC_DATAHI
   sta PPUCTRL
-
-  ; Render the overworld
   seta16
   ldx #0
   lda #$c000>>1
@@ -116,7 +244,7 @@ RenderLoop:
   ; Top
   lda #16
   sta 0
-: lda f:Scratchpad,x
+: lda f:MapMetatileBuffer,x
   and #255
   asl
   tay
@@ -136,7 +264,7 @@ RenderLoop:
   ; Bottom
   lda #16
   sta 0
-: lda f:Scratchpad,x
+: lda f:MapMetatileBuffer,x
   and #255
   asl
   tay
@@ -183,9 +311,13 @@ RenderLoop:
   ; set up plane 0's scroll
   stz BGSCROLLX+0
   stz BGSCROLLX+0
+  stz BGSCROLLX+2
+  stz BGSCROLLX+2
   lda #$FF
   sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
   sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
+  sta BGSCROLLY+2
+  sta BGSCROLLY+2
 
   stz PPURES
   lda #%00010011  ; enable sprites, plane 0 and 1
@@ -193,20 +325,116 @@ RenderLoop:
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
 
+
+
+
+
+
   ; -----------------------------------
 OverworldLoop:
   setaxy16
-  jsl WaitKeysReady
+  jsl WaitKeysReady ; Also clears OamPtr
 
+  ldy OamPtr
+  ldx #0
+OverworldPriorityRenderSpriteLoop:
+  lda f:MapPrioritySprites+0,x
+  sta OAM+0,y
+  lda f:MapPrioritySprites+2,x
+  jsr RenderSpriteShared
+  cpy MapPriorityLength
+  bne OverworldPriorityRenderSpriteLoop
+  sty OamPtr
+  ; -----------------------------------
+  ldy OamPtr
+  ldx #0
+OverworldRenderSpriteLoop:
+  lda f:MapDecorationSprites+0,x
+  sta OAM+0,y
+  lda f:MapDecorationSprites+2,x
+  jsr RenderSpriteShared
+  cpy MapDecorationLength
+  bne OverworldRenderSpriteLoop
+  sty OamPtr
 
+  ldx OamPtr
+  jsl ppu_clear_oam
+  jsl ppu_pack_oamhi
 
   jsl WaitVblank
+  jsl ppu_copy_oam
   seta8
   lda #15
   sta PPUBRIGHT
   jmp OverworldLoop
 
   rtl
+
+
+.a16
+RenderSpriteShared:
+  sta OAM+2,y
+  lda #$0200  ; Use 16x16 sprites
+  sta OAMHI,y
+  inx
+  inx
+  inx
+  inx
+  iny
+  iny
+  iny
+  iny
+  rts
 .endproc
 
+; Input: A = overworld sprite ID
+; Output: 0 and 1
+.a8
+.i16
+.proc GetOverworldSpriteTile
+  phx
+  phy
+
+  setxy8
+  tay
+
+  ; Find the graphic
+  lda OWDecorationGraphic,y
+  ldx #3
+: cmp SpriteTileSlots,x  
+  beq :+
+  dex
+  bpl :-
+: ; No handler for not finding it
+
+  txa
+  ; Multiply by 32
+  asl
+  asl
+  asl
+  asl
+  asl
+  ora OWDecorationPic,y
+  sta 0
+
+  ; Find the palette
+  lda OWDecorationPalette,y
+  ldx #3
+: cmp SpritePaletteSlots,x  
+  beq :+
+  dex
+  bpl :-
+: ; No handler for not finding it
+
+  txa
+  asl
+  ora #(>OAM_PRIORITY_2)|1 ; second set of 256 sprite tiles
+  sta 1
+
+  setxy16
+
+  ply
+  plx
+  rts
+.endproc
 

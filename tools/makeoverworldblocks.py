@@ -139,5 +139,5 @@ outfile = open("src/overworldblockenum.s", "w")
 outfile.write('; This is automatically generated. Edit "overworldblocks.txt" instead\n')
 outfile.write('.enum OverworldBlock\n')
 for b in all_blocks:
-	outfile.write('  %s' % b['name'])
+	outfile.write('  %s\n' % b['name'])
 outfile.write('.endenum\n\n')

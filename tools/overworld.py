@@ -63,6 +63,7 @@ for f in glob.glob("overworlds/*.tmx"):
 	map_priority_sprites = []
 	map_graphics = []
 	map_palettes = []
+	map_spritegraphics = []
 
 	# Parse the map file
 	for e in root:
@@ -81,6 +82,8 @@ for f in glob.glob("overworlds/*.tmx"):
 							map_graphics = p.attrib['value'].split()
 						if p.attrib['name'] == 'Palettes':
 							map_palettes = p.attrib['value'].split()
+						if p.attrib['name'] == 'SpriteGraphics':
+							map_spritegraphics = p.attrib['value'].split()
 				elif d.tag == 'data':
 					assert d.attrib['encoding'] == 'csv'
 					for line in [x for x in d.text.splitlines() if len(x)]:
@@ -97,10 +100,12 @@ for f in glob.glob("overworlds/*.tmx"):
 					x = int(level.attrib['x'])//16
 					y = int(level.attrib['y'])//16
 					assert level[0].tag == 'properties'
-					assert level[0][0].tag == 'property'
-					destination = level[0][0].attrib['value']
-					print("%d %d %s" % (x, y, destination))
-
+					for p in level[0]:
+						if p.attrib['name'] == 'Directions':
+							pass
+						elif p.attrib['name'] == 'Level':
+							destination = p.attrib['value']
+							print("%d %d %s" % (x, y, destination))
 			elif e.attrib['name'].lower() == 'sprites':
 				for sprite in e:
 					gid = int(sprite.attrib['gid'])
@@ -115,15 +120,15 @@ for f in glob.glob("overworlds/*.tmx"):
 							if property.attrib['name'] == 'Priority':
 								priority = property.attrib['value'] == 'true'
 					attribs = (64 if xflip else 0)|(128 if yflip else 0)
-					data = (tile, int(sprite.attrib['x']), int(sprite.attrib['y']), attribs)
+					data = (tile, int(sprite.attrib['x']), int(sprite.attrib['y'])-16, attribs)
 					if priority:
 						map_priority_sprites.append(data)
 					else:
 						map_sprites.append(data)
 
 	# Sort by Y position
-	map_sprites = sorted(map_sprites, key=lambda r: r[1], reverse=True)
-	map_priority_sprites = sorted(map_priority_sprites, key=lambda r: r[1], reverse=True)
+	map_sprites = sorted(map_sprites, key=lambda r: r[1])
+	map_priority_sprites = sorted(map_priority_sprites, key=lambda r: r[1])
 
 	# Find runs of the same block
 	map_bg = sum(map_bg, []) # Flatten
@@ -143,8 +148,20 @@ for f in glob.glob("overworlds/*.tmx"):
 	outfile.write('255\n')
 
 	# Output palettes used to the file
-	outfile.write('  ; Palette\n  .byt ')
+	outfile.write('  ; Palettes\n  .byt ')
 	for palette in map_palettes:
+		outfile.write('Palette::%s, ' % palette)
+	outfile.write('255\n')
+
+	# Output sprite graphics used to the file
+	outfile.write('  ; Sprite graphics\n  .byt ')
+	for graphic in map_spritegraphics:
+		outfile.write('GraphicsUpload::%s, ' % graphic)
+	outfile.write('255\n')
+
+	# Output sprite palettes used to the file
+	outfile.write('  ; Sprite palettes\n  .byt ')
+	for palette in map_spritegraphics:
 		outfile.write('Palette::%s, ' % palette)
 	outfile.write('255\n')
 
@@ -157,17 +174,18 @@ for f in glob.glob("overworlds/*.tmx"):
 		outfile.write('OverworldBlock::%s, ' % block[0])
 	outfile.write('255\n')
 
-	# Output the decorational sprites to the file
-	outfile.write('  ; Decorational sprites\n  .byt ')
+	# Output the decorative priority sprites to the file
+	outfile.write('  ; Decorative priority sprites\n  .byt ')
+	for sprite in map_priority_sprites:
+		outfile.write('OWDecoration::%s, %d, %d, %d, ' % sprite)
+	outfile.write('255\n')
+
+	# Output the decorative sprites to the file
+	outfile.write('  ; Decorative regular sprites\n  .byt ')
 	for sprite in map_sprites:
 		outfile.write('OWDecoration::%s, %d, %d, %d, ' % sprite)
 	outfile.write('255\n')
 
-	# Output the decorational priority sprites to the file
-	outfile.write('  ; Decorational priority sprites\n  .byt ')
-	for sprite in map_priority_sprites:
-		outfile.write('OWDecoration::%s, %d, %d, %d, ' % sprite)
-	outfile.write('255\n')
 
 
 	outfile.write('\n\n')
