@@ -167,6 +167,7 @@ def convert_layer(layer):
 
 	return output, byte_count
 
+all_levels = []
 
 outfile = open("src/leveldata.s", "w")
 outfile.write('; This is automatically generated. Edit level JSON files instead\n')
@@ -180,6 +181,7 @@ outfile.write('.segment "LevelBank1"\n\n')
 
 for f in glob.glob("levels/*.json"):
 	plain_name = os.path.splitext(os.path.basename(f))[0]
+	all_levels.append(plain_name)
 	outfile.write(".export level_%s\n" % plain_name)
 	outfile.write("level_%s:\n" % plain_name)
 
@@ -277,3 +279,11 @@ for f in glob.glob("levels/*.json"):
 	outfile.write("\n")
 	print("Total size: %d" % total_level_size)
 outfile.close()
+
+# Generate the enum in a separate file
+outfile = open("src/levelenum.s", "w")
+outfile.write('; This is automatically generated. Edit level JSON files instead\n')
+outfile.write('.enum Level\n')
+for b in all_levels:
+	outfile.write('  %s\n' % b)
+outfile.write('.endenum\n\n')

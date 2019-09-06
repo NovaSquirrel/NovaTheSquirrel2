@@ -6,6 +6,8 @@ tilesets['tiles/Background.tsx'] = {}
 tilesets['tiles/Path.tsx'] = {}
 tilesets['tiles/Sprites.tsx'] = {}
 all_overworlds = []
+all_levelmarkers = []
+all_levelpointers = []
 
 # Read the tileset files for the ID
 for f in tilesets:
@@ -25,10 +27,11 @@ outfile.write('.include "snes.inc"\n')
 outfile.write('.include "actorenum.s"\n')
 outfile.write('.include "graphicsenum.s"\n')
 outfile.write('.include "paletteenum.s"\n')
+outfile.write('.include "pathenum.s"\n')
 outfile.write('.include "overworldblockenum.s"\n')
 outfile.write('.segment "Overworld"\n\n')
 
-for f in glob.glob("overworlds/*.tmx"):
+for f in sorted(glob.glob("overworlds/*.tmx")):
 	plain_name = os.path.splitext(os.path.basename(f))[0]
 	all_overworlds.append(plain_name)
 
@@ -56,6 +59,18 @@ for f in glob.glob("overworlds/*.tmx"):
 						return None
 		return None
 
+	def compress_map(map):
+		map = sum(map, []) # Flatten
+		compressed_map = []
+		for block in map:
+			# Make a new entry
+			if len(compressed_map) == 0 or compressed_map[-1][0] != block or compressed_map[-1][1] == 127:
+				compressed_map.append([block, 0])
+			# The last entry was repeated once
+			else:
+				compressed_map[-1][1] = compressed_map[-1][1]+1
+		return compressed_map
+
 	# The two map layers
 	map_bg      = []
 	map_path    = []
@@ -64,6 +79,8 @@ for f in glob.glob("overworlds/*.tmx"):
 	map_graphics = []
 	map_palettes = []
 	map_spritegraphics = []
+	map_levelmarkers = [None] * 16
+	map_levelpointers = [None] * 16
 
 	# Parse the map file
 	for e in root:
@@ -99,13 +116,30 @@ for f in glob.glob("overworlds/*.tmx"):
 				for level in e:
 					x = int(level.attrib['x'])//16
 					y = int(level.attrib['y'])//16
+					color = identify_tile(int(level.attrib['gid']))
+					color = ['LevelStory', 'LevelPlatform', 'LevelMode7', 'LevelBoss'].index(color)
+					directions = 0
+					destination = None
+					slot = None
 					assert level[0].tag == 'properties'
 					for p in level[0]:
 						if p.attrib['name'] == 'Directions':
-							pass
+							for d in p.attrib['value']:
+								if d.upper() == 'L':
+									directions |= 8
+								elif d.upper() == 'R':
+									directions |= 4
+								elif d.upper() == 'U':
+									directions |= 2
+								elif d.upper() == 'D':
+									directions |= 1
 						elif p.attrib['name'] == 'Level':
 							destination = p.attrib['value']
-							print("%d %d %s" % (x, y, destination))
+						elif p.attrib['name'] == 'Slot':
+							slot = int(p.attrib['value'])
+					assert slot != None
+					map_levelmarkers[slot] = (x, y, color, directions)
+					map_levelpointers[slot] = 'level_'+destination
 			elif e.attrib['name'].lower() == 'sprites':
 				for sprite in e:
 					gid = int(sprite.attrib['gid'])
@@ -125,21 +159,16 @@ for f in glob.glob("overworlds/*.tmx"):
 						map_priority_sprites.append(data)
 					else:
 						map_sprites.append(data)
+	all_levelmarkers.append(map_levelmarkers)
+	all_levelpointers.append(map_levelpointers)
 
 	# Sort by Y position
 	map_sprites = sorted(map_sprites, key=lambda r: r[1])
 	map_priority_sprites = sorted(map_priority_sprites, key=lambda r: r[1])
 
 	# Find runs of the same block
-	map_bg = sum(map_bg, []) # Flatten
-	compressed_map = []
-	for block in map_bg:
-		# Make a new entry
-		if len(compressed_map) == 0 or compressed_map[-1][0] != block or compressed_map[-1][1] == 127:
-			compressed_map.append([block, 0])
-		# The last entry was repeated once
-		else:
-			compressed_map[-1][1] = compressed_map[-1][1]+1
+	map_bg = compress_map(map_bg)
+	map_path = compress_map(map_path)
 
 	# Output graphics used to the file
 	outfile.write('  ; Graphics\n  .byt ')
@@ -167,7 +196,7 @@ for f in glob.glob("overworlds/*.tmx"):
 
 	# Output the map to the file
 	outfile.write('  ; Compressed map\n  .byt ')
-	for block in compressed_map:
+	for block in map_bg:
 		# Repeat?
 		if block[1]:
 			outfile.write('128|%d, ' % (block[1]-1))
@@ -186,13 +215,60 @@ for f in glob.glob("overworlds/*.tmx"):
 		outfile.write('OWDecoration::%s, %d, %d, %d, ' % sprite)
 	outfile.write('255\n')
 
+	# Output the compressed path to the file
+	outfile.write('  ; Compressed path\n  .byt ')
+	for block in map_path:
+		# Repeat?
+		if block[1]:
+			outfile.write('128|%d, ' % (block[1]-1))
+		outfile.write('OWPath::%s, ' % block[0])
+	outfile.write('255\n')
+
 
 
 	outfile.write('\n\n')
 
-
+# Output the table of overworld pointers
 outfile.write('.export Overworld_Pointers\n')
 outfile.write('Overworld_Pointers:\n')
 for ow in all_overworlds:
 	outfile.write('  .addr $ffff & Overworld_%s\n' % ow)
+
+# Output the level markers to the file
+outfile.write('.export Overworld_LevelMarkers\n')
+outfile.write('Overworld_LevelMarkers: ; (16 per world)\n')
+for world in all_levelmarkers:
+	outfile.write('  .byt ')
+	first = True
+	for level in world:
+		if not first:
+			outfile.write(', ')			
+		first = False
+		if level == None:
+			outfile.write('$ff, $ff')
+		else:
+			x, y, color, directions = level
+			outfile.write('$%.2x, $%.2x' % ((y<<4)|x, (color<<4)|directions))
+outfile.write('\n\n')
+
+# Import all of the level pointers
+outfile.write('.import %s\n' % (', '.join(filter(None, sum(all_levelpointers, []))))) # Flatten
+
+# Output the level pointers to the file
+outfile.write('.export Overworld_LevelPointers\n')
+outfile.write('Overworld_LevelPointers: ; (16 per world)\n')
+for world in all_levelpointers:
+	outfile.write('  .faraddr ')
+	first = True
+	for level in world:
+		if not first:
+			outfile.write(', ')
+		first = False
+		if level == None:
+			outfile.write('0')
+		else:
+			outfile.write(level)
+outfile.write('\n\n')
+
+
 outfile.close()

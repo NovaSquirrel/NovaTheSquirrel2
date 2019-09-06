@@ -76,4 +76,24 @@
    <property name="Id" value="PathD"/>
   </properties>
  </tile>
+ <tile id="16">
+  <properties>
+   <property name="Id" value="PathWideCurveUL"/>
+  </properties>
+ </tile>
+ <tile id="18">
+  <properties>
+   <property name="Id" value="PathWideCurveUR"/>
+  </properties>
+ </tile>
+ <tile id="32">
+  <properties>
+   <property name="Id" value="PathWideCurveDL"/>
+  </properties>
+ </tile>
+ <tile id="34">
+  <properties>
+   <property name="Id" value="PathWideCurveDR"/>
+  </properties>
+ </tile>
 </tileset>

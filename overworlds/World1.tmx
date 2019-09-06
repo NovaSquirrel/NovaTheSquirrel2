@@ -44,87 +44,101 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="8" name="Level markers">
+ <objectgroup id="8" name="Level markers" visible="0">
   <object id="37" gid="138" x="32" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="R"/>
-    <property name="Level" value="World1A"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="1"/>
    </properties>
   </object>
   <object id="38" gid="138" x="64" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="R"/>
-    <property name="Level" value="World1B"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="2"/>
    </properties>
   </object>
   <object id="39" gid="138" x="96" y="112" width="16" height="16">
    <properties>
     <property name="Directions" value="RU"/>
-    <property name="Level" value="World1C"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="5"/>
    </properties>
   </object>
   <object id="40" gid="138" x="160" y="176" width="16" height="16">
    <properties>
     <property name="Directions" value="R"/>
-    <property name="Level" value="World1F"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="10"/>
    </properties>
   </object>
   <object id="41" gid="138" x="192" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="U"/>
-    <property name="Level" value="World1G"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="11"/>
    </properties>
   </object>
   <object id="42" gid="139" x="192" y="112" width="16" height="16">
    <properties>
     <property name="Directions" value="U"/>
-    <property name="Level" value="World1MC"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="12"/>
    </properties>
   </object>
   <object id="43" gid="139" x="96" y="96" width="16" height="16">
    <properties>
     <property name="Directions" value="U"/>
-    <property name="Level" value="World1MB"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="6"/>
    </properties>
   </object>
   <object id="44" gid="139" x="96" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="UD"/>
-    <property name="Level" value="World1MA"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="3"/>
    </properties>
   </object>
   <object id="45" gid="140" x="192" y="80" width="16" height="16">
    <properties>
     <property name="Directions" value="R"/>
-    <property name="Level" value="World1Boss"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="13"/>
    </properties>
   </object>
   <object id="46" gid="137" x="96" y="80" width="16" height="16">
    <properties>
-    <property name="Level" value="World1Top"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="7"/>
    </properties>
   </object>
   <object id="47" gid="137" x="32" y="176" width="16" height="16">
    <properties>
     <property name="Directions" value="U"/>
-    <property name="Level" value="World1Intro"/>
+    <property name="Level" value="woodtest"/>
+    <property name="Slot" type="int" value="0"/>
    </properties>
   </object>
   <object id="48" gid="137" x="96" y="160" width="16" height="16">
    <properties>
-    <property name="Level" value="World1Pier"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="4"/>
    </properties>
   </object>
   <object id="49" gid="138" x="128" y="112" width="16" height="16">
    <properties>
     <property name="Directions" value="D"/>
-    <property name="Level" value="World1D"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="8"/>
    </properties>
   </object>
   <object id="50" gid="138" x="128" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="D"/>
-    <property name="Level" value="World1E"/>
+    <property name="Level" value="demo"/>
+    <property name="Slot" type="int" value="9"/>
    </properties>
   </object>
  </objectgroup>

@@ -23,8 +23,6 @@ __pycache__/
 
 graphics.s
 *.lnk
-nova-the-squirrel-2.sfc
-*.sfc
 src/blockenum.s
 src/blockdata.s
 src/paletteenum.s
@@ -43,3 +41,4 @@ Mesen-S.exe
 src/overworldblockenum.s
 src/overworldblockdata.s
 src/overworlddata.s
+src/levelenum.s
