@@ -213,6 +213,11 @@ LevelZeroWhenLoad_End:
   CursorY:       .res 2
   AutoRepeatTimer: .res 1
 
+  OverworldPlayerX:   .res 1
+  OverworldPlayerY:   .res 1
+  OverworldMap:       .res 1
+  OverworldDirection: .res 1
+
 GameStateStart:
   YourInventory:    .res InventoryLen*2
   LevelInventory:   .res InventoryLen*2

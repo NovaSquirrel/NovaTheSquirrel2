@@ -29,7 +29,6 @@ MapDecorationSprites = Scratchpad + (256*2) ; 512 bytes
 MapPrioritySprites   = Scratchpad + (256*4) ; ? bytes
 MapDecorationLength  = TouchTemp     ; number of bytes
 MapPriorityLength    = TouchTemp + 2 ; number of bytes
-WorldNumber          = TouchTemp + 4
 
 .import Overworld_Pointers
 .import OWBlockTopLeft, OWBlockTopRight, OWBlockBottomLeft, OWBlockBottomRight
@@ -46,9 +45,8 @@ WorldNumber          = TouchTemp + 4
   phk
   plb
 
-  seta8
-  sta WorldNumber
   setaxy16
+  lda OverworldMap
   and #255
   asl
   tax
@@ -87,6 +85,8 @@ UploadGraphicLoop:
   bra UploadGraphicLoop
 ExitGraphicLoop:
 
+  lda #GraphicsUpload::OWNova
+  jsl DoGraphicUpload
   lda #GraphicsUpload::OWLevel
   jsl DoGraphicUpload
   lda #GraphicsUpload::OWPaths
@@ -113,6 +113,9 @@ ExitPaletteLoop:
   phy
   ldy #0+7
   lda #Palette::FGCommon
+  jsl DoPaletteUpload
+  ldy #8+6
+  lda #Palette::SPNova
   jsl DoPaletteUpload
   ldy #8+7
   lda #Palette::OWLevel
@@ -263,7 +266,7 @@ ExitDecorationSpriteLoop:
   sta 0
   lda #0  ; Clear top half of Y
   xba
-  lda WorldNumber ; Choose which list of 16 level slots
+  lda OverworldMap ; Choose which list of 16 level slots
   asl
   asl
   asl
@@ -485,6 +488,65 @@ OverworldLoop:
   setaxy16
   jsl WaitKeysReady ; Also clears OamPtr
 
+
+  seta8
+  lda OverworldPlayerX
+  ora OverworldPlayerY
+  and #15
+  beq NotMoving
+    lda #0
+    xba
+    lda OverworldDirection
+    tay
+
+    lda OverworldPlayerX
+    add MovementOffsetX,y
+    sta OverworldPlayerX
+
+    lda OverworldPlayerY
+    add MovementOffsetY,y
+    sta OverworldPlayerY
+    bra CantMove
+  NotMoving:
+
+
+  ; Start walking
+  lda keynew+1
+  and #>KEY_LEFT
+  beq NotLeft
+    dec OverworldPlayerX
+    lda #3
+    sta OverworldDirection
+NotLeft:
+
+  lda keynew+1
+  and #>KEY_RIGHT
+  beq NotRight
+    inc OverworldPlayerX
+    stz OverworldDirection
+NotRight:
+
+  lda keynew+1
+  and #>KEY_DOWN
+  beq NotDown
+    inc OverworldPlayerY
+    lda #1
+    sta OverworldDirection
+NotDown:
+
+  lda keynew+1
+  and #>KEY_UP
+  beq NotUp
+    dec OverworldPlayerY
+    lda #2
+    sta OverworldDirection
+NotUp:
+
+CantMove:
+  seta16
+
+
+  ; Draw all the sprites
   ldy OamPtr
   ldx #0
 OverworldPriorityRenderSpriteLoop:
@@ -494,9 +556,41 @@ OverworldPriorityRenderSpriteLoop:
   jsr RenderSpriteShared
   cpy MapPriorityLength
   bne OverworldPriorityRenderSpriteLoop
-  sty OamPtr
   ; -----------------------------------
-  ldy OamPtr
+  seta8
+  lda OverworldPlayerX
+  sta OAM+0+(4*0),y
+  sta OAM+0+(4*1),y
+  lda OverworldPlayerY
+  sta OAM+1+(4*1),y
+  sub #16
+  sta OAM+1+(4*0),y
+  lda #>(OAM_PRIORITY_2|OAM_COLOR_6)
+  sta OAM+3+(4*0),y
+  sta OAM+3+(4*1),y
+  lda OverworldDirection
+  cmp #3
+  bne :+
+    lda #>(OAM_PRIORITY_2|OAM_COLOR_6|OAM_XFLIP)
+    sta OAM+3+(4*0),y
+    sta OAM+3+(4*1),y
+    lda #0
+  :
+  asl
+  asl
+  sta OAM+2+(4*0),y
+  ora #2
+  sta OAM+2+(4*1),y
+
+  ; Player uses two sprites
+  seta16
+  lda #$0200
+  sta OAMHI+0,y
+  sta OAMHI+4,y
+  tya
+  add #4*2
+  tay
+  ; -----------------------------------
   ldx #0
 OverworldRenderSpriteLoop:
   lda f:MapDecorationSprites+0,x
@@ -530,11 +624,15 @@ RenderSpriteShared:
   inx
   inx
   inx
+NextOAM:
   iny
   iny
   iny
   iny
   rts
+
+MovementOffsetX: .lobytes 1, 0, 0, -1
+MovementOffsetY: .lobytes 0, 1, -1, 0
 .endproc
 
 ; Input: A = overworld sprite ID

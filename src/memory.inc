@@ -184,3 +184,7 @@ VWFStackLen   = 4
 .global VWFStackB
 .global VWFStackIndex
 
+.global OverworldPlayerX
+.global OverworldPlayerY
+.global OverworldMap
+.global OverworldDirection

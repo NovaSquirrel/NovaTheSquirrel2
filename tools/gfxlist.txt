@@ -11,6 +11,7 @@ D000 MapBGForest
 0200 InventoryBG
 8000 InventorySprite
 0200 OWGrassy
+8000 OWNova
 8400 OWLevel
 A000 OWGreenery
 A000 OWStone
