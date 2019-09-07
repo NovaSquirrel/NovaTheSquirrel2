@@ -17,18 +17,24 @@
 
 .include "snes.inc"
 .include "global.inc"
+.include "pathenum.s"
+.include "graphicsenum.s"
+.include "paletteenum.s"
 .smart
 
 
-MapMetatileBuffer    = Scratchpad             ; 224 bytes
-MapDecorationSprites = Scratchpad + 256       ; 512 bytes
-MapPrioritySprites   = Scratchpad + 256 + 512 ; ? bytes
+MapMetatileBuffer    = Scratchpad + (256*0) ; 224 bytes
+MapPathBuffer        = Scratchpad + (256*1) ; 224 bytes
+MapDecorationSprites = Scratchpad + (256*2) ; 512 bytes
+MapPrioritySprites   = Scratchpad + (256*4) ; ? bytes
 MapDecorationLength  = TouchTemp     ; number of bytes
 MapPriorityLength    = TouchTemp + 2 ; number of bytes
+WorldNumber          = TouchTemp + 4
 
 .import Overworld_Pointers
 .import OWBlockTopLeft, OWBlockTopRight, OWBlockBottomLeft, OWBlockBottomRight
 .import OWDecorationGraphic, OWDecorationPalette, OWDecorationPic
+.import Overworld_LevelMarkers, Overworld_LevelPointers
 .export OpenOverworld
 
 .segment "Overworld"
@@ -40,6 +46,8 @@ MapPriorityLength    = TouchTemp + 2 ; number of bytes
   phk
   plb
 
+  seta8
+  sta WorldNumber
   setaxy16
   and #255
   asl
@@ -58,6 +66,10 @@ MapPriorityLength    = TouchTemp + 2 ; number of bytes
   sta SpritePaletteSlots+2*2
   sta SpritePaletteSlots+2*3
 
+  ldx #$c000 >> 1
+  ldy #0
+  jsl ppu_clear_nt
+
   ; Start reading the overworld
   ldy #0
   seta8
@@ -75,6 +87,13 @@ UploadGraphicLoop:
   bra UploadGraphicLoop
 ExitGraphicLoop:
 
+  lda #GraphicsUpload::OWLevel
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::OWPaths
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::SolidTiles
+  jsl DoGraphicUpload
+
   ; -------------------------
 
   ldx #0
@@ -90,6 +109,15 @@ UploadPaletteLoop:
   inx
   bra UploadPaletteLoop
 ExitPaletteLoop:
+
+  phy
+  ldy #0+7
+  lda #Palette::FGCommon
+  jsl DoPaletteUpload
+  ldy #8+7
+  lda #Palette::OWLevel
+  jsl DoPaletteUpload
+  ply
 
   ; -------------------------
 
@@ -154,9 +182,7 @@ DecompressMapLoop:
   inx
   dec 0
   bne :-
-
   bra DecompressMapLoop
-
 ExitMapLoop:
 
   ; -------------------------
@@ -229,7 +255,87 @@ ReadDecorationSpriteLoop:
   inx
   bra ReadDecorationSpriteLoop
 ExitDecorationSpriteLoop:
+
+  ; Add the level markers too!
+  ; tiles start at 32
+  phy
+  lda #16 ; 16 level slots
+  sta 0
+  lda #0  ; Clear top half of Y
+  xba
+  lda WorldNumber ; Choose which list of 16 level slots
+  asl
+  asl
+  asl
+  asl
+  asl
+  tay
+AddLevelMarkerLoop:
+  lda Overworld_LevelMarkers,y
+  pha
+  and #15
+  asl
+  asl
+  asl
+  asl
+  sta f:MapDecorationSprites+0,x ; X
+  pla
+  and #$f0
+  sub #$10 ; Move up 16 pixels I guess
+  sta f:MapDecorationSprites+1,x ; Y
+
+  lda Overworld_LevelMarkers+1,y
+  and #$f0
+  lsr
+  lsr
+  lsr
+  ora #32
+  sta f:MapDecorationSprites+2,x ; Tile
+  lda #>(OAM_COLOR_7|OAM_PRIORITY_2)
+  sta f:MapDecorationSprites+3,x ; Attributes
+
+  ; Next sprite
+  inx
+  inx
+  inx
+  inx
+  iny
+  iny
+  dec 0
+  bne AddLevelMarkerLoop
+  ply
+
+
+
   stx MapDecorationLength
+
+  ; -------------------------
+
+  ldx #0
+  stz 0 ; Initialize the repeat counter
+DecompressPathLoop:
+  lda (DecodePointer),y
+  iny
+  cmp #255
+  beq ExitPathLoop
+
+  ; If the high bit is set then set the repeat counter
+  cmp #128
+  bcc :+
+    and #127
+    inc a
+    sta 0
+    bra DecompressPathLoop
+  :
+
+  ; Repeat for counter + 1 times
+  inc 0
+: sta f:MapPathBuffer,x
+  inx
+  dec 0
+  bne :-
+  bra DecompressPathLoop
+ExitPathLoop:
 
   ; ---------------
 
@@ -238,7 +344,7 @@ ExitDecorationSpriteLoop:
   sta PPUCTRL
   seta16
   ldx #0
-  lda #$c000>>1
+  lda #$d000>>1
   sta PPUADDR
 RenderLoop:
   ; Top
@@ -280,6 +386,50 @@ RenderLoop:
   cpx #224
   bne RenderLoop
 
+  ; -----------------------------------------------------------------
+  ; Render the path layer (oh boy)
+  ldx #0
+  lda #$c000>>1
+  sta PPUADDR
+PathRenderLoop:
+  ; Top
+  lda #16
+  sta 0
+: lda f:MapPathBuffer,x
+  and #255
+  asl
+  tay
+  lda OWPathTopLeft,y
+  sta PPUDATA
+  lda OWPathTopRight,y
+  sta PPUDATA
+
+  inx
+  dec 0
+  bne :-
+
+  txa
+  sub #16
+  tax
+
+  ; Bottom
+  lda #16
+  sta 0
+: lda f:MapPathBuffer,x
+  and #255
+  asl
+  tay
+  lda OWPathBottomLeft,y
+  sta PPUDATA
+  lda OWPathBottomRight,y
+  sta PPUDATA
+
+  inx
+  dec 0
+  bne :-
+
+  cpx #224
+  bne PathRenderLoop
 
 
 
@@ -303,8 +453,8 @@ RenderLoop:
 
   lda #1 | ($c000 >> 9)
   sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
-  lda #2 | ($d000 >> 9)
-  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens tall
+  lda #1 | ($d000 >> 9)
+  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens wide
   lda #0 | ($e000 >> 9)
   sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
 
@@ -436,5 +586,254 @@ RenderSpriteShared:
   ply
   plx
   rts
+.endproc
+
+
+PathBase = (1024-32) | (7 << 10) ; Start at 7C00 and palette 7
+XF = $4000 ; X flip
+YF = $8000 ; Y flip
+R   = 0
+D   = 1
+RD  = 2
+Dot = 3
+
+.proc OWPathTopLeft
+; ....
+  .word 0
+; ...D
+  .word PathBase|Dot
+; ..U.
+  .word PathBase|R
+; ..UD
+  .word PathBase|R
+; .R..
+  .word PathBase|Dot
+; .R.D
+  .word PathBase|Dot
+; .RU.
+  .word PathBase|R
+; .RUD
+  .word PathBase|R
+; L...
+  .word PathBase|D
+; L..D
+  .word PathBase|D
+; L.U.
+  .word PathBase|RD
+; L.UD
+  .word PathBase|RD
+; LR..
+  .word PathBase|D
+; LR.D
+  .word PathBase|D
+; LRU.
+  .word PathBase|RD
+; LRUD
+  .word PathBase|RD
+; -----------------
+;  PathWideCurveUL_A
+  .word 0
+;  PathWideCurveUL_B
+  .word PathBase|8
+;  PathWideCurveUL_C
+  .word PathBase|4
+;  PathWideCurveUR_A
+  .word PathBase|D
+;  PathWideCurveUR_B
+  .word 0
+;  PathWideCurveUR_D
+  .word PathBase|5|XF
+;  PathWideCurveDL_A
+  .word PathBase|R
+;  PathWideCurveDL_C
+  .word 0
+;  PathWideCurveDL_D
+  .word PathBase|7|YF
+;  PathWideCurveDR_B
+  .word PathBase|R
+;  PathWideCurveDR_C
+  .word PathBase|D
+;  PathWideCurveDR_D
+  .word PathBase|6|XF|YF
+.endproc
+
+.proc OWPathTopRight
+; ....
+  .word 0
+; ...D
+  .word PathBase|Dot|XF
+; ..U.
+  .word PathBase|R|XF
+; ..UD
+  .word PathBase|R|XF
+; .R..
+  .word PathBase|D
+; .R.D
+  .word PathBase|D
+; .RU.
+  .word PathBase|RD|XF
+; .RUD
+  .word PathBase|RD|XF
+; L...
+  .word PathBase|Dot|XF
+; L..D
+  .word PathBase|Dot|XF
+; L.U.
+  .word PathBase|R|XF
+; L.UD
+  .word PathBase|R|XF
+; LR..
+  .word PathBase|D
+; LR.D
+  .word PathBase|D
+; LRU.
+  .word PathBase|RD|XF
+; LRUD
+  .word PathBase|RD|XF
+; -----------------
+;  PathWideCurveUL_A
+  .word 0
+;  PathWideCurveUL_B
+  .word PathBase|D
+;  PathWideCurveUL_C
+  .word PathBase|5
+;  PathWideCurveUR_A
+  .word PathBase|8|XF
+;  PathWideCurveUR_B
+  .word 0
+;  PathWideCurveUR_D
+  .word PathBase|4|XF
+;  PathWideCurveDL_A
+  .word PathBase|R|XF
+;  PathWideCurveDL_C
+  .word PathBase|6|YF
+;  PathWideCurveDL_D
+  .word PathBase|D
+;  PathWideCurveDR_B
+  .word PathBase|R|XF
+;  PathWideCurveDR_C
+  .word PathBase|7|XF|YF
+;  PathWideCurveDR_D
+  .word 0
+.endproc
+
+.proc OWPathBottomLeft
+; ....
+  .word 0
+; ...D
+  .word PathBase|R
+; ..U.
+  .word PathBase|Dot|YF
+; ..UD
+  .word PathBase|R
+; .R..
+  .word PathBase|Dot|YF
+; .R.D
+  .word PathBase|R
+; .RU.
+  .word PathBase|D|YF
+; .RUD
+  .word PathBase|R
+; L...
+  .word PathBase|D|YF
+; L..D
+  .word PathBase|RD|YF
+; L.U.
+  .word PathBase|D|YF
+; L.UD
+  .word PathBase|RD|YF
+; LR..
+  .word PathBase|D|YF
+; LR.D
+  .word PathBase|RD|YF
+; LRU.
+  .word PathBase|D|YF
+; LRUD
+  .word PathBase|RD|YF
+; -----------------
+;  PathWideCurveUL_A
+  .word 0
+;  PathWideCurveUL_B
+  .word PathBase|7
+;  PathWideCurveUL_C
+  .word PathBase|R
+;  PathWideCurveUR_A
+  .word PathBase|D|YF
+;  PathWideCurveUR_B
+  .word PathBase|6|XF
+;  PathWideCurveUR_D
+  .word PathBase|R
+;  PathWideCurveDL_A
+  .word PathBase|4|YF
+;  PathWideCurveDL_C
+  .word 0
+;  PathWideCurveDL_D
+  .word PathBase|8|YF
+;  PathWideCurveDR_B
+  .word PathBase|5|XF|YF
+;  PathWideCurveDR_C
+  .word PathBase|D|YF
+;  PathWideCurveDR_D
+  .word 0
+.endproc
+
+.proc OWPathBottomRight
+; ....
+  .word 0
+; ...D
+  .word PathBase|R|XF
+; ..U.
+  .word PathBase|Dot|XF|YF
+; ..UD
+  .word PathBase|R|XF
+; .R..
+  .word PathBase|D
+; .R.D
+  .word PathBase|RD|XF|YF
+; .RU.
+  .word PathBase|Dot|XF|YF
+; .RUD
+  .word PathBase|RD|XF|YF
+; L...
+  .word PathBase|Dot|XF|YF
+; L..D
+  .word PathBase|R|XF
+; L.U.
+  .word PathBase|Dot|XF|YF
+; L.UD
+  .word PathBase|R|XF
+; LR..
+  .word PathBase|D|YF
+; LR.D
+  .word PathBase|RD|XF|YF
+; LRU.
+  .word PathBase|D|YF
+; LRUD
+  .word PathBase|RD|XF|YF
+; -----------------
+;  PathWideCurveUL_A
+  .word PathBase|6
+;  PathWideCurveUL_B
+  .word PathBase|D|YF
+;  PathWideCurveUL_C
+  .word PathBase|R|XF
+;  PathWideCurveUR_A
+  .word PathBase|7|XF
+;  PathWideCurveUR_B
+  .word 0
+;  PathWideCurveUR_D
+  .word PathBase|R|XF
+;  PathWideCurveDL_A
+  .word PathBase|5|YF
+;  PathWideCurveDL_C
+  .word 0
+;  PathWideCurveDL_D
+  .word PathBase|D|YF
+;  PathWideCurveDR_B
+  .word PathBase|4|XF|YF
+;  PathWideCurveDR_C
+  .word PathBase|8|XF|YF
+;  PathWideCurveDR_D
+  .word 0
 .endproc
 

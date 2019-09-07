@@ -16,8 +16,16 @@
   PathLRD  ; LR.D
   PathLRU  ; LRU.
   PathLRUD ; LRUD
-  PathWideCurveUL
-  PathWideCurveUR
-  PathWideCurveDL
-  PathWideCurveDR
+  PathWideCurveUL_A
+  PathWideCurveUL_B
+  PathWideCurveUL_C
+  PathWideCurveUR_A
+  PathWideCurveUR_B
+  PathWideCurveUR_D
+  PathWideCurveDL_A
+  PathWideCurveDL_C
+  PathWideCurveDL_D
+  PathWideCurveDR_B
+  PathWideCurveDR_C
+  PathWideCurveDR_D
 .endenum

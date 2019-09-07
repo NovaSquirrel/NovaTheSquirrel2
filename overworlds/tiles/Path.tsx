@@ -78,22 +78,62 @@
  </tile>
  <tile id="16">
   <properties>
-   <property name="Id" value="PathWideCurveUL"/>
+   <property name="Id" value="PathWideCurveUL_A"/>
+  </properties>
+ </tile>
+ <tile id="17">
+  <properties>
+   <property name="Id" value="PathWideCurveUL_B"/>
   </properties>
  </tile>
  <tile id="18">
   <properties>
-   <property name="Id" value="PathWideCurveUR"/>
+   <property name="Id" value="PathWideCurveUR_A"/>
+  </properties>
+ </tile>
+ <tile id="19">
+  <properties>
+   <property name="Id" value="PathWideCurveUR_B"/>
+  </properties>
+ </tile>
+ <tile id="24">
+  <properties>
+   <property name="Id" value="PathWideCurveUL_C"/>
+  </properties>
+ </tile>
+ <tile id="27">
+  <properties>
+   <property name="Id" value="PathWideCurveUR_D"/>
   </properties>
  </tile>
  <tile id="32">
   <properties>
-   <property name="Id" value="PathWideCurveDL"/>
+   <property name="Id" value="PathWideCurveDL_A"/>
   </properties>
  </tile>
- <tile id="34">
+ <tile id="35">
   <properties>
-   <property name="Id" value="PathWideCurveDR"/>
+   <property name="Id" value="PathWideCurveDR_B"/>
+  </properties>
+ </tile>
+ <tile id="40">
+  <properties>
+   <property name="Id" value="PathWideCurveDL_C"/>
+  </properties>
+ </tile>
+ <tile id="41">
+  <properties>
+   <property name="Id" value="PathWideCurveDL_D"/>
+  </properties>
+ </tile>
+ <tile id="42">
+  <properties>
+   <property name="Id" value="PathWideCurveDR_C"/>
+  </properties>
+ </tile>
+ <tile id="43">
+  <properties>
+   <property name="Id" value="PathWideCurveDR_D"/>
   </properties>
  </tile>
 </tileset>

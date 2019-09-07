@@ -14,3 +14,5 @@ D000 MapBGForest
 8400 OWLevel
 A000 OWGreenery
 A000 OWStone
+7C00 OWPaths
+0000 SolidTiles
