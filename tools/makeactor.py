@@ -82,7 +82,7 @@ saveActor()
 outfile = open("src/actordata.s", "w")
 
 outfile.write('; This is automatically generated. Edit "actors.txt" instead\n')
-outfile.write('.include "snes.inc"\n.include "actorenum.s"\n.include "global.inc"\n.include "graphicsenum.s"\n.include "paletteenum.s"\n')
+outfile.write('.include "snes.inc"\n.include "global.inc"\n.include "graphicsenum.s"\n.include "paletteenum.s"\n')
 
 outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidth, ActorHeight, ActorPalette, ActorGraphic\n')
 outfile.write('.export ParticleRun, ParticleDraw\n')

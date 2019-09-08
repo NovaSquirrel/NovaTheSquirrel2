@@ -34,8 +34,6 @@
 .include "snes.inc"
 .include "global.inc"
 .include "vwf.inc"
-.include "graphicsenum.s"
-.include "paletteenum.s"
 .smart
 
 ; First plane
