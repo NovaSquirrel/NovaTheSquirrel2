@@ -126,23 +126,28 @@ $(objdir)/mktables.s: tools/mktables.py
 	$< > $@
 
 # Files that depend on extra included files
-$(objdir)/bg.o:
-$(objdir)/player.o:
 $(objdir)/spcimage.o: $(brrlisto)
 
-# Block data relies on the enum
+# Files that depend on auto-generated enums
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
-
-# Reliance on the block enum
-$(objdir)/player.o: $(srcdir)/blockenum.s
+$(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
-
-# Level loading relies on palette indexes and graphic directory
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s 
+$(objdir)/overworldcode.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s
+$(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(srcdir)/actordata.s: $(srcdir)/actorenum.s
+$(objdir)/actorcode.o: $(srcdir)/actorenum.s
+
 
 # Automatically insert graphics into the ROM
-$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt
+$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt tools/insertthegfx.py
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
@@ -156,15 +161,12 @@ $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 	$(PY) tools/makeoverworldblocks.py
 
 
-$(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py
-$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s
-$(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(srcdir)/actorenum.s: tools/actors.txt tools/makeactor.py
 	$(PY) tools/makeactor.py
-$(srcdir)/leveldata.s: $(levels) $(srcdir)/graphicsenum.s tools/levelconvert.py
+$(srcdir)/leveldata.s: $(levels) tools/levelconvert.py
 	$(PY) tools/levelconvert.py
 $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
 	$(PY) tools/overworld.py

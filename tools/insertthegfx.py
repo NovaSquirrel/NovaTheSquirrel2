@@ -4,13 +4,7 @@ import os, sys
 with open("tools/gfxlist.txt") as f:
     text = [s.rstrip() for s in f.readlines()]
 
-# Bank information
-banks_free = {}
-banks_files = {}
-ordered_files = []
-for bank in ["Graphics1", "Graphics2"]:
-	banks_free[bank] = 0x8000
-	banks_files[bank] = []
+all_graphics = []
 
 # Interpret every line in the file
 for line in text:
@@ -40,7 +34,20 @@ for line in text:
 	graphic['address'] = address
 	graphic['filename'] = "../%s" % filename
 	graphic['size'] = os.path.getsize(filename)
-	
+	all_graphics.append(graphic)
+all_graphics = sorted(all_graphics, key=lambda g: g['size'], reverse=True) 
+
+# -------------------------------------
+
+# Bank information
+banks_free = {}
+banks_files = {}
+ordered_files = []
+for bank in ["Graphics1", "Graphics2"]:
+	banks_free[bank] = 0x8000
+	banks_files[bank] = []
+
+for graphic in all_graphics:
 	# Select a bank to put it in
 	# This is actually the bin packing problem, which is very difficult,
 	# but I don't care about optimal efficiency so I'll just find the first bank the item will fit in.
