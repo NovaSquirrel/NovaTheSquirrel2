@@ -275,6 +275,8 @@ ExitDecorationSpriteLoop:
   tay
 AddLevelMarkerLoop:
   lda Overworld_LevelMarkers,y
+  cmp #255
+  beq UnusedLevelMarker
   pha
   and #15
   asl
@@ -302,6 +304,7 @@ AddLevelMarkerLoop:
   inx
   inx
   inx
+UnusedLevelMarker:
   iny
   iny
   dec 0
@@ -554,7 +557,7 @@ OverworldPriorityRenderSpriteLoop:
   sta OAM+0,y
   lda f:MapPrioritySprites+2,x
   jsr RenderSpriteShared
-  cpy MapPriorityLength
+  cpx MapPriorityLength
   bne OverworldPriorityRenderSpriteLoop
   ; -----------------------------------
   seta8
@@ -597,7 +600,7 @@ OverworldRenderSpriteLoop:
   sta OAM+0,y
   lda f:MapDecorationSprites+2,x
   jsr RenderSpriteShared
-  cpy MapDecorationLength
+  cpx MapDecorationLength
   bne OverworldRenderSpriteLoop
   sty OamPtr
 
