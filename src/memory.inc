@@ -44,6 +44,25 @@
 .globalzp ForceControllerTime
 
 .globalzp PlayerAbility
+.enum Ability
+  None
+  Burger
+  Glider
+  Bomb
+  Ice
+  Fire
+  Water
+  Hammer
+  Fishing
+  Yoyo
+  Wheel
+  Mirror
+  Wing
+  Remote
+  Rocket
+  Bubble
+.endenum
+
 .global   NeedAbilityChange
 .global   NeedAbilityChangeSilent
 
