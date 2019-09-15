@@ -434,7 +434,7 @@ CommonTileBase = $40
 .proc ActorGetShotTest
 ProjectileIndex = TempVal
 ProjectileType  = 0
-  ldy #ActorStart
+  ldy #ProjectileStart
 Loop:
   lda ActorType,y
   cmp #Actor::PlayerProjectile*2
@@ -453,7 +453,7 @@ NotProjectile:
   tya
   add #ActorSize
   tay
-  cpy #ActorEnd
+  cpy #ProjectileEnd
   bne Loop
 
   clc

@@ -119,7 +119,7 @@ SkipEntity:
   txa
   add #ActorSize
   tax
-  cpx #ActorEnd
+  cpx #ProjectileEnd ; NOT ActorEnd, go and run the projectiles too
   bne Loop
 
   jmp RunAllParticles
@@ -206,6 +206,7 @@ FoundTileset:
   ; Detect the correct palette
   ; using an unrolled loop again
   lda f:ActorPalette,x
+  bmi NoPaletteNeeded ; $ffff for no palette
   cmp SpritePaletteSlots+2*0
   bne :+
     inc PaletteInUse+0
@@ -285,6 +286,7 @@ FoundPaletteRequestIndex:
   ora #OAM_COLOR_4 ; ....1pp. ........
   bra FoundPalette ; yxPPpppt tttttttt
 
+NoPaletteNeeded:
 PaletteNotFound:
   ; Probably exit without drawing it, instead of drawing with the wrong colors
   lda #0

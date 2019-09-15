@@ -10,3 +10,7 @@ PlayerGraphics:
 .incbin "../tilesets4/NovaClimb.chrsfc"
 .incbin "../tilesets4/NovaRoll.chrsfc"
 .incbin "../tilesets4/NovaAttack.chrsfc"
+.incbin "../tilesets4/NovaRemote.chrsfc"
+.incbin "../tilesets4/NovaFishing.chrsfc"
+.incbin "../tilesets4/NovaThrow.chrsfc"
+.incbin "../tilesets4/NovaAttackBelow.chrsfc"

@@ -110,6 +110,7 @@ OAM_TILE = OAM+2
 OAM_ATTR = OAM+3
 
 ActorLen = 20
+ProjectileLen = 5
 .global ActorStart
 .globalzp ActorSize
 .global ActorEnd
@@ -127,6 +128,8 @@ ActorLen = 20
 .globalzp ActorState
 .globalzp ActorOnGround
 .globalzp ActorOnScreen
+.global ProjectileStart
+.global ProjectileEnd
 
 ParticleLen = 32
 .global ParticleStart
@@ -179,7 +182,9 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global RenderBuffer
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
-.global TailAttackTimer
+.global TailAttackTimer, TailAttackDirection, TailAttackFrame
+.global AbilityMovementLock
+
 
 ; Save stuff
 .global MoneyAmount

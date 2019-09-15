@@ -87,6 +87,9 @@
   ActorSize = 10*2+4
   ActorStart: .res ActorLen*ActorSize
   ActorEnd:
+  ; Must be contiguous
+  ProjectileStart: .res ProjectileLen*ActorSize
+  ProjectileEnd:
 
   ActorType         = 0 ; Actor type ID
   ActorPX           = 2 ; Positions
@@ -202,7 +205,10 @@ LevelZeroWhenLoad_End:
   TapReleaseButton: .res 1 ; Indicates if left or right was released
   IsTapRun: .res 1 ; Current run is from a tap
 
-  TailAttackTimer: .res 1
+  TailAttackTimer:     .res 1 ; How far we are into the animation
+  TailAttackDirection: .res 1 ; What directional keys were pressed
+  TailAttackFrame:     .res 1 ; Current frame to use for the player during the attack
+  AbilityMovementLock: .res 1
 
   VWFStackL:     .res VWFStackLen
   VWFStackH:     .res VWFStackLen

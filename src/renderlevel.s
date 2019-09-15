@@ -55,7 +55,7 @@
 
   ; Init actors
   ldx #ActorStart
-  ldy #ActorEnd-ActorStart
+  ldy #ProjectileEnd-ActorStart
   jsl MemClear
 
   ; Init particles

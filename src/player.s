@@ -110,6 +110,32 @@
     lda #%00000010
     sta COPYSTART
 
+
+    ; Ability graphics -------------
+    phk
+    plb
+    seta16
+    lda PlayerAbility
+    and #255
+    tay
+    lda AbilityTilesetForId,y
+    and #255
+    xba
+    asl
+    asl
+    adc #.loword(AbilityGraphics) ; Carry always clear here
+    sta DMAADDR
+
+    lda #1024 ; Two rows of tiles
+    sta DMALEN
+    lda #($8400)>>1
+    sta PPUADDR
+    seta8
+    lda #%00000001
+    sta COPYSTART
+
+
+
     stz NeedAbilityChange
     stz NeedAbilityChangeSilent
   NoNeedAbilityChange:
@@ -188,42 +214,7 @@ MaxSpeedRight = 12
   NoTapRun:
 
 
-
-  lda TailAttackTimer
-  beq :+
-    inc TailAttackTimer
-    cmp #(AttackAnimationSequenceEnd-AttackAnimationSequence)*2
-    bne :+
-      stz TailAttackTimer
-  :
-
-  lda TailAttackTimer
-  cmp #4*2
-  bne :+
-    seta16
-    jsl FindFreeActorX
-    bcc :+
-    lda #Actor::PlayerProjectile*2
-    sta ActorType,x
-
-    lda #13<<4
-    jsr PlayerNegIfLeft
-    add PlayerPX
-    sta ActorPX,x
-
-    lda PlayerPY
-    sub #7<<4
-    sta ActorPY,x
-
-    stz ActorTimer,x
-
-    lda #4*16
-    jsr PlayerNegIfLeft
-    sta ActorVX,x
-  :
-  seta8
-
-
+  ; Start off an attack
   lda keydown
   and #KEY_X|KEY_A|KEY_L|KEY_R
   beq :+
@@ -232,8 +223,22 @@ MaxSpeedRight = 12
     lda TailAttackTimer
     bne :+
       inc TailAttackTimer
+      lda keydown+1
+      sta TailAttackDirection
   :
 
+  ; Continue an attack that was started
+  lda TailAttackTimer
+  beq :+
+    lda #0
+    xba
+    lda PlayerAbility
+    asl
+    tax
+    php
+    jsr (.loword(AbilityRoutineForId),x)
+    plp
+  :
 
 
   lda ForceControllerTime
@@ -288,6 +293,10 @@ MaxSpeedRight = 12
   sta MaxSpeedRight
 NotWalkSpeed:
 
+  ; Don't walk if the ability prevents it
+  lda AbilityMovementLock
+  lsr
+  bcs NotWalk
 
   ; Handle left and right
   lda keydown
@@ -927,6 +936,18 @@ OfferJumpFromGracePeriod:
   ATTACK7
   ATTACK8
   ATTACK9
+  REMOTE1
+  REMOTE2
+  FISHING
+  THROW1
+  THROW2
+  THROW3
+  ATTACKBELOW1
+  ATTACKBELOW2
+  ATTACKBELOW3
+  ATTACKBELOW4
+  ATTACKBELOW5
+  ATTACKBELOW6
 .endenum
 
 .a16
@@ -1160,10 +1181,7 @@ HealthLoopEnd:
 
   lda TailAttackTimer
   beq NoTailAttack
-    dea
-    lsr
-    tax
-    lda AttackAnimationSequence,x
+    lda TailAttackFrame
     sta PlayerFrame
     bra Exit
   NoTailAttack:
@@ -1254,8 +1272,263 @@ AttackAnimationSequence:
   .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
 AttackAnimationSequenceEnd:
 
+AttackBelowAnimationSequence:
+  .byt PlayerFrame::ATTACKBELOW1
+  .byt PlayerFrame::ATTACKBELOW2
+  .byt PlayerFrame::ATTACKBELOW3
+  .byt PlayerFrame::ATTACKBELOW4
+  .byt PlayerFrame::ATTACKBELOW5
+  .byt PlayerFrame::ATTACKBELOW6, PlayerFrame::ATTACKBELOW6
+  .byt PlayerFrame::ATTACK7, PlayerFrame::ATTACK7
+  .byt PlayerFrame::ATTACK8, PlayerFrame::ATTACK8
+  .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
+AttackBelowAnimationSequenceEnd:
+
 AbilityIcons:
   .incbin "../tilesets4/AbilityIcons.chrsfc"
+AbilityGraphics:
+  .incbin "../tilesets4/AbilityMiscellaneous.chrsfc"
+  .incbin "../tilesets4/AbilityHammerBubbles.chrsfc"
+  .incbin "../tilesets4/AbilityMirror.chrsfc"
+  .incbin "../tilesets4/AbilityRemote.chrsfc"
+  .incbin "../tilesets4/AbilityWaterFishing.chrsfc"
+SetNone   = 0 ; Don't need anything
+SetMisc   = 0
+SetHammer = 1
+SetMirror = 2
+SetRemote = 3
+SetWater  = 4
+AbilityTilesetForId:
+  .byt SetNone   ; None
+  .byt SetMisc   ; Burger
+  .byt SetMisc   ; Glider
+  .byt SetMisc   ; Bomb
+  .byt SetMisc   ; Ice
+  .byt SetMisc   ; Fire
+  .byt SetWater  ; Water
+  .byt SetHammer ; Hammer
+  .byt SetWater  ; Fishing
+  .byt SetMisc   ; Yoyo
+  .byt SetNone   ; Wheel
+  .byt SetMirror ; Mirror
+  .byt SetNone   ; Wing
+  .byt SetRemote ; Remote
+  .byt SetRemote ; Rocket
+  .byt SetHammer ; Bubble
+AbilityRoutineForId:
+  .addr .loword(RunAbilityNone)
+  .addr .loword(RunAbilityBurger)
+  .addr .loword(RunAbilityGlider)
+  .addr .loword(RunAbilityBomb)
+  .addr .loword(RunAbilityIce)
+  .addr .loword(RunAbilityFire)
+  .addr .loword(RunAbilityWater)
+  .addr .loword(RunAbilityHammer)
+  .addr .loword(RunAbilityFishing)
+  .addr .loword(RunAbilityYoyo)
+  .addr .loword(RunAbilityWheel)
+  .addr .loword(RunAbilityMirror)
+  .addr .loword(RunAbilityWing)
+  .addr .loword(RunAbilityRemote)
+  .addr .loword(RunAbilityRocket)
+  .addr .loword(RunAbilityBubble)
+
+; -----------------------------------------------------------------------------
+
+.a8
+.proc StepTailSwish
+  lda TailAttackTimer
+  pha
+  pha
+  dea
+  lsr
+  tax
+  lda AttackAnimationSequence,x
+  sta TailAttackFrame
+Common:
+  inc TailAttackTimer
+  pla
+  cmp #(AttackAnimationSequenceEnd-AttackAnimationSequence-1)*2
+  bne :+
+    stz TailAttackTimer
+  :
+
+  pla
+  cmp #4*2
+  rts
+.endproc
+
+.a8
+.proc StepTailSwishBelow
+  lda TailAttackTimer
+  pha
+  pha
+  dea
+  lsr
+  tax
+  lda AttackBelowAnimationSequence,x
+  sta TailAttackFrame
+  bra StepTailSwish::Common
+.endproc
+
+.a8
+.proc StepThrowAnim
+  lda TailAttackTimer
+  pha
+  pha
+  dea
+  lsr
+  lsr
+  add #PlayerFrame::THROW1
+  sta TailAttackFrame
+
+  inc TailAttackTimer
+  pla
+  cmp #6*2
+  bne :+
+    stz TailAttackTimer
+  :
+
+  pla
+  cmp #4*2
+  rts
+.endproc
+
+
+.a8
+.proc RunAbilityNone
+  jsr StepTailSwish
+  bne :+
+    seta16
+    jsr FindFreeProjectileX
+    bcc :+
+    lda #Actor::PlayerProjectile*2
+    sta ActorType,x
+
+    lda #13<<4
+    jsr PlayerNegIfLeft
+    add PlayerPX
+    sta ActorPX,x
+
+    lda PlayerPY
+    sub #7<<4
+    sta ActorPY,x
+
+    stz ActorTimer,x
+
+    lda #4*16
+    jsr PlayerNegIfLeft
+    sta ActorVX,x
+  :
+  rts
+.endproc
+
+.a8
+.proc RunAbilityBurger
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityGlider
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityBomb
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityIce
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityFire
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityWater
+  jsr StepThrowAnim
+  rts
+.endproc
+
+.a8
+.proc RunAbilityHammer
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityFishing
+  lda #1
+  sta AbilityMovementLock
+  lda #PlayerFrame::FISHING
+  sta TailAttackFrame
+  rts
+.endproc
+
+.a8
+.proc RunAbilityYoyo
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityWheel
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityMirror
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityWing
+  jsr StepTailSwish
+  rts
+.endproc
+
+.a8
+.proc RunAbilityRemote
+  lda #1
+  sta AbilityMovementLock
+  lda retraces
+  lsr
+  lsr
+  lsr
+  lsr
+  lsr
+  and #1
+  add #PlayerFrame::REMOTE1
+  sta TailAttackFrame
+  rts
+.endproc
+
+.a8
+.proc RunAbilityRocket
+  bra RunAbilityRemote
+.endproc
+
+.a8
+.proc RunAbilityBubble
+  jsr StepTailSwish
+  rts
+.endproc
+
+; -----------------------------------------------------------------------------
+
+
+
 
 ; Damages the player
 .export HurtPlayer
@@ -1274,7 +1547,7 @@ AbilityIcons:
   rtl
 .endproc
 
-; Takes a speed in the accumulator, and negates it if Actor facing left
+; Takes a speed in the accumulator, and negates it if player facing left
 .a16
 .proc PlayerNegIfLeft
   pha
@@ -1289,3 +1562,23 @@ Left:
   negw
   rts
 .endproc
+
+.a16
+.i16
+.proc FindFreeProjectileX
+  ldx #ProjectileStart
+Loop:
+  lda ActorType,x
+  beq Found
+  txa
+  add #ActorSize
+  tax
+  cpx #ProjectileEnd
+  bne Loop
+  clc
+  rts
+Found:
+  sec
+  rts
+.endproc
+
