@@ -106,6 +106,8 @@
   ActorOnGround     = 22 ; Nonzero means on ground
   ActorOnScreen     = 23 ; Nonzero means on screen
 
+  ActorProjectileType = ActorIndexInLevel
+
   ; For less important, light entities
   ParticleSize = 7*2
   ParticleStart: .res ParticleLen*ParticleSize

@@ -1405,6 +1405,8 @@ Common:
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
 
+    stz ActorProjectileType,x
+
     lda #13<<4
     jsr PlayerNegIfLeft
     add PlayerPX

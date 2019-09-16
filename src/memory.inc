@@ -110,7 +110,7 @@ OAM_TILE = OAM+2
 OAM_ATTR = OAM+3
 
 ActorLen = 20
-ProjectileLen = 5
+ProjectileLen = 8
 .global ActorStart
 .globalzp ActorSize
 .global ActorEnd
@@ -128,8 +128,29 @@ ProjectileLen = 5
 .globalzp ActorState
 .globalzp ActorOnGround
 .globalzp ActorOnScreen
+.globalzp ActorProjectileType
 .global ProjectileStart
 .global ProjectileEnd
+
+.enum PlayerProjectileType
+  Stun
+  Copy
+  Burger
+  Glider
+  Bomb
+  Ice
+  FireBall
+  FireStill
+  WaterBottle
+  Hammer
+  FishingHook
+  Yoyo
+  Mirror
+  RemoteHand
+  RemoteCar
+  RemoteMissile
+  Bubble
+.endenum
 
 ParticleLen = 32
 .global ParticleStart

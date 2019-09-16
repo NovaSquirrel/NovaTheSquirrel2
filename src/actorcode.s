@@ -34,6 +34,67 @@ CommonTileBase = $40
 .i16
 .export RunPlayerProjectile
 .proc RunPlayerProjectile
+  lda ActorProjectileType,x
+  asl
+  tay
+  lda RunPlayerProjectileTable,y
+  pha
+  rts
+.endproc
+
+RunPlayerProjectileTable:
+  .word .loword(RunProjectileStun-1)
+  .word .loword(RunProjectileCopy-1)
+  .word .loword(RunProjectileBurger-1)
+  .word .loword(RunProjectileGlider-1)
+  .word .loword(RunProjectileBomb-1)
+  .word .loword(RunProjectileIce-1)
+  .word .loword(RunProjectileFireBall-1)
+  .word .loword(RunProjectileFireStill-1)
+  .word .loword(RunProjectileWaterBottle-1)
+  .word .loword(RunProjectileHammer-1)
+  .word .loword(RunProjectileFishingHook-1)
+  .word .loword(RunProjectileYoyo-1)
+  .word .loword(RunProjectileMirror-1)
+  .word .loword(RunProjectileRemoteHand-1)
+  .word .loword(RunProjectileRemoteCar-1)
+  .word .loword(RunProjectileRemoteMissile-1)
+  .word .loword(RunProjectileBubble-1)
+
+.a16
+.i16
+.export DrawPlayerProjectile
+.proc DrawPlayerProjectile
+  lda ActorProjectileType,x
+  asl
+  tay
+  lda DrawPlayerProjectileTable,y
+  pha
+  rts
+.endproc
+
+DrawPlayerProjectileTable:
+  .word .loword(DrawProjectileStun-1)
+  .word .loword(DrawProjectileCopy-1)
+  .word .loword(DrawProjectileBurger-1)
+  .word .loword(DrawProjectileGlider-1)
+  .word .loword(DrawProjectileBomb-1)
+  .word .loword(DrawProjectileIce-1)
+  .word .loword(DrawProjectileFireBall-1)
+  .word .loword(DrawProjectileFireStill-1)
+  .word .loword(DrawProjectileWaterBottle-1)
+  .word .loword(DrawProjectileHammer-1)
+  .word .loword(DrawProjectileFishingHook-1)
+  .word .loword(DrawProjectileYoyo-1)
+  .word .loword(DrawProjectileMirror-1)
+  .word .loword(DrawProjectileRemoteHand-1)
+  .word .loword(DrawProjectileRemoteCar-1)
+  .word .loword(DrawProjectileRemoteMissile-1)
+  .word .loword(DrawProjectileBubble-1)
+
+.a16
+.i16
+.proc RunProjectileStun
   jsl ActorApplyXVelocity
 
   inc ActorTimer,x
@@ -47,11 +108,201 @@ CommonTileBase = $40
 
 .a16
 .i16
-.export DrawPlayerProjectile
-.proc DrawPlayerProjectile
-  stz SpriteTileBase
+.proc DrawProjectileStun
   lda #CommonTileBase+$2c+OAM_PRIORITY_2
-  jml DispActor8x8
+  jml DispActor8x8 
+.endproc
+
+.a16
+.i16
+.proc RunProjectileCopy
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileCopy
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileBurger
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileBurger
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileGlider
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileGlider
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileBomb
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileBomb
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileIce
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileIce
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileFireBall
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileFireBall
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileFireStill
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileFireStill
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileWaterBottle
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileWaterBottle
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileHammer
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileHammer
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileFishingHook
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileFishingHook
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileYoyo
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileYoyo
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileMirror
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileMirror
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileRemoteHand
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileRemoteHand
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileRemoteCar
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileRemoteCar
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileRemoteMissile
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileRemoteMissile
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileBubble
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileBubble
+  rtl
 .endproc
 
 

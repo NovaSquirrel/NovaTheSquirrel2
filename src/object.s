@@ -200,6 +200,7 @@ CallDraw:
   bne :+
     lda #$1E0
   :
+  lda #0
 FoundTileset:
   sta SpriteTileBase
 

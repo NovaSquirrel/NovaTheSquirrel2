@@ -63,6 +63,11 @@ run RunPlayerProjectile
 draw DrawPlayerProjectile
 size 8x8
 
++PlayerProjectile16x16
+run RunPlayerProjectile
+draw DrawPlayerProjectile
+size 16x16
+
 # ---------- cannon stuff ----------
 +Burger
 flag AutoRemove GetShot
