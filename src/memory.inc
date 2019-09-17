@@ -72,6 +72,7 @@
 .global PlayerAccelSpeed
 .global PlayerDecelSpeed
 .global JumpGracePeriod
+.global PlayerRidingSomething
 
 .global ColumnUpdateAddress
 .global ColumnUpdateBuffer
@@ -150,6 +151,7 @@ ProjectileLen = 8
   RemoteCar
   RemoteMissile
   Bubble
+  Explosion
 .endenum
 
 ParticleLen = 32

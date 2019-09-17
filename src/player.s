@@ -692,6 +692,7 @@ SkipGroundCheck:
 
   ; If on the ground, offer a jump
   seta8
+  stz PlayerRidingSomething
   lda PlayerOnGround
   seta16
   beq @NotOnGround
@@ -719,7 +720,6 @@ SkipGroundCheck:
     :
     seta16
   @NotOnGround:
-
   rtl
 
 TryBelowInteraction:
@@ -746,15 +746,22 @@ TryAboveInteraction:
   lda BlockFlag
   cmp BottomCmp
   bcc :+
-    stz PlayerVY
     lda #$00ff
     trb PlayerPY
+HasGroundAfterAll:
+    stz PlayerVY
 
     seta8
     inc PlayerOnGround
     stz PlayerOnLadder
     seta16
+    rts
   :
+
+  ; Riding on something forces it to act like you are standing on solid ground
+  lda PlayerRidingSomething
+  and #255
+  bne HasGroundAfterAll
   rts
 
 TrySideInteraction:
@@ -1345,7 +1352,7 @@ AbilityRoutineForId:
   tax
   lda AttackAnimationSequence,x
   sta TailAttackFrame
-Common:
+
   inc TailAttackTimer
   pla
   cmp #(AttackAnimationSequenceEnd-AttackAnimationSequence-1)*2
@@ -1368,7 +1375,17 @@ Common:
   tax
   lda AttackBelowAnimationSequence,x
   sta TailAttackFrame
-  bra StepTailSwish::Common
+
+  inc TailAttackTimer
+  pla
+  cmp #(AttackAnimationSequenceEnd-AttackAnimationSequence-1)*2
+  bne :+
+    stz TailAttackTimer
+  :
+
+  pla
+  cmp #3*2
+  rts
 .endproc
 
 .a8
@@ -1400,7 +1417,7 @@ Common:
   jsr StepTailSwish
   bne :+
     seta16
-    jsr FindFreeProjectileX
+    jsl FindFreeProjectileX
     bcc :+
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
@@ -1427,7 +1444,69 @@ Common:
 
 .a8
 .proc RunAbilityBurger
+  lda TailAttackDirection
+  and #>KEY_DOWN
+  beq NoBelow
+    jsr StepTailSwishBelow
+    beq BurgerBelow
+    rts
+BurgerBelow:
+    seta16
+    jsl FindFreeProjectileX
+    bcc :+
+
+    jsr DoBurgerShared
+
+    stz PlayerVY
+
+    lda PlayerPY
+    sta ActorPY,x
+    sub #$100
+    sta PlayerPY
+
+    lda #.loword(-3<<4)
+    jsr PlayerNegIfLeft
+    add PlayerPX
+    sta ActorPX,x
+  : rts
+NoBelow:
+
+  ; -----------------------------------
+
   jsr StepTailSwish
+  bne :+
+BurgerSide:
+    seta16
+    jsl FindFreeProjectileX
+    bcc :+
+
+    jsr DoBurgerShared
+
+    lda PlayerPY
+    sub #4<<4
+    sta ActorPY,x
+
+    lda #13<<4
+    jsr PlayerNegIfLeft
+    add PlayerPX
+    sta ActorPX,x
+  :
+  rts
+
+.a16
+DoBurgerShared:
+  lda #Actor::PlayerProjectile16x16*2
+  sta ActorType,x
+
+  lda #PlayerProjectileType::Burger
+  sta ActorProjectileType,x
+
+  lda #40
+  sta ActorTimer,x
+
+  lda #3*16
+  jsr PlayerNegIfLeft
+  sta ActorVX,x
   rts
 .endproc
 
@@ -1567,6 +1646,7 @@ Left:
 
 .a16
 .i16
+.export FindFreeProjectileX
 .proc FindFreeProjectileX
   ldx #ProjectileStart
 Loop:
@@ -1578,9 +1658,25 @@ Loop:
   cpx #ProjectileEnd
   bne Loop
   clc
-  rts
+  rtl
 Found:
   sec
-  rts
+  rtl
 .endproc
 
+.a16
+.i16
+.export FindFreeProjectileY
+.proc FindFreeProjectileY
+  ldy #ProjectileStart
+Loop:
+  lda ActorType,y
+  beq FindFreeProjectileX::Found
+  tya
+  add #ActorSize
+  tay
+  cpy #ProjectileEnd
+  bne Loop
+  clc
+  rtl
+.endproc

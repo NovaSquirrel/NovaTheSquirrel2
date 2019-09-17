@@ -134,6 +134,7 @@
   NeedLevelRerender:     .res 1 ; If set, rerender the level again
   RerenderInitEntities:  .res 1 ; If set, init entity lists for next rerender
 
+
   IRQHandler: .res 3
 
   OAM:   .res 512
@@ -168,6 +169,7 @@
   PlayerJumpCancelLock: .res 1 ; timer for the player being unable to cancel a jump
   PlayerJumpCancel: .res 1
   PlayerWantsToJump: .res 1    ; true if player pressed the jump button
+  PlayerRidingSomething: .res 1 ; if 1, player is treated to be standing on a solid and can jump
 
   LevelBackgroundColor:   .res 2
 

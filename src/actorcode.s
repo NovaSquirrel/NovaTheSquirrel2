@@ -27,6 +27,7 @@ CommonTileBase = $40
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
+.import FindFreeProjectileY
 
 ; -------------------------------------
 
@@ -60,6 +61,7 @@ RunPlayerProjectileTable:
   .word .loword(RunProjectileRemoteCar-1)
   .word .loword(RunProjectileRemoteMissile-1)
   .word .loword(RunProjectileBubble-1)
+  .word .loword(RunProjectileExplosion-1)
 
 .a16
 .i16
@@ -91,6 +93,7 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileRemoteCar-1)
   .word .loword(DrawProjectileRemoteMissile-1)
   .word .loword(DrawProjectileBubble-1)
+  .word .loword(DrawProjectileExplosion-1)
 
 .a16
 .i16
@@ -128,13 +131,30 @@ DrawPlayerProjectileTable:
 .a16
 .i16
 .proc RunProjectileBurger
+  jsl ActorApplyXVelocity
+
+  jsl CollideRide
+  jsl RideOnProjectile
+  ; Also move the player when the burger moves
+  bcc :+
+    lda PlayerPX
+    add ActorVX,x
+    sta PlayerPX
+  :
+
+  dec ActorTimer,x
+  bne :+
+    lda #5*4
+    jmp ChangeToExplosion
+  :
   rtl
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileBurger
-  rtl
+  lda #32|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -305,6 +325,39 @@ DrawPlayerProjectileTable:
   rtl
 .endproc
 
+.a16
+.i16
+.proc RunProjectileExplosion
+  jsl RandomByte
+  and #31
+  tay
+  lda ActorVarA,x
+  lsr
+  lsr
+  jsr ThwaiteSpeedAngle2Offset
+  inc ActorVarA,x
+
+  lda ActorVX,x
+  add 0
+  sta ActorPX,x
+
+  lda ActorVY,x
+  add 2
+  sta ActorPY,x
+
+  dec ActorTimer,x
+  bne :+
+    stz ActorType,x
+  :
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileExplosion
+  lda #(6*16)|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
 
 .a16
 .i16
@@ -688,8 +741,8 @@ ProjectileType  = 0
   ldy #ProjectileStart
 Loop:
   lda ActorType,y
-  cmp #Actor::PlayerProjectile*2
-  bne NotProjectile  
+;  cmp #Actor::PlayerProjectile*2
+  beq NotProjectile  
 
   jsl TwoActorCollision
   bcc :+
@@ -728,6 +781,119 @@ ProjectileType  = ActorGetShotTest::ProjectileType
   lda #0
   sta ActorType,y
   rtl
+.endproc
+
+
+
+; Check for collision with a rideable 16x16 thing
+.a16
+.i16
+.proc CollideRide
+  ; Check for collision with player
+  lda PlayerVY
+  bpl :+
+  clc
+  rtl
+: jml PlayerActorCollision
+.endproc
+
+.a16
+.i16
+.proc RideOnProjectile
+  bcc Exit
+    lda ActorPY,x
+    cmp PlayerPY
+    bcc :+
+      seta8
+      lda #2
+      sta PlayerRidingSomething
+      seta16
+      lda ActorPY,x
+      sub #$100
+      sta PlayerPY
+
+      stz PlayerVY
+      sec
+      rtl
+: clc
+Exit:
+  rtl
+.endproc
+
+.a16
+.i16
+.proc ChangeToExplosion
+  sta ActorTimer,x
+  lda ActorPX,x
+  sta ActorVX,x
+  lda ActorPY,x
+  sta ActorVY,x
+  stz ActorVarA,x
+
+  lda #Actor::PlayerProjectile16x16*2
+  sta ActorType,x
+  lda #PlayerProjectileType::Explosion
+  sta ActorProjectileType,x
+  jsl FindFreeProjectileY
+  bcc :+
+    lda ActorType,x
+    sta ActorType,y
+    lda ActorTimer,x
+    sta ActorTimer,y
+    lda ActorProjectileType,x
+    sta ActorProjectileType,y
+    lda ActorPX,x
+    sta ActorPX,y
+    sta ActorVX,y
+    lda ActorPY,x
+    sta ActorPY,y
+    sta ActorVY,y
+    lda #0
+    sta ActorVarA,y
+  :
+  rtl
+.endproc
+
+; Less precise sin/cos table used by e.g. missile smoke generation.
+; These are indexed by angle through the whole circle
+; and scaled by 64.
+; (90*7/8)s*64=
+ThwaiteSineTable:
+  .byt   0, 12, 24, 36, 45, 53, 59, 63
+ThwaiteCosineTable:
+  .byt  64, 63, 59, 53, 45, 36, 24, 12
+  .byt   0,<-12,<-24,<-36,<-45,<-53,<-59,<-63
+  .byt <-64,<-63,<-59,<-53,<-45,<-36,<-24,<-12
+  .byt   0, 12, 24, 36, 45, 53, 59, 63
+
+
+; Calculates a horizontal and vertical speed from a speed and an angle
+; input: A (speed) Y (angle, 0-31)
+; output: 0,1 (X position), 2,3 (Y position)
+.proc ThwaiteSpeedAngle2Offset
+  php
+  seta8
+  sta M7MCAND ; 16-bit factor
+  stz M7MCAND
+  lda ThwaiteCosineTable,y
+  sta M7MUL ; 8-bit factor
+
+  lda M7PRODLO
+  sta 0
+  lda M7PRODHI
+  sta 1
+
+  ; --------
+
+  lda ThwaiteSineTable,y
+  sta M7MUL ; 8-bit factor
+
+  lda M7PRODLO
+  sta 2
+  lda M7PRODHI
+  sta 3
+  plp
+  rts
 .endproc
 
 
