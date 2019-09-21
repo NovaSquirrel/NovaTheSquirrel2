@@ -1411,6 +1411,45 @@ AbilityRoutineForId:
   rts
 .endproc
 
+; Shared code between abilities to put a projectile in the correct spot
+; for a simple 8x8 one
+.a16
+.proc AbilityPositionProjectile8x8
+  lda PlayerPY
+  sub #7<<4
+  sta ActorPY,x
+
+Horizontal:
+  lda #13<<4
+  jsr PlayerNegIfLeft
+  add PlayerPX
+  sta ActorPX,x
+  rts
+.endproc
+
+; Same, for 16x16
+.a16
+.proc AbilityPositionProjectile16x16
+  lda PlayerPY
+  sub #4<<4
+  sta ActorPY,x
+  bra AbilityPositionProjectile8x8::Horizontal
+.endproc
+
+; Same but for 16x16 projectiles that are ridden on
+.a16
+.proc AbilityPositionProjectile16x16Below
+  lda PlayerPY
+  sta ActorPY,x
+  sub #$100
+  sta PlayerPY
+
+  lda #.loword(-3<<4)
+  jsr PlayerNegIfLeft
+  add PlayerPX
+  sta ActorPX,x
+  rts
+.endproc
 
 .a8
 .proc RunAbilityNone
@@ -1424,14 +1463,7 @@ AbilityRoutineForId:
 
     stz ActorProjectileType,x
 
-    lda #13<<4
-    jsr PlayerNegIfLeft
-    add PlayerPX
-    sta ActorPX,x
-
-    lda PlayerPY
-    sub #7<<4
-    sta ActorPY,x
+    jsr AbilityPositionProjectile8x8
 
     stz ActorTimer,x
 
@@ -1454,20 +1486,9 @@ BurgerBelow:
     seta16
     jsl FindFreeProjectileX
     bcc :+
-
     jsr DoBurgerShared
-
     stz PlayerVY
-
-    lda PlayerPY
-    sta ActorPY,x
-    sub #$100
-    sta PlayerPY
-
-    lda #.loword(-3<<4)
-    jsr PlayerNegIfLeft
-    add PlayerPX
-    sta ActorPX,x
+    jsr AbilityPositionProjectile16x16Below
   : rts
 NoBelow:
 
@@ -1479,17 +1500,8 @@ BurgerSide:
     seta16
     jsl FindFreeProjectileX
     bcc :+
-
     jsr DoBurgerShared
-
-    lda PlayerPY
-    sub #4<<4
-    sta ActorPY,x
-
-    lda #13<<4
-    jsr PlayerNegIfLeft
-    add PlayerPX
-    sta ActorPX,x
+    jsr AbilityPositionProjectile16x16
   :
   rts
 
@@ -1513,6 +1525,28 @@ DoBurgerShared:
 .a8
 .proc RunAbilityGlider
   jsr StepTailSwish
+  bne :+
+    seta16
+    jsl FindFreeProjectileX
+    bcc :+
+    lda #Actor::PlayerProjectile*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::Glider
+    sta ActorProjectileType,x
+
+    jsr AbilityPositionProjectile8x8
+
+    lda #140
+    sta ActorTimer,x
+
+    seta8
+    lda PlayerDir
+    sta ActorDirection,x
+    lda TailAttackDirection
+    sta ActorVarA,x
+    seta16
+  :
   rts
 .endproc
 
@@ -1524,7 +1558,55 @@ DoBurgerShared:
 
 .a8
 .proc RunAbilityIce
+  lda TailAttackDirection
+  and #>KEY_DOWN
+  beq NoBelow
+    jsr StepTailSwishBelow
+    beq IceBelow
+    rts
+IceBelow:
+    seta16
+    jsl FindFreeProjectileX
+    bcc :+
+    jsr DoIceShared
+    stz PlayerVY
+    jsr AbilityPositionProjectile16x16Below
+  : rts
+NoBelow:
+
+  ; -----------------------------------
+
   jsr StepTailSwish
+  bne :+
+IceSide:
+    seta16
+    jsl FindFreeProjectileX
+    bcc :+
+    jsr DoIceShared
+    jsr AbilityPositionProjectile16x16
+  :
+  rts
+
+.a16
+DoIceShared:
+  lda #Actor::PlayerProjectile16x16*2
+  sta ActorType,x
+
+  lda #PlayerProjectileType::Ice
+  sta ActorProjectileType,x
+
+  lda #80
+  sta ActorTimer,x
+  lda #$30
+  sta ActorVarA,x
+
+  stz ActorVX,x
+  stz ActorVY,x
+
+  seta8
+  lda PlayerDir
+  sta ActorDirection,x
+  seta16
   rts
 .endproc
 

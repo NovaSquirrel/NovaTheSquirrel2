@@ -160,13 +160,74 @@ DrawPlayerProjectileTable:
 .a16
 .i16
 .proc RunProjectileGlider
+  lda framecount
+  and #3
+  asl
+  tay
+
+  lda GliderPushX,y
+  pha
+
+  lda ActorDirection,x ; Read 8-bit variable as 16-bit
+  lsr
+  bcc :+
+    pla
+    eor #$ffff
+    ina
+    pha
+  :
+
+  pla
+  add ActorPX,x
+  sta ActorPX,x
+
+  ; ---------------
+
+  lda GliderPushY,y
+  pha
+
+  lda ActorVarA,x ; Read 8-bit variable as 16-bit
+  and #>(KEY_UP)
+  beq :+
+    pla
+    eor #$ffff
+    ina
+    pha
+  :
+
+  pla
+  add ActorPY,x
+  sta ActorPY,x
+
+  ; ---------------
+
+  dec ActorTimer,x
+  bne :+
+    stz ActorType,x
+  :
   rtl
+GliderPushX:
+  .word $00, $00, $00, $30
+GliderPushY:
+  .word $00, $30, $00, $00
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileGlider
-  rtl
+  stz 0
+  lda ActorVarA,x
+  and #>(KEY_UP)
+  beq :+
+    lda #OAM_YFLIP
+    sta 0
+  :
+
+  lda framecount
+  and #3
+  add #$2a|OAM_PRIORITY_2
+  ora 0
+  jml DispActor8x8
 .endproc
 
 .a16
@@ -184,13 +245,66 @@ DrawPlayerProjectileTable:
 .a16
 .i16
 .proc RunProjectileIce
+  dec ActorTimer,x
+  bne :+
+    stz ActorType,x
+  :
+
+  jsl ActorFall
+  lda ActorVarA,x
+  sta TempVal ; keep the VarA that was actually used for later
+  jsl ActorWalk
+  jsl ActorAutoBump
+
+  lda ActorVarA,x
+  beq :+
+  dec ActorVarA,x
+  lda #10
+  sta ActorTimer,x
+: sta ActorVX,x ; required to be nonzero for the projectile to collide with enemies
+
+  jsl CollideRide
+  jsl RideOnProjectile
+  bcc @NotRiding
+  ; Without this, if the block falls fast enough the player will fall off
+  lda ActorVY,x
+  sta PlayerVY
+
+  ; Add the speed to the player so they move with the block
+  lda TempVal
+  beq @NotRiding
+  sta 0
+
+  ; Let the player keep the block going
+  lda keydown
+  and #KEY_DOWN
+  beq :+
+    inc ActorVarA,x
+  :
+
+  ; Negate the offset if facing left
+  lda ActorDirection,x
+  lsr
+  bcc :+
+  lda 0
+    eor #$ffff
+    ina
+    sta 0
+  :
+
+  ; Finally add the offset to the player position
+  lda PlayerPX
+  add 0
+  sta PlayerPX
+@NotRiding:
   rtl
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileIce
-  rtl
+  lda #34|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
