@@ -23,11 +23,11 @@
 .segment "ActorData"
 CommonTileBase = $40
 
-.import DispActor16x16, DispActor8x8, DispParticle8x8
+.import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
-.import FindFreeProjectileY
+.import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
 
 ; -------------------------------------
 
@@ -201,10 +201,7 @@ DrawPlayerProjectileTable:
 
   ; ---------------
 
-  dec ActorTimer,x
-  bne :+
-    stz ActorType,x
-  :
+  jsr ActorExpire
   rtl
 GliderPushX:
   .word $00, $00, $00, $30
@@ -245,10 +242,7 @@ GliderPushY:
 .a16
 .i16
 .proc RunProjectileIce
-  dec ActorTimer,x
-  bne :+
-    stz ActorType,x
-  :
+  jsr ActorExpire
 
   jsl ActorFall
   lda ActorVarA,x
@@ -334,13 +328,57 @@ GliderPushY:
 .a16
 .i16
 .proc RunProjectileWaterBottle
-  rtl
+  jsr ActorExpire
+  jsl ActorGravity
+  jml ActorApplyXVelocity
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileWaterBottle
-  rtl
+  lda framecount
+  lsr
+  and #%110
+  tay
+
+  lda OffsetsA,y
+  sta SpriteXYOffset
+  lda TilesA,y
+  add ActorVarA,x
+  phy
+  jsl DispActor8x8WithOffset
+  ply
+
+  lda OffsetsB,y
+  sta SpriteXYOffset
+  lda TilesB,y
+  add ActorVarA,x
+  jml DispActor8x8WithOffset
+
+; Base is:
+; X + 4
+; Y + 8
+
+OffsetsA:
+  .lobytes 4, 8-4
+  .lobytes 4+4, 8
+  .lobytes 4, 8+4
+  .lobytes 4-4, 8
+TilesA:
+  .word $20|OAM_PRIORITY_2
+  .word $34|OAM_PRIORITY_2
+  .word $20|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+  .word $34|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+OffsetsB:
+  .lobytes 4, 8+4
+  .lobytes 4-4, 8
+  .lobytes 4, 8-4
+  .lobytes 4+4, 8
+TilesB:
+  .word $30|OAM_PRIORITY_2
+  .word $24|OAM_PRIORITY_2
+  .word $30|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+  .word $24|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
 .endproc
 
 .a16
@@ -459,10 +497,7 @@ GliderPushY:
   add 2
   sta ActorPY,x
 
-  dec ActorTimer,x
-  bne :+
-    stz ActorType,x
-  :
+  jsr ActorExpire
   rtl
 .endproc
 
@@ -1010,4 +1045,11 @@ ThwaiteCosineTable:
   rts
 .endproc
 
+.proc ActorExpire
+  dec ActorTimer,x
+  bne :+
+    stz ActorType,x
+  :
+  rts
+.endproc
 

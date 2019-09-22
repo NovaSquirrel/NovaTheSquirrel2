@@ -1619,6 +1619,63 @@ DoIceShared:
 .a8
 .proc RunAbilityWater
   jsr StepThrowAnim
+  bne NoThrow
+    seta16
+    jsl FindFreeProjectileX
+    bcc :+
+    lda #Actor::PlayerProjectile16x16*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::WaterBottle
+    sta ActorProjectileType,x
+
+    lda PlayerPY
+    sub #7<<4
+    sta ActorPY,x
+    lda PlayerPX
+    sta ActorPX,x
+
+    lda #60
+    sta ActorTimer,x
+
+    ; Pick from four varieties
+    jsl RandomByte
+    and #3
+    sta ActorVarA,x
+
+    ; Default arc
+    lda #$1c
+    sta ActorVX,x
+    lda #.loword(-$58)
+    sta ActorVY,x
+
+    lda TailAttackDirection
+    and #>(KEY_UP)
+    beq :+
+      lda #$26
+      sta ActorVX,x
+      lda #.loword(-$67)
+      sta ActorVY,x
+    :
+
+    lda TailAttackDirection
+    and #>(KEY_DOWN)
+    beq :+
+      lda #$18
+      sta ActorVX,x
+      lda #.loword(-$40)
+      sta ActorVY,x
+    :
+
+    lda PlayerDir
+    lsr
+    bcc :+
+      lda ActorVX,x
+      eor #$ffff
+      ina
+      sta ActorVX,x
+    :
+  NoThrow:
   rts
 .endproc
 

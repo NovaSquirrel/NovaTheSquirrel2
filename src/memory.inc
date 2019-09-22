@@ -175,7 +175,7 @@ ParticleLen = 32
 .global PaletteRequestValue
 
 .global GraphicUploadOffset
-
+SpriteXYOffset = GraphicUploadOffset
 
 .globalzp LevelNumber
 .globalzp StartedLevelNumber

@@ -1056,6 +1056,9 @@ Invalid:
 .proc DispActor8x8
   sta 4
 
+  lda #$0804
+  sta SpriteXYOffset
+CustomOffset:
   ; If facing left, set the X flip bit
   lda ActorDirection,x ; Ignore high byte
   lsr
@@ -1077,10 +1080,10 @@ Invalid:
 
   seta8
   lda 0
-  add #4
+  add SpriteXYOffset+0
   sta OAM_XPOS,y
   lda 2
-  add #8
+  add SpriteXYOffset+1
   sta OAM_YPOS,y
 
   ; Get the high bit of the calculated position and plug it in
@@ -1095,8 +1098,13 @@ Invalid:
   add #4
   sta OamPtr
   rtl
-.endproc
 
+WithOffset:
+  sta 4
+  bra CustomOffset
+.endproc
+DispActor8x8WithOffset = DispActor8x8::WithOffset
+.export DispActor8x8WithOffset
 
 .a16
 .proc ParticleDrawPosition
