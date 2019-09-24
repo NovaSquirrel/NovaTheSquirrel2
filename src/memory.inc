@@ -73,6 +73,8 @@
 .global PlayerDecelSpeed
 .global JumpGracePeriod
 .global PlayerRidingSomething
+.global PlayerDrawX
+.global PlayerDrawY
 
 .global ColumnUpdateAddress
 .global ColumnUpdateBuffer

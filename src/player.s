@@ -215,7 +215,7 @@ MaxSpeedRight = 12
 
 
   ; Start off an attack
-  lda keydown
+  lda keynew
   and #KEY_X|KEY_A|KEY_L|KEY_R
   beq :+
     lda PlayerRolling
@@ -348,6 +348,12 @@ NotWalk:
   ; Decelerate
   lda #4
   sta Temp
+
+  ; Still decelerate if movement lock is on and you hold the button
+  lda AbilityMovementLock
+  lsr
+  bcs DecelerateAnyway
+
   ; Adjust the deceleration speed if you're trying to turn around
   lda keydown
   and #KEY_LEFT
@@ -364,6 +370,7 @@ NotWalk:
     bpl IsMoving
     lsr Temp
   :
+DecelerateAnyway:
   lda PlayerVX
   beq Stopped
     ; If negative, make positive
@@ -1007,6 +1014,7 @@ OfferJumpFromGracePeriod:
 
   seta8
   lda 0
+  sta PlayerDrawX
   sta OAM_XPOS+(4*1),x
   sta OAM_XPOS+(4*3),x
   sub #16
@@ -1021,6 +1029,7 @@ OfferJumpFromGracePeriod:
   :
 
   lda 2
+  sta PlayerDrawY
   sub #16
   sta OAM_YPOS+(4*2),x
   sta OAM_YPOS+(4*3),x
@@ -1421,7 +1430,7 @@ AbilityRoutineForId:
 
 Horizontal:
   lda #13<<4
-  jsr PlayerNegIfLeft
+  jsl PlayerNegIfLeft
   add PlayerPX
   sta ActorPX,x
   rts
@@ -1445,7 +1454,7 @@ Horizontal:
   sta PlayerPY
 
   lda #.loword(-3<<4)
-  jsr PlayerNegIfLeft
+  jsl PlayerNegIfLeft
   add PlayerPX
   sta ActorPX,x
   rts
@@ -1468,7 +1477,7 @@ Horizontal:
     stz ActorTimer,x
 
     lda #4*16
-    jsr PlayerNegIfLeft
+    jsl PlayerNegIfLeft
     sta ActorVX,x
   :
   rts
@@ -1517,7 +1526,7 @@ DoBurgerShared:
   sta ActorTimer,x
 
   lda #3*16
-  jsr PlayerNegIfLeft
+  jsl PlayerNegIfLeft
   sta ActorVX,x
   rts
 .endproc
@@ -1739,10 +1748,89 @@ DoIceShared:
   bra RunAbilityRemote
 .endproc
 
+
 .a8
 .proc RunAbilityBubble
+  ; Need Up+Attack or Down+Attack to charge
+  lda TailAttackDirection
+  and #>(KEY_DOWN|KEY_UP)
+  bne ChargeUp
   jsr StepTailSwish
   rts
+ChargeUp:
+
+  lda #1
+  sta AbilityMovementLock
+  lda #PlayerFrame::FISHING
+  sta TailAttackFrame
+
+  ; Display bubble wand
+  lda #0
+  xba
+  lda PlayerDir
+  tay
+  ldx OamPtr
+  lda PlayerDrawX
+  add WandOffsetX,y
+  sta OAM_XPOS,x
+  lda PlayerDrawY
+  sub #26
+  sta OAM_YPOS,x
+  lda #$2a
+  sta OAM_TILE,x
+  lda WandAttrib,y
+  sta OAM_ATTR,x
+  stz OAMHI+0,x
+  lda #$02
+  sta OAMHI+1,x
+  inx
+  inx
+  inx
+  inx
+  stx OamPtr
+
+  lda keydown
+  and #KEY_X|KEY_A|KEY_L|KEY_R
+  bne :+
+    stz TailAttackTimer
+    stz AbilityMovementLock
+    rts
+  :
+
+  ; Use the amount of time the ability has been out instead of the frame counter
+  lda TailAttackTimer
+  ina
+  ora #$f0
+  sta TailAttackTimer
+  cmp #$f8
+  bne NoBubble
+    seta16
+    jsl FindFreeProjectileX
+    bcc NoBubble
+    lda #Actor::PlayerProjectile*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::Bubble
+    sta ActorProjectileType,x
+
+    jsr AbilityPositionProjectile8x8
+    lda PlayerPY
+    sub #16*16
+    sta ActorPY,x
+
+    stz ActorTimer,x
+
+    jsl RandomByte
+    and #16+1
+    sta ActorVarA,x
+
+    .import RandomPlayerBubblePosition
+    jsl RandomPlayerBubblePosition
+  NoBubble:
+
+  rts
+WandOffsetX: .lobytes 1, -16-1
+WandAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .endproc
 
 ; -----------------------------------------------------------------------------
@@ -1769,6 +1857,7 @@ DoIceShared:
 
 ; Takes a speed in the accumulator, and negates it if player facing left
 .a16
+.export PlayerNegIfLeft
 .proc PlayerNegIfLeft
   pha
   lda PlayerDir ; Ignore high byte
@@ -1776,11 +1865,11 @@ DoIceShared:
   bcs Left
 Right:
   pla ; No change
-  rts
+  rtl
 Left:
   pla ; Negate
   negw
-  rts
+  rtl
 .endproc
 
 .a16

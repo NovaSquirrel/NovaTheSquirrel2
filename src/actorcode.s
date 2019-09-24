@@ -28,6 +28,7 @@ CommonTileBase = $40
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
+.import PlayerNegIfLeft
 
 ; -------------------------------------
 
@@ -468,13 +469,90 @@ TilesB:
 .a16
 .i16
 .proc RunProjectileBubble
+  lda ActorTimer,x
+  beq NotLaunched
+    cmp #60
+    bne :+
+      stz ActorType,x
+    :
+    inc ActorTimer,x
+	jsl ActorApplyVelocity
+    rtl
+  NotLaunched:
+  ; -------
+
+  lda PlayerPX
+  add ActorVarB,x
+
+  sub ActorPX,x
+  jsr Divide
+  add ActorPX,x
+  sta ActorPX,x
+
+  ; -------
+
+  lda PlayerPY
+  sub #8*16
+  add ActorVarC,x
+
+  sub ActorPY,x
+  jsr Divide
+  add ActorPY,x
+  sta ActorPY,x
+
+  ; -------
+
+  lda framecount
+  and #15
+  bne NoRearrange
+    jsl RandomPlayerBubblePosition
+  NoRearrange:
+
+  ; Need to press attack, but not up or down
+  lda keynew
+  and #KEY_X|KEY_A|KEY_L|KEY_R
+  beq :+
+  lda keydown
+  and #KEY_DOWN|KEY_UP
+  bne :+
+    inc ActorTimer,x
+    lda #$50
+    jsl PlayerNegIfLeft
+    sta ActorVX,x
+  :
+  rtl
+
+Divide:
+  cmp #$8000
+  ror
+  cmp #$8000
+  ror
+  cmp #$8000
+  ror
+  rts
+.endproc
+
+.a16
+.export RandomPlayerBubblePosition
+.proc RandomPlayerBubblePosition
+  jsl RandomByte
+  asl
+  jsl VelocityLeftOrRight
+  sta ActorVarB,x
+  jsl RandomByte
+  and #127
+  jsl VelocityLeftOrRight
+  sta ActorVarC,x
   rtl
 .endproc
+
 
 .a16
 .i16
 .proc DrawProjectileBubble
-  rtl
+  lda #$28|OAM_PRIORITY_2
+  add ActorVarA,x
+  jml DispActor8x8
 .endproc
 
 .a16

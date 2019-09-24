@@ -170,6 +170,8 @@
   PlayerJumpCancel: .res 1
   PlayerWantsToJump: .res 1    ; true if player pressed the jump button
   PlayerRidingSomething: .res 1 ; if 1, player is treated to be standing on a solid and can jump
+  PlayerDrawX: .res 1
+  PlayerDrawY: .res 1
 
   LevelBackgroundColor:   .res 2
 
