@@ -324,39 +324,53 @@ Exit:
 
 
 
-; Random number generator, consists of two LFSRs that get used together for a high period
-; http://codebase64.org/doku.php?id=base:two_very_fast_16bit_pseudo_random_generators_as_lfsr
+; Random number generator
+; From http://wiki.nesdev.com/w/index.php/Random_number_generator/Linear_feedback_shift_register_(advanced)#Overlapped_24_and_32_bit_LFSR
 ; output: A (random number)
 .proc RandomByte
+  phx
+  phy
   php
-  seta8
+  setaxy8
   lda #0 ; Clear the high byte
   xba
 
-  lda random1+1
+  seed = random1
+  ; rotate the middle bytes left
+  ldy seed+2 ; will move to seed+3 at the end
+  lda seed+1
+  sta seed+2
+  ; compute seed+1 ($C5>>1 = %1100010)
+  lda seed+3 ; original high byte
+  lsr
+  sta seed+1 ; reverse: 100011
+  lsr
+  lsr
+  lsr
+  lsr
+  eor seed+1
+  lsr
+  eor seed+1
+  eor seed+0 ; combine with original low byte
+  sta seed+1
+  ; compute seed+0 ($C5 = %11000101)
+  lda seed+3 ; original high byte
+  asl
+  eor seed+3
   asl
   asl
-  eor random1+1
-  asl
-  eor random1+1
   asl
   asl
-  eor random1+1
+  eor seed+3
   asl
-  rol random1         ;shift this left, "random" bit comes from low
-  rol random1+1
+  asl
+  eor seed+3
+  sty seed+3 ; finish rotating byte 2 into 3
+  sta seed+0
 
-  lda random2+1
-  asl
-  eor random2+1
-  asl
-  asl
-  ror random2         ;shift this right, random bit comes from high - nicer when eor with random1
-  rol random2+1
-
-  lda random1           ;mix up lowbytes of random1
-  eor random2           ;and random2 to combine both 
   plp
+  ply
+  plx
   rtl
 .endproc
 
