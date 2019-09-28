@@ -1130,4 +1130,3 @@ ThwaiteCosineTable:
   :
   rts
 .endproc
-

@@ -1488,3 +1488,18 @@ Exit:
   seta16
   rtl
 .endproc
+
+.export ActorClear
+.a16
+.i16
+.proc ActorClear
+  stz ActorVarA,x
+  stz ActorVarB,x
+  stz ActorVarC,x
+  stz ActorVX,x
+  stz ActorVY,x
+  stz ActorTimer,x
+  stz ActorDirection,x
+  stz ActorOnGround,x
+  rtl
+.endproc

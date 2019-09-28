@@ -23,6 +23,7 @@
 .import BlockRunInteractionAbove, BlockRunInteractionBelow
 .import BlockRunInteractionSide,  BlockRunInteractionInsideHead
 .import BlockRunInteractionInsideBody
+.import ActorClear
 
 .segment "ZEROPAGE"
 
@@ -164,6 +165,7 @@ MaxSpeedRight = 12
   seta8
   countdown JumpGracePeriod
   countdown PlayerWantsToJump
+  countdown PlayerWantsToAttack
   countdown PlayerJumpCancelLock
   countdown PlayerOnLadder
   countdown PlayerInvincible
@@ -214,14 +216,21 @@ MaxSpeedRight = 12
   NoTapRun:
 
 
-  ; Start off an attack
   lda keynew
   and #KEY_X|KEY_A|KEY_L|KEY_R
+  beq :+
+    lda #3
+    sta PlayerWantsToAttack
+  :
+
+  ; Start off an attack
+  lda PlayerWantsToAttack
   beq :+
     lda PlayerRolling
     bne :+
     lda TailAttackTimer
     bne :+
+      stz PlayerWantsToAttack
       inc TailAttackTimer
       lda keydown+1
       sta TailAttackDirection
@@ -256,7 +265,7 @@ MaxSpeedRight = 12
   :
 
   lda keydown+1
-  and #(KEY_DOWN>>8)
+  and #>KEY_DOWN
   beq NotDown
     lda PlayerDownTimer
     cmp #60
@@ -1807,6 +1816,7 @@ ChargeUp:
     seta16
     jsl FindFreeProjectileX
     bcc NoBubble
+	jsl ActorClear
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
 
