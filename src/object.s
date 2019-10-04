@@ -949,10 +949,7 @@ Good:
   bcs :+
   cmp #16*256
   bcs Invalid
-: lsr
-  lsr
-  lsr
-  lsr
+: jsr Shift
   sub #8
   sta 0
 
@@ -963,10 +960,7 @@ Good:
 ;  bcs :+
   cmp #15*256
   bcs Invalid
-  lsr
-  lsr
-  lsr
-  lsr
+  jsr Shift
   sub #16
   sta 2
 
@@ -974,6 +968,43 @@ Good:
   rts
 Invalid:
   clc
+  rts
+
+Shift:
+  eor #.loword(-$8000)
+  lsr
+  lsr
+  lsr
+  lsr
+  add #.loword(-($8000 >> 4))
+  rts
+.endproc
+
+; For meta sprites
+.a16
+.proc ActorDrawPositionMeta
+  lda ActorPX,x
+  sub ScrollX
+  cmp #.loword(-1*256)
+  bcs :+
+  cmp #17*256
+  bcs ActorDrawPosition::Invalid
+: jsr ActorDrawPosition::Shift
+  ; No hardcoded offset
+  sta 0
+
+  lda ActorPY,x
+  sub ScrollY
+  ; TODO: properly allow sprites to be partially offscreen on the top
+;  cmp #.loword(-1*256)
+;  bcs :+
+  cmp #16*256
+  bcs ActorDrawPosition::Invalid
+  jsr ActorDrawPosition::Shift
+  ; No hardcoded offset
+  sta 2
+
+  sec
   rts
 .endproc
 
@@ -1037,7 +1068,7 @@ Invalid:
 
   ; Get the high bit of the calculated position and plug it in
   lda 1
-  cmp #%00001000
+  cmp #%00000001
   lda #1 ; 16x16 sprites
   sta ActorOnScreen,x
   rol
@@ -1072,7 +1103,7 @@ CustomOffset:
   jsr ActorDrawPosition
   bcs :+
     rtl
-  :  
+  :
 
   lda 4
   ora SpriteTileBase
@@ -1088,7 +1119,7 @@ CustomOffset:
 
   ; Get the high bit of the calculated position and plug it in
   lda 1
-  cmp #%00001000
+  cmp #%00000001
   lda #0 ; 8x8 sprites
   rol
   sta OAMHI+1,y
@@ -1105,6 +1136,115 @@ WithOffset:
 .endproc
 DispActor8x8WithOffset = DispActor8x8::WithOffset
 .export DispActor8x8WithOffset
+
+; Appropriately selects left or right
+.a16
+.i16
+.export DispActorMeta
+.proc DispActorMeta
+  ; Except only right exists for now
+  seta8
+  lda ActorDirection,x
+  lsr
+  seta16
+  bcs DispActorMetaRight
+  ; Fall into the next routine
+.endproc
+; -------------------- keep together --------------------
+.a16
+.i16
+.export DispActorMetaRight
+.proc DispActorMetaRight
+BasePixelX = 0
+BasePixelY = 2
+Pointer = DecodePointer
+CurrentX = 4
+CurrentY = 6
+SizeBit  = 8
+Count    = 10
+TempTile = 12
+  ldy OamPtr
+
+  ; Get the base pixel positions
+  jsr ActorDrawPositionMeta
+  bcs :+
+    rtl
+  :
+
+StripStart:
+  ; Size bit and count
+  lda (Pointer)  
+  and #15
+  cmp #15
+  beq Exit
+  sta Count
+  inc Pointer
+
+  ; X
+  lda (Pointer)
+  add BasePixelX
+  sub #4
+  sta CurrentX
+  inc Pointer
+  inc Pointer
+
+  ; Y
+  lda (Pointer)
+  add BasePixelY
+  sub #8
+  sta CurrentY
+  inc Pointer
+  inc Pointer
+
+StripLoop:
+  ; Now read off a series of tiles
+  lda (Pointer)
+  and #64
+  bne StripSkip
+
+  lda (Pointer)
+  pha
+  and #31
+  ora SpriteTileBase
+  sta TempTile
+  pla
+  and #%11000000 ; The X and Y flip bits
+  xba            ; Shift them over to where they are in the attributes
+  eor TempTile
+  sta OAM_TILE,y
+
+  seta8
+  lda CurrentX
+  sta OAM_XPOS,y
+  lda CurrentY
+  sta OAM_YPOS,y
+  lda CurrentX+1
+  cmp #%00000001
+  lda #0
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  ; Next sprite
+  iny
+  iny
+  iny
+  iny
+StripSkip:
+  inc Pointer
+
+  lda CurrentX
+  add #8
+  sta CurrentX
+  dec Count
+  bne StripLoop
+  bra StripStart
+  
+Exit:
+  sty OamPtr
+  rtl
+.endproc
+
 
 .a16
 .proc ParticleDrawPosition

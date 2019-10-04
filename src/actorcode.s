@@ -24,6 +24,7 @@
 CommonTileBase = $40
 
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
+.import DispActorMeta, DispActorMetaRight
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
@@ -654,7 +655,17 @@ Divide:
 .i16
 .export DrawMovingPlatform
 .proc DrawMovingPlatform
-  rtl
+  lda #$40|OAM_PRIORITY_2
+  sta SpriteTileBase
+  lda #.loword(Platform)
+  sta DecodePointer
+  jml DispActorMetaRight
+
+Platform:
+  .byt 4        ; 4 across
+  .word .loword(-16), 0  ; X and Y
+  .byt $00, $10, $10, $01
+  .byt 255
 .endproc
 
 .a16
