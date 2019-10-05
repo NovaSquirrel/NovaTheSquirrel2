@@ -20,7 +20,7 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7 perspective_data huffmunch inventory vwf \
+  mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode
 objlistspc = \
   spcheader spcimage musicseq
@@ -172,6 +172,8 @@ $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
 	$(PY) tools/overworld.py
 $(srcdir)/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
+$(srcdir)/sincos_data.s: tools/makesincos.py
+	$(PY) tools/makesincos.py
 m7levels/%.hfm: m7levels/%.bin
 	tools/huffmunch -B $< $@
 

@@ -246,6 +246,9 @@ GliderPushY:
 .proc RunProjectileIce
   jsr ActorExpire
 
+  jsl CollideRide
+  php
+
   jsl ActorFall
   lda ActorVarA,x
   sta TempVal ; keep the VarA that was actually used for later
@@ -259,7 +262,7 @@ GliderPushY:
   sta ActorTimer,x
 : sta ActorVX,x ; required to be nonzero for the projectile to collide with enemies
 
-  jsl CollideRide
+  plp
   jsl RideOnProjectile
   bcc @NotRiding
   ; Without this, if the block falls fast enough the player will fall off
@@ -686,6 +689,68 @@ Platform:
 .i16
 .export RunMovingPlatformPush
 .proc RunMovingPlatformPush
+  jsl CollideRide
+  php
+
+  seta8
+  lda ActorState,x
+  cmp #ActorStateValue::Init
+  bne :+ ; change it to paused
+    seta16
+    lda ActorPX,x
+    sta ActorVarA,x
+    lda ActorPY,x
+    sta ActorVarB,x
+  :
+  seta16
+
+  lda framecount
+  asl
+  and #255
+  asl
+  tay
+  lda #11
+  jsr SpeedAngle2Offset256
+
+  OldX = 6
+  OldY = 8
+  lda ActorPX,x
+  sta OldX
+  lda ActorPY,x
+  sta OldY
+
+  lda ActorVarA,x
+  add 1
+  sta ActorPX,x
+
+  lda ActorVarB,x
+  add 4
+  sta ActorPY,x
+
+  ; ---------------
+
+  plp
+  bcc NoRide
+    seta8
+    lda #2
+    sta PlayerRidingSomething
+    seta16
+    stz PlayerVY
+    lda ActorPY,x
+    sub #$70
+    sta PlayerPY
+
+    lda ActorPX,x
+    sub OldX
+    add PlayerPX
+    sta PlayerPX
+
+;    lda ActorPY,x
+;    sub OldY
+;    add PlayerPY
+;    sta PlayerPY
+  NoRide:
+
   rtl
 .endproc
 
@@ -1130,6 +1195,44 @@ ThwaiteCosineTable:
   sta 2
   lda M7PRODHI
   sta 3
+  plp
+  rts
+.endproc
+
+; Calculates a horizontal and vertical speed from a speed and an angle
+; input: A (speed) Y (angle, 0-255 times 2)
+; output: 0,1 (X position), 2,3 (Y position)
+.import MathSinTable, MathCosTable
+.proc SpeedAngle2Offset256
+  php
+  seta8
+  sta M7MUL ; 8-bit factor
+
+  lda MathCosTable+0,y
+  sta M7MCAND ; 16-bit factor
+  lda MathCosTable+1,y
+  sta M7MCAND
+
+  lda M7PRODLO
+  sta 0
+  lda M7PRODHI
+  sta 1
+  lda M7PRODBANK
+  sta 2
+
+  ; --------
+
+  lda MathSinTable+0,y
+  sta M7MCAND ; 16-bit factor
+  lda MathSinTable+1,y
+  sta M7MCAND
+
+  lda M7PRODLO
+  sta 3
+  lda M7PRODHI
+  sta 4
+  lda M7PRODBANK
+  sta 5
   plp
   rts
 .endproc
