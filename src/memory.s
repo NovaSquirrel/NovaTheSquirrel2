@@ -173,6 +173,7 @@
   PlayerRidingSomething: .res 1 ; if 1, player is treated to be standing on a solid and can jump
   PlayerDrawX: .res 1
   PlayerDrawY: .res 1
+  PlayerOAMIndex: .res 2
 
   LevelBackgroundColor:   .res 2
 

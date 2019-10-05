@@ -19,7 +19,7 @@
 .include "global.inc"
 .smart
 .export main, nmi_handler
-.import RunAllActors
+.import RunAllActors, DrawPlayer, DrawPlayerStatus
 
 .segment "CODE"
 ;;
@@ -105,6 +105,16 @@
   .import Mode7Test
 ;  jml Mode7Test
 
+  .import OpenOverworld
+;  seta8
+;  lda #2*16
+;  sta OverworldPlayerX
+;  lda #10*16
+;  sta OverworldPlayerY
+;  stz OverworldMap
+;  stz OverworldDirection
+;  jml OpenOverworld
+
   lda #0
   jml StartLevel
 .endproc
@@ -137,6 +147,21 @@ forever:
     plb
   :
 
+  ; Temporary debug feature
+  lda keynew
+  and #KEY_SELECT
+  beq :+
+    seta8
+    lda PlayerAbility
+    ina
+    and #15
+    sta PlayerAbility
+    lda #1
+    sta NeedAbilityChange
+    seta16
+  :
+
+
   lda NeedLevelRerender
   lsr
   bcc :+
@@ -168,12 +193,19 @@ DelayedBlockLoop:
   stz OamPtr
   jsl RunPlayer
   jsl AdjustCamera
-  jsl DrawPlayer
-  jsl RunAllActors
 
-  ; Mark remaining sprites as offscreen, then convert sprite size
-  ; data from the convenient-to-manipulate format described by
-  ; psycopathicteen to the packed format that the PPU actually uses.
+  ; Make a 5 sprite hole to fill later
+  lda OamPtr
+  sta PlayerOAMIndex
+  add #4*5
+  sta OamPtr
+
+  jsl DrawPlayerStatus
+  jsl RunAllActors
+  jsl DrawPlayer
+
+  ; Put all remaining sprites offscreen and generate the second OAM table 
+  ; from the less compact version in RAM.
   setaxy16
   ldx OamPtr
   jsl ppu_clear_oam

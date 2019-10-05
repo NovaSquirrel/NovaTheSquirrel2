@@ -597,8 +597,10 @@ PlayerIsntOnLadder:
     lda PlayerDownTimer
     cmp #4
     bcc :+
-      lda #1
-      sta PlayerRolling
+      lda PlayerRidingSomething
+      bne :+
+        lda #1
+        sta PlayerRolling
     :
     seta16
 
@@ -975,8 +977,9 @@ OfferJumpFromGracePeriod:
 
 .a16
 .i16
+.export DrawPlayer
 .proc DrawPlayer
-  ldx OamPtr
+  ldx PlayerOAMIndex
 
   jsr XToPixels
 
@@ -1128,42 +1131,6 @@ OfferJumpFromGracePeriod:
     sta OAM_YPOS+(4*2),x
     sta OAM_YPOS+(4*3),x
   :
- 
-  seta16
-  ; Five sprites
-  txa
-  clc
-  adc #5*4
-  tax
-
-  ; -----------------------------------
-  ; But we still need to draw the health meter
-  HealthCount = 0
-  HealthX = 1
-  seta8
-  lda #15
-  sta HealthX
-
-  lda PlayerHealth
-  lsr
-  php
-  sta HealthCount
-HealthLoop:
-  lda HealthCount
-  beq HealthLoopEnd
-  lda #$6e
-  jsr MakeHealthIcon
-  dec HealthCount
-  bne HealthLoop
-HealthLoopEnd:
-  plp 
-  bcc :+
-    lda #$6f
-    jsr MakeHealthIcon
-  :
-
-  ; -----------------------------------
-  stx OamPtr
 
   ; Automatically cycle through the walk animation
   seta8
@@ -1261,6 +1228,41 @@ XToPixels:
   lsr
   sta 0
   rts
+.endproc
+
+.export DrawPlayerStatus
+.proc DrawPlayerStatus
+  ldx OamPtr
+  ; -----------------------------------
+  ; But we still need to draw the health meter
+  HealthCount = 0
+  HealthX = 1
+  seta8
+  lda #15
+  sta HealthX
+
+  lda PlayerHealth
+  lsr
+  php
+  sta HealthCount
+HealthLoop:
+  lda HealthCount
+  beq HealthLoopEnd
+  lda #$6e
+  jsr MakeHealthIcon
+  dec HealthCount
+  bne HealthLoop
+HealthLoopEnd:
+  plp 
+  bcc :+
+    lda #$6f
+    jsr MakeHealthIcon
+  :
+
+  ; -----------------------------------
+  stx OamPtr
+  setaxy16
+  rtl
 
 .a8
 MakeHealthIcon:
@@ -1282,8 +1284,8 @@ MakeHealthIcon:
   inx
   inx
   rts
-
 .endproc
+
 
 AttackAnimationSequence:
   .byt PlayerFrame::ATTACK1
@@ -1462,9 +1464,7 @@ Horizontal:
   sub #$100
   sta PlayerPY
 
-  lda #.loword(-3<<4)
-  jsl PlayerNegIfLeft
-  add PlayerPX
+  lda PlayerPX
   sta ActorPX,x
   rts
 .endproc
@@ -1506,6 +1506,8 @@ BurgerBelow:
     bcc :+
     jsr DoBurgerShared
     stz PlayerVY
+
+    ; Position the burger underneath the player
     jsr AbilityPositionProjectile16x16Below
   : rts
 NoBelow:

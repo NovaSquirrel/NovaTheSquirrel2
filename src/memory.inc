@@ -76,6 +76,7 @@
 .global PlayerRidingSomething
 .global PlayerDrawX
 .global PlayerDrawY
+.global PlayerOAMIndex
 
 .global ColumnUpdateAddress
 .global ColumnUpdateBuffer
