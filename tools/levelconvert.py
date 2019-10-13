@@ -203,13 +203,13 @@ for f in glob.glob("levels/*.json"):
 	total_level_size = 33
 
 	boundaries = 0;
-	def set_boundary_at(screen):
+	def set_boundary_at(screen, boundaries):
 		if screen < 1:
 			return
 		if screen > 16:
-			return;
-		bit = 1 << 16-screen;
-		boundaries |= bit;
+			return
+		bit = 1 << 16-screen
+		return boundaries | bit
 
 	# Apply some control commands
 	for r in control:
@@ -220,9 +220,9 @@ for f in glob.glob("levels/*.json"):
 		if r.type == 'SCROLL_LOCK':
 			screen = (r.x//16);
 			if r.x&15 == 15:
-				set_boundary_at(screen+1);
+				boundaries = set_boundary_at(screen+1, boundaries);
 			else:
-				set_boundary_at(screen);
+				boundaries = set_boundary_at(screen, boundaries);
 
     # Write the header
 	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction

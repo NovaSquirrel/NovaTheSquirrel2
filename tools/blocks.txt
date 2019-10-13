@@ -407,6 +407,16 @@ solid
 t 8,3 9,3
 t 3,3 3,3
 
++LedgeSolidLeftSideCornerBottom
+solid
+t 3,3 3,3
+t 6,3v 7,3
+
++LedgeSolidRightSideCornerBottom
+solid
+t 3,3 3,3
+t 8,3 9,3v
+
 +LedgeSolidBottom
 autotile AutotileLedgeSolidBottom
 solid

@@ -233,6 +233,25 @@ AutotileExpandOther = AutotileExpandDirt::ExpandOther
 
 .export AutotileLedgeSolidLeft
 .proc AutotileLedgeSolidLeft
+  dey
+  dey
+  lda [MidPointer],y
+  cmp #Block::LedgeMiddle
+  bne :+
+    lda #Block::LedgeSolidLeftSideCornerBottom
+    sta [MidPointer],y
+
+    ; Correct a bottom ledge on the left
+    lda [LeftPointer],y
+    cmp #Block::LedgeSolidBottomRight
+    bne Loop
+    lda #Block::LedgeSolidBottom
+    sta [LeftPointer],y
+    bra Loop
+  :
+  iny
+  iny
+
 Loop:
   iny
   iny
@@ -258,6 +277,18 @@ Nope:
 
 .export AutotileLedgeSolidRight
 .proc AutotileLedgeSolidRight
+  dey
+  dey
+  lda [MidPointer],y
+  cmp #Block::LedgeMiddle
+  bne :+
+    lda #Block::LedgeSolidRightSideCornerBottom
+    sta [MidPointer],y
+    bra Loop
+  :
+  iny
+  iny
+
 Loop:
   iny
   iny
@@ -313,10 +344,12 @@ IsBottom:
   beq Yes
   cmp #Block::LedgeSolidBottomRight
   beq Yes
+  cmp #Block::LedgeSolidRightSideCornerBottom
+  beq Yes
   clc
   rts
 Yes:
-  sec
+  ; Carry set by being >= the compared value
   rts
 .endproc
 

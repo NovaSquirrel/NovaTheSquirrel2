@@ -108,11 +108,12 @@
   .import level_demo
   .import level_autodirttest
   .import level_woodtest
-  lda #<level_woodtest
+  .import level_firstlevel
+  lda #<level_firstlevel
   sta DecodePointer+0
-  lda #>level_woodtest
+  lda #>level_firstlevel
   sta DecodePointer+1
-  lda #^level_woodtest
+  lda #^level_firstlevel
   sta DecodePointer+2
 
   ; Music and starting player direction
