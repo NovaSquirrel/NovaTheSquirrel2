@@ -228,7 +228,15 @@ for f in glob.glob("levels/*.json"):
 	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction
 	outfile.write('  .byt %d\n' % player_x)
 	outfile.write('  .byt %d\n' % player_y)
-	outfile.write('  .byt 0\n') # flags
+	flags = 0
+	for flag in level_json["Header"]["Flags"]:
+		if flag == "VerticalScrolling":
+			flags |= 0x40
+		elif flag == "TwoLayerLevel": # Probably pull it from the layer count instead
+			flags |= 0x20
+		elif flag == "TwoLayerInteraction":
+			flags |= 0x10
+	outfile.write('  .byt $%.2x\n' % flags)
 	outfile.write('  .word %s\n' % level_json["Header"]["BGColor"])
 	if level_json["Header"]["Background"]:
 		outfile.write('  .word %s\n' % level_json["Header"]["Background"])

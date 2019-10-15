@@ -198,6 +198,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global LevelBackgroundColor
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
+.global VerticalScrollEnabled
 
 .globalzp random1
 .globalzp random2

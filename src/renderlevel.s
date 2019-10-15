@@ -43,6 +43,14 @@
   :
   sta ScrollY
 
+  ; If vertical scrolling is not enabled, lock to the bottom of the level
+  lda VerticalScrollEnabled
+  lsr
+  bcs :+
+    lda #((32-14)*256)
+    sta ScrollY
+  :
+
   ; -------------------
 
   lda RerenderInitEntities

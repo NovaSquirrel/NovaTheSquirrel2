@@ -158,6 +158,11 @@
 
     dec VerticalLevelFlag ; Set it to 255
   :
+  lda [DecodePointer],y
+  and #$40
+  beq :+
+    dec VerticalScrollEnabled ; Set it to 255
+  :
   ; (TODO: use the other flags)
 
 

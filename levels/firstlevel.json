@@ -15,7 +15,7 @@
 		"Music":	null,
 		"Background":	null,
 		"SpriteGFX":	["SPWalker", "SPCannon"],
-		"Flags":	["VerticalScrolling"],
+		"Flags":	[],
 		"BGPalette":	["FGCommon", "FGGrassy", null, null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone"],
 		"BGColor":	"RGB(15,23,31)"
@@ -783,31 +783,31 @@
 				}, {
 					"Id":	"WoodPlatform",
 					"X":	204,
-					"Y":	21,
+					"Y":	22,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
 					"X":	211,
-					"Y":	21,
+					"Y":	22,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SolidBlock",
 					"X":	204,
-					"Y":	20,
+					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SolidBlock",
 					"X":	211,
-					"Y":	20,
+					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Bridge",
 					"X":	205,
-					"Y":	20,
+					"Y":	21,
 					"W":	6,
 					"H":	1
 				}, {
@@ -818,7 +818,7 @@
 					"H":	1
 				}, {
 					"Id":	"Bridge",
-					"X":	226,
+					"X":	227,
 					"Y":	21,
 					"W":	6,
 					"H":	1
@@ -836,13 +836,13 @@
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
-					"X":	225,
+					"X":	226,
 					"Y":	22,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
-					"X":	232,
+					"X":	233,
 					"Y":	22,
 					"W":	1,
 					"H":	1
@@ -860,44 +860,44 @@
 					"H":	1
 				}, {
 					"Id":	"SolidBlock",
-					"X":	225,
+					"X":	226,
 					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SolidBlock",
-					"X":	232,
+					"X":	233,
 					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Bridge",
 					"X":	237,
-					"Y":	20,
+					"Y":	23,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
 					"X":	236,
-					"Y":	21,
+					"Y":	24,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
 					"X":	243,
-					"Y":	21,
+					"Y":	24,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SolidBlock",
 					"X":	236,
-					"Y":	20,
+					"Y":	23,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SolidBlock",
 					"X":	243,
-					"Y":	20,
+					"Y":	23,
 					"W":	1,
 					"H":	1
 				}, {
@@ -909,21 +909,57 @@
 				}, {
 					"Id":	"Ledge",
 					"X":	246,
-					"Y":	20,
+					"Y":	24,
 					"W":	9,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	245,
-					"Y":	20,
+					"Y":	24,
 					"W":	1,
-					"H":	13
+					"H":	8
 				}, {
 					"Id":	"LedgeSolidRight",
 					"X":	255,
+					"Y":	24,
+					"W":	1,
+					"H":	8
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	243,
 					"Y":	20,
 					"W":	1,
-					"H":	12
+					"H":	1
+				}, {
+					"Id":	"Bridge",
+					"X":	244,
+					"Y":	19,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"SolidBlock",
+					"X":	243,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SolidBlock",
+					"X":	250,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	250,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	244,
+					"Y":	23,
+					"W":	1,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",
@@ -1015,7 +1051,7 @@
 					"XFlip":	true
 				}, {
 					"Id":	"Sneaker",
-					"X":	232,
+					"X":	233,
 					"Y":	20,
 					"W":	1,
 					"H":	1,
@@ -1023,14 +1059,42 @@
 				}, {
 					"Id":	"Sneaker",
 					"X":	243,
-					"Y":	19,
+					"Y":	22,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
 				}, {
 					"Id":	"Sneaker",
 					"X":	211,
-					"Y":	19,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	250,
+					"Y":	18,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	248,
+					"Y":	18,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	246,
+					"Y":	18,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	244,
+					"Y":	18,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true

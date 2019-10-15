@@ -183,6 +183,7 @@ LevelZeroWhenLoad_Start:
   ScreenFlags:            .res 16
   ScreenFlagsDummy:       .res 1
   VerticalLevelFlag:      .res 1
+  VerticalScrollEnabled:  .res 1
 
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4

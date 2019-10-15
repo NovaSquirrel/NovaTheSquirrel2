@@ -78,6 +78,14 @@ TargetY = 6
   add ScrollY
   sta ScrollY
 
+  ; If vertical scrolling is not enabled, lock to the bottom of the level
+  lda VerticalScrollEnabled
+  lsr
+  bcs :+
+    lda #(256+32)*16
+    sta ScrollY
+  :
+
   ; -----------------------------------
 
   bit VerticalLevelFlag-1
