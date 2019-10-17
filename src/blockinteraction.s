@@ -204,10 +204,31 @@ Skip:
 .endproc
 
 .proc BlockHeart
+  seta8
+  lda PlayerHealth
+  cmp #4
+  bcs Full
+    lda #4
+    sta PlayerHealth
+    seta16
+    lda #Block::Empty
+    jsl ChangeBlock
+  Full:
+  seta16
   rts
 .endproc
 
 .proc BlockSmallHeart
+  seta8
+  lda PlayerHealth
+  cmp #4
+  bcs Full
+    inc PlayerHealth
+    seta16
+    lda #Block::Empty
+    jsl ChangeBlock
+  Full:
+  seta16
   rts
 .endproc
 
@@ -379,6 +400,8 @@ Common:
   beq :+
     inc PlayerOnLadder
   :
+  lda PlayerRidingSomething
+  bne Exit
   seta16
 
   lda keydown
@@ -395,6 +418,7 @@ GetOnLadder:
     seta8
     lda #2
     sta PlayerOnLadder
+Exit:
     seta16
   :
   rts
