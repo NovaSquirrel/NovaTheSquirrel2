@@ -1011,11 +1011,18 @@ OfferJumpFromGracePeriod:
   ; Y coordinate to pixels
   lda PlayerPY
   sub ScrollY
+  cmp #(224*16)+(32*16)
+  bcc :+
+    lda #255
+    bra HaveY
+  :
   lsr
   lsr
   lsr
   lsr
+HaveY:
   sta 2
+
 
   lda #$0200  ; Use 16x16 sprites
   sta OAMHI+(4*0),x
