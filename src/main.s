@@ -20,6 +20,7 @@
 .smart
 .export main, nmi_handler
 .import RunAllActors, DrawPlayer, DrawPlayerStatus
+.import StartLevel, ResumeLevelFromCheckpoint
 
 .segment "CODE"
 ;;
@@ -203,6 +204,26 @@ DelayedBlockLoop:
   jsl DrawPlayerStatus
   jsl RunAllActors
   jsl DrawPlayer
+  .a16
+  .i16
+
+  ; Going past the bottom of the screen results in dying
+  lda PlayerPY
+  cmp #(512+32)*16
+  bcs Die
+  ; So does running out of health
+  lda PlayerHealth
+  and #255
+  bne NotDie
+Die:
+  jsl WaitVblank
+  seta8
+  lda #FORCEBLANK
+  sta PPUBRIGHT
+  seta16
+  jml ResumeLevelFromCheckpoint
+  NotDie:
+
 
   ; Put all remaining sprites offscreen and generate the second OAM table 
   ; from the less compact version in RAM.

@@ -20,7 +20,7 @@
 .include "blockenum.s"
 .include "leveldata.inc"
 .smart
-.import GameMainLoop, AutotileLevel
+.import GameMainLoop, AutotileLevel, UploadLevelGraphics
 .import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
 
 .segment "LevelDecompress"
@@ -28,21 +28,84 @@
 ; Accumulator = level number
 .a16
 .i16
+.export StartLevel
 .proc StartLevel
-  seta8
-  lda #4
-  sta PlayerHealth
-
   setaxy16
+  ; Taken from the overworld and used for level-specific flags
   sta StartedLevelNumber
 
+  seta8
+  .import level_demo
+  .import level_autodirttest
+  .import level_woodtest
+  .import level_firstlevel
+  lda #<level_firstlevel
+  sta LevelHeaderPointer+0
+  lda #>level_firstlevel
+  sta LevelHeaderPointer+1
+  lda #^level_firstlevel
+  sta LevelHeaderPointer+2
+
+  seta16
+  jsr StartLevelCommon
+  jsl UploadLevelGraphics
+  jsl MakeCheckpoint
+  jml GameMainLoop
+.endproc
+
+; Called both when starting a level normally and when making a checkpoint through other means
+.export MakeCheckpoint
+.proc MakeCheckpoint
+  php
+
+  seta8
+  ; Y instead of X so an actor can call it easily
+  ldy #GameStateSize-1
+: lda GameStateStart,y
+  sta CheckpointState,y
+  dey
+  bpl :-
+
+  lda PlayerPX+1
+  sta CheckpointX
+  lda PlayerPY+1
+  sta CheckpointY
+
+  plp
+  rtl
+.endproc
+
+; Stuff that's done whether a level is started from scratch or resumed
+.proc StartLevelCommon
   jsl DecompressLevel
   jsl AutotileLevel
-
   inc RerenderInitEntities
-  .import UploadLevelGraphics
+  rts
+.endproc
+
+.a16
+.i16
+.export ResumeLevelFromCheckpoint
+.proc ResumeLevelFromCheckpoint
+  jsr StartLevelCommon
+
+  ; Restore saved state
+  seta8
+  ldy #GameStateSize-1
+: lda CheckpointState,y
+  sta GameStateStart,y
+  dey
+  bpl :-
+
+  lda CheckpointX
+  sta PlayerPX+1
+  lda CheckpointY
+  sta PlayerPY+1
+
+  ; Wait until here to do this, because it renders the screen and we're overriding the player start position
   jsl UploadLevelGraphics
 
+  ; Don't need to restore register size because GameMainLoop does setaxy16
   jml GameMainLoop
 .endproc
 
@@ -52,6 +115,7 @@
 ; Accumulator = level number
 .a16
 .i16
+.export DecompressLevel
 .proc DecompressLevel
   sta LevelNumber
 
@@ -89,6 +153,10 @@
   dex
   bpl :-
 
+  ; Health
+  lda #4
+  sta PlayerHealth
+
   ; Clear FirstActorOnScreen list too
   ldy #15
   lda #255
@@ -104,16 +172,11 @@
   ; -----------------------------------
 
   ; Parse the level header
-  ; (Replace with a lookup later)
-  .import level_demo
-  .import level_autodirttest
-  .import level_woodtest
-  .import level_firstlevel
-  lda #<level_firstlevel
+  lda LevelHeaderPointer+0
   sta DecodePointer+0
-  lda #>level_firstlevel
+  lda LevelHeaderPointer+1
   sta DecodePointer+1
-  lda #^level_firstlevel
+  lda LevelHeaderPointer+2
   sta DecodePointer+2
 
   ; Music and starting player direction

@@ -46,8 +46,6 @@ PlayerHeight = 16*16+14*16
 .global ChangeBlock, DelayChangeBlock
 .global GetBlockX, GetBlockY
 
-.global StartLevel, DecompressLevel
-
 ; Flags
 .enum ActorFlag
   AutoRemove    = 1

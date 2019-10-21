@@ -246,6 +246,10 @@ SaveDataStart:
   EventFlag:        .res 32  ; 256 event flags
 SaveDataEnd:
 
+CheckpointState:    .res GameStateEnd-GameStateStart
+CheckpointX:        .res 1
+CheckpointY:        .res 1
+LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or other purposes
 
 .segment "BSS7E"
   RenderBuffer:

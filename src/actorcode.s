@@ -26,6 +26,7 @@ CommonTileBase = $40
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
 .import DispActorMeta, DispActorMetaRight
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
+.import ActorHover
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
@@ -644,13 +645,21 @@ Divide:
 .i16
 .export DrawCheckpoint
 .proc DrawCheckpoint
-  rtl
+  lda #$42|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
 .i16
 .export RunCheckpoint
 .proc RunCheckpoint
+  jsl ActorHover
+  jsl PlayerActorCollision
+  bcc :+
+    stz ActorType,x
+    .import MakeCheckpoint
+    jml MakeCheckpoint
+  :
   rtl
 .endproc
 
