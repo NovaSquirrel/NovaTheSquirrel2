@@ -123,6 +123,11 @@ Mode7TurnWanted: .res 2
   jsl DoPaletteUpload
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
+  lda #GraphicsUpload::MaffiM7TempWalk
+  jsl DoGraphicUpload
+  lda #Palette::SPMaffi
+  ldy #8
+  jsl DoPaletteUpload
 
   ; Upload graphics
   stz PPUADDR
@@ -476,6 +481,9 @@ WasRotation:
   sub #11*16+8
   sta Mode7ScrollY
 
+
+; Star I was using originally
+.if 0
   ldy OamPtr
   lda #$68|OAM_PRIORITY_2
   sta OAM_TILE,y
@@ -490,6 +498,52 @@ WasRotation:
   tya
   add #4
   sta OamPtr
+.endif
+
+
+  ; Draw a crappy temporary walk animation
+  ldy OamPtr
+  lda framecount
+  lsr
+  and #%1100
+  ora #OAM_PRIORITY_2
+  sta 0
+  sta OAM_TILE+(4*0),y
+  ora #$02
+  sta OAM_TILE+(4*1),y
+  lda 0
+  ora #$20
+  sta OAM_TILE+(4*2),y
+  ora #$02
+  sta OAM_TILE+(4*3),y
+  seta8
+  DrawCenterX = 128
+  DrawCenterY = 192
+
+  lda #DrawCenterX-16
+  sta OAM_XPOS+(4*0),y
+  sta OAM_XPOS+(4*2),y
+  lda #DrawCenterY-12-16
+  sta OAM_YPOS+(4*0),y
+  sta OAM_YPOS+(4*1),y
+
+  lda #DrawCenterX
+  sta OAM_XPOS+(4*1),y
+  sta OAM_XPOS+(4*3),y
+  lda #DrawCenterY-12
+  sta OAM_YPOS+(4*2),y
+  sta OAM_YPOS+(4*3),y
+
+  lda #$02
+  sta OAMHI+1+(4*0),y
+  sta OAMHI+1+(4*1),y
+  sta OAMHI+1+(4*2),y
+  sta OAMHI+1+(4*3),y
+  seta16
+  tya
+  add #4*4
+  sta OamPtr
+
 
 
   ; Change green to red
