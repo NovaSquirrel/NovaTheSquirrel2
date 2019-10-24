@@ -459,7 +459,10 @@ NoRotation:
   cmp #64*16 ; Don't allow if this would make the player go out of bounds
   bcs WasRotation
   jsr Mode7BlockAddress
-  bne NotWall
+  tay
+  lda BlockInfo,y
+  lsr
+  bcc NotWall
 IsWall:
     bra WasRotation
   NotWall:
@@ -482,7 +485,7 @@ WasRotation:
   sta Mode7ScrollY
 
 
-; Star I was using originally
+; Star I was using to show the player position initially
 .if 0
   ldy OamPtr
   lda #$68|OAM_PRIORITY_2
@@ -546,21 +549,16 @@ WasRotation:
 
 
 
-  ; Change green to red
+  ; Respond to special floors when you're in the middle of a block
   lda Mode7PlayerX
   ora Mode7PlayerY
   and #15
   bne :+
-  lda Mode7PlayerX
-  ldy Mode7PlayerY
-  jsr Mode7BlockAddress
-  cmp #Mode7Block::Collect
-  bne :+
-    lda #Mode7Block::Hurt
-    jsr Mode7ChangeBlock
+    lda Mode7PlayerX
+    ldy Mode7PlayerY
+    jsr Mode7BlockAddress
+    jsr CallBlockAction
   :
-
-
 
   setaxy16
   ldx OamPtr
@@ -738,6 +736,78 @@ Exit:
   and #255
   rts
 .endproc
+
+.proc BlockInfo
+  Solid = 1
+  Floor = 0
+  .byt Solid ;Void
+  .byt Floor ;Checker1
+  .byt Floor ;Checker2
+  .byt Floor ;ToggleFloor
+  .byt Floor ;ToggleWall
+  .byt Floor ;Collect
+  .byt Floor ;Hurt
+  .byt Floor ;Spring
+  .byt Floor ;ForceDown
+  .byt Floor ;ForceUp
+  .byt Floor ;ForceLeft
+  .byt Floor ;ForceRight
+  .byt Floor ;Unused1
+  .byt Floor ;Unused2
+  .byt Floor ;ToggleButton
+  .byt Floor ;Button
+  .byt Floor ;BlueLock
+  .byt Solid ;RedLock
+  .byt Solid ;GreenLock
+  .byt Solid ;YellowLock
+  .byt Floor ;BlueKey
+  .byt Floor ;RedKey
+  .byt Floor ;GreenKey
+  .byt Floor ;YellowKey
+.endproc
+
+CallBlockAction:
+  asl
+  tay
+  lda BlockAction,y
+  pha
+  rts
+
+.proc BlockAction
+  .raddr .loword(DoNothing) ;Void
+  .raddr .loword(DoNothing) ;Checker1
+  .raddr .loword(DoNothing) ;Checker2
+  .raddr .loword(DoNothing) ;ToggleFloor
+  .raddr .loword(DoNothing) ;ToggleWall
+  .raddr .loword(DoCollect) ;Collect
+  .raddr .loword(DoNothing) ;Hurt
+  .raddr .loword(DoNothing) ;Spring
+  .raddr .loword(DoNothing) ;ForceDown
+  .raddr .loword(DoNothing) ;ForceUp
+  .raddr .loword(DoNothing) ;ForceLeft
+  .raddr .loword(DoNothing) ;ForceRight
+  .raddr .loword(DoNothing) ;Unused1
+  .raddr .loword(DoNothing) ;Unused2
+  .raddr .loword(DoNothing) ;ToggleButton
+  .raddr .loword(DoNothing) ;Button
+  .raddr .loword(DoNothing) ;BlueLock
+  .raddr .loword(DoNothing) ;RedLock
+  .raddr .loword(DoNothing) ;GreenLock
+  .raddr .loword(DoNothing) ;YellowLock
+  .raddr .loword(DoNothing) ;BlueKey
+  .raddr .loword(DoNothing) ;RedKey
+  .raddr .loword(DoNothing) ;GreenKey
+  .raddr .loword(DoNothing) ;YellowKey
+
+DoNothing:
+  rts
+
+DoCollect:
+  lda #Mode7Block::Hurt
+  jmp Mode7ChangeBlock
+.endproc
+
+
 
 
 GradientTable:     ; 
