@@ -21,7 +21,7 @@ objlist = \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
-  overworldblockdata overworlddata overworldcode
+  overworldblockdata overworlddata overworldcode m7leveldata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -102,7 +102,8 @@ chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 palettes := $(wildcard palettes/*.png)
 levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
-m7levels := $(patsubst %.bin,%.hfm,$(wildcard m7levels/*.bin))
+m7levels_hfm := $(patsubst %.bin,%.hfm,$(wildcard m7levels/*.bin))
+m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
 
 # Background conversion
 # (nametable conversion is implied)
@@ -176,6 +177,12 @@ $(srcdir)/sincos_data.s: tools/makesincos.py
 	$(PY) tools/makesincos.py
 m7levels/%.hfm: m7levels/%.bin
 	tools/huffmunch -B $< $@
+m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py
+	$(PY) tools/m7levelconvert.py $< $@
+$(srcdir)/m7leveldata.s: $(m7levels_hfm) $(m7levels_bin) tools/m7levelinsert.py
+	$(PY) tools/m7levelinsert.py
+
+
 
 
 $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc

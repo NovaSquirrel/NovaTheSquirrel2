@@ -83,21 +83,21 @@
   <object id="42" gid="139" x="192" y="112" width="16" height="16">
    <properties>
     <property name="Directions" value="U"/>
-    <property name="Level" value="demo"/>
+    <property name="Level" value="sample"/>
     <property name="Slot" type="int" value="12"/>
    </properties>
   </object>
   <object id="43" gid="139" x="96" y="96" width="16" height="16">
    <properties>
     <property name="Directions" value="U"/>
-    <property name="Level" value="demo"/>
+    <property name="Level" value="sample"/>
     <property name="Slot" type="int" value="6"/>
    </properties>
   </object>
   <object id="44" gid="139" x="96" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="UD"/>
-    <property name="Level" value="demo"/>
+    <property name="Level" value="sample"/>
     <property name="Slot" type="int" value="3"/>
    </properties>
   </object>

@@ -139,7 +139,10 @@ for f in sorted(glob.glob("overworlds/*.tmx")):
 							slot = int(p.attrib['value'])
 					assert slot != None
 					map_levelmarkers[slot] = (x, y, color, directions)
-					map_levelpointers[slot] = 'level_'+destination
+					if color == 2:
+						map_levelpointers[slot] = 'M7Level_'+destination
+					else:
+						map_levelpointers[slot] = 'level_'+destination
 			elif e.attrib['name'].lower() == 'sprites':
 				for sprite in e:
 					gid = int(sprite.attrib['gid'])

@@ -59,10 +59,8 @@ Mode7TurnWanted: .res 2
   stz Mode7Direction
   stz Mode7Turning
   stz Mode7TurnWanted
-
-  lda #10*16
-  sta Mode7PlayerX
-  sta Mode7PlayerY
+  stz Mode7PlayerX
+  stz Mode7PlayerY
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -155,12 +153,30 @@ CheckerLoop:
   ; Decompress a level of some sort
   seta8
   .importzp hm_node
-  lda #<DemoLevel
+  .import M7Level_sample
+  lda #<M7Level_sample
   sta hm_node+0
-  lda #>DemoLevel
+  lda #>M7Level_sample
   sta hm_node+1
-  lda #^DemoLevel
+  lda #^M7Level_sample
   sta hm_node+2
+
+  lda [hm_node]
+  .repeat 4
+    asl
+    rol Mode7PlayerX+1
+  .endrep
+  sta Mode7PlayerX
+  inc16 hm_node
+
+  lda [hm_node]
+  .repeat 4
+    asl
+    rol Mode7PlayerY+1
+  .endrep
+  sta Mode7PlayerY
+  inc16 hm_node
+
   seta16
   ldx #0
   .import huffmunch_load_snes, huffmunch_read_snes
@@ -756,7 +772,7 @@ Exit:
   .byt Floor ;Unused2
   .byt Floor ;ToggleButton
   .byt Floor ;Button
-  .byt Floor ;BlueLock
+  .byt Solid ;BlueLock
   .byt Solid ;RedLock
   .byt Solid ;GreenLock
   .byt Solid ;YellowLock
@@ -844,6 +860,3 @@ GradientTable:     ;
    .byt $07, $81   ; 
    .byt $05, $80   ; 
    .byt $00        ; 
-
-DemoLevel:
-  .incbin "../m7levels/demo.hfm"

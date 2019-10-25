@@ -42,3 +42,5 @@ src/overworldblockenum.s
 src/overworldblockdata.s
 src/overworlddata.s
 src/levelenum.s
+m7levels/*.bin
+src/m7leveldata.s
