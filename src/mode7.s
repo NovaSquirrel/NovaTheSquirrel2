@@ -161,6 +161,7 @@ CheckerLoop:
   lda #^M7Level_sample
   sta hm_node+2
 
+  ; Starting X pos
   lda [hm_node]
   .repeat 4
     asl
@@ -169,12 +170,22 @@ CheckerLoop:
   sta Mode7PlayerX
   inc16 hm_node
 
+  ; Starting Y pos
   lda [hm_node]
   .repeat 4
     asl
     rol Mode7PlayerY+1
   .endrep
   sta Mode7PlayerY
+  inc16 hm_node
+
+  ; Direction
+  lda [hm_node]
+  sta Mode7Direction
+  asl
+  asl
+  asl
+  sta Mode7RealAngle
   inc16 hm_node
 
   seta16

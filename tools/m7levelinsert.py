@@ -20,6 +20,7 @@ for f in sorted(glob.glob("m7levels/*.tmx")):
 	root = tree.getroot()
 
 	start_x, start_y = 5, 5
+	start_dir = 0
 
 	# Parse the map file
 	for e in root:
@@ -38,12 +39,17 @@ for f in sorted(glob.glob("m7levels/*.tmx")):
 					x = int(cmd.attrib['x'])//16
 					y = int(cmd.attrib['y'])//16
 					name = cmd.attrib['name']
-
 					if name.lower() == 'playerstart':
 						start_x, start_y = x, y
 
+						assert cmd[0].tag == 'properties'
+						assert cmd[0][0].tag == 'property'
+						assert cmd[0][0].attrib['name'] == 'Direction'
+						start_dir = ['N', 'W', 'S', 'E'].index(cmd[0][0].attrib['value'])
+
 	# Write the level data
-	outfile.write('  .byt %d, %d\n' % (start_x, start_y))
+	outfile.write('  .byt %d, %d ; X and Y\n' % (start_x, start_y))
+	outfile.write('  .byt %d ; Start direction\n' % (start_dir))
 	outfile.write('  .incbin "../%s"\n' % compressed_name.replace('\\', '/'))
 
 	outfile.write('\n')
