@@ -435,7 +435,7 @@ SkipBlock:
     bne AlreadyTurning
 
     lda keydown
-    and #KEY_A
+    and #KEY_B
     beq NotStop
       lda keydown
       and #KEY_UP

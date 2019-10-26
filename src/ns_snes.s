@@ -325,3 +325,6 @@ DJ_Label:
   phk
   plb
 .endproc
+
+; Shortcut to typing out .loword() every time
+.define lw(value) ($ffff & value)
