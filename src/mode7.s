@@ -45,6 +45,9 @@ Mode7RealAngle:  .res 2 ; 0-31
 Mode7Direction:  .res 2 ; 0-3
 Mode7Turning:    .res 2
 Mode7TurnWanted: .res 2
+Mode7Sidestep:       .res 2
+Mode7SidestepWanted: .res 2
+Mode7SidestepDir:    .res 2
 
 .segment "Mode7Game"
 
@@ -63,6 +66,8 @@ Mode7TurnWanted: .res 2
   stz Mode7TurnWanted
   stz Mode7PlayerX
   stz Mode7PlayerY
+  stz Mode7Sidestep
+  stz Mode7SidestepWanted
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -423,17 +428,97 @@ SkipBlock:
   jsl WaitKeysReady
   seta16
 
+  ; ---------------
+
+  lda Mode7Sidestep
+  beq NoSidestep
+    lda Mode7SidestepDir
+    asl
+    tax
+
+    lda Mode7PlayerX
+    add ForwardX,x
+    sta Mode7PlayerX
+
+    lda Mode7PlayerY
+    add ForwardY,x
+    sta Mode7PlayerY
+
+    ; Stop a vertical sidestep when Y is lined up
+    lda Mode7SidestepDir
+    lsr
+    bcs :+
+      lda Mode7PlayerY
+      and #15
+      beq @Stop
+    :
+
+    ; Stop a horizontal sidestep when X is lined up
+    lda Mode7SidestepDir
+    lsr
+    bcc :+
+      lda Mode7PlayerX
+      and #15
+      beq @Stop
+    :
+
+    bra :+
+    @Stop:
+      stz Mode7Sidestep
+    :
+    jmp WasRotation
+  NoSidestep:
+
+  ; ---------------
+
   lda Mode7Turning
-  bne AlreadyTurning
+  jne AlreadyTurning
     lda keydown
     and #KEY_LEFT|KEY_RIGHT
     tsb Mode7TurnWanted
+    lda keydown
+    and #KEY_L|KEY_R
+    tsb Mode7SidestepWanted
 
+    ; Can't turn except directly on a tile
     lda Mode7PlayerX
     ora Mode7PlayerY
     and #15
-    bne AlreadyTurning
+    jne AlreadyTurning
 
+    lda Mode7SidestepWanted
+    and #KEY_L
+    beq NoSidestepL
+      stz Mode7SidestepWanted
+      lda Mode7Direction
+      inc
+      and #3
+      sta Mode7SidestepDir
+      asl
+      tax
+      jsr CheckWallAhead
+      bcs NoSidestepL
+        inc Mode7Sidestep
+        jmp WasRotation
+    NoSidestepL:
+
+    lda Mode7SidestepWanted
+    and #KEY_R
+    beq NoSidestepR
+      stz Mode7SidestepWanted
+      lda Mode7Direction
+      dec
+      and #3
+      sta Mode7SidestepDir
+      asl
+      tax
+      jsr CheckWallAhead
+      bcs NoSidestepR
+        inc Mode7Sidestep
+        jmp WasRotation
+    NoSidestepR:
+
+.if 0
     lda keydown
     and #KEY_B
     beq NotStop
@@ -444,11 +529,12 @@ SkipBlock:
       :
       jmp WasRotation
     NotStop:
-
+.endif
 
     lda Mode7TurnWanted
     and #KEY_RIGHT
     beq :+
+      stz Mode7Sidestep
       dec Mode7Turning
       lda Mode7Direction
       dec
@@ -460,6 +546,7 @@ SkipBlock:
     lda Mode7TurnWanted
     and #KEY_LEFT
     beq :+
+      stz Mode7Sidestep
       inc Mode7Turning
       lda Mode7Direction
       inc
@@ -483,6 +570,16 @@ NoRotation:
   lda Mode7Direction
   asl
   tax
+
+  ; Only move forward when you press up
+  lda Mode7PlayerX
+  ora Mode7PlayerY
+  and #15
+  bne :+
+    lda keydown
+    and #KEY_UP
+    beq WasRotation
+  :
 
   ; Don't check for walls except when moving onto a new block
   lda Mode7PlayerX
@@ -657,6 +754,7 @@ BuildHDMALoop:
   jmp Loop
 
   rtl
+.endproc
 
 ForwardX:
   .word 0, .loword(-2), 0, .loword(2)
@@ -666,6 +764,25 @@ ForwardXTile:
   .word 0, .loword(-16), 0, .loword(16)
 ForwardYTile:
   .word .loword(-16), 0, .loword(16), 0
+
+.proc CheckWallAhead
+  lda Mode7PlayerY
+  add ForwardYTile,x
+  cmp #64*16 ; Don't allow if this would make the player go out of bounds
+  bcs Block
+  tay
+  lda Mode7PlayerX
+  add ForwardXTile,x
+  cmp #64*16 ; Don't allow if this would make the player go out of bounds
+  bcs Block
+  jsr Mode7BlockAddress
+  tay
+  lda BlockInfo,y
+  lsr
+  rts
+Block:
+  sec
+  rts
 .endproc
 
 Mode7Tiles:
