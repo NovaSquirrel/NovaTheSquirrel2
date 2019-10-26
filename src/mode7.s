@@ -21,6 +21,8 @@
 .include "paletteenum.s"
 .include "m7leveldata.inc"
 .smart
+.importzp hm_node
+.import huffmunch_load_snes, huffmunch_read_snes
 
 Mode7LevelMap = LevelBuf
 
@@ -127,6 +129,8 @@ Mode7TurnWanted: .res 2
   ldy #8
   jsl DoPaletteUpload
 
+  ; -----------------------------------
+
   ; Upload graphics
   stz PPUADDR
   lda #DMAMODE_PPUHIDATA
@@ -152,13 +156,12 @@ CheckerLoop:
 
   ; Decompress a level of some sort
   seta8
-  .importzp hm_node
-  .import M7Level_sample
-  lda #<M7Level_sample
+  .import M7Level_sample2
+  lda #<M7Level_sample2
   sta hm_node+0
-  lda #>M7Level_sample
+  lda #>M7Level_sample2
   sta hm_node+1
-  lda #^M7Level_sample
+  lda #^M7Level_sample2
   sta hm_node+2
 
   ; Starting X pos
@@ -190,7 +193,6 @@ CheckerLoop:
 
   seta16
   ldx #0
-  .import huffmunch_load_snes, huffmunch_read_snes
   jsl huffmunch_load_snes
 
   ; Read out the level
@@ -432,6 +434,18 @@ SkipBlock:
     and #15
     bne AlreadyTurning
 
+    lda keydown
+    and #KEY_A
+    beq NotStop
+      lda keydown
+      and #KEY_UP
+      beq :+
+        stz Mode7TurnWanted
+      :
+      jmp WasRotation
+    NotStop:
+
+
     lda Mode7TurnWanted
     and #KEY_RIGHT
     beq :+
@@ -656,16 +670,6 @@ ForwardYTile:
 
 Mode7Tiles:
 .incbin "../tools/M7Tileset.chrm7"
-
-; Smiley
-  .byt 0,   0, 11, 11, 11, 11,  0,  0
-  .byt 0,  11, 12, 12, 12, 12, 11,  0
-  .byt 11, 12,  1, 12, 12,  1, 12, 11
-  .byt 11, 12, 12, 12, 12, 12, 12, 11
-  .byt 11, 12,  1, 12, 12,  1, 12, 11
-  .byt 11, 12, 12,  1,  1, 12, 12, 11
-  .byt 0,  11, 12, 12, 12, 12, 11,  0
-  .byt 0,   0, 11, 11, 11, 11,  0,  0
 Mode7TilesEnd:
 
 .include "m7palettedata.s"
@@ -791,6 +795,14 @@ Exit:
   .byt Floor ;RedKey
   .byt Floor ;GreenKey
   .byt Floor ;YellowKey
+  .byt Floor ;CountFive
+  .byt Floor ;CountFour
+  .byt Floor ;CountThree
+  .byt Floor ;CountTwo
+  .byt Floor ;GetBlock
+  .byt Solid ;AcceptBlock
+  .byt Floor ;Bridge
+  .byt Floor ;FlyingBlock
 .endproc
 
 CallBlockAction:
@@ -825,12 +837,32 @@ CallBlockAction:
   .raddr .loword(DoNothing) ;RedKey
   .raddr .loword(DoNothing) ;GreenKey
   .raddr .loword(DoNothing) ;YellowKey
+  .raddr .loword(DoCountFive) ;CountFive
+  .raddr .loword(DoCountFour) ;CountFour
+  .raddr .loword(DoCountThree) ;CountThree
+  .raddr .loword(DoCountTwo) ;CountTwo
+  .raddr .loword(DoNothing) ;GetBlock
+  .raddr .loword(DoNothing) ;AcceptBlock
+  .raddr .loword(DoNothing) ;Bridge
+  .raddr .loword(DoNothing) ;FlyingBlock
 
 DoNothing:
   rts
 
 DoCollect:
   lda #Mode7Block::Hurt
+  jmp Mode7ChangeBlock
+DoCountFive:
+  lda #Mode7Block::CountFour
+  jmp Mode7ChangeBlock
+DoCountFour:
+  lda #Mode7Block::CountThree
+  jmp Mode7ChangeBlock
+DoCountThree:
+  lda #Mode7Block::CountTwo
+  jmp Mode7ChangeBlock
+DoCountTwo:
+  lda #Mode7Block::Collect
   jmp Mode7ChangeBlock
 .endproc
 
