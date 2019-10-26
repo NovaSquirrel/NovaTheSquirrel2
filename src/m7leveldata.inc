@@ -23,4 +23,12 @@
   RedKey
   GreenKey
   YellowKey
+  CountFive
+  CountFour
+  CountThree
+  CountTwo
+  GetBlock
+  AcceptBlock
+  HorizBridge
+  VertBridge
 .endenum
