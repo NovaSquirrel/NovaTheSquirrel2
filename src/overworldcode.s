@@ -264,8 +264,7 @@ ExitDecorationSpriteLoop:
   phy
   lda #16 ; 16 level slots
   sta 0
-  lda #0  ; Clear top half of Y
-  xba
+  tdc ; Clear A
   lda OverworldMap ; Choose which list of 16 level slots
   asl
   asl
@@ -497,8 +496,7 @@ OverworldLoop:
   ora OverworldPlayerY
   and #15
   beq NotMoving
-    lda #0
-    xba
+    tdc ; Clear A
     lda OverworldDirection
     tay
 

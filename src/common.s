@@ -331,8 +331,7 @@ Exit:
   phy
   php
   setaxy8
-  lda #0 ; Clear the high byte
-  xba
+  tdc ; Clear A, including the high byte
 
   seed = random1
   ; rotate the middle bytes left

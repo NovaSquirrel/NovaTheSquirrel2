@@ -239,8 +239,7 @@ MaxSpeedRight = 12
   ; Continue an attack that was started
   lda TailAttackTimer
   beq :+
-    lda #0
-    xba
+    tdc ; Clear A
     lda PlayerAbility
     asl
     tax
@@ -1785,8 +1784,7 @@ ChargeUp:
   sta TailAttackFrame
 
   ; Display bubble wand
-  lda #0
-  xba
+  tdc ; Clear A
   lda PlayerDir
   tay
   ldx OamPtr

@@ -115,8 +115,7 @@ AfterFontColor:
   phk
   plb
   seta8
-  lda #0
-  xba
+  tdc ; Clear A
   lda [DecodePointer] ; Reread the character
   tay
   lda (FontWidthPointer),y
@@ -267,8 +266,7 @@ EndScript:
   dec VWFStackIndex
 
   ; Pop the text decode pointer off the stack
-  lda #0 ; Clear high byte
-  xba
+  tdc ; Clear A
   lda VWFStackIndex
   tay
   lda VWFStackL,y
@@ -402,8 +400,7 @@ Common2:
   phk
   plb
   seta8
-  lda #0
-  xba
+  tdc ; Clear A
   lda [DecodePointer] ; Reread the character
   tay
   ; Add double the width
@@ -516,8 +513,7 @@ CharacterLoop:
 .proc PushVWF
   seta8
   ; Push the text decode pointer on the stack
-  lda #0 ; Clear high byte
-  xba
+  tdc ; Clear A
   lda VWFStackIndex
   tay
   lda DecodePointer+0
@@ -594,7 +590,7 @@ CharacterLoop:
   asl
   asl
   tay
-  lda #0 ; Clear high byte for the TAX
+  tdc ; Clear high byte for the TAX
   seta8
   lda FontDrawX
   and #7

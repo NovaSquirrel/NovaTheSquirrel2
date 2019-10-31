@@ -601,8 +601,7 @@ Exit:
 
   lda CursorY
   bne ItemDescription
-  lda #0
-  xba
+  tdc ; Clear A
   lda CursorTopMenu
   asl
   tax

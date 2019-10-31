@@ -64,9 +64,7 @@ hm_length: .res 1 ; bytes left in current string
 .proc huffmunch_read_snes
   php
   setaxy8
-  ; Clear the high byte
-  lda #0
-  xba
+  tdc ; Clear A
   jsl huffmunch_read
   plp
   rtl
