@@ -328,7 +328,6 @@ Exit:
 ; From http://wiki.nesdev.com/w/index.php/Random_number_generator/Linear_feedback_shift_register_(advanced)#Overlapped_24_and_32_bit_LFSR
 ; output: A (random number)
 .proc RandomByte
-  phx
   phy
   php
   setaxy8
@@ -370,7 +369,6 @@ Exit:
 
   plp
   ply
-  plx
   rtl
 .endproc
 

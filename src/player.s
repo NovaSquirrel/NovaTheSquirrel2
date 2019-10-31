@@ -792,6 +792,7 @@ TrySideInteraction:
     lda SideXPos
     cmp PlayerPX
     bcs :+
+      ; Left
       lda PlayerPX
       sub PlayerVX ; Undo the horizontal movement
       and #$ff00   ; Snap to the block
@@ -801,6 +802,7 @@ TrySideInteraction:
       rts
     :
 
+    ; Right
     lda PlayerPX
     sub PlayerVX  ; Undo the horizontal movement
     and #$ff00    ; Snap to the block
