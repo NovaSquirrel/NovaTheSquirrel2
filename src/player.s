@@ -594,7 +594,7 @@ PlayerIsntOnLadder:
 
     ; Start rolling
     lda PlayerDownTimer
-    cmp #4
+    cmp #15
     bcc :+
       lda PlayerRidingSomething
       bne :+
