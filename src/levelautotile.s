@@ -266,8 +266,13 @@ Nope:
   dey
   dey
   lda [LeftPointer],y
+  cmp #Block::LedgeLeft
+  beq Yup
+  cmp #Block::LedgeSolidLeft
+  beq Yup
   cmp #Block::Ledge
   bne :+
+Yup:
     lda #Block::LedgeSolidLeftSideCorner
     sta [MidPointer],y
     jmp AutotileExpandDirt
@@ -302,9 +307,14 @@ Loop:
 Nope:
   dey
   dey
+  cmp #Block::LedgeRight
+  beq Yup
+  cmp #Block::LedgeSolidRight
+  beq Yup
   lda [RightPointer],y
   cmp #Block::Ledge
   bne :+
+Yup:
     lda #Block::LedgeSolidRightSideCorner
     sta [MidPointer],y
     jmp AutotileExpandDirt
