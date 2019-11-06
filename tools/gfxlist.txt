@@ -18,3 +18,5 @@ A000 OWStone
 7C00 OWPaths
 0000 SolidTiles
 8000 MaffiM7TempWalk
+2800 FGSmallTrees
+2E00 FGCommonPalFlowertops

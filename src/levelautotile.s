@@ -708,3 +708,78 @@ No:
 Yes:
   rts
 .endproc
+
+.export AutotileSmallTreeBush
+.proc AutotileSmallTreeBush
+  lda #Block::SmallTreeBushTopRight
+  sta [RightPointer],y
+  iny
+  iny
+  lda #Block::SmallTreeBushBottomLeft
+  sta [MidPointer],y
+  lda #Block::SmallTreeBushBottomRight
+  sta [RightPointer],y
+  rts
+.endproc
+
+.export AutotileSmallTree
+.proc AutotileSmallTree
+  lda #Block::SmallTreeTopRight
+  sta [RightPointer],y
+  iny
+  iny
+  lda #Block::SmallTreeBottomLeft
+  sta [MidPointer],y
+  lda #Block::SmallTreeBottomRight
+  sta [RightPointer],y
+  iny
+  iny
+  lda #Block::SmallTreeTrunkTopLeft
+  sta [MidPointer],y
+  lda #Block::SmallTreeTrunkTopRight
+  sta [RightPointer],y
+  ; Expand down
+: iny
+  iny
+  lda [MidPointer],y
+  bne Exit
+  lda #Block::SmallTreeTrunkLeft
+  sta [MidPointer],y
+  lda #Block::SmallTreeTrunkRight
+  sta [RightPointer],y
+  bra :-
+
+Exit:
+  dey
+  dey
+  rts
+.endproc
+
+.export AutotileVines
+.proc AutotileVines
+  lda #Block::Vines
+  jmp AutotileExpandOther
+.endproc
+
+.export AutotileBranchPlatform
+.proc AutotileBranchPlatform
+  lda [LeftPointer],y
+  cmp #Block::BranchPlatformLeft
+  beq :+
+  cmp #Block::BranchPlatformMiddle
+  bne Left
+:
+  lda [RightPointer],y
+  cmp #Block::BranchPlatformMiddle
+  bne Right
+  rts
+
+Left:
+  lda #Block::BranchPlatformLeft
+  sta [MidPointer],y
+  rts
+Right:
+  lda #Block::BranchPlatformRight
+  sta [MidPointer],y
+  rts
+.endproc

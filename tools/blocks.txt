@@ -5,6 +5,8 @@ alias common $0000
 alias terrain $1000
 alias terrain_rocks $1c00
 alias wood $2000
+alias small_trees $2800
+alias common_pal_flowertops $2e00
 alias global_palette 0
 alias terrain_palette 1
 
@@ -724,4 +726,121 @@ t 1,1 1,1
 solid
 t 0,0 2,0
 t 3,0 5,0
+
+#######################################
+# Small trees (and other plants)
+#######################################
+base small_trees
+palette terrain_palette
+
++LeafCube
+q 0,0
+
++TreeLog
+t 8,0 9,0
+t 8,0 9,0
+
++SmallTreeTopLeft
+autotile AutotileSmallTree
+q 2,0
+
++SmallTreeTopRight
+q 4,0
+
++SmallTreeBottomLeft
+q 10,0
+
++SmallTreeBottomRight
+q 12,0
+
++SmallTreeTrunkTopLeft
+t 0:0 6,0
+t 0:0 6,1
+
++SmallTreeTrunkTopRight
+t 7,0 0:0
+t 7,1 0:0
+
++SmallTreeTrunkLeft
+t 0:0 6,1
+t 0:0 6,1
+
++SmallTreeTrunkRight
+t 7,1 0:0
+t 7,1 0:0
+
++SmallTreeBushTopLeft
+autotile AutotileSmallTreeBush
+t 0:0 0:0
+t 2,0 3,0
+
++SmallTreeBushTopRight
+t 0:0 0:0
+t 4,0 5,0
+
++SmallTreeBushBottomLeft
+t 2,1 3,1
+t 14,0 15,0
+
++SmallTreeBushBottomRight
+t 4,1 5,1
+t 14,1 15,1
+
++SmallTreeTrunk
+t 6,1 7,1
+t 6,1 7,1
+
++Grass
+t 0:0 0:0
+t 8,1 9,1
+
++Vines
+t 5,2 6,2
+t 7,2 8,2
+
++BranchPlatformLeft
+solid_top
+t 0,2 1,2
+t 0:0 0:0
+
++BranchPlatformRight
+solid_top
+t 1,2 2,2
+t 0:0 0:0
+
++BranchPlatformMiddle
+solid_top
+autotile AutotileBranchPlatform
+t 1,2 1,2
+t 0:0 0:0
+
++RedFlower
+palette global_palette
+t 0,3 1,3
+palette terrain_palette
+t 3,2 4,2
+
++BlueFlower
+palette global_palette
+t 2,3 3,3
+palette terrain_palette
+t 3,2 4,2
+
+base common_pal_flowertops
+palette global_palette
+
++BlueFlowerSpiral
+autotile AutotileVines
+t 4,0 5,0
+t 6,0 7,0
+
++RedFlowerSpiral
+autotile AutotileVines
+t 8,0 9,0
+t 10,0 11,0
+
++BlueFlowerCircle
+autotile AutotileVines
+t 12,0 13,0
+t 14,0 15,0
 

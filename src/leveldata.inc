@@ -38,6 +38,8 @@
   SlopeR_Gradual
   SlopeR_Medium
   SlopeR_Steep
+  S_SmallTreeTopLeft
+  S_SmallTreeBushTopLeft
 .endenum
 
 .enum LN1
@@ -67,9 +69,20 @@
   Fence
   Stone
   Sand
+  LeafCube
+  TreeLog
+  Grass
+  Vines
+  SmallTreeTrunk
+  RedFlower
+  BlueFlower
+  BlueFlowerSpiral
+  RedFlowerSpiral
 .endenum
 
 .enum LN3
+  BlueFlowerCircle
+  BranchPlatformMiddle
 .endenum
 
 .enum LN4

@@ -527,6 +527,9 @@ SpecialConfig:
   .word $ffff&SlopeRGradual,        0
   .word $ffff&SlopeRMedium,         0
   .word $ffff&SlopeRSteep,          0
+
+  .word $ffff&BlockSingle,          Block::SmallTreeTopLeft
+  .word $ffff&BlockSingle,          Block::SmallTreeBushTopLeft
 .assert (* - LevelCommands) < 120*4, error, "Too many level commands defined"
 .endproc
 
@@ -557,16 +560,33 @@ SpecialConfig:
   .word Block::Fence
   .word Block::Stone
   .word Block::Sand
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::LeafCube
+  .word Block::TreeLog
+  .word Block::Grass
+  .word Block::Vines
+  .word Block::SmallTreeTrunk
+  .word Block::RedFlower
+  .word Block::BlueFlower
+  .word Block::BlueFlowerSpiral
+  .word Block::RedFlowerSpiral
 ; Set 3
+  .word Block::BlueFlowerCircle
+  .word Block::BranchPlatformMiddle
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+  .word Block::Empty
+; Set 4
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty
