@@ -287,7 +287,7 @@ SpriteLoop:
   inx
   inx
   cpx #8*2
-  bne :-
+  bne SpriteLoop
 
   ; Upload background palettes
   ldy #0
