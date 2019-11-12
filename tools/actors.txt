@@ -68,6 +68,55 @@ run RunPlayerProjectile
 draw DrawPlayerProjectile
 size 16x16
 
++FireWalk
+run RunFireWalk
+draw DrawFireWalk
+flag AutoRemove AutoReset GetShot
+gfx SPFire
+pal SPFire
+size 16x16
+
++FireJump
+run RunFireJump
+draw DrawFireJump
+flag AutoRemove AutoReset GetShot
+gfx SPFire
+pal SPFire
+size 16x16
+
++FireBall
+run RunFireBall
+draw DrawFireBall
+flag AutoRemove AutoReset GetShot
+gfx SPFire
+pal SPFire
+size 8x8
+
++FireBullet
+run RunFireBullet
+draw DrawFireBullet
+flag AutoRemove AutoReset GetShot
+gfx SPFire
+pal SPFire
+size 8x8
+
++FireFox
+run RunFireFox
+draw DrawFireFox
+flag AutoRemove AutoReset GetShot
+gfx SPFire2
+pal SPFire
+size 16x16
+
++Grillbert
+run RunGrillbert
+draw DrawGrillbert
+flag AutoRemove AutoReset GetShot
+gfx SPFire2
+pal SPFire
+size 16x16
+
+
 # ---------- cannon stuff ----------
 +Burger
 flag AutoRemove GetShot

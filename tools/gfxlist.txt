@@ -1,6 +1,6 @@
 0000 FGCommon
 1000 FGGrassy
-1c00 FGForestStone
+1C00 FGForestStone
 2000 FGTropicalWood
 8800 SPCommon
 A000 SPWalker
@@ -20,3 +20,5 @@ A000 OWStone
 8000 MaffiM7TempWalk
 2800 FGSmallTrees
 2E00 FGCommonPalFlowertops
+A000 SPFire
+A000 SPFire2

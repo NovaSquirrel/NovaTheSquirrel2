@@ -619,7 +619,7 @@ Divide:
 .i16
 .export RunSpikedHat
 .proc RunSpikedHat
-  lda #$20
+  lda #$10
   jsl ActorWalkOnPlatform
   jsl ActorFall
   jml PlayerActorCollisionHurt
@@ -907,6 +907,100 @@ Platform:
 .proc RunBurgerCannonV
   rtl
 .endproc
+
+.a16
+.i16
+.export RunFireWalk
+.proc RunFireWalk
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawFireWalk
+.proc DrawFireWalk
+  rtl
+.endproc
+
+
+.a16
+.i16
+.export RunFireJump
+.proc RunFireJump
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawFireJump
+.proc DrawFireJump
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunFireBall
+.proc RunFireBall
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawFireBall
+.proc DrawFireBall
+  rtl
+.endproc
+
+
+.a16
+.i16
+.export RunFireBullet
+.proc RunFireBullet
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawFireBullet
+.proc DrawFireBullet
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunFireFox
+.proc RunFireFox
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawFireFox
+.proc DrawFireFox
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunGrillbert
+.proc RunGrillbert
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawGrillbert
+.proc DrawGrillbert
+  rtl
+.endproc
+
+
+
+
+
+
+
+
 
 ; -------------------------------------
 .a16
