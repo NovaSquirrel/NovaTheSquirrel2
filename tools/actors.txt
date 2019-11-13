@@ -116,6 +116,14 @@ gfx SPFire2
 pal SPFire
 size 16x16
 
++George
+run RunGeorge
+draw DrawGeorge
+flag AutoRemove AutoReset GetShot
+gfx SPGeorge
+pal SPWalker
+size 16x16
+
 
 # ---------- cannon stuff ----------
 +Burger

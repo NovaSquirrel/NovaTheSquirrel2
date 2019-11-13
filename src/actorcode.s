@@ -994,6 +994,19 @@ Platform:
   rtl
 .endproc
 
+.a16
+.i16
+.export RunGeorge
+.proc RunGeorge
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawGeorge
+.proc DrawGeorge
+  rtl
+.endproc
 
 
 

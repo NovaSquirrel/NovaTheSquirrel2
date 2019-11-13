@@ -22,3 +22,4 @@ A000 OWStone
 2E00 FGCommonPalFlowertops
 A000 SPFire
 A000 SPFire2
+A000 SPGeorge
