@@ -24,9 +24,11 @@
 CommonTileBase = $40
 
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
+.import DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
-.import ActorHover
+.import ActorTurnAround
+.import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
@@ -912,21 +914,88 @@ Platform:
 .i16
 .export RunFireWalk
 .proc RunFireWalk
-  rtl
+  jsl ActorFall
+  lda #$10
+  ldy ActorVarA,x
+  bne :+
+    jsl ActorWalk
+    jsl ActorAutoBump
+    bra NormalWalk
+  : 
+  jsl ActorWalkOnPlatform
+NormalWalk:
+
+  ; Make flames sometimes
+  lda ActorState,x
+  and #255
+  bne :+
+    lda framecount
+    and #15
+    bne :+
+      jsl FindFreeActorY
+      bcc :+
+        jsl ActorCopyPosXY
+
+        ; Throw fires in the air
+        lda #.loword(-$20)
+        sta ActorVY,y
+
+        ; Random X velocity
+        jsl RandomByte
+        and #31
+        jsl VelocityLeftOrRight
+        sta ActorVX,y
+
+        lda #Actor::FireFlames*2
+        sta ActorType,y
+        lda #32
+        sta ActorTimer,y
+  :
+
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
 .i16
 .export DrawFireWalk
 .proc DrawFireWalk
-  rtl
+  lda retraces
+  lsr
+  lsr
+  and #2
+  add #OAM_PRIORITY_2|8
+  jml DispActor16x16
 .endproc
-
 
 .a16
 .i16
 .export RunFireJump
 .proc RunFireJump
+  jsl ActorFall
+  bcc :+
+    lda ActorState,x
+    and #255
+    bne :+
+      lda #.loword(-$40)
+      sta ActorVY,x
+
+      lda #Actor::FireFlames*2  ; limit the number of flames
+      jsl CountActorAmount
+      cpy #3
+      bcs :+
+        jsl FindFreeActorY
+        bcc :+
+          jsl ActorClearY
+          jsl ActorCopyPosXY
+
+          lda #Actor::FireFlames*2
+          sta ActorType,y
+          lda #40
+          sta ActorTimer,y
+  :
+  lda #$10
+  jsl ActorWalk
+  jsl ActorAutoBump
   rtl
 .endproc
 
@@ -934,7 +1003,18 @@ Platform:
 .i16
 .export DrawFireJump
 .proc DrawFireJump
-  rtl
+  lda framecount
+  lsr
+  lsr
+  and #%1110
+  tay
+  lda Frames,y
+  jml DispActor16x16Flipped
+
+Frames:
+  PR = OAM_PRIORITY_2
+  .word PR|0|OAM_XFLIP, PR|2|OAM_XFLIP, PR|4|OAM_XFLIP, PR|6|OAM_XFLIP
+  .word PR|0|OAM_YFLIP, PR|2|OAM_YFLIP, PR|4|OAM_YFLIP, PR|6|OAM_YFLIP
 .endproc
 
 .a16
@@ -968,6 +1048,34 @@ Platform:
 
 .a16
 .i16
+.export RunFireFlames
+.proc RunFireFlames
+  jsl ActorFall
+  bcc :+
+    stz ActorVX,x
+  :
+  jsl ActorApplyVelocity
+
+  lda framecount
+  and #8
+  bne :+
+    jsl ActorTurnAround
+  :
+
+  jsr ActorExpire
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawFireFlames
+.proc DrawFireFlames
+  lda #OAM_PRIORITY_2|14
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
 .export RunFireFox
 .proc RunFireFox
   rtl
@@ -977,21 +1085,29 @@ Platform:
 .i16
 .export DrawFireFox
 .proc DrawFireFox
-  rtl
+  lda #OAM_PRIORITY_2|0
+  jml DispActor16x16
 .endproc
 
 .a16
 .i16
 .export RunGrillbert
 .proc RunGrillbert
-  rtl
+  jsl ActorHover
+  jsl ActorRoverMovement
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
 .i16
 .export DrawGrillbert
 .proc DrawGrillbert
-  rtl
+  lda retraces
+  lsr
+  lsr
+  and #2
+  add #OAM_PRIORITY_2|6
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -1360,3 +1476,4 @@ ThwaiteCosineTable:
   :
   rts
 .endproc
+

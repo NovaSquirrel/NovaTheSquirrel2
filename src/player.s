@@ -23,7 +23,7 @@
 .import BlockRunInteractionAbove, BlockRunInteractionBelow
 .import BlockRunInteractionSide,  BlockRunInteractionInsideHead
 .import BlockRunInteractionInsideBody
-.import ActorClear
+.import ActorClearX
 
 .segment "ZEROPAGE"
 
@@ -1825,7 +1825,7 @@ ChargeUp:
     seta16
     jsl FindFreeProjectileX
     bcc NoBubble
-	jsl ActorClear
+	jsl ActorClearX
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
 

@@ -1081,6 +1081,72 @@ Shift:
   rtl
 .endproc
 
+; A = tile to draw, with X and/or Y flips embedded
+; but where X flips ignore the original direction
+; locals: 0
+.a16
+.export DispActor16x16FlippedAbsolute
+.proc DispActor16x16FlippedAbsolute
+  sta 0
+
+  ; Direction and state are right next to each other, so they can be saved together
+  ; with a 16-bit push/pull
+  lda ActorDirection,x
+  pha
+  stz ActorDirection,x ; Start as zero
+
+  ; Temporarily write new values
+  seta8
+  lda #>OAM_XFLIP
+  trb 1
+  beq :+
+    inc ActorDirection,x
+  :
+Finish:
+  lda #>OAM_YFLIP
+  trb 1
+  beq :+
+    lda #ActorStateValue::Stunned
+    sta ActorState,x
+  :
+  seta16
+
+  lda 0
+  jsl DispActor16x16
+
+  ; Restore direction and state
+  pla
+  sta ActorDirection,x
+
+  rtl
+.endproc
+
+; A = tile to draw, with X and/or Y flips embedded
+; where the X flip bit inverts the original direction
+; locals: 0
+.a16
+.export DispActor16x16Flipped
+.proc DispActor16x16Flipped
+  sta 0
+
+  ; Direction and state are right next to each other, so they can be saved together
+  ; with a 16-bit push/pull
+  lda ActorDirection,x
+  pha
+  stz ActorDirection,x ; Start as zero
+
+  ; Temporarily write new values
+  seta8
+  lda #>OAM_XFLIP
+  trb 1
+  beq :+
+    lda ActorDirection,x
+    eor #1
+    sta ActorDirection,x
+  :
+  bra DispActor16x16FlippedAbsolute::Finish
+.endproc
+
 ; A = tile to draw
 .a16
 .export DispActor8x8
@@ -1629,10 +1695,10 @@ Exit:
   rtl
 .endproc
 
-.export ActorClear
+.export ActorClearX
 .a16
 .i16
-.proc ActorClear
+.proc ActorClearX
   stz ActorVarA,x
   stz ActorVarB,x
   stz ActorVarC,x
@@ -1641,5 +1707,83 @@ Exit:
   stz ActorTimer,x
   stz ActorDirection,x
   stz ActorOnGround,x
+  rtl
+.endproc
+
+.export ActorClearY
+.a16
+.i16
+.proc ActorClearY
+  phx
+  tyx
+  jsl ActorClearX
+  plx
+  rtl
+.endproc
+
+.export ActorRoverMovement
+.a16
+.i16
+.proc ActorRoverMovement
+  lda ActorPX,x
+  sub PlayerPX
+  absw
+  ; Face the player if too far away
+  xba
+  and #255
+  cmp #5
+  bcc :+
+  pha
+  jsl ActorLookAtPlayer
+  pla
+: ; Run faster when farther away
+  asl
+  asl
+  jsl ActorWalk
+  jml ActorAutoBump
+.endproc
+
+
+; Counts the amount of a certain actor that currently exists
+; inputs: A (actor type * 2)
+; outputs: Y (count)
+; locals: 0
+.export CountActorAmount
+.a16
+.i16
+.proc CountActorAmount
+  phx
+  sta 0  ; 0 = object num
+  ldy #0 ; Y = counter for number of matching objects
+
+  ldx #ActorStart
+Loop:
+  lda ActorType,x
+  cmp 0
+  bne :+
+    iny
+  :
+  txa
+  add #ActorSize
+  tax
+  cpx #ActorEnd
+  bne Loop
+
+  plx
+  rtl
+.endproc
+
+.export ActorCopyPosXY
+.a16
+.i16
+.proc ActorCopyPosXY
+  seta8
+  lda #0
+  sta ActorState,y
+  seta16
+  lda ActorPX,x
+  sta ActorPX,y
+  lda ActorPY,x
+  sta ActorPY,y
   rtl
 .endproc

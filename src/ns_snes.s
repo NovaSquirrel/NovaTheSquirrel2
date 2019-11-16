@@ -327,4 +327,4 @@ DJ_Label:
 .endproc
 
 ; Shortcut to typing out .loword() every time
-.define lw(value) ($ffff & value)
+.define lw(value) $ffff & (value)

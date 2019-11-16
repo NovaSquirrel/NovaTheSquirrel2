@@ -100,6 +100,14 @@ gfx SPFire
 pal SPFire
 size 8x8
 
++FireFlames
+run RunFireFlames
+draw DrawFireFlames
+flag AutoRemove
+gfx SPFire
+pal SPFire
+size 16x16
+
 +FireFox
 run RunFireFox
 draw DrawFireFox
