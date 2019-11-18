@@ -1717,6 +1717,9 @@ Exit:
 .export ActorWaitForCameraVertically
 .proc ActorWaitForCameraVertically
   seta8
+  ; If no vertical scrolling, just exit
+  lda VerticalScrollEnabled
+  beq Exit
   ; If already activated, just exit
   lda ActorState,x
   beq Exit
