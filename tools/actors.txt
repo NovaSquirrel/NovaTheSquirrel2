@@ -71,7 +71,7 @@ size 16x16
 +FireWalk
 run RunFireWalk
 draw DrawFireWalk
-flag AutoRemove AutoReset GetShot
+flag AutoRemove AutoReset GetShot WaitForCameraVertically
 gfx SPFire
 pal SPFire
 size 16x16
@@ -79,7 +79,7 @@ size 16x16
 +FireJump
 run RunFireJump
 draw DrawFireJump
-flag AutoRemove AutoReset GetShot
+flag AutoRemove AutoReset GetShot WaitForCameraVertically
 gfx SPFire
 pal SPFire
 size 16x16

@@ -105,6 +105,13 @@ Loop:
     pla
   NotWaitUntilNear:
 
+  lsr ; WaitForCameraVertically
+  bcc NotWaitCameraVertically
+    pha
+    jsl ActorWaitForCameraVertically
+    pla
+  NotWaitCameraVertically:
+
   ; Reset the "init" state
   seta8
   lda ActorState,x
@@ -1687,6 +1694,16 @@ Exit:
   cmp #7
   bcs Exit
 
+  ; Also require being close vertically if vertical scrolling is on
+  lda VerticalScrollEnabled
+  beq :+
+    lda PlayerPY+1
+    sub ActorPY+1,x
+    abs
+    cmp #7
+    bcs Exit
+  :
+
 Yes: ; Change to normal state
   lda #ActorStateValue::None
   sta ActorState,x
@@ -1694,6 +1711,41 @@ Exit:
   seta16
   rtl
 .endproc
+
+; If an actor is initializing, change it to the paused state
+; and hold it in the paused state until the actor is within the camera's height
+.export ActorWaitForCameraVertically
+.proc ActorWaitForCameraVertically
+  seta8
+  ; If already activated, just exit
+  lda ActorState,x
+  beq Exit
+  cmp #ActorStateValue::Stunned
+  beq Exit
+  ; If it's initializing, automatically start pausing
+  cmp #ActorStateValue::Init
+  bne :+ ; change it to paused
+    lda #ActorStateValue::Paused
+    sta ActorState,x
+  :
+
+  ; Stop pausing if close enough
+  lda ScrollY+1
+  add #8
+  sub ActorPY+1,x
+  abs
+  cmp #6
+  bcs Exit
+
+Yes: ; Change to normal state
+  lda #ActorStateValue::None
+  sta ActorState,x
+Exit:
+  seta16
+  rtl
+.endproc
+
+
 
 .export ActorClearX
 .a16

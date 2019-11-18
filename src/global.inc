@@ -52,6 +52,7 @@ PlayerHeight = 16*16+14*16
   GetShot       = 2
   AutoReset     = 4
   WaitUntilNear = 8
+  WaitForCameraVertically = 16
   Priority      = %1100000000000000 ; Priority bits
   Essential     = %1000000000000000 
   Primary       = %0100000000000000
