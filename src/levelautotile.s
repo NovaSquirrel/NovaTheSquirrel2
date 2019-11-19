@@ -157,8 +157,13 @@ No:
     lda [MidPointer],y
     iny
     iny
+    cmp #Block::LedgeLeftSide
+    beq @Yes
+    cmp #Block::LedgeRightSide
+    beq @Yes
     cmp #Block::LedgeMiddle
     bne :+
+@Yes:
       lda [MidPointer],y
       add #4*2
       sta [MidPointer],y
