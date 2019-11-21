@@ -1467,10 +1467,31 @@ Horizontal:
 ; Same but for 16x16 projectiles that are ridden on
 .a16
 .proc AbilityPositionProjectile16x16Below
+  phx
+  lda PlayerPY
+  sub #PlayerHeight+$80 ; Top of the head
+  sta PlayerPYTop
+  tay
+  lda PlayerPX
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  jsl BlockRunInteractionBelow
+  plx
+
+  lda BlockFlag
+  bpl NotSolid
+    wdm 0
+    lda PlayerPY
+    add #$0100
+    sta ActorPY,x
+    bra WasSolid
+NotSolid:
+
   lda PlayerPY
   sta ActorPY,x
   sub #$100
   sta PlayerPY
+WasSolid:
 
   lda PlayerPX
   sta ActorPX,x
