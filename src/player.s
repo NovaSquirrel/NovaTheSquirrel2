@@ -1279,7 +1279,7 @@ MakeHealthIcon:
   sta OAM_XPOS,x
   add #8
   sta HealthX
-  lda #>(OAM_PRIORITY_2|OAM_COLOR_0)
+  lda #>(OAM_PRIORITY_3|OAM_COLOR_0)
   sta OAM_ATTR,x
   lda #16+8
   sta OAM_YPOS,x
