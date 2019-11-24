@@ -118,19 +118,82 @@ DrawPlayerProjectileTable:
 .i16
 .proc DrawProjectileStun
   lda #CommonTileBase+$2c+OAM_PRIORITY_2
-  jml DispActor8x8 
+  jml DispActor8x8
 .endproc
 
 .a16
 .i16
 .proc RunProjectileCopy
+  jsl ActorApplyXVelocity
+
+  inc ActorTimer,x
+  lda ActorTimer,x
+  cmp #20
+  bne :+
+    stz ActorType,x
+  :
   rtl
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileCopy
-  rtl
+  lda framecount
+  and #31
+  tay
+
+  lda #1
+  jsr ThwaiteSpeedAngle2Offset
+
+  ; Remove the subpixels
+  lda 0
+  jsr Reduce
+  pha
+  sta 0
+
+  lda 2
+  jsr Reduce
+  pha
+  sta 2
+
+  seta8
+  lda 0
+  sta SpriteXYOffset+0
+  lda 2
+  add #4
+  sta SpriteXYOffset+1
+  seta16
+
+  lda #CommonTileBase+$2a+OAM_PRIORITY_2
+  phy
+  jsl DispActor8x8WithOffset
+  ply
+
+  pla
+  sta 2
+  pla
+  sta 0
+
+  seta8
+  lda 0
+  eor #255
+  ina
+  sta SpriteXYOffset+0
+  lda 2
+  eor #255
+  ina
+  add #4
+  sta SpriteXYOffset+1
+  seta16
+
+  lda #CommonTileBase+$2b+OAM_PRIORITY_2
+  jml DispActor8x8WithOffset
+
+; DispActor8x8WithOffset takes pixels, which is a problem.
+; Shift the subpixels off.
+Reduce:
+  asr_n_16 4
+  rts
 .endproc
 
 .a16
@@ -996,7 +1059,7 @@ NormalWalk:
   lda #$10
   jsl ActorWalk
   jsl ActorAutoBump
-  rtl
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
@@ -1281,7 +1344,7 @@ Loop:
 
   jsl TwoActorCollision
   bcc :+
-    lda ActorType,y
+    lda ActorProjectileType,y
     sta ProjectileType
     sty ProjectileIndex
     sec
@@ -1302,6 +1365,15 @@ NotProjectile:
 .proc ActorGotShot
 ProjectileIndex = ActorGetShotTest::ProjectileIndex
 ProjectileType  = ActorGetShotTest::ProjectileType
+  lda ProjectileType
+  asl
+  tay
+  lda HitProjectileResponse,y
+  pha
+  ldy ProjectileIndex
+  rts
+
+StunAndRemove:
   ; Use ProjectileType to decide what to do.
   ; For now just stun.
   seta8
@@ -1316,6 +1388,93 @@ ProjectileType  = ActorGetShotTest::ProjectileType
   lda #0
   sta ActorType,y
   rtl
+
+Bump:
+  lda #.loword(-$30)
+  sta ActorVY,x
+BumpStunOnly:
+  jsl ActorTurnAround
+  seta8
+  lda #ActorStateValue::Stunned
+  sta ActorState,x
+  seta16
+  lda #90
+  sta ActorTimer,x
+  rtl
+
+KillAndRemove:
+  lda #0
+  sta ActorType,y
+Kill:
+  stz ActorType,x
+  rtl
+
+HitProjectileResponse:
+  .word .loword(StunAndRemove-1) ; Stun
+  .word .loword(Copy-1) ; Copy
+  .word .loword(Bump-1) ; Burger
+  .word .loword(KillAndRemove-1) ; Glider
+  .word .loword(Bump-1) ; Bomb
+  .word .loword(Bump-1) ; Ice
+  .word .loword(KillAndRemove-1) ; Fire ball
+  .word .loword(Kill-1) ; Fire stil
+  .word .loword(KillAndRemove-1) ; Water bottle
+  .word .loword(Kill-1) ; Hammer
+  .word .loword(Bump-1) ; Fishing hook
+  .word .loword(Kill-1) ; Yoyo
+  .word .loword(StunAndRemove-1) ; Mirror
+  .word .loword(StunAndRemove-1) ; RC hand
+  .word .loword(Bump-1) ; RC car
+  .word .loword(StunAndRemove-1) ; RC missile
+  .word .loword(StunAndRemove-1) ; Bubble
+  .word .loword(Kill-1) ; Explosion
+
+Copy:
+  lda #0
+  sta ActorType,y
+
+  ; Find the enemy's type
+  ldy #0
+: lda CopyEnemy,y
+  beq @NoCopy
+  cmp ActorType,x
+  beq @YesCopy
+  iny
+  iny
+  bra :-
+
+  ; Get the ability ID
+@YesCopy:
+  tya
+  lsr
+  tay
+  seta8
+  lda CopyAbility,y
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  seta16
+@NoCopy:
+  rtl
+
+CopyEnemy:
+  .word Actor::FireWalk*2
+  .word Actor::FireJump*2
+  .word Actor::FireFlames*2
+  .word Actor::FireFox*2
+  .word Actor::Grillbert*2
+  .word Actor::George*2
+  .word Actor::Burger*2
+  .word $ffff
+
+CopyAbility:
+  .byt Ability::Fire
+  .byt Ability::Fire
+  .byt Ability::Fire
+  .byt Ability::Fire
+  .byt Ability::Fire
+  .byt Ability::Water
+  .byt Ability::Burger
 .endproc
 
 

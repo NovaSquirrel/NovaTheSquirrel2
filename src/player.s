@@ -1465,6 +1465,7 @@ Horizontal:
 .endproc
 
 ; Same but for 16x16 projectiles that are ridden on
+; Will need to make sure there this can't push you into a wall or ceiling!
 .a16
 .proc AbilityPositionProjectile16x16Below
   phx
@@ -1480,7 +1481,6 @@ Horizontal:
 
   lda BlockFlag
   bpl NotSolid
-    wdm 0
     lda PlayerPY
     add #$0100
     sta ActorPY,x
@@ -1502,6 +1502,9 @@ WasSolid:
 .proc RunAbilityNone
   jsr StepTailSwish
   bne :+
+    lda TailAttackDirection
+    and #>KEY_UP
+    bne CopyInstead
     seta16
     jsl FindFreeProjectileX
     bcc :+
@@ -1511,13 +1514,32 @@ WasSolid:
     stz ActorProjectileType,x
 
     jsr AbilityPositionProjectile8x8
-
-    stz ActorTimer,x
-
-    lda #4*16
-    jsl PlayerNegIfLeft
-    sta ActorVX,x
+    jsr Shared
   :
+  rts
+
+CopyInstead:
+  seta16
+  jsl FindFreeProjectileX
+  bcc _rts
+  lda #Actor::PlayerProjectile16x16*2
+  sta ActorType,x
+
+  lda #PlayerProjectileType::Copy
+  sta ActorProjectileType,x
+
+  jsr AbilityPositionProjectile16x16
+  jsr Shared
+
+_rts:
+  rts
+
+.a16
+Shared:
+  stz ActorTimer,x
+  lda #4*16
+  jsl PlayerNegIfLeft
+  sta ActorVX,x
   rts
 .endproc
 

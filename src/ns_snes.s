@@ -310,7 +310,7 @@ DJ_Label:
   .byt $2c ; BIT absolute
 .endmacro
 
-.macro asr ; Arithmetic shift left
+.macro asr ; Arithmetic shift right
   cmp #$80
   ror
 .endmacro
@@ -328,3 +328,31 @@ DJ_Label:
 
 ; Shortcut to typing out .loword() every time
 .define lw(value) $ffff & (value)
+
+; Efficient arithmetic shift right (16-bit)
+.macro asr_n_16 times
+  .if times = 1
+    cmp #$8000
+    ror
+  .else
+    eor #.loword(-$8000)
+    .repeat times
+      lsr
+    .endrep
+    add #.loword(-($8000 >> times))
+  .endif
+.endmacro
+
+; Efficient arithmetic shift right (8-bit)
+.macro asr_n_8 times
+  .if times = 1
+    cmp #$80
+    ror
+  .else
+    eor #.loword(-$80)
+    .repeat times
+      lsr
+    .endrep
+    add #.loword(-($80 >> times))
+  .endif
+.endmacro
