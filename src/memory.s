@@ -145,22 +145,6 @@
   ; being sent to the PPU, but it makes sprite drawing code much
   ; simpler.
 
-  ; Video updates from scrolling
-  ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
-  ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
-  RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
-  RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
-
-  BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
-
-  DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in
-  DelayedBlockEditAddr: .res MaxDelayedBlockEdits*2 ; Address to put the block at
-; DelayedBlockEditTime: ; Declared elsewhere. Time left until the change
-
   GetLevelPtrXY_Ptr: .res 2 ; Pointer for how to handle getting a pointer from an X and Y position
 
   PlayerAccelSpeed: .res 2
@@ -197,7 +181,21 @@ LevelZeroWhenLoad_Start:
   PlayerSlopeType:     .res 2 ; Type of slope the player is on, if they are on one
   PlayerRolling:       .res 1 ; Nonzero if the player is rolling down a slope
 
-  DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the edit
+  ; Video updates from scrolling
+  ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
+  ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
+  RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
+  RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
+
+  BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
+
+  DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in
+  DelayedBlockEditAddr: .res MaxDelayedBlockEdits*2 ; Address to put the block at
+  DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the change
 LevelZeroWhenLoad_End:
   NeedAbilityChange:       .res 1
   NeedAbilityChangeSilent: .res 1
