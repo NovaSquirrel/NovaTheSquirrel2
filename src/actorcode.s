@@ -1044,7 +1044,7 @@ NormalWalk:
 
       lda #Actor::FireFlames*2  ; limit the number of flames
       jsl CountActorAmount
-      cpy #3
+      cpy #6
       bcs :+
         jsl FindFreeActorY
         bcc :+
