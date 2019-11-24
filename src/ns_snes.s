@@ -3,12 +3,20 @@
 .macpack generic
 .macpack longbranch
 
-; Meant to be an easy replacement for .repeat and .endrepeat
-; when you're trying to save space. Uses a zeropage memory location
-; instead of a register as a loop counter so as not to disturb any
-; registers.
+; Provide the regular 6502 with INA and DEA
+.ifp02
+.macro ina
+  add #1
+.endmacro
+
+.macro dea
+  sub #1
+.endmacro
+.endif
+
+; Loop macro
 ; Times - Number of times to loop ( may be a memory location )
-; Free  - Free zeropage memory location to use
+; Free  - Free memory location to use
 .macro .dj_loop Times, Free
   .scope
     DJ_Counter = Free
@@ -23,25 +31,7 @@ DJ_Label:
   .endscope
 .endmacro
 
-; These use increments (useless)
-.macro .ij_loop Times, Free
-  .scope
-    DJ_Times = Times
-    DJ_Counter = Free
-    lda #0
-    sta Free
-DJ_Label:
-.endmacro
-.macro .end_ijl
-  NextIndex:
-    inc DJ_Counter
-    lda DJ_Counter
-    cmp Times
-    jne DJ_Label
-  .endscope
-.endmacro
-
-; swap using X
+; Swap using X
 .macro swapx mema, memb
   ldx mema
   lda memb
@@ -49,7 +39,7 @@ DJ_Label:
   sta mema
 .endmacro
 
-; swap using Y
+; Swap using Y
 .macro swapy mema, memb
   ldy mema
   lda memb
@@ -57,7 +47,7 @@ DJ_Label:
   sta mema
 .endmacro
 
-; swap using just A + stack
+; Swap using just A + stack
 .macro swapa mema, memb
   lda mema
   pha
@@ -67,7 +57,7 @@ DJ_Label:
   sta memb
 .endmacro
 
-; swap array,x and array,y
+; Swap array,x and array,y
 .macro swaparray list
   lda list,x
   pha
@@ -78,12 +68,12 @@ DJ_Label:
 .endmacro
 
 ; Imitation of z80's djnz opcode.
-; Can be on A, X, Y, or a zeropage memory location
+; Can be on A, X, Y, or a memory location
 ; Label - Label to jump to
 ; Reg   - Counter register to use: A,X,Y or memory location
 .macro djnz Label, Reg
   .if (.match({Reg}, a))
-    sub #1
+    dea
   .elseif (.match({Reg}, x))
     dex
   .elseif (.match({Reg}, y))
@@ -94,39 +84,46 @@ DJ_Label:
   bne Label
 .endmacro
 
-.macro .nyb InpA, InpB		; Makes a .byt storing two 4 bit values
-	.byt ( InpA<<4 ) | InpB
+; Put a nybble in the ROM, big endian I guess?
+.macro .nyb InpA, InpB
+  .byt ( InpA<<4 ) | InpB
 .endmacro
 
-.macro .raddr This          ; like .addr but for making "RTS trick" tables with
- .addr This-1
+; For making "RTS trick" tables
+.macro .raddr This
+  .addr .loword(This-1)
 .endmacro
 
+; Negate (8-bit)
 .macro neg
   eor #255
-  inc a
+  ina
 .endmacro
 
-.macro abs ; absolute value
+; Negate (16-bit)
+.macro negw
+  eor #$ffff
+  ina
+.endmacro
+
+; Absolute value (8-bit)
+.macro abs
 .local @Skip
   bpl @Skip
   neg
 @Skip:
 .endmacro
 
-.macro negw
-  eor #$ffff
-  inc a
-.endmacro
-
-.macro absw ; absolute value
+; Absolute value (16-bit)
+.macro absw
 .local @Skip
   bpl @Skip
   negw
 @Skip:
 .endmacro
 
-.macro sex ; sign extend
+; Sign extend, A = $00 if positive, $FFFF if negative
+.macro sex
 .local @Skip
   ora #$7F
   bmi @Skip
@@ -134,6 +131,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
+; Sign extend, A = $0000 if positive, $FFFF if negative
 .macro sexw
 .local @Skip
   ora #$7FFF
@@ -142,6 +140,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
+; 16-bit negate, 8-bit mode
 .macro neg16 lo, hi
   sec             ;Ensure carry is set
   lda #0          ;Load constant zero
@@ -152,6 +151,7 @@ DJ_Label:
   sta hi          ;... and store the result
 .endmacro
 
+; 16-bit negate indexed, 8-bit mode
 .macro neg16x lo, hi
   sec             ;Ensure carry is set
   lda #0          ;Load constant zero
@@ -162,6 +162,7 @@ DJ_Label:
   sta hi,x        ;... and store the result
 .endmacro
 
+; 16-bit increment, 8-bit mode
 .macro inc16 variable
 .local @Skip
   inc variable+0
@@ -170,6 +171,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
+; 16-bit decrement, 8-bit mode
 .macro dec16 variable
 .local @Skip
   lda variable+0
@@ -191,6 +193,7 @@ DJ_Label:
   pla
 .endmacro
 
+; For avoiding a "lda \ adc #0 \ sta"
 .macro addcarry to
 .local @Skip
   bcc @Skip
@@ -198,13 +201,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
-.macro subcarry to
-.local @Skip
-  bcs @Skip
-  dec to
-@Skip:
-.endmacro
-
+; Above, but indexed
 .macro addcarryx to
 .local @Skip
   bcc @Skip
@@ -212,6 +209,15 @@ DJ_Label:
 @Skip:
 .endmacro
 
+; For avoiding a "lda \ sbc #0 \ sta"
+.macro subcarry to
+.local @Skip
+  bcs @Skip
+  dec to
+@Skip:
+.endmacro
+
+; Above, but indexed
 .macro subcarryx to
 .local @Skip
   bcs @Skip
@@ -219,6 +225,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
+; Decreases a variable if it's not already zero
 .macro countdown counter
 .local @Skip
   lda counter
@@ -227,7 +234,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
-; --- conditional return ---
+; --- Conditional return ---
 .macro rtseq
 .local @Skip
   bne @Skip
@@ -270,6 +277,7 @@ DJ_Label:
 @Skip:
 .endmacro
 
+; Splits a byte into nybbles and stores them
 .macro unpack lo, hi
   pha
   and #15
@@ -282,6 +290,7 @@ DJ_Label:
   sta hi
 .endmacro
 
+; Splits a byte into nybbles and stores them, indexed
 .macro unpackx lo, hi
   pha
   and #15
@@ -294,6 +303,7 @@ DJ_Label:
   sta hi,x
 .endmacro
 
+; Splits a byte into nybbles and stores them, indexed
 .macro unpacky lo, hi
   pha
   and #15
@@ -306,35 +316,46 @@ DJ_Label:
   sta hi,y
 .endmacro
 
+; BIT absolute; skips the next two bytes.
+; Be careful they don't form an address that's sensitive to reads
 .macro skip2
-  .byt $2c ; BIT absolute
+  .byt $2c
 .endmacro
 
-.macro asr ; Arithmetic shift right
+; Arithmetic shift right, 8-bit
+.macro asr
   cmp #$80
   ror
 .endmacro
 
-.macro notcarry ; toggles carry
+; Toggles carry
+.macro notcarry
   rol
   eor #1
   ror
 .endmacro
 
-.proc tkb ; transfer K to B
+; Transfer K to B
+.proc tkb
   phk
   plb
 .endproc
 
 ; Shortcut to typing out .loword() every time
+; with how much it's needed in 65816 stuff
 .define lw(value) $ffff & (value)
 
 ; Efficient arithmetic shift right (16-bit)
 .macro asr_n_16 times
-  .if times = 1
+  .if times = 1     ; 4 bytes
     cmp #$8000
     ror
-  .else
+  .elseif times = 2 ; 8 bytes
+    cmp #$8000
+    ror
+    cmp #$8000
+    ror
+  .else             ; 7+n bytes
     eor #.loword(-$8000)
     .repeat times
       lsr
@@ -345,10 +366,15 @@ DJ_Label:
 
 ; Efficient arithmetic shift right (8-bit)
 .macro asr_n_8 times
-  .if times = 1
+  .if times = 1     ; 3 bytes
     cmp #$80
     ror
-  .else
+  .elseif times = 2 ; 6 bytes
+    cmp #$80
+    ror
+    cmp #$80
+    ror
+  .else             ; 5+n bytes
     eor #.loword(-$80)
     .repeat times
       lsr
