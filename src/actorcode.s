@@ -318,9 +318,11 @@ GliderPushY:
 
   jsl ActorFall
   lda ActorVarA,x
-  sta TempVal ; keep the VarA that was actually used for later
+  pha
   jsl ActorWalk
   jsl ActorAutoBump
+  pla
+  sta TempVal ; keep the VarA that was actually used for later
 
   lda ActorVarA,x
   beq :+
