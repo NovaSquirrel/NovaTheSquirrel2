@@ -938,13 +938,6 @@ Good:
   rtl
 .endproc
 
-; TODO
-.a16
-.proc ActorBecomePoof
-  stz ActorType,x
-  rtl
-.endproc
-
 
 ; Calculate the position of the Actor on-screen
 ; and whether it's visible in the first place
@@ -1351,6 +1344,40 @@ Invalid:
   clc
   rts
 .endproc
+
+; A = tile to draw
+; Very similar to DispParticle8x8; maybe combine them somehow?
+.a16
+.export DispParticle16x16
+.proc DispParticle16x16
+  ldy OamPtr
+  sta OAM_TILE,y ; 16-bit, combined with attribute
+
+  jsr ParticleDrawPosition
+  bcs :+
+    rtl
+  :  
+
+  seta8
+  lda 0
+  sta OAM_XPOS,y
+  lda 2
+  sta OAM_YPOS,y
+
+  ; Get the high bit of the calculated position and plug it in
+  lda 1
+  cmp #%00001000
+  lda #1 ; 8x8 sprites
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  tya
+  add #4
+  sta OamPtr
+  rtl
+.endproc
+
 
 ; A = tile to draw
 .a16

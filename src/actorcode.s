@@ -24,6 +24,7 @@
 CommonTileBase = $40
 
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
+.import DispParticle16x16
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
@@ -1199,6 +1200,11 @@ Frames:
 .i16
 .export DrawPoof
 .proc DrawPoof
+  lda ParticleTimer,x
+  lsr
+  and #%110
+  ora #CommonTileBase+$20+OAM_PRIORITY_2
+  jsl DispParticle16x16
   rts
 .endproc
 
@@ -1206,6 +1212,12 @@ Frames:
 .i16
 .export RunPoof
 .proc RunPoof
+  inc ParticleTimer,x
+  lda ParticleTimer,x
+  cmp #4*3
+  bne :+
+    stz ParticleType,x
+  :
   rts
 .endproc
 
@@ -1406,8 +1418,7 @@ KillAndRemove:
   lda #0
   sta ActorType,y
 Kill:
-  stz ActorType,x
-  rtl
+  jml ActorBecomePoof
 
 HitProjectileResponse:
   .word .loword(StunAndRemove-1) ; Stun
@@ -1636,3 +1647,28 @@ ThwaiteCosineTable:
   rts
 .endproc
 
+
+.a16
+.proc ActorBecomePoof
+  phx
+  lda ActorType,x
+  stz ActorType,x
+  tax
+  .import ActorHeight
+  lda f:ActorHeight,x
+  sta 0
+  plx
+
+  jsl FindFreeParticleY
+  bcc Exit
+    lda #Particle::Poof
+    sta ParticleType,y
+    lda ActorPX,x
+    sta ParticlePX,y
+    lda ActorPY,x
+    sub 0
+    add #4*16
+    sta ParticlePY,y
+Exit:
+  rtl
+.endproc
