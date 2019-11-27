@@ -1684,6 +1684,44 @@ DoIceShared:
 .a8
 .proc RunAbilityFire
   jsr StepTailSwish
+  bne No
+    seta16
+    jsl FindFreeProjectileX
+    bcc No
+    lda #Actor::PlayerProjectile*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::FireBall
+    sta ActorProjectileType,x
+
+    jsr AbilityPositionProjectile8x8
+
+    lda #75
+    sta ActorTimer,x
+
+    ; Horizontal speed
+    lda #$20
+    sta ActorVarA,x
+    lda TailAttackDirection
+    and #>KEY_DOWN
+    beq :+
+       stz ActorVarA,x
+    :
+
+    ; Vertical speed
+    stz ActorVY,x
+    lda TailAttackDirection
+    and #>KEY_UP
+    beq :+
+       lda #.loword(-$50)
+       sta ActorVY,x
+    :
+
+    seta8
+    lda PlayerDir
+    sta ActorDirection,x
+    seta16
+No:
   rts
 .endproc
 

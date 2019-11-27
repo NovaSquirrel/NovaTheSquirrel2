@@ -378,24 +378,66 @@ GliderPushY:
 .a16
 .i16
 .proc RunProjectileFireBall
+  dec ActorTimer,x
+  bne :+
+    inc ActorProjectileType,x ; to FireStill
+    lda #$40
+    sta ActorTimer,x
+    rtl
+  :
+
+  lda ActorVarA,x
+  jsl ActorWalk
+  jsl ActorAutoBump
+
+  jsl ActorFall
+  bcc Exit
+  lda #.loword(-$20)
+  sta ActorVY,x
+Exit:
   rtl
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileFireBall
-  rtl
+  lda framecount
+  and #1
+  ora #$3a|OAM_PRIORITY_2
+  jml DispActor8x8
 .endproc
 
 .a16
 .i16
 .proc RunProjectileFireStill
+  jsl ActorFall
+  bcc :+
+    stz ActorVX,x
+  :
+  jsl ActorApplyVelocity
+
+  lda framecount
+  and #7
+  bne :+
+    jsl ActorTurnAround
+  :
+
+  jsr ActorExpire
   rtl
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileFireStill
+  lda ActorTimer,x
+  cmp #8
+  bcs Always
+  lsr
+  bcc Nope
+Always:
+  lda #OAM_PRIORITY_2|$28
+  jml DispActor16x16
+Nope:
   rtl
 .endproc
 
@@ -1116,19 +1158,7 @@ Frames:
 .i16
 .export RunFireFlames
 .proc RunFireFlames
-  jsl ActorFall
-  bcc :+
-    stz ActorVX,x
-  :
-  jsl ActorApplyVelocity
-
-  lda framecount
-  and #8
-  bne :+
-    jsl ActorTurnAround
-  :
-
-  jsr ActorExpire
+  jsl RunProjectileFireStill
   jml PlayerActorCollisionHurt
 .endproc
 
@@ -1139,7 +1169,7 @@ Frames:
   lda ActorTimer,x
   cmp #8
   bcs Always
-  lsr  
+  lsr
   bcc Nope
 Always:
   lda #OAM_PRIORITY_2|14
