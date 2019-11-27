@@ -18,7 +18,7 @@ draw DrawSneaker
 size 16x16
 
 +Bunny
-flag AutoRemove AutoReset GetShot
+flag AutoRemove AutoReset GetShot WaitForCameraVertically
 pal SPWalker
 gfx SPWalker
 run RunBunny
