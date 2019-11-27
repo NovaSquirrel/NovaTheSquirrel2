@@ -755,13 +755,30 @@ Skip:
   stz ActorOnGround,x
   seta16
 
-  ; If going upwards, don't check (for now)
+  ; If going upwards, bounce against ceilings
   stz 0
   lda ActorVY,x
-  bpl :+
-    lda #0
+  bpl NotUp
+    phx
+    lda ActorType,x
+    tax
+    lda f:ActorHeight,x
+    plx
+    ; Reverse subtraction
+    eor #$ffff
+    sec
+    adc ActorPY,x
+    tay
+    lda ActorPX,x
+    jsl ActorTryVertInteraction
+    asl
+    bcc :+
+      lda #$20
+      sta ActorVY,x
+      clc
+    :
     rtl
-  :
+  NotUp:
 
   ; Check for slope interaction
   jsr ActorGetSlopeYPos
