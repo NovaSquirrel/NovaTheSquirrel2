@@ -1136,8 +1136,16 @@ Frames:
 .i16
 .export DrawFireFlames
 .proc DrawFireFlames
+  lda ActorTimer,x
+  cmp #8
+  bcs Always
+  lsr  
+  bcc Nope
+Always:
   lda #OAM_PRIORITY_2|14
   jml DispActor16x16
+Nope:
+  rtl
 .endproc
 
 .a16
