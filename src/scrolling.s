@@ -402,6 +402,7 @@ CheckExistsLoop:
   stz ActorVarB,x
   stz ActorVarC,x
   stz ActorTimer,x
+  stz ActorOnScreen,x ; also ActorDamage
   lda #ActorStateValue::Init
   sta ActorState,x
   tya

@@ -1806,6 +1806,10 @@ Exit:
   stz ActorTimer,x
   stz ActorDirection,x
   stz ActorOnGround,x
+  ; Change this if another 8-bit property is added
+  seta8
+  stz ActorDamage,x
+  seta16
   rtl
 .endproc
 

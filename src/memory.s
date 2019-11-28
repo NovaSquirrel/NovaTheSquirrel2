@@ -84,7 +84,7 @@
   LevelActorPointer: .res 3 ; actor pointer for this level
 
 .segment "BSS" ; First 8KB of RAM
-  ActorSize = 10*2+4
+  ActorSize = 10*2+5
   ActorStart: .res ActorLen*ActorSize
   ActorEnd:
   ; Must be contiguous
@@ -105,7 +105,7 @@
   ActorState        = 21 ; Nonzero usually means stunned
   ActorOnGround     = 22 ; Nonzero means on ground
   ActorOnScreen     = 23 ; Nonzero means on screen
-
+  ActorDamage       = 24 ; Amount of damage the actor has
   ActorProjectileType = ActorIndexInLevel
 
   ; For less important, light entities

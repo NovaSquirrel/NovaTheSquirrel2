@@ -133,6 +133,7 @@ ProjectileLen = 8
 .globalzp ActorState
 .globalzp ActorOnGround
 .globalzp ActorOnScreen
+.globalzp ActorDamage
 .globalzp ActorProjectileType
 .global ProjectileStart
 .global ProjectileEnd

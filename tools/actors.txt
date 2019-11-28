@@ -32,6 +32,7 @@ gfx SPWalker2
 run RunSpikedHat
 draw DrawSpikedHat
 size 16x13
+health $20
 
 +MovingPlatformHoriz
 essential
@@ -131,7 +132,7 @@ flag AutoRemove AutoReset GetShot
 gfx SPGeorge
 pal SPWalker
 size 16x16
-
+health $20
 
 # ---------- cannon stuff ----------
 +Burger

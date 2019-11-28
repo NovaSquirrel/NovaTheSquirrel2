@@ -1454,30 +1454,87 @@ BumpStunOnly:
   sta ActorTimer,x
   rtl
 
-KillAndRemove:
-  lda #0
-  sta ActorType,y
+
+; Instantly kill anything
 Kill:
   jml ActorBecomePoof
+
+DamageALittle:
+  lda #0
+  sta ActorType,y
+  lda #$04
+  bra AddDamage  
+
+DamageAndRemoveHalf:
+  lda #0
+  sta ActorType,y
+  lda #$08
+  bra AddDamage
+
+DamageAndRemove:
+  lda #0
+  sta ActorType,y
+Damage:
+  lda #$10
+
+; A = damage
+AddDamage:
+  sta 0
+
+  ; Add the damage now
+  lda ActorDamage,x
+  and #255
+  add 0
+  seta8
+  sta ActorDamage,x
+  seta16
+  ; If >= $0100 then it's automatically defeated
+  cmp #$0100
+  bcs Defeated
+  ; Otherwise we need to check how much health the enemy had;
+  ; Save new damage value
+  sta 0
+
+  phx
+  lda ActorType,x
+  lsr
+  tax
+  .import ActorHealth
+  lda f:ActorHealth,x
+  and #255
+  plx
+  cmp 0
+  beq Defeated
+  bcs Damaged
+Defeated:
+  jml ActorBecomePoof
+Damaged:
+  seta8
+  lda #ActorStateValue::Stunned
+  sta ActorState,x
+  seta16
+  lda #60
+  sta ActorTimer,x
+  rtl
 
 HitProjectileResponse:
   .word .loword(StunAndRemove-1) ; Stun
   .word .loword(Copy-1) ; Copy
   .word .loword(Bump-1) ; Burger
-  .word .loword(KillAndRemove-1) ; Glider
+  .word .loword(DamageAndRemove-1) ; Glider
   .word .loword(Bump-1) ; Bomb
   .word .loword(Bump-1) ; Ice
-  .word .loword(KillAndRemove-1) ; Fire ball
-  .word .loword(Kill-1) ; Fire stil
-  .word .loword(KillAndRemove-1) ; Water bottle
-  .word .loword(Kill-1) ; Hammer
+  .word .loword(DamageAndRemove-1) ; Fire ball
+  .word .loword(Damage-1) ; Fire still
+  .word .loword(DamageAndRemoveHalf-1) ; Water bottle
+  .word .loword(Damage-1) ; Hammer
   .word .loword(Bump-1) ; Fishing hook
-  .word .loword(Kill-1) ; Yoyo
+  .word .loword(Damage-1) ; Yoyo
   .word .loword(StunAndRemove-1) ; Mirror
   .word .loword(StunAndRemove-1) ; RC hand
   .word .loword(Bump-1) ; RC car
   .word .loword(StunAndRemove-1) ; RC missile
-  .word .loword(StunAndRemove-1) ; Bubble
+  .word .loword(DamageALittle-1) ; Bubble
   .word .loword(Kill-1) ; Explosion
 
 Copy:

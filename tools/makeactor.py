@@ -51,7 +51,7 @@ for line in text:
 		# Reset to prepare for the new actor
 		priority = False
 		actor = {"name": line[1:], "particle": False, "owdecoration": False, "pic": 0, "size": [16, 16],
-			"run": "ActorNothing", "draw": "ActorNothing", "flags": [],
+			"run": "ActorNothing", "draw": "ActorNothing", "flags": [], "health": "$10",
 			"gfx": None, "pal": None, "essential": False, "secondary": False}
 		continue
 	word, arg = separateFirstWord(line)
@@ -65,7 +65,7 @@ for line in text:
 		actor["size"] = arg.split("x")
 	elif word == "flag":
 		actor["flags"] = arg.split()
-	elif word in ["gfx", "pal", "pic"]:
+	elif word in ["gfx", "pal", "pic", "health"]:
 		actor[word] = arg
 	elif word in ["run", "draw"]:
 		actor[word] = arg
@@ -84,7 +84,7 @@ outfile = open("src/actordata.s", "w")
 outfile.write('; This is automatically generated. Edit "actors.txt" instead\n')
 outfile.write('.include "snes.inc"\n.include "global.inc"\n.include "graphicsenum.s"\n.include "paletteenum.s"\n')
 
-outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidth, ActorHeight, ActorPalette, ActorGraphic\n')
+outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidth, ActorHeight, ActorPalette, ActorGraphic, ActorHealth\n')
 outfile.write('.export ParticleRun, ParticleDraw\n')
 outfile.write('.export OWDecorationGraphic, OWDecorationPalette, OWDecorationPic\n')
 
@@ -146,6 +146,11 @@ for b in all_actors:
 		outfile.write('  .word Palette::%s\n' % (b["pal"]))
 	else:
 		outfile.write('  .word $ffff\n')
+outfile.write('.endproc\n\n')
+
+outfile.write('.proc ActorHealth\n  .byt 0\n')
+for b in all_actors:
+	outfile.write('  .byt %s\n' % (b["health"]))
 outfile.write('.endproc\n\n')
 
 # Particles
