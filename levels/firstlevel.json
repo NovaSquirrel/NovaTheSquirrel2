@@ -16,7 +16,7 @@
 		"Background":	null,
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	[],
-		"BGPalette":	["FGCommon", "FGGrassy", null, null, null, null, null, "BGForest"],
+		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops"],
 		"BGColor":	"RGB(15,23,31)"
 	},

@@ -7,8 +7,8 @@ alias terrain_rocks $1c00
 alias wood $2000
 alias small_trees $2800
 alias common_pal_flowertops $2e00
-alias global_palette 0
-alias terrain_palette 1
+alias global_palette 1
+alias terrain_palette 2
 
 #######################################
 # Global tile stuff
