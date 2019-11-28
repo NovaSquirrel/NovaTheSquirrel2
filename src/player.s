@@ -139,6 +139,7 @@
 
     stz NeedAbilityChange
     stz NeedAbilityChangeSilent
+    stz TailAttackTimer
   NoNeedAbilityChange:
 
   plp

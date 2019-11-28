@@ -225,6 +225,20 @@ Die:
   NotDie:
 
 
+  ; Upon switching abilities, remove all player projectiles
+  .a16
+  lda NeedAbilityChange
+  and #255
+  beq NoAbilityChange
+    lda #ProjectileStart
+  : tax
+    stz ActorType,x
+    add #ActorSize
+    cmp #ProjectileEnd
+    bcc :-
+NoAbilityChange:
+
+
   ; Put all remaining sprites offscreen and generate the second OAM table 
   ; from the less compact version in RAM.
   setaxy16
