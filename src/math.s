@@ -41,10 +41,6 @@
 .a16
 .i8
 .proc GetAtan2
-DX    = 0
-DY    = 2
-Temp1 = 4
-Temp2 = 6
   phk
   plb
 
