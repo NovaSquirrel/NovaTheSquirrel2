@@ -1827,7 +1827,7 @@ CopyEnemy:
   .word Actor::Grillbert*2
   .word Actor::George*2
   .word Actor::Burger*2
-  .word $ffff
+  .word 0
 
 CopyAbility:
   .byt Ability::Fire
