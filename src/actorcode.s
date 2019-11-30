@@ -33,7 +33,7 @@ CommonTileBase = $40
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
-.import PlayerNegIfLeft
+.import PlayerNegIfLeft, ActorNegIfLeft
 
 ; -------------------------------------
 
@@ -1042,6 +1042,7 @@ NormalWalk:
     bne :+
       jsl FindFreeActorY
       bcc :+
+        jsl ActorClearY
         jsl ActorCopyPosXY
 
         ; Throw fires in the air
@@ -1218,17 +1219,239 @@ Nope:
 .i16
 .export RunGeorge
 .proc RunGeorge
-  rtl
+  lda #$10
+  jsl ActorWalkOnPlatform
+  jsl ActorFall
+
+  ; Count down the cooldown timer
+  lda ActorVarA,x
+  beq :+
+    dec ActorVarA,x
+  :
+
+  seta8
+  ; Set the cooldown timer
+  lda ActorState,x
+  cmp #ActorStateValue::Active
+  bne :+
+    lda ActorTimer,x
+    cmp #1
+    bne :+
+      lda #90
+      sta ActorVarA,x
+  :
+
+  lda ActorPX+1,x
+  sub PlayerPX+1
+  abs
+  cmp #6
+  jcs NotNear
+  ; ---
+  lda ActorPY+1,x
+  sub PlayerPY+1
+  abs
+  cmp #7
+  jcs NotNear
+  lda ActorState,x
+  jne NotNear
+  lda ActorVarA,x ; Don't throw if it's already been done too recently
+  jne NotNear
+    lda #ActorStateValue::Active
+    sta ActorState,x
+    seta16
+    lda #60
+    sta ActorTimer,x
+
+    jsl FindFreeActorY
+    bcc NotThrow
+      jsl ActorClearY
+      lda #$00c0
+      jsl ActorNegIfLeft
+      add ActorPX,x
+      sta ActorPX,y
+
+      lda ActorPY,x
+      sub #$0080
+      sta ActorPY,y      
+
+      ; Calculate angle
+      phy
+      lda PlayerPX
+      sub ActorPX,y
+      sta 0
+      lda PlayerPY
+      sub ActorPY,y
+      sta 2
+      .import GetAngle512
+      jsl GetAngle512
+      and #$fffe
+      tay
+      lda #1
+      jsr SpeedAngle2Offset256
+      ply
+      lda 1
+      sta ActorVX,y
+      lda 4
+      sub #$40
+      sta ActorVY,y
+
+      lda #Actor::GeorgeBottle*2
+      sta ActorType,y
+
+      lda #60
+      sta ActorTimer,y
+      seta8
+      lda #ActorStateValue::Paused
+      sta ActorState,y
+
+      ; Put a warning
+      seta16
+      jsl FindFreeParticleY
+      bcc NotThrow
+        lda #Particle::WarningParticle
+        sta ParticleType,y
+        lda PlayerPX
+        sta ParticlePX,y
+        lda PlayerPY
+        sub #$0200
+        sta ParticlePY,y
+        lda #60
+        sta ParticleTimer,y
+    NotThrow:
+  NotNear:
+  seta16
+
+
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
 .i16
 .export DrawGeorge
 .proc DrawGeorge
+  lda ActorVarA,x
+  bne Frame2
+
+  lda #.loword(-4*16)
+  sta SpriteXYOffset
+  lda #OAM_PRIORITY_2 | 0
+  jsr DispActor16x16HorizShift
+
+  lda #.loword(4*16)
+  sta SpriteXYOffset
+  lda #OAM_PRIORITY_2 | 1
+  jsr DispActor16x16HorizShift
+  rtl
+
+Frame2:
+  lda #.loword(-4*16)
+  sta SpriteXYOffset
+  lda #OAM_PRIORITY_2 | 3
+  jsr DispActor16x16HorizShift
+
+  lda #.loword(4*16)
+  sta SpriteXYOffset
+  lda #OAM_PRIORITY_2 | 4
+  jsr DispActor16x16HorizShift
   rtl
 .endproc
 
+.a16
+.i16
+.export RunGeorgeBottle
+.proc RunGeorgeBottle
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Paused
+  bne NotPaused
+  dec ActorTimer,x
+  bne :+
+    lda #30
+    sta ActorTimer,x
+    seta8
+    stz ActorState,x
+    seta16
+: rtl
 
+NotPaused:
+  jsl RunProjectileWaterBottle
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawGeorgeBottle
+.proc DrawGeorgeBottle
+  lda framecount
+  lsr
+  and #%110
+  tay
+
+  lda OffsetsA,y
+  sta SpriteXYOffset
+  lda TilesA,y
+  phy
+  jsl DispActor8x8WithOffset
+  ply
+
+  lda OffsetsB,y
+  sta SpriteXYOffset
+  lda TilesB,y
+  jml DispActor8x8WithOffset
+
+; Base is:
+; X + 4
+; Y + 8
+OffsetsA:
+  .lobytes 4, 8-4
+  .lobytes 4+4, 8
+  .lobytes 4, 8+4
+  .lobytes 4-4, 8
+TilesA:
+  .word $0e|OAM_PRIORITY_2
+  .word $1f|OAM_PRIORITY_2
+  .word $0e|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+  .word $1f|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+OffsetsB:
+  .lobytes 4, 8+4
+  .lobytes 4-4, 8
+  .lobytes 4, 8-4
+  .lobytes 4+4, 8
+TilesB:
+  .word $1e|OAM_PRIORITY_2
+  .word $0f|OAM_PRIORITY_2
+  .word $1e|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+  .word $0f|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
+.endproc
+
+
+; A = tile to draw
+.a16
+.i16
+.proc DispActor16x16HorizShift
+  tay
+
+  ; Flip the offset if needed
+  lda ActorDirection,x
+  lsr
+  bcc :+
+    lda SpriteXYOffset
+    eor #$ffff
+    ina
+    sta SpriteXYOffset
+  :
+
+  lda ActorPX,x
+  pha
+  add SpriteXYOffset
+  sta ActorPX,x
+  tya
+  jsl DispActor16x16  
+
+  pla
+  sta ActorPX,x
+  rts
+.endproc
 
 
 
@@ -1316,6 +1539,29 @@ Nope:
   :
   rts
 .endproc
+
+
+.a16
+.i16
+.export DrawWarningParticle
+.proc DrawWarningParticle
+  lda #CommonTileBase+$11+OAM_PRIORITY_2
+  jsl DispParticle8x8
+  rts
+.endproc
+
+.a16
+.i16
+.export RunWarningParticle
+.proc RunWarningParticle
+  dec ParticleTimer,x
+  bne :+
+    stz ParticleType,x
+  :
+  rts
+.endproc
+
+
 
 
 .a16
@@ -1700,7 +1946,7 @@ ThwaiteCosineTable:
 
 ; Calculates a horizontal and vertical speed from a speed and an angle
 ; input: A (speed) Y (angle, 0-255 times 2)
-; output: 0,1 (X position), 2,3 (Y position)
+; output: 0,1,2 (X position), 2,3,4 (Y position)
 .import MathSinTable, MathCosTable
 .proc SpeedAngle2Offset256
   php

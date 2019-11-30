@@ -134,6 +134,14 @@ pal SPWalker
 size 16x16
 health $20
 
++GeorgeBottle
+run RunGeorgeBottle
+draw DrawGeorgeBottle
+flag AutoRemove
+gfx SPGeorge
+pal SPWalker
+size 8x8
+
 # ---------- cannon stuff ----------
 +Burger
 flag AutoRemove GetShot
@@ -195,6 +203,11 @@ draw DrawPrizeParticle
 particle
 run RunBricksParticle
 draw DrawBricksParticle
+
++WarningParticle
+particle
+run RunWarningParticle
+draw DrawWarningParticle
 
 # ---------- static overworld sprites ----------
 +Tree
