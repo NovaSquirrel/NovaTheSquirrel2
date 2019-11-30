@@ -1549,17 +1549,179 @@
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"Sand",
-					"X":	164,
-					"Y":	12,
-					"W":	5,
-					"H":	4
+					"Id":	"FloatingPlatform",
+					"X":	167,
+					"Y":	13,
+					"W":	3,
+					"H":	1
 				}, {
 					"Id":	"Sand",
-					"X":	171,
-					"Y":	12,
+					"X":	172,
+					"Y":	15,
+					"W":	4,
+					"H":	16
+				}, {
+					"Id":	"Grass",
+					"X":	152,
+					"Y":	24,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	149,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	179,
+					"Y":	17,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	190,
+					"Y":	21,
 					"W":	5,
-					"H":	4
+					"H":	1
+				}, {
+					"Id":	"Sand",
+					"X":	184,
+					"Y":	19,
+					"W":	4,
+					"H":	13
+				}, {
+					"Id":	"Ledge",
+					"X":	188,
+					"Y":	24,
+					"W":	10,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	194,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Sand",
+					"X":	172,
+					"Y":	31,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	198,
+					"Y":	24,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Ledge",
+					"X":	199,
+					"Y":	26,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	201,
+					"Y":	26,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Ledge",
+					"X":	202,
+					"Y":	28,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	166,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	170,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	178,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	182,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	130,
+					"Y":	20,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	121,
+					"Y":	25,
+					"W":	2,
+					"H":	3
+				}, {
+					"Id":	"Money",
+					"X":	136,
+					"Y":	25,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Money",
+					"X":	160,
+					"Y":	19,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Money",
+					"X":	167,
+					"Y":	11,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	179,
+					"Y":	15,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	191,
+					"Y":	19,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	197,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	200,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	203,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	188,
+					"Y":	23,
+					"W":	4,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",
@@ -1635,7 +1797,7 @@
 					"XFlip":	true
 				}, {
 					"Id":	"FireWalk",
-					"X":	95,
+					"X":	96,
 					"Y":	19,
 					"W":	1,
 					"H":	1,
@@ -1670,13 +1832,6 @@
 					"XFlip":	true
 				}, {
 					"Id":	"SlowSneaker",
-					"X":	142,
-					"Y":	27,
-					"W":	1,
-					"H":	1,
-					"XFlip":	true
-				}, {
-					"Id":	"SlowSneaker",
 					"X":	137,
 					"Y":	23,
 					"W":	1,
@@ -1703,11 +1858,60 @@
 					"H":	1,
 					"XFlip":	true
 				}, {
-					"Id":	"FireJump",
-					"X":	171,
-					"Y":	11,
+					"Id":	"George",
+					"X":	168,
+					"Y":	12,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Checkpoint",
+					"X":	154,
+					"Y":	14,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	175,
+					"Y":	14,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	187,
+					"Y":	18,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"George",
+					"X":	180,
+					"Y":	16,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"George",
+					"X":	192,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireWalk",
+					"X":	142,
+					"Y":	27,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireJump",
+					"X":	129,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
 				}]
 		}, {
 			"Name":	"Control",
@@ -1717,6 +1921,12 @@
 					"Id":	"PLAYER_START_R",
 					"X":	3,
 					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SCROLL_LOCK",
+					"X":	207,
+					"Y":	0,
 					"W":	1,
 					"H":	1
 				}]
