@@ -1263,7 +1263,7 @@ Nope:
     sta ActorTimer,x
 
     jsl FindFreeActorY
-    bcc NotThrow
+    jcc NotThrow
       jsl ActorClearY
       lda #$00c0
       jsl ActorNegIfLeft
@@ -1311,9 +1311,10 @@ Nope:
         lda #Particle::WarningParticle
         sta ParticleType,y
         lda PlayerPX
+        sub #$40
         sta ParticlePX,y
         lda PlayerPY
-        sub #$0200
+        sub #$0280
         sta ParticlePY,y
         lda #60
         sta ParticleTimer,y
@@ -1545,8 +1546,15 @@ TilesB:
 .i16
 .export DrawWarningParticle
 .proc DrawWarningParticle
-  lda #CommonTileBase+$11+OAM_PRIORITY_2
-  jsl DispParticle8x8
+  lda framecount
+  and #%1000
+  beq Flipped
+  lda #CommonTileBase+$0a+OAM_PRIORITY_2
+  jsl DispParticle16x16
+  rts
+Flipped:
+  lda #CommonTileBase+$0a+OAM_PRIORITY_2+OAM_XFLIP
+  jsl DispParticle16x16
   rts
 .endproc
 
