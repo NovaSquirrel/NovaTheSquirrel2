@@ -14,7 +14,7 @@
 	"Header":	{
 		"Music":	null,
 		"Background":	null,
-		"SpriteGFX":	["SPWalker", "SPWalker2", "SPCannon", "SPFire", "SPFire2"],
+		"SpriteGFX":	["SPWalker", "SPGeorge", "SPFire", "SPFire2"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops"],
@@ -340,7 +340,7 @@
 					"Id":	"Ledge",
 					"X":	43,
 					"Y":	8,
-					"W":	2,
+					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"Prize",
@@ -386,145 +386,139 @@
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidBottom",
-					"X":	66,
+					"X":	72,
 					"Y":	12,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidLeft",
-					"X":	66,
+					"X":	72,
 					"Y":	10,
 					"W":	1,
 					"H":	2
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	71,
+					"X":	77,
 					"Y":	10,
 					"W":	1,
 					"H":	2
 				}, {
 					"Id":	"Ledge",
-					"X":	67,
+					"X":	73,
 					"Y":	10,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	61,
+					"X":	67,
 					"Y":	10,
 					"W":	5,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidBottom",
-					"X":	70,
+					"X":	76,
 					"Y":	19,
-					"W":	6,
+					"W":	8,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidLeft",
-					"X":	70,
+					"X":	76,
 					"Y":	17,
 					"W":	1,
 					"H":	2
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	75,
-					"Y":	17,
+					"X":	83,
+					"Y":	6,
 					"W":	1,
-					"H":	2
+					"H":	13
 				}, {
 					"Id":	"Ledge",
-					"X":	71,
+					"X":	77,
 					"Y":	17,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"Ladder",
-					"X":	72,
+					"X":	78,
 					"Y":	10,
 					"W":	1,
 					"H":	7
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	73,
+					"X":	79,
 					"Y":	10,
 					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidBottom",
-					"X":	68,
+					"X":	74,
 					"Y":	27,
 					"W":	7,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidLeft",
-					"X":	68,
-					"Y":	23,
-					"W":	1,
-					"H":	4
-				}, {
-					"Id":	"LedgeSolidRight",
 					"X":	74,
 					"Y":	23,
 					"W":	1,
 					"H":	4
 				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	80,
+					"Y":	23,
+					"W":	1,
+					"H":	4
+				}, {
 					"Id":	"Ledge",
-					"X":	69,
+					"X":	75,
 					"Y":	23,
 					"W":	5,
 					"H":	1
 				}, {
 					"Id":	"Bridge",
-					"X":	75,
+					"X":	81,
 					"Y":	23,
-					"W":	3,
+					"W":	5,
 					"H":	1
 				}, {
 					"Id":	"Sand",
-					"X":	78,
+					"X":	86,
 					"Y":	23,
 					"W":	4,
 					"H":	9
 				}, {
 					"Id":	"Ladder",
-					"X":	69,
+					"X":	75,
 					"Y":	17,
 					"W":	1,
 					"H":	6
 				}, {
-					"Id":	"SolidBlock",
-					"X":	75,
-					"Y":	10,
-					"W":	1,
-					"H":	7
-				}, {
 					"Id":	"FloatingPlatform",
-					"X":	76,
+					"X":	84,
 					"Y":	20,
 					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	79,
+					"X":	87,
 					"Y":	20,
 					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
-					"X":	78,
+					"X":	86,
 					"Y":	20,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
-					"X":	81,
+					"X":	89,
 					"Y":	20,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Stone",
-					"X":	66,
+					"X":	72,
 					"Y":	13,
 					"W":	2,
 					"H":	11
@@ -568,7 +562,7 @@
 					"Id":	"Ledge",
 					"X":	50,
 					"Y":	25,
-					"W":	8,
+					"W":	7,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
@@ -644,10 +638,10 @@
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	45,
-					"Y":	8,
+					"X":	50,
+					"Y":	1,
 					"W":	1,
-					"H":	2
+					"H":	9
 				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	42,
@@ -658,7 +652,7 @@
 					"Id":	"LedgeSolidBottom",
 					"X":	42,
 					"Y":	10,
-					"W":	4,
+					"W":	9,
 					"H":	1
 				}, {
 					"Id":	"Grass",
@@ -714,6 +708,858 @@
 					"Y":	17,
 					"W":	3,
 					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	51,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	57,
+					"Y":	25,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Ledge",
+					"X":	58,
+					"Y":	27,
+					"W":	10,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	64,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	64,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	65,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	66,
+					"Y":	23,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	51,
+					"Y":	21,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Ledge",
+					"X":	55,
+					"Y":	18,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	57,
+					"Y":	18,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	54,
+					"Y":	18,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	54,
+					"Y":	20,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	54,
+					"Y":	21,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Vines",
+					"X":	55,
+					"Y":	21,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	54,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	57,
+					"Y":	16,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	52,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Sand",
+					"X":	58,
+					"Y":	18,
+					"W":	5,
+					"H":	9
+				}, {
+					"Id":	"Ledge",
+					"X":	54,
+					"Y":	24,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	46,
+					"Y":	1,
+					"W":	1,
+					"H":	8
+				}, {
+					"Id":	"Vines",
+					"X":	47,
+					"Y":	11,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Vines",
+					"X":	49,
+					"Y":	11,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Ledge",
+					"X":	47,
+					"Y":	1,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"SpikesUp",
+					"X":	46,
+					"Y":	0,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	55,
+					"Y":	14,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	67,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	69,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	69,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	69,
+					"Y":	10,
+					"W":	1,
+					"H":	7
+				}, {
+					"Id":	"Money",
+					"X":	59,
+					"Y":	16,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	72,
+					"Y":	9,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	75,
+					"Y":	6,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	77,
+					"Y":	9,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	76,
+					"Y":	15,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	77,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	79,
+					"Y":	20,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	81,
+					"Y":	6,
+					"W":	1,
+					"H":	12
+				}, {
+					"Id":	"Ledge",
+					"X":	82,
+					"Y":	6,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SpikesUp",
+					"X":	81,
+					"Y":	5,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Sand",
+					"X":	94,
+					"Y":	23,
+					"W":	4,
+					"H":	9
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	90,
+					"Y":	20,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	95,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	94,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	97,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Sand",
+					"X":	71,
+					"Y":	24,
+					"W":	3,
+					"H":	8
+				}, {
+					"Id":	"Sand",
+					"X":	74,
+					"Y":	28,
+					"W":	7,
+					"H":	4
+				}, {
+					"Id":	"Fence",
+					"X":	67,
+					"Y":	9,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	77,
+					"Y":	22,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	76,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	72,
+					"Y":	8,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	81,
+					"Y":	21,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Heart",
+					"X":	63,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	98,
+					"Y":	27,
+					"W":	12,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	99,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	101,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	103,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	105,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	98,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	110,
+					"Y":	23,
+					"W":	1,
+					"H":	5
+				}, {
+					"Id":	"Ledge",
+					"X":	111,
+					"Y":	23,
+					"W":	7,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	107,
+					"Y":	25,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	118,
+					"Y":	23,
+					"W":	1,
+					"H":	9
+				}, {
+					"Id":	"Grass",
+					"X":	111,
+					"Y":	22,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"RedFlowerSpiral",
+					"X":	117,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	115,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	116,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	98,
+					"Y":	21,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	100,
+					"Y":	22,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	121,
+					"Y":	29,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	124,
+					"Y":	25,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	119,
+					"Y":	23,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	123,
+					"Y":	17,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	124,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	126,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	122,
+					"Y":	18,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	122,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	127,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	122,
+					"Y":	19,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Vines",
+					"X":	124,
+					"Y":	19,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Vines",
+					"X":	126,
+					"Y":	19,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	119,
+					"Y":	19,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	122,
+					"Y":	16,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	118,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	123,
+					"Y":	25,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Ledge",
+					"X":	130,
+					"Y":	24,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	129,
+					"Y":	25,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	129,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	134,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	131,
+					"Y":	22,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	130,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	134,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	119,
+					"Y":	21,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	136,
+					"Y":	28,
+					"W":	7,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	136,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	135,
+					"Y":	24,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	125,
+					"Y":	24,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	131,
+					"Y":	23,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	87,
+					"Y":	18,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	95,
+					"Y":	18,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	136,
+					"Y":	18,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	135,
+					"Y":	19,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	135,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	140,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	134,
+					"Y":	18,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	136,
+					"Y":	16,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	137,
+					"Y":	20,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	122,
+					"Y":	28,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	138,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"RedFlowerSpiral",
+					"X":	139,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	144,
+					"Y":	23,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	143,
+					"Y":	23,
+					"W":	1,
+					"H":	6
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	148,
+					"Y":	23,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Ledge",
+					"X":	149,
+					"Y":	25,
+					"W":	7,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	142,
+					"Y":	23,
+					"W":	1,
+					"H":	5
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	142,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	150,
+					"Y":	18,
+					"W":	8,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	157,
+					"Y":	16,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Ledge",
+					"X":	153,
+					"Y":	16,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	156,
+					"Y":	23,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	163,
+					"Y":	12,
+					"W":	1,
+					"H":	16
+				}, {
+					"Id":	"Ledge",
+					"X":	157,
+					"Y":	23,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	158,
+					"Y":	16,
+					"W":	1,
+					"H":	7
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	159,
+					"Y":	16,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	157,
+					"Y":	15,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	145,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	161,
+					"Y":	12,
+					"W":	1,
+					"H":	12
+				}, {
+					"Id":	"Ledge",
+					"X":	162,
+					"Y":	12,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	147,
+					"Y":	22,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	150,
+					"Y":	3,
+					"W":	1,
+					"H":	15
+				}, {
+					"Id":	"SpikesUp",
+					"X":	150,
+					"Y":	2,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	152,
+					"Y":	3,
+					"W":	1,
+					"H":	14
+				}, {
+					"Id":	"Ledge",
+					"X":	151,
+					"Y":	3,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	150,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	159,
+					"Y":	22,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	163,
+					"Y":	28,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Fence",
+					"X":	161,
+					"Y":	11,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	154,
+					"Y":	13,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	153,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	156,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	156,
+					"Y":	12,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Sand",
+					"X":	164,
+					"Y":	12,
+					"W":	5,
+					"H":	4
+				}, {
+					"Id":	"Sand",
+					"X":	171,
+					"Y":	12,
+					"W":	5,
+					"H":	4
 				}]
 		}, {
 			"Name":	"Sprites",
@@ -734,12 +1580,6 @@
 					"H":	1,
 					"XFlip":	true
 				}, {
-					"Id":	"FireFox",
-					"X":	19,
-					"Y":	13,
-					"W":	1,
-					"H":	1
-				}, {
 					"Id":	"FireWalk",
 					"X":	24,
 					"Y":	16,
@@ -755,15 +1595,117 @@
 					"XFlip":	true
 				}, {
 					"Id":	"FireJump",
-					"X":	50,
+					"X":	40,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"George",
+					"X":	56,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"George",
+					"X":	80,
+					"Y":	16,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"George",
+					"X":	96,
+					"Y":	22,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Checkpoint",
+					"X":	80,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FireWalk",
+					"X":	92,
+					"Y":	19,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireWalk",
+					"X":	95,
+					"Y":	19,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	115,
+					"Y":	22,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	79,
+					"Y":	9,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"George",
+					"X":	132,
+					"Y":	21,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireWalk",
+					"X":	125,
+					"Y":	16,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	142,
+					"Y":	27,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	137,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	140,
+					"Y":	17,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	153,
+					"Y":	12,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FireWalk",
+					"X":	154,
 					"Y":	24,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
 				}, {
 					"Id":	"FireJump",
-					"X":	40,
-					"Y":	23,
+					"X":	171,
+					"Y":	11,
 					"W":	1,
 					"H":	1
 				}]
