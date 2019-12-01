@@ -968,7 +968,6 @@ Platform:
   cmp #$20
   bcc :+
   sub #$20
-  asl
   jsl ActorWalk
   jsl ActorAutoBump
 :
@@ -980,7 +979,7 @@ Platform:
     lda ActorOnScreen,x
     beq :+
       lda ActorVarC,x
-      cmp #$20+$30/2
+      cmp #$20+$30
       beq :+
         inc ActorVarC,x
   :
@@ -1051,7 +1050,8 @@ NormalWalk:
 
         ; Random X velocity
         jsl RandomByte
-        and #31
+        and #15
+        add #7
         jsl VelocityLeftOrRight
         sta ActorVX,y
 
