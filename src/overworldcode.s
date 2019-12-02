@@ -22,6 +22,11 @@
 .include "paletteenum.s"
 .smart
 
+PATH_ALLOW_DOWN  = %0001
+PATH_ALLOW_UP    = %0010
+PATH_ALLOW_RIGHT = %0100
+PATH_ALLOW_LEFT  = %1000
+
 
 MapMetatileBuffer    = Scratchpad + (256*0) ; 224 bytes
 MapPathBuffer        = Scratchpad + (256*1) ; 224 bytes
@@ -29,6 +34,7 @@ MapDecorationSprites = Scratchpad + (256*2) ; 512 bytes
 MapPrioritySprites   = Scratchpad + (256*4) ; ? bytes
 MapDecorationLength  = TouchTemp     ; number of bytes
 MapPriorityLength    = TouchTemp + 2 ; number of bytes
+MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
 
 .import Overworld_Pointers
 .import OWBlockTopLeft, OWBlockTopRight, OWBlockBottomLeft, OWBlockBottomRight
@@ -63,6 +69,7 @@ MapPriorityLength    = TouchTemp + 2 ; number of bytes
   sta SpritePaletteSlots+2*1
   sta SpritePaletteSlots+2*2
   sta SpritePaletteSlots+2*3
+  stz MapPlayerMoving
 
   ldx #$c000 >> 1
   ldy #0
@@ -492,9 +499,7 @@ OverworldLoop:
 
 
   seta8
-  lda OverworldPlayerX
-  ora OverworldPlayerY
-  and #15
+  lda MapPlayerMoving
   beq NotMoving
     tdc ; Clear A
     lda OverworldDirection
@@ -507,7 +512,26 @@ OverworldLoop:
     lda OverworldPlayerY
     add MovementOffsetY,y
     sta OverworldPlayerY
-    bra CantMove
+
+    ; Time to stop moving?
+    lda OverworldPlayerX
+    ora OverworldPlayerY
+    and #15
+    jne CantMove
+      jsr GetLevelMarkerUnderPlayer
+      bcs StopMoving
+      jsr GetPathUnderPlayer
+      sta 0
+      tdc ; Clear all of A
+      lda OverworldDirection
+      tax
+      lda f:AllowBitForDirection,x
+      and 0
+      bne :+
+StopMoving:
+        stz MapPlayerMoving
+      :
+      bra CantMove
   NotMoving:
 
 
@@ -515,32 +539,51 @@ OverworldLoop:
   lda keynew+1
   and #>KEY_LEFT
   beq NotLeft
+    jsr GetPathUnderPlayer
+    and #PATH_ALLOW_LEFT
+    beq NotLeft
+    dec OverworldPlayerX
     dec OverworldPlayerX
     lda #3
     sta OverworldDirection
+    inc MapPlayerMoving
 NotLeft:
-
   lda keynew+1
   and #>KEY_RIGHT
   beq NotRight
+    jsr GetPathUnderPlayer
+    and #PATH_ALLOW_RIGHT
+    beq NotRight
+    inc OverworldPlayerX
     inc OverworldPlayerX
     stz OverworldDirection
+    inc MapPlayerMoving
 NotRight:
 
   lda keynew+1
   and #>KEY_DOWN
   beq NotDown
+    jsr GetPathUnderPlayer
+    and #PATH_ALLOW_DOWN
+    beq NotDown
+    inc OverworldPlayerY
     inc OverworldPlayerY
     lda #1
     sta OverworldDirection
+    inc MapPlayerMoving
 NotDown:
 
   lda keynew+1
   and #>KEY_UP
   beq NotUp
+    jsr GetPathUnderPlayer
+    and #PATH_ALLOW_UP
+    beq NotUp
+    dec OverworldPlayerY
     dec OverworldPlayerY
     lda #2
     sta OverworldDirection
+    inc MapPlayerMoving
 NotUp:
 
 CantMove:
@@ -615,7 +658,6 @@ OverworldRenderSpriteLoop:
 
   rtl
 
-
 .a16
 RenderSpriteShared:
   sta OAM+2,y
@@ -632,9 +674,78 @@ NextOAM:
   iny
   rts
 
-MovementOffsetX: .lobytes 1, 0, 0, -1
-MovementOffsetY: .lobytes 0, 1, -1, 0
+MovementOffsetX: .lobytes 2, 0, 0, -2
+MovementOffsetY: .lobytes 0, 2, -2, 0
+
+AllowBitForDirection:
+  .byt PATH_ALLOW_RIGHT
+  .byt PATH_ALLOW_DOWN
+  .byt PATH_ALLOW_UP
+  .byt PATH_ALLOW_LEFT
 .endproc
+
+
+.a8
+.i16
+.proc GetIndexUnderPlayer
+  tdc ; Clear the entire accumulator
+  lda OverworldPlayerY
+  and #$f0
+  sta 0
+  lda OverworldPlayerX
+  lsr
+  lsr
+  lsr
+  lsr
+  ora 0
+  tax
+  rts
+.endproc
+
+.a8
+.i16
+.proc GetLevelMarkerUnderPlayer
+  jsr GetIndexUnderPlayer
+  add #$10 ; Shouldn't need this; fix overworld.py maybe
+  sta 0 ; Compare against this
+
+  ldx #16 ; 16 marker slots
+
+  lda OverworldMap ; Choose which list of 16 level slots
+  asl
+  asl
+  asl
+  asl
+  asl
+  tay
+AddLevelMarkerLoop:
+  lda Overworld_LevelMarkers,y
+  cmp 0
+  beq Yes
+  iny
+  iny
+  dex
+  bne AddLevelMarkerLoop
+Nope:
+  clc
+  rts
+
+Yes:
+  sec
+  rts
+.endproc
+
+
+; Get the path ID under the player
+.a8
+.i16
+.proc GetPathUnderPlayer
+  jsr GetIndexUnderPlayer
+  lda f:MapPathBuffer,x
+  rts
+.endproc
+
+
 
 ; Input: A = overworld sprite ID
 ; Output: 0 and 1
