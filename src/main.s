@@ -230,6 +230,9 @@ Die:
   lda NeedAbilityChange
   and #255
   beq NoAbilityChange
+  ; But don't do it if it should be silent! That probably means an unpause or something
+  lda NeedAbilityChangeSilent
+  bne NoAbilityChange
     lda #ProjectileStart
   : tax
     stz ActorType,x
