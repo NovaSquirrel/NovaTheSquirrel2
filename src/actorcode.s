@@ -1251,11 +1251,14 @@ Nope:
   sub PlayerPY+1
   abs
   cmp #7
-  jcs NotNear
+  bcc :+
+GoToNotNear:
+    jmp NotNear
+  :
   lda ActorState,x
-  jne NotNear
+  bne GoToNotNear
   lda ActorVarA,x ; Don't throw if it's already been done too recently
-  jne NotNear
+  bne GoToNotNear
     lda #ActorStateValue::Active
     sta ActorState,x
     seta16
