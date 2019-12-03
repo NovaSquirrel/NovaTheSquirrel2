@@ -531,7 +531,7 @@ OverworldLoop:
 StopMoving:
         stz MapPlayerMoving
       :
-      bra CantMove
+      jmp CantMove
   NotMoving:
 
 
@@ -585,6 +585,34 @@ NotDown:
     sta OverworldDirection
     inc MapPlayerMoving
 NotUp:
+
+  lda keynew+1
+  and #>KEY_START
+  bne :+
+  lda keynew
+  and #KEY_A
+  beq NotStartLevel
+:   jsr GetLevelMarkerUnderPlayer
+    bcc NotStartLevel
+      pha
+      jsl WaitVblank
+      lda #FORCEBLANK
+      sta PPUBRIGHT
+      tdc   ; Clear top byte of accumulator
+      pla
+
+      and #$f0 ; Just get the color
+      cmp #$20 ; Maffi level?
+      beq StartMaffiLevel
+
+      lda 0 ; Level number
+      .import StartLevel
+      jml StartLevel
+    StartMaffiLevel:
+      lda 0 ; Level number
+      .import StartMode7Level
+      jml StartMode7Level
+  NotStartLevel:
 
 CantMove:
   seta16
@@ -684,7 +712,7 @@ AllowBitForDirection:
   .byt PATH_ALLOW_LEFT
 .endproc
 
-
+; Index the player is currently standing over
 .a8
 .i16
 .proc GetIndexUnderPlayer
@@ -702,6 +730,9 @@ AllowBitForDirection:
   rts
 .endproc
 
+; Carry set = There is a level marker under the player
+; If there is a level, level header pointer is in LevelHeaderPointer,
+; the level number is in 0, and the color/directions are in A
 .a8
 .i16
 .proc GetLevelMarkerUnderPlayer
@@ -709,14 +740,15 @@ AllowBitForDirection:
   add #$10 ; Shouldn't need this; fix overworld.py maybe
   sta 0 ; Compare against this
 
-  ldx #16 ; 16 marker slots
+  ldx #0
+  tdc ; Clear top byte of accumulator
 
   lda OverworldMap ; Choose which list of 16 level slots
   asl
   asl
   asl
   asl
-  asl
+  asl ; Double it because it's a set of position,info pairs
   tay
 AddLevelMarkerLoop:
   lda Overworld_LevelMarkers,y
@@ -724,14 +756,44 @@ AddLevelMarkerLoop:
   beq Yes
   iny
   iny
-  dex
+  inx
+  cpx #16 ; 16 level slots
   bne AddLevelMarkerLoop
 Nope:
-  clc
+  clc ; Not over a level marker
   rts
 
 Yes:
-  sec
+  lda Overworld_LevelMarkers+1,y
+  pha ; Level color (top nybble) and directions (bottom nybble)
+
+  ; X = the marker index within the world
+  ; First get the level ID
+  lda OverworldMap
+  asl
+  asl
+  asl
+  asl
+  sta 0
+  txa
+  tsb 0
+
+  ; Multiply OverworldMap by 3 bytes per pointer
+  lda 0
+  asl
+  adc 0 ; (Carry is probably clear)
+  tay
+
+  ; Copy over the level header pointer
+  lda Overworld_LevelPointers+0,y
+  sta LevelHeaderPointer+0
+  lda Overworld_LevelPointers+1,y
+  sta LevelHeaderPointer+1
+  lda Overworld_LevelPointers+2,y
+  sta LevelHeaderPointer+2
+
+  pla ; A = level color and directions
+  sec ; Is over a level marker
   rts
 .endproc
 

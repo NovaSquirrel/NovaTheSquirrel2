@@ -51,12 +51,14 @@ Mode7SidestepDir:    .res 2
 
 .segment "Mode7Game"
 
-.export Mode7Test
-.proc Mode7Test
+.export StartMode7Level
+.proc StartMode7Level
   phk
   plb
 
   setaxy16
+  sta StartedLevelNumber
+
   ; Clear variables
   stz Mode7ScrollX
   stz Mode7ScrollY
@@ -68,6 +70,9 @@ Mode7SidestepDir:    .res 2
   stz Mode7PlayerY
   stz Mode7Sidestep
   stz Mode7SidestepWanted
+
+  ldx #0
+  jsl ppu_clear_oam
 
   seta8
   ; Transparency outside the mode 7 plane

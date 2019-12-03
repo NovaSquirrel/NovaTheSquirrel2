@@ -34,19 +34,6 @@
   ; Taken from the overworld and used for level-specific flags
   sta StartedLevelNumber
 
-  seta8
-  .import level_demo
-  .import level_autodirttest
-  .import level_woodtest
-  .import level_firstlevel
-  lda #<level_firstlevel
-  sta LevelHeaderPointer+0
-  lda #>level_firstlevel
-  sta LevelHeaderPointer+1
-  lda #^level_firstlevel
-  sta LevelHeaderPointer+2
-
-  seta16
   jsr StartLevelCommon
   jsl UploadLevelGraphics
   jsl MakeCheckpoint

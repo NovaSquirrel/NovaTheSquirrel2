@@ -16,7 +16,7 @@
 		"Background":	null,
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
-		"BGPalette":	["FGCommon", "FGGrassy", null, null, null, null, null, "BGForest"],
+		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "FGForestStone", "BGForest"],
 		"BGColor":	"RGB(15,23,31)"
 	},

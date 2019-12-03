@@ -103,21 +103,15 @@
   dec
   sta random2
 
-  .import Mode7Test
-;  jml Mode7Test
-
   .import OpenOverworld
-;  seta8
-;  lda #2*16
-;  sta OverworldPlayerX
-;  lda #10*16
-;  sta OverworldPlayerY
-;  stz OverworldMap
-;  stz OverworldDirection
-;  jml OpenOverworld
-
-  lda #0
-  jml StartLevel
+  seta8
+  lda #2*16
+  sta OverworldPlayerX
+  lda #10*16
+  sta OverworldPlayerY
+  stz OverworldMap
+  stz OverworldDirection
+  jml OpenOverworld
 .endproc
 
 .export GameMainLoop
