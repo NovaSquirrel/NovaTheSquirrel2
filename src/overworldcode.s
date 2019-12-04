@@ -44,6 +44,18 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
 
 .segment "Overworld"
 
+.a16
+.i16
+.export ExitToOverworld
+.proc ExitToOverworld
+  ldx #$1ff
+  txs ; Reset the stack pointer so no cleanup is needed
+  jsl WaitVblank
+  seta8
+  lda #FORCEBLANK
+  sta PPUBRIGHT
+.endproc
+
 ; Input: A = overworld number
 .a16
 .i16

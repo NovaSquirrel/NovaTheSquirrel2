@@ -66,7 +66,6 @@
                                ; (used for fallthrough platforms)
   PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
   PlayerHealth:     .res 1     ; current health, measured in half hearts
-  PlayerInvincible: .res 1     ; timer for player invincibility
 
   LevelNumber:           .res 2 ; Current level number (actual map number from the game)
   StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
@@ -196,6 +195,8 @@ LevelZeroWhenLoad_Start:
   DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in
   DelayedBlockEditAddr: .res MaxDelayedBlockEdits*2 ; Address to put the block at
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the change
+
+  PlayerInvincible: .res 1     ; timer for player invincibility
 LevelZeroWhenLoad_End:
   NeedAbilityChange:       .res 1
   NeedAbilityChangeSilent: .res 1

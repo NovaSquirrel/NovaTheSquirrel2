@@ -120,6 +120,10 @@ StringExitLevel:
   ldy #32*8+31
   jsl ppu_clear_nt
 
+  ; Temporary until I start actually preloading this with the first selected item
+  jsl InitVWF
+  jsl CopyVWF
+
   ; Prep the VWF area
   seta16
   .repeat 5, I
@@ -400,6 +404,17 @@ CursorTopRow:
       stz CursorTopMenu
   :
 
+  ; Exit from the level
+  lda keynew
+  and #KEY_A
+  beq :+
+    lda CursorTopMenu
+    cmp #4
+    bne :+
+      .import ExitToOverworld
+      jml ExitToOverworld
+  :
+
 CursorWasNotTopRow:
 
   ; Display the cursor
@@ -597,6 +612,7 @@ Exit:
 ; Redraw the item description for whatever the player is currently pointing at
 .proc RefreshItemDescription
   jsl InitVWF
+
   seta8
 
   lda CursorY

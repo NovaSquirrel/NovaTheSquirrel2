@@ -507,6 +507,7 @@ SpecialConfig:
   .word $ffff&BlockSingle,          Block::LedgeRight
   .word $ffff&BlockSingle,          Block::LedgeSolidLeft
   .word $ffff&BlockSingle,          Block::LedgeSolidRight
+  .word $ffff&BlockSingle,          Block::DoorTop
 
   .word $ffff&SlopeLGradual,        0
   .word $ffff&SlopeLMedium,         0

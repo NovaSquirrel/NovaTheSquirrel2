@@ -32,6 +32,7 @@
   S_LedgeRight
   S_LedgeSolidLeft
   S_LedgeSolidRight
+  S_DoorTop
   SlopeL_Gradual
   SlopeL_Medium
   SlopeL_Steep

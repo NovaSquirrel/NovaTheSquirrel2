@@ -128,6 +128,21 @@ t 2,4 3,4
 t 0,0 0,0
 t 4,4 4,4h
 
++DoorTop
+autotile AutotileDoor
+t 0,1 1,1
+t 1,0 1,0
+
++DoorExit
+autotile AutotileDoor
+t 2,1 3,1
+t 1,0 1,0
+
++DoorBottom
+when InsideBody, BlockDoor
+t 1,0 1,0
+t 1,0 1,0
+
 # Wood stuff
 base wood
 

@@ -788,3 +788,12 @@ Right:
   sta [MidPointer],y
   rts
 .endproc
+
+.export AutotileDoor
+.proc AutotileDoor
+  iny
+  iny
+  lda #Block::DoorBottom
+  sta [MidPointer],y
+  rts
+.endproc

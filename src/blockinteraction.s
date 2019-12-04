@@ -25,7 +25,7 @@
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
 .export BlockSign, BlockSpikes, BlockSpring, BlockLadder, BlockLadderTop
-.export BlockFallthrough
+.export BlockFallthrough, BlockDoor
 
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -455,7 +455,7 @@ Exit:
 .proc BlockFallthrough
   seta8
   lda PlayerDownTimer
-  cmp #4
+  cmp #16
   bcc :+
     lda #2
     sta ForceControllerTime
@@ -480,4 +480,24 @@ Exit:
   ora #$80
   sta ParticlePY,y
   rts
+.endproc
+
+.a16
+.i16
+.proc BlockDoor
+  lda keynew
+  and #KEY_UP
+  bne Up
+  rts
+Up:
+  dec LevelBlockPtr
+  dec LevelBlockPtr
+  lda [LevelBlockPtr]
+  cmp #Block::DoorExit
+  beq DoorExit
+DoorNormal:
+  rts
+DoorExit:
+  .import ExitToOverworld
+  jml ExitToOverworld
 .endproc
