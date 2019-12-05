@@ -1588,9 +1588,16 @@ DoBurgerShared:
   lda #40
   sta ActorTimer,x
 
+  ; Set this for the actor riding stuff to work correctly
   lda #3*16
   jsl PlayerNegIfLeft
   sta ActorVX,x
+
+  ; But also set this for ActorWalk
+  seta8
+  lda PlayerDir
+  sta ActorDirection,x
+  seta16
   rts
 .endproc
 

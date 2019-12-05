@@ -200,7 +200,9 @@ Reduce:
 .a16
 .i16
 .proc RunProjectileBurger
-  jsl ActorApplyXVelocity
+  lda #$30
+  jsl ActorWalk
+  bcs Explode
 
   jsl CollideRide
   jsl RideOnProjectile
@@ -213,6 +215,7 @@ Reduce:
 
   dec ActorTimer,x
   bne :+
+Explode:
     lda #5*4
     jmp ChangeToExplosion
   :
@@ -1145,7 +1148,9 @@ Frames:
 .i16
 .export RunFireBullet
 .proc RunFireBullet
-  rtl
+  jsr ActorExpire
+  jsl ActorApplyXVelocity  
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
