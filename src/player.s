@@ -608,8 +608,10 @@ PlayerIsntOnLadder:
     lda PlayerRolling
     and #255
     beq :+
+       seta8
        lda #2
        sta ForceControllerTime
+       seta16
        ; Force left or right based on the slope direction
        lda #KEY_RIGHT|KEY_Y
        sta ForceControllerBits
