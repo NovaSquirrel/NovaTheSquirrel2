@@ -658,7 +658,7 @@ WalkDistance = 0
 
   ; Look up if the wall is solid
   lda ActorPY,x
-  sub #1<<8
+  sub #1<<7
   tay
   lda ActorPX,x
   add WalkDistance
