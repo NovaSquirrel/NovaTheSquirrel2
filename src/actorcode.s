@@ -980,16 +980,25 @@ Platform:
   lda ActorState,x
   bne :+
     lda ActorOnScreen,x
-    beq :+
+    beq SlowBackDown
       lda ActorVarC,x
       cmp #$20+$30
       beq :+
         inc ActorVarC,x
   :
+SlowedDown:
   seta16
-
   jsl ActorFall
   jml PlayerActorCollisionHurt
+
+.a8
+; If not on the screen, start slowing back down
+SlowBackDown:
+  lda ActorVarC,x
+  cmp #$30
+  bcc SlowedDown
+  dec ActorVarC,x
+  bra SlowedDown
 .endproc
 
 .a16
