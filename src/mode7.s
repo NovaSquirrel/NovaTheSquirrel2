@@ -74,12 +74,25 @@ Mode7SidestepDir:    .res 2
   ldx #0
   jsl ppu_clear_oam
 
+  ; Clear the HUD's nametable
+  ldx #$c000 >> 1
+  ldy #64
+  jsl ppu_clear_nt
+
   seta8
   ; Transparency outside the mode 7 plane
   lda #M7_NOWRAP
   sta M7SEL
+  ; Prepare LevelBlockPtr's bank byte
   lda #^Mode7LevelMap
   sta LevelBlockPtr+2
+
+  ; The HUD goes on layer 2 and goes at $c000
+  lda #0 | ($c000 >> 9) ; Right after the sprite graphics
+  sta NTADDR+1
+  ; Base for the tiles themselves are $c000 too
+  lda #$cc >> 1
+  sta BGCHRADDR+0
 
 
   ; Prepare the HDMA tables
@@ -129,7 +142,12 @@ Mode7SidestepDir:    .res 2
 
   ; Common sprites
   lda #Palette::FGCommon
-  ldy #8
+  pha
+  ldy #9
+  jsl DoPaletteUpload
+  pla
+  ; And upload the common palette to the last background palette
+  ldy #7
   jsl DoPaletteUpload
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
@@ -137,6 +155,11 @@ Mode7SidestepDir:    .res 2
   jsl DoGraphicUpload
   lda #Palette::SPMaffi
   ldy #8
+  jsl DoPaletteUpload
+
+  ; Put FGCommon in the last background palette for the HUD
+  lda #Palette::FGCommon
+  ldy #7
   jsl DoPaletteUpload
 
   ; -----------------------------------
@@ -411,7 +434,7 @@ SkipBlock:
   lda Mode7ScrollY+1
   sta BGSCROLLY
 
-  lda #%00010000  ; enable sprites, plane 1
+  lda #%00010010  ; enable sprites, plane 1
   sta BLENDMAIN
 
   ; Calculate the centers
