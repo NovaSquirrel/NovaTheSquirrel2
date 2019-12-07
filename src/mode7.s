@@ -48,6 +48,8 @@ Mode7TurnWanted: .res 2
 Mode7Sidestep:       .res 2
 Mode7SidestepWanted: .res 2
 Mode7SidestepDir:    .res 2
+Mode7ChipsLeft:      .res 2
+Mode7ShadowHUD = Scratchpad
 
 .segment "Mode7Game"
 
@@ -70,6 +72,7 @@ Mode7SidestepDir:    .res 2
   stz Mode7PlayerY
   stz Mode7Sidestep
   stz Mode7SidestepWanted
+  stz Mode7ChipsLeft
 
   ldx #0
   jsl ppu_clear_oam
@@ -152,6 +155,8 @@ Mode7SidestepDir:    .res 2
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
   lda #GraphicsUpload::MaffiM7TempWalk
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::Mode7HUD
   jsl DoGraphicUpload
   lda #Palette::SPMaffi
   ldy #8
@@ -264,6 +269,16 @@ RenderMapLoop:
   ; Top row
   ldy #64
 : lda f:Mode7LevelMap,x
+  cmp #Mode7Block::Collect
+  bne DontIncreaseChipCounter
+    pha
+    sed
+    lda Mode7ChipsLeft
+    adc #0 ; Carry will be set
+    sta Mode7ChipsLeft
+    cld
+    pla
+DontIncreaseChipCounter:
   asl
   asl
   sta PPUDATA
@@ -362,6 +377,46 @@ SkipBlock:
   sta PPUCTRL
 
   seta16
+  ; -----------------------------------
+  ; Update the HUD
+  lda #($c000 >> 1) + NTXY(14, 2)
+  sta PPUADDR
+  HUD_Base = 64 + (7 << 10)
+  lda #12 | HUD_Base
+  sta PPUDATA
+  ina
+  sta PPUDATA
+  lda Mode7ChipsLeft
+  lsr
+  lsr
+  lsr
+  lsr
+  add #2 | HUD_Base
+  sta PPUDATA
+  lda Mode7ChipsLeft
+  and #$0f
+  add #2 | HUD_Base
+  sta PPUDATA
+  ;--- (Bottom)
+  lda #($c000 >> 1) + NTXY(14, 3)
+  sta PPUADDR
+  lda #$10+12 | HUD_Base
+  sta PPUDATA
+  ina
+  sta PPUDATA
+  lda Mode7ChipsLeft
+  lsr
+  lsr
+  lsr
+  lsr
+  add #$12 | HUD_Base
+  sta PPUDATA
+  lda Mode7ChipsLeft
+  and #$0f
+  add #$12 | HUD_Base
+  sta PPUDATA
+
+
   ; -----------------------------------
   ; Start preparing the HDMA
   lda Mode7RealAngle
@@ -672,9 +727,15 @@ WasRotation:
 
   ; Draw a crappy temporary walk animation
   ldy OamPtr
+  lda keydown
+  and #KEY_UP
+  bne :+
+    lda #4
+    bra :++
+  :
   lda framecount
   lsr
-  and #%1100
+: and #%1100
   ora #OAM_PRIORITY_2
   sta 0
   sta OAM_TILE+(4*0),y
@@ -995,6 +1056,11 @@ DoNothing:
   rts
 
 DoCollect:
+  sed
+  lda Mode7ChipsLeft
+  sub #1
+  sta Mode7ChipsLeft
+  cld
   lda #Mode7Block::Hurt
   jmp Mode7ChangeBlock
 DoCountFive:

@@ -23,3 +23,4 @@ A000 OWStone
 A000 SPFire
 A000 SPFire2
 A000 SPGeorge
+C800 Mode7HUD
