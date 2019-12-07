@@ -387,6 +387,12 @@ SkipBlock:
   ina
   sta PPUDATA
   lda Mode7ChipsLeft
+  bne :+
+    lda #1|HUD_Base
+    sta PPUDATA
+    sta PPUDATA
+    bra @TopWasZero
+  :
   lsr
   lsr
   lsr
@@ -397,6 +403,7 @@ SkipBlock:
   and #$0f
   add #2 | HUD_Base
   sta PPUDATA
+@TopWasZero:
   ;--- (Bottom)
   lda #($c000 >> 1) + NTXY(14, 3)
   sta PPUADDR
@@ -405,6 +412,12 @@ SkipBlock:
   ina
   sta PPUDATA
   lda Mode7ChipsLeft
+  bne :+
+    lda #$11|HUD_Base
+    sta PPUDATA
+    sta PPUDATA
+    bra @BottomWasZero
+  :
   lsr
   lsr
   lsr
@@ -415,7 +428,7 @@ SkipBlock:
   and #$0f
   add #$12 | HUD_Base
   sta PPUDATA
-
+@BottomWasZero:
 
   ; -----------------------------------
   ; Start preparing the HDMA
