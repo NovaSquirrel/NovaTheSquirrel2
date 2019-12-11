@@ -648,12 +648,14 @@ NotZZZAlternate:
 
 
 
-  inc MenuBGScroll
-
   lda MenuBGScroll
+  add #$04
+  sta MenuBGScroll
+  lsr
+  lsr
+  lsr
   lsr
   sta 0
-  lsr
   sta 2
 
   ; Turn rendering on
