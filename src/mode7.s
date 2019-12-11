@@ -37,6 +37,9 @@ M7C_M7D_Buffer2 = HDMA_Buffer2+1024
 .import m7c_m7d_list
 
 .segment "BSS"
+; Expose these for reuse by other systems
+.export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7Turning, Mode7TurnWanted
+.export Mode7Sidestep, Mode7SidestepWanted, Mode7SidestepDir, Mode7ChipsLeft
 Mode7ScrollX:    .res 2
 Mode7ScrollY:    .res 2
 Mode7PlayerX:    .res 2

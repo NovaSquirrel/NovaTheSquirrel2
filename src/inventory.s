@@ -23,6 +23,9 @@
 .segment "Inventory"
 .import InitVWF, DrawVWF, CopyVWF, KeyRepeat
 CursorTopMenu = CursorX + 1
+.import Mode7ScrollX, Mode7ScrollY ; Reuse these since it's not used during the inventory
+MenuBGScrollX = Mode7ScrollX
+MenuBGScrollY = Mode7ScrollY
 .include "vwf.inc"
 
 
@@ -71,11 +74,25 @@ StringExitLevel:
   lda #1
   sta CursorY
 
+  ; Initialize the background scroll effect
+  stz MenuBGScrollX
+  lda #1 * 128
+  sta MenuBGScrollY
+
   seta8
   lda #FORCEBLANK
   sta PPUBRIGHT
   lda #1|BG3_PRIORITY
   sta BGMODE
+  ; 32x32 tilemaps on all backgrounds
+  ; (Do this once UploadLevelGraphics can change the sizes back)
+;  lda #0 | ($c000 >> 9) ; Foreground
+;  sta NTADDR+0
+;  lda #0 | ($d000 >> 9) ; Background
+;  sta NTADDR+1
+;  lda #0 | ($e000 >> 9) ; Text
+;  sta NTADDR+2
+
 
   ; Reset all scrolling
   ldx #2*3-1
@@ -106,19 +123,48 @@ StringExitLevel:
   ; Write graphics
   lda #GraphicsUpload::InventoryBG
   jsl DoGraphicUpload
+  lda #GraphicsUpload::InventoryBG2
+  jsl DoGraphicUpload
   lda #GraphicsUpload::InventorySprite
   jsl DoGraphicUpload
 
   ; Clear the screens
-  ldx #$c000 >> 1
+  ldx #$c000 >> 1 ; Foreground
   ldy #0
   jsl ppu_clear_nt
-  ldx #$d000 >> 1
-  ldy #0
-  jsl ppu_clear_nt
-  ldx #$e000 >> 1
+  ldx #$e000 >> 1 ; Text
   ldy #32*8+31
   jsl ppu_clear_nt
+
+
+  setaxy16
+  lda #$d000 >> 1
+  sta PPUADDR
+BGFill:
+  ldy #16 ; Should only need 8 once it's moved to a 32x32 tilemap
+@Loop2:
+  lda #128 | (2<<10)
+  sta 0
+@Loop:
+  ldx #8
+  : lda 0
+    sta PPUDATA
+    ina
+    sta PPUDATA
+    ina
+    sta PPUDATA
+    ina
+    sta PPUDATA
+    dex
+    bne :-
+  lda 0
+  add #4
+  sta 0
+  cmp #128 + (4*4) | (2<<10)
+  bne @Loop
+  dey
+  bne @Loop2
+
 
   ; Temporary until I start actually preloading this with the first selected item
   jsl InitVWF
@@ -174,6 +220,9 @@ VWFBackLoop:
   ; Write palettes for everything else
   lda #Palette::InventoryBG
   ldy #0
+  jsl DoPaletteUpload
+  lda #Palette::InventoryBG2
+  ldy #2
   jsl DoPaletteUpload
   lda #Palette::InventorySprite
   ldy #8
@@ -594,10 +643,60 @@ NotZZZAlternate:
   jsl CopyVWF
   jsl ppu_copy_oam
 
+  ; Slowly move the background diagonally
+;  inc MenuBGScrollX
+;  lda MenuBGScrollX
+;  lsr
+;  sta 0
+
+
+
+  lda CursorX
+  and #255
+  xba
+  lsr
+  sub MenuBGScrollX
+  asr_n_16 4
+  add MenuBGScrollX
+  sta MenuBGScrollX
+
+  lda CursorY
+  and #255
+  xba
+  lsr
+  sub MenuBGScrollY
+  asr_n_16 4
+  add MenuBGScrollY
+  sta MenuBGScrollY
+
+  lda MenuBGScrollX
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+
+  lda MenuBGScrollY
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 2
+
   ; Turn rendering on
   seta8
   lda #15
   sta PPUBRIGHT
+
+  lda 0
+  sta BGSCROLLX+2
+  lda 1
+  sta BGSCROLLX+2
+  lda 2
+  sta BGSCROLLY+2
+  lda 3
+  sta BGSCROLLY+2
+
   jmp Loop
 
 Exit:
