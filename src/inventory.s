@@ -24,8 +24,7 @@
 .import InitVWF, DrawVWF, CopyVWF, KeyRepeat
 CursorTopMenu = CursorX + 1
 .import Mode7ScrollX, Mode7ScrollY ; Reuse these since it's not used during the inventory
-MenuBGScrollX = Mode7ScrollX
-MenuBGScrollY = Mode7ScrollY
+MenuBGScroll = SpriteTileBase
 .include "vwf.inc"
 
 
@@ -75,9 +74,7 @@ StringExitLevel:
   sta CursorY
 
   ; Initialize the background scroll effect
-  stz MenuBGScrollX
-  lda #1 * 128
-  sta MenuBGScrollY
+  stz MenuBGScroll
 
   seta8
   lda #FORCEBLANK
@@ -86,12 +83,12 @@ StringExitLevel:
   sta BGMODE
   ; 32x32 tilemaps on all backgrounds
   ; (Do this once UploadLevelGraphics can change the sizes back)
-;  lda #0 | ($c000 >> 9) ; Foreground
-;  sta NTADDR+0
-;  lda #0 | ($d000 >> 9) ; Background
-;  sta NTADDR+1
-;  lda #0 | ($e000 >> 9) ; Text
-;  sta NTADDR+2
+  lda #0 | ($c000 >> 9) ; Foreground
+  sta NTADDR+0
+  lda #0 | ($d000 >> 9) ; Background
+  sta NTADDR+1
+  lda #0 | ($e000 >> 9) ; Text
+  sta NTADDR+2
 
 
   ; Reset all scrolling
@@ -141,7 +138,7 @@ StringExitLevel:
   lda #$d000 >> 1
   sta PPUADDR
 BGFill:
-  ldy #16 ; Should only need 8 once it's moved to a 32x32 tilemap
+  ldy #8
 @Loop2:
   lda #128 | (2<<10)
   sta 0
@@ -651,35 +648,11 @@ NotZZZAlternate:
 
 
 
-  lda CursorX
-  and #255
-  xba
-  lsr
-  sub MenuBGScrollX
-  asr_n_16 4
-  add MenuBGScrollX
-  sta MenuBGScrollX
+  inc MenuBGScroll
 
-  lda CursorY
-  and #255
-  xba
-  lsr
-  sub MenuBGScrollY
-  asr_n_16 4
-  add MenuBGScrollY
-  sta MenuBGScrollY
-
-  lda MenuBGScrollX
-  lsr
-  lsr
-  lsr
+  lda MenuBGScroll
   lsr
   sta 0
-
-  lda MenuBGScrollY
-  lsr
-  lsr
-  lsr
   lsr
   sta 2
 

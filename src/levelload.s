@@ -304,38 +304,13 @@
   sta DecodePointer+0
 
   ; -----------------------------------
-  ; Set up PPU registers
-  ; (Is this the appropriate place for this?)
   seta8
-  lda #1
-  sta BGMODE       ; mode 1
-
-  stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
-  lda #$e>>1
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
-
-  lda #$8000 >> 14
-  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
-
-  lda #1 | ($c000 >> 9)
-  sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
-  lda #2 | ($d000 >> 9)
-  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens tall
-  lda #0 | ($e000 >> 9)
-  sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
-
   ; set up plane 0's scroll
   stz BGSCROLLX+0
   stz BGSCROLLX+0
   lda #$FF
   sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
   sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
-
-  stz PPURES
-  lda #%00010011  ; enable sprites, plane 0 and 1
-  sta BLENDMAIN
-  lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
-  sta PPUNMI
 
   ; -----------------------------------
   jsr IndexActorList

@@ -262,7 +262,8 @@ DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
   rtl
 .endproc
 
-; Upload level graphics and palettes
+; Upload level graphics and palettes,
+; and also set PPU settings correctly for levels
 .export UploadLevelGraphics
 .proc UploadLevelGraphics
   seta8
@@ -334,7 +335,34 @@ SpriteLoop:
   ldx #$e800 >> 1
   ldy #0
   jsl ppu_clear_nt
-  seta16
 
+  ; .------------------------------------.
+  ; | Set up PPU registers for level use |
+  ; '------------------------------------'
+  .a8 ; Side effect of ppu_clear_nt
+  lda #1
+  sta BGMODE       ; mode 1
+
+  stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
+  lda #$e>>1
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
+
+  lda #$8000 >> 14
+  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
+
+  lda #1 | ($c000 >> 9)
+  sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
+  lda #2 | ($d000 >> 9)
+  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens tall
+  lda #0 | ($e000 >> 9)
+  sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
+
+  stz PPURES
+  lda #%00010011  ; enable sprites, plane 0 and 1
+  sta BLENDMAIN
+  lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
+  sta PPUNMI
+
+  seta16
   jml RenderLevelScreens
 .endproc
