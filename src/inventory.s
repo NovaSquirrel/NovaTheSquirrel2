@@ -641,13 +641,6 @@ NotZZZAlternate:
   jsl ppu_copy_oam
 
   ; Slowly move the background diagonally
-;  inc MenuBGScrollX
-;  lda MenuBGScrollX
-;  lsr
-;  sta 0
-
-
-
   lda MenuBGScroll
   add #$04
   sta MenuBGScroll
@@ -656,7 +649,6 @@ NotZZZAlternate:
   lsr
   lsr
   sta 0
-  sta 2
 
   ; Turn rendering on
   seta8
@@ -667,9 +659,9 @@ NotZZZAlternate:
   sta BGSCROLLX+2
   lda 1
   sta BGSCROLLX+2
-  lda 2
+  lda 0
   sta BGSCROLLY+2
-  lda 3
+  lda 1
   sta BGSCROLLY+2
 
   jmp Loop
