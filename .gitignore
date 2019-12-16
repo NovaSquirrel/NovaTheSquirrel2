@@ -44,3 +44,5 @@ src/overworlddata.s
 src/levelenum.s
 m7levels/*.bin
 src/m7leveldata.s
+src/portraitenum.s
+src/portraitdata.s

@@ -19,6 +19,7 @@
 .include "blockenum.s"
 .include "graphicsenum.s"
 .include "paletteenum.s"
+.include "portraitenum.s"
 .include "m7leveldata.inc"
 .smart
 .importzp hm_node
@@ -37,21 +38,30 @@ M7C_M7D_Buffer2 = HDMA_Buffer2+1024
 
 .segment "BSS"
 ; Expose these for reuse by other systems
-.export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7Turning, Mode7TurnWanted
-.export Mode7Sidestep, Mode7SidestepWanted, Mode7SidestepDir, Mode7ChipsLeft
+.export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted
+.export Mode7SidestepWanted, Mode7ChipsLeft
 Mode7ScrollX:    .res 2
 Mode7ScrollY:    .res 2
 Mode7PlayerX:    .res 2
 Mode7PlayerY:    .res 2
 Mode7RealAngle:  .res 2 ; 0-31
 Mode7Direction:  .res 2 ; 0-3
+Mode7MoveDirection: .res 2 ; 0-3
 Mode7Turning:    .res 2
 Mode7TurnWanted: .res 2
-Mode7Sidestep:       .res 2
 Mode7SidestepWanted: .res 2
-Mode7SidestepDir:    .res 2
 Mode7ChipsLeft:      .res 2
+Mode7Portrait = TouchTemp
+Mode7HappyTimer:  .res 2
+Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
+
+PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
+PORTRAIT_OOPS   = $88 | OAM_PRIORITY_3
+PORTRAIT_HAPPY  = $A0 | OAM_PRIORITY_3
+PORTRAIT_RIGHT  = $A8 | OAM_PRIORITY_3
+PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
+
 
 .segment "Mode7Game"
 
@@ -72,9 +82,9 @@ Mode7ShadowHUD = Scratchpad
   stz Mode7TurnWanted
   stz Mode7PlayerX
   stz Mode7PlayerY
-  stz Mode7Sidestep
   stz Mode7SidestepWanted
   stz Mode7ChipsLeft
+  stz Mode7Oops
 
   ; Clear HDMA buffer space
   ; so the first frame isn't garbage
@@ -169,6 +179,26 @@ Mode7ShadowHUD = Scratchpad
   lda #Palette::SPMaffi
   ldy #8
   jsl DoPaletteUpload
+
+
+  .import DoPortraitUpload
+  lda #Portrait::Maffi
+  ldy #$9000 >> 1
+  jsl DoPortraitUpload
+  ina
+  ldy #$9100 >> 1
+  jsl DoPortraitUpload
+  ina
+  ldy #$9400 >> 1
+  jsl DoPortraitUpload
+  ina
+  ldy #$9500 >> 1
+  jsl DoPortraitUpload
+  ina
+  ldy #$9800 >> 1
+  jsl DoPortraitUpload
+ 
+
 
   ; Put FGCommon in the last background palette for the HUD
   lda #Palette::FGCommon
@@ -539,94 +569,36 @@ SkipBlock:
   ora Mode7PlayerY
   pha
 
-
-  lda Mode7Sidestep
-  beq NoSidestep
-    lda Mode7SidestepDir
-    asl
-    tax
-
-    lda Mode7PlayerX
-    add ForwardX,x
-    sta Mode7PlayerX
-
-    lda Mode7PlayerY
-    add ForwardY,x
-    sta Mode7PlayerY
-
-    ; Stop a vertical sidestep when Y is lined up
-    lda Mode7SidestepDir
-    lsr
-    bcs :+
-      lda Mode7PlayerY
-      and #15
-      beq @Stop
-    :
-
-    ; Stop a horizontal sidestep when X is lined up
-    lda Mode7SidestepDir
-    lsr
-    bcc :+
-      lda Mode7PlayerX
-      and #15
-      beq @Stop
-    :
-
-    bra :+
-    @Stop:
-      stz Mode7Sidestep
-    :
-    jmp WasRotation
-  NoSidestep:
-
   ; ---------------
 
+  lda Mode7Oops
+  jne WasRotation
   lda Mode7Turning
   jne AlreadyTurning
     lda keydown
     and #KEY_LEFT|KEY_RIGHT
     tsb Mode7TurnWanted
-    lda keydown
-    and #KEY_L|KEY_R
-    tsb Mode7SidestepWanted
 
     ; Can't turn except directly on a tile
     lda Mode7PlayerX
     ora Mode7PlayerY
     and #15
+    php
+
+    beq :+
+      ; But you set SidestepWanted while moving forward/backward and also pressing the sidestep key
+      lda Mode7Direction
+      eor Mode7MoveDirection
+      lsr
+      bcs :+
+
+      lda keydown
+      and #KEY_L|KEY_R
+      tsb Mode7SidestepWanted
+    :
+
+    plp
     jne AlreadyTurning
-
-    lda Mode7SidestepWanted
-    and #KEY_L
-    beq NoSidestepL
-      stz Mode7SidestepWanted
-      lda Mode7Direction
-      inc
-      and #3
-      sta Mode7SidestepDir
-      asl
-      tax
-      jsr CheckWallAhead
-      bcs NoSidestepL
-        inc Mode7Sidestep
-        jmp WasRotation
-    NoSidestepL:
-
-    lda Mode7SidestepWanted
-    and #KEY_R
-    beq NoSidestepR
-      stz Mode7SidestepWanted
-      lda Mode7Direction
-      dec
-      and #3
-      sta Mode7SidestepDir
-      asl
-      tax
-      jsr CheckWallAhead
-      bcs NoSidestepR
-        inc Mode7Sidestep
-        jmp WasRotation
-    NoSidestepR:
 
 .if 0
     lda keydown
@@ -644,7 +616,6 @@ SkipBlock:
     lda Mode7TurnWanted
     and #KEY_RIGHT
     beq :+
-      stz Mode7Sidestep
       dec Mode7Turning
       lda Mode7Direction
       dec
@@ -656,7 +627,6 @@ SkipBlock:
     lda Mode7TurnWanted
     and #KEY_LEFT
     beq :+
-      stz Mode7Sidestep
       inc Mode7Turning
       lda Mode7Direction
       inc
@@ -676,20 +646,61 @@ SkipBlock:
     bne NoRotation
       stz Mode7Turning
 NoRotation:
-  ; If not rotating, move forward
-  lda Mode7Direction
-  asl
-  tax
 
-  ; Only move forward when you press up
+  ; If not rotating, allow moving forward
   lda Mode7PlayerX
   ora Mode7PlayerY
   and #15
-  bne :+
+  bne @NotAligned
+    lda keydown
+    ora Mode7SidestepWanted
+    and #KEY_L
+    beq :+
+      stz Mode7SidestepWanted
+      lda Mode7Direction
+      ina
+      and #3
+      sta Mode7MoveDirection
+      bra @StartMoving
+    :
+
+    lda keydown
+    ora Mode7SidestepWanted
+    and #KEY_R
+    beq :+
+      stz Mode7SidestepWanted
+      lda Mode7Direction
+      dec
+      and #3
+      sta Mode7MoveDirection
+      bra @StartMoving
+    :
+
     lda keydown
     and #KEY_UP
-    beq WasRotation
-  :
+    beq :+
+      lda Mode7Direction
+      sta Mode7MoveDirection
+      bra @StartMoving
+    :
+
+    lda keydown
+    and #KEY_DOWN
+    beq :+
+      lda Mode7Direction
+      eor #2
+      sta Mode7MoveDirection
+      bra @StartMoving
+    :
+
+    bra WasRotation
+@NotAligned:
+@StartMoving:
+
+  ; If not rotating, move forward
+  lda Mode7MoveDirection
+  asl
+  tax
 
   ; Don't check for walls except when moving onto a new block
   lda Mode7PlayerX
@@ -751,6 +762,24 @@ WasRotation:
   sta OamPtr
 .endif
 
+  ; Decide which portrait to use
+  lda #PORTRAIT_NORMAL
+  sta Mode7Portrait
+
+  lda Mode7HappyTimer
+  beq :+
+    lda #PORTRAIT_HAPPY
+    sta Mode7Portrait
+    dec Mode7HappyTimer
+  :
+  lda Mode7Oops
+  beq :+
+    lda #PORTRAIT_OOPS
+    sta Mode7Portrait
+    dec Mode7Oops
+    jeq Mode7Die
+  :
+
 
   ; Draw a crappy temporary walk animation
   ldy OamPtr
@@ -773,6 +802,17 @@ WasRotation:
   sta OAM_TILE+(4*2),y
   ora #$02
   sta OAM_TILE+(4*3),y
+
+  lda Mode7Portrait
+  sta OAM_TILE+(4*4),y
+  ora #$02
+  sta OAM_TILE+(4*5),y
+  lda Mode7Portrait
+  ora #$04
+  sta OAM_TILE+(4*6),y
+  ora #$02
+  sta OAM_TILE+(4*7),y
+
   seta8
   DrawCenterX = 128
   DrawCenterY = 192
@@ -791,14 +831,33 @@ WasRotation:
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
 
+
+  lda #10
+  sta OAM_XPOS+(4*4),y
+  sta OAM_XPOS+(4*6),y
+  sta OAM_YPOS+(4*4),y
+  sta OAM_YPOS+(4*5),y
+  lda #10+16
+  sta OAM_XPOS+(4*5),y
+  sta OAM_XPOS+(4*7),y
+  sta OAM_YPOS+(4*6),y
+  sta OAM_YPOS+(4*7),y
+
+
+
   lda #$02
   sta OAMHI+1+(4*0),y
   sta OAMHI+1+(4*1),y
   sta OAMHI+1+(4*2),y
   sta OAMHI+1+(4*3),y
+  ; Portrait
+  sta OAMHI+1+(4*4),y
+  sta OAMHI+1+(4*5),y
+  sta OAMHI+1+(4*6),y
+  sta OAMHI+1+(4*7),y
   seta16
   tya
-  add #4*4
+  add #8*4
   sta OamPtr
 
 
@@ -1094,10 +1153,14 @@ DoNothing:
   rts
 
 DoHurt:
-  .import ExitToOverworld
-  jml ExitToOverworld
+  lda #30
+  sta Mode7Oops
+  rts
 
 DoCollect:
+  lda #15
+  sta Mode7HappyTimer
+
   sed
   lda Mode7ChipsLeft
   sub #1
@@ -1120,7 +1183,15 @@ DoCountTwo:
 .endproc
 
 
-
+.proc Mode7Die
+  seta8
+  jsl WaitVblank
+  lda #FORCEBLANK
+  sta PPUBRIGHT
+  seta16
+  lda StartedLevelNumber
+  jmp StartMode7Level
+.endproc
 
 GradientTable:     ; 
    .byt $02, $9F   ; 

@@ -5,7 +5,7 @@ from PIL import Image
 palettes = {}
 
 for f in glob.glob("palettes/*.png"):
-	# Name of the palette is 
+	# Name of the palette is the filename with path and extension taken out
 	name = os.path.splitext(os.path.basename(f))[0]
 	palettes[name] = []
 

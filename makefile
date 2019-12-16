@@ -22,7 +22,7 @@ objlist = \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
-  math
+  math portraitdata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -101,6 +101,7 @@ brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 palettes := $(wildcard palettes/*.png)
+portaits := $(wildcard portraits/*.png)
 levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
 m7levels_hfm := $(patsubst %.bin,%.hfm,$(wildcard m7levels/*.bin))
@@ -142,7 +143,7 @@ $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(sr
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
-$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s
@@ -163,6 +164,9 @@ $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 	$(PY) tools/makeoverworldblocks.py
 
 
+$(srcdir)/portraitdata.s: $(portraits)
+$(srcdir)/portraitenum.s: $(portraits) tools/encodeportraits.py
+	$(PY) tools/encodeportraits.py
 $(srcdir)/palettedata.s: $(palettes)
 $(srcdir)/paletteenum.s: $(palettes)
 	$(PY) tools/encodepalettes.py

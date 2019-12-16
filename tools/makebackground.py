@@ -50,7 +50,7 @@ def tilestring_bytes(ts):
 	return a+b
 
 def convert(f):
-	# Name of the palette is 
+	# Name of the background is the filename with path and extension taken out
 	name = os.path.splitext(os.path.basename(f))[0]
 	print("Name "+name)
 

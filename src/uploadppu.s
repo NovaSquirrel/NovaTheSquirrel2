@@ -366,3 +366,53 @@ SpriteLoop:
   seta16
   jml RenderLevelScreens
 .endproc
+
+.a16
+.i16
+; Uploads portrait A to address Y
+.export DoPortraitUpload
+.proc DoPortraitUpload
+  pha
+  php
+  seta16
+
+  and #255         ; Zero extend
+  xba              ; *256
+  asl              ; *512
+  ora #$8000
+  sta DMAADDR+$00
+  ora #256
+  sta DMAADDR+$10
+
+  ; Set DMA parameters  
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE+$00
+  sta DMAMODE+$10
+
+  lda #32*8 ; 8 tiles for each DMA
+  sta DMALEN+$00
+  sta DMALEN+$10
+
+  sty PPUADDR
+  seta8
+  .import PortraitData
+  lda #^PortraitData
+  sta DMAADDRBANK+$00
+  sta DMAADDRBANK+$10
+
+  lda #%00000001
+  sta COPYSTART
+
+  ; Bottom row -------------------
+  seta16
+  tya
+  add #$200 >> 1
+  sta PPUADDR
+  seta8
+  lda #%00000010
+  sta COPYSTART
+
+  plp
+  pla
+  rtl
+.endproc
