@@ -12,7 +12,7 @@
   ForceLeft
   ForceRight
   Unused1
-  Unused2
+  Checkpoint
   ToggleButton
   Button
   BlueLock
@@ -29,6 +29,10 @@
   CountTwo
   GetBlock
   AcceptBlock
-  HorizBridge
-  VertBridge
+  Bridge
+  FlyingBlock
+  Exit
+  Ice
+  Bomb
+  RedButton
 .endenum

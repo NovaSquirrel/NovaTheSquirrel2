@@ -25,6 +25,7 @@
 .import huffmunch_load_snes, huffmunch_read_snes
 
 Mode7LevelMap = LevelBuf
+Mode7LevelMapCheckpoint = LevelBuf + (64*64) ; 4096
 
 M7A_M7B_Buffer1 = HDMA_Buffer1
 M7C_M7D_Buffer1 = HDMA_Buffer1+1024
@@ -32,9 +33,7 @@ M7A_M7B_Buffer2 = HDMA_Buffer2
 M7C_M7D_Buffer2 = HDMA_Buffer2+1024
 
 .import m7a_m7b_0
-.import m7c_m7d_0
 .import m7a_m7b_list
-.import m7c_m7d_list
 
 .segment "BSS"
 ; Expose these for reuse by other systems
@@ -76,6 +75,12 @@ Mode7ShadowHUD = Scratchpad
   stz Mode7Sidestep
   stz Mode7SidestepWanted
   stz Mode7ChipsLeft
+
+  ; Clear HDMA buffer space
+  ; so the first frame isn't garbage
+  ldx #.loword(HDMA_Buffer1)
+  ldy #4096
+  jsl MemClear7F
 
   ldx #0
   jsl ppu_clear_oam
@@ -529,6 +534,12 @@ SkipBlock:
 
   ; ---------------
 
+  ; Save player X ORed with player Y so we can know if the player was moving last frame
+  lda Mode7PlayerX
+  ora Mode7PlayerY
+  pha
+
+
   lda Mode7Sidestep
   beq NoSidestep
     lda Mode7SidestepDir
@@ -792,6 +803,11 @@ WasRotation:
 
 
 
+  ; Don't respond to special floors when you weren't moving last frame
+  pla ; Mode7PlayerX|Mode7PlayerY
+  and #15
+  beq :+
+
   ; Respond to special floors when you're in the middle of a block
   lda Mode7PlayerX
   ora Mode7PlayerY
@@ -822,8 +838,7 @@ WasRotation:
 
   ; Switch the data bank.
   ; Probably actually better than switching to 8-bit mode and back to do it.
-  ph2banks m7a_m7b_0, m7a_m7b_0
-  plb
+  ph2banks m7a_m7b_0, StartMode7Level
   plb
 
   ; Write index
@@ -853,7 +868,7 @@ BuildHDMALoop:
   dec 0
   bne BuildHDMALoop
 
-  phk
+  ; Set B back to this bank
   plb
 
   jmp Loop
@@ -1024,7 +1039,11 @@ Exit:
   .byt Floor ;GetBlock
   .byt Solid ;AcceptBlock
   .byt Floor ;Bridge
-  .byt Floor ;FlyingBlock
+  .byt Solid ;FlyingBlock
+  .byt Floor ;Exit
+  .byt Floor ;Ice
+  .byt Floor ;Bomb
+  .byt Floor ;RedButton
 .endproc
 
 CallBlockAction:
@@ -1041,7 +1060,7 @@ CallBlockAction:
   .raddr .loword(DoNothing) ;ToggleFloor
   .raddr .loword(DoNothing) ;ToggleWall
   .raddr .loword(DoCollect) ;Collect
-  .raddr .loword(DoNothing) ;Hurt
+  .raddr .loword(DoHurt)    ;Hurt
   .raddr .loword(DoNothing) ;Spring
   .raddr .loword(DoNothing) ;ForceDown
   .raddr .loword(DoNothing) ;ForceUp
@@ -1067,9 +1086,16 @@ CallBlockAction:
   .raddr .loword(DoNothing) ;AcceptBlock
   .raddr .loword(DoNothing) ;Bridge
   .raddr .loword(DoNothing) ;FlyingBlock
-
+  .raddr .loword(DoNothing) ;Exit
+  .raddr .loword(DoNothing) ;Ice
+  .raddr .loword(DoNothing) ;Bomb
+  .raddr .loword(DoNothing) ;RedButton
 DoNothing:
   rts
+
+DoHurt:
+  .import ExitToOverworld
+  jml ExitToOverworld
 
 DoCollect:
   sed
