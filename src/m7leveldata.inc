@@ -11,7 +11,7 @@
   ForceUp
   ForceLeft
   ForceRight
-  Unused1
+  Empty
   Checkpoint
   ToggleButton
   Button

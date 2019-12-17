@@ -28,6 +28,12 @@
 Mode7LevelMap = LevelBuf
 Mode7LevelMapCheckpoint = LevelBuf + (64*64) ; 4096
 
+; Reusing this may be a little risky but it should be big enough
+Mode7CheckpointX     = CheckpointState + 0
+Mode7CheckpointY     = CheckpointState + 2
+Mode7CheckpointDir   = CheckpointState + 4
+Mode7CheckpointChips = CheckpointState = 6
+
 M7A_M7B_Buffer1 = HDMA_Buffer1
 M7C_M7D_Buffer1 = HDMA_Buffer1+1024
 M7A_M7B_Buffer2 = HDMA_Buffer2
@@ -78,27 +84,9 @@ PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
   stz Mode7ScrollY
   stz Mode7RealAngle
   stz Mode7Direction
-  stz Mode7Turning
-  stz Mode7TurnWanted
   stz Mode7PlayerX
   stz Mode7PlayerY
-  stz Mode7SidestepWanted
   stz Mode7ChipsLeft
-  stz Mode7Oops
-
-  ; Clear HDMA buffer space
-  ; so the first frame isn't garbage
-  ldx #.loword(HDMA_Buffer1)
-  ldy #4096
-  jsl MemClear7F
-
-  ldx #0
-  jsl ppu_clear_oam
-
-  ; Clear the HUD's nametable
-  ldx #$c000 >> 1
-  ldy #64
-  jsl ppu_clear_nt
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -115,33 +103,6 @@ PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
   lda #$cc >> 1
   sta BGCHRADDR+0
 
-
-  ; Prepare the HDMA tables
-  lda #49
-  sta f:M7A_M7B_Buffer1
-  sta f:M7C_M7D_Buffer1
-  sta f:M7A_M7B_Buffer2
-  sta f:M7C_M7D_Buffer2
-  ; "1 scanline"
-  lda #1
-  ldx #5
-: sta f:M7A_M7B_Buffer1,x
-  sta f:M7C_M7D_Buffer1,x
-  sta f:M7A_M7B_Buffer2,x
-  sta f:M7C_M7D_Buffer2,x
-  inx
-  inx
-  inx
-  inx
-  inx
-  cpx #5*(224-48)
-  bne :-
-  ; Zero scanlines, terminate the list
-  dea
-  sta f:M7A_M7B_Buffer1,x
-  sta f:M7C_M7D_Buffer1,x
-  sta f:M7A_M7B_Buffer2,x
-  sta f:M7C_M7D_Buffer2,x
 
 
   ; Upload palettes
@@ -290,11 +251,57 @@ DecompressReadLoop:
   bne DecompressReadLoop
   seta16
 
+RestoredFromCheckpoint:
+  stz Mode7Turning
+  stz Mode7TurnWanted
+  stz Mode7SidestepWanted
+  stz Mode7HappyTimer
+  stz Mode7Oops
+
+  ; Initialize the HDMA table and mode 7 scroll
+  jsr BuildHDMATable
+  jsr CalculateScroll
+
+  ldx #0
+  jsl ppu_clear_oam
+
+  ; Clear the HUD's nametable
+  ldx #$c000 >> 1
+  ldy #64
+  jsl ppu_clear_nt
+  .a8
+
+  ; Prepare the HDMA tables
+  lda #49
+  sta f:M7A_M7B_Buffer1
+  sta f:M7C_M7D_Buffer1
+  sta f:M7A_M7B_Buffer2
+  sta f:M7C_M7D_Buffer2
+  ; "1 scanline"
+  lda #1
+  ldx #5
+: sta f:M7A_M7B_Buffer1,x
+  sta f:M7C_M7D_Buffer1,x
+  sta f:M7A_M7B_Buffer2,x
+  sta f:M7C_M7D_Buffer2,x
+  inx
+  inx
+  inx
+  inx
+  inx
+  cpx #5*(224-48)
+  bne :-
+  ; Zero scanlines, terminate the list
+  dea
+  sta f:M7A_M7B_Buffer1,x
+  sta f:M7C_M7D_Buffer1,x
+  sta f:M7A_M7B_Buffer2,x
+  sta f:M7C_M7D_Buffer2,x
 
   ; .----------------------------------
   ; | Render Mode7LevelMap
   ; '----------------------------------
-  seta8
+
   ; Increment the address on low writes, as the tilemap is in low VRAM bytes
   stz PPUADDR+0
   stz PPUADDR+1
@@ -369,6 +376,7 @@ DontIncreaseChipCounter:
   lda #.loword(Mode7IRQ)
   sta IRQHandler+0
 
+  jsr MakeCheckpoint
 Loop:
   setaxy16
   inc framecount
@@ -736,13 +744,7 @@ IsWall:
 WasRotation:
 
   ; Make it so that 0,0 places the player on the top left corner of the map
-  lda Mode7PlayerX
-  sub #7*16+8
-  sta Mode7ScrollX
-  lda Mode7PlayerY
-  sub #11*16+8
-  sta Mode7ScrollY
-
+  jsr CalculateScroll
 
 ; Star I was using to show the player position initially
 .if 0
@@ -883,7 +885,16 @@ WasRotation:
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
+  jsr BuildHDMATable
 
+  jmp Loop
+
+  rtl
+.endproc
+
+.a16
+.i16
+.proc BuildHDMATable
   ; Build the HDMA table for the matrix registers,
   ; allowing them to be compressed significantly.
   lda Mode7RealAngle
@@ -929,10 +940,7 @@ BuildHDMALoop:
 
   ; Set B back to this bank
   plb
-
-  jmp Loop
-
-  rtl
+  rts
 .endproc
 
 ForwardX:
@@ -1080,7 +1088,7 @@ Exit:
   .byt Floor ;ForceLeft
   .byt Floor ;ForceRight
   .byt Floor ;Unused1
-  .byt Floor ;Unused2
+  .byt Floor ;Checkpoint
   .byt Floor ;ToggleButton
   .byt Floor ;Button
   .byt Solid ;BlueLock
@@ -1125,8 +1133,8 @@ CallBlockAction:
   .raddr .loword(DoNothing) ;ForceUp
   .raddr .loword(DoNothing) ;ForceLeft
   .raddr .loword(DoNothing) ;ForceRight
-  .raddr .loword(DoNothing) ;Unused1
-  .raddr .loword(DoNothing) ;Unused2
+  .raddr .loword(DoNothing) ;Unused
+  .raddr .loword(DoCheckpoint) ;Checkpoint
   .raddr .loword(DoNothing) ;ToggleButton
   .raddr .loword(DoNothing) ;Button
   .raddr .loword(DoNothing) ;BlueLock
@@ -1180,17 +1188,79 @@ DoCountThree:
 DoCountTwo:
   lda #Mode7Block::Collect
   jmp Mode7ChangeBlock
+
+DoCheckpoint:
+  lda #Mode7Block::Empty
+  jsr Mode7ChangeBlock
+  jmp MakeCheckpoint
 .endproc
 
+
+
+
+.a16
+.i16
+.proc MakeCheckpoint
+  lda Mode7PlayerX
+  sta Mode7CheckpointX
+  lda Mode7PlayerY
+  sta Mode7CheckpointY
+  lda Mode7Direction
+  sta Mode7CheckpointDir
+  lda Mode7ChipsLeft
+  sta Mode7CheckpointChips
+
+  ldx #4096-2
+: lda f:Mode7LevelMap,x
+  sta f:Mode7LevelMapCheckpoint,x
+  dex
+  dex
+  bne :-
+  rts
+.endproc
 
 .proc Mode7Die
   seta8
   jsl WaitVblank
   lda #FORCEBLANK
   sta PPUBRIGHT
+  stz BLENDMAIN
   seta16
   lda StartedLevelNumber
-  jmp StartMode7Level
+.endproc
+  ; Fall into next routine
+.proc RestoreCheckpoint
+  setaxy16
+  lda Mode7CheckpointX
+  sta Mode7PlayerX
+  lda Mode7CheckpointY
+  sta Mode7PlayerY
+  lda Mode7CheckpointDir
+  sta Mode7Direction
+  asl
+  asl
+  asl
+  sta Mode7RealAngle
+  lda Mode7CheckpointChips
+  sta Mode7ChipsLeft
+
+  ldx #4096-2
+: lda f:Mode7LevelMapCheckpoint,x
+  sta f:Mode7LevelMap,x
+  dex
+  dex
+  bne :-
+  jmp StartMode7Level::RestoredFromCheckpoint
+.endproc
+
+.proc CalculateScroll
+  lda Mode7PlayerX
+  sub #7*16+8
+  sta Mode7ScrollX
+  lda Mode7PlayerY
+  sub #11*16+8
+  sta Mode7ScrollY
+  rts
 .endproc
 
 GradientTable:     ; 
