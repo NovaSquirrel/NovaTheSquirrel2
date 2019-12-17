@@ -65,7 +65,7 @@ Mode7ShadowHUD = Scratchpad
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
 PORTRAIT_OOPS   = $88 | OAM_PRIORITY_3
 PORTRAIT_HAPPY  = $A0 | OAM_PRIORITY_3
-PORTRAIT_RIGHT  = $A8 | OAM_PRIORITY_3
+PORTRAIT_BLINK  = $A8 | OAM_PRIORITY_3
 PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
 
 
@@ -767,6 +767,21 @@ WasRotation:
   ; Decide which portrait to use
   lda #PORTRAIT_NORMAL
   sta Mode7Portrait
+
+  ; Blink sometimes!
+  lda framecount
+  lsr
+  lsr
+  lsr
+  and #63
+  beq @Blink
+  cmp #2
+  bne :+
+@Blink:
+    lda #PORTRAIT_BLINK
+    sta Mode7Portrait
+  :
+  
 
   lda Mode7HappyTimer
   beq :+
