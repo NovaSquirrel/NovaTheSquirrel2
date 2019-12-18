@@ -235,6 +235,8 @@ MaxSpeedRight = 12
       inc TailAttackTimer
       lda keydown+1
       sta TailAttackDirection
+      lda PlayerNeedsGround
+      sta PlayerNeedsGroundAtAttack
   :
 
   ; Continue an attack that was started
@@ -592,6 +594,7 @@ PlayerIsntOnLadder:
     seta8
     inc PlayerOnSlope
     inc PlayerOnGround
+    stz PlayerNeedsGround
 
     ; Start rolling
     lda PlayerDownTimer
@@ -774,6 +777,10 @@ HasGroundAfterAll:
     seta8
     inc PlayerOnGround
     stz PlayerOnLadder
+    lda PlayerRidingSomething
+    bne DoesntCount
+      stz PlayerNeedsGround
+    DoesntCount:
     seta16
     rts
   :
@@ -1548,6 +1555,8 @@ Shared:
 
 .a8
 .proc RunAbilityBurger
+  lda PlayerNeedsGroundAtAttack
+  bne NoBelow
   lda TailAttackDirection
   and #>KEY_DOWN
   beq NoBelow
@@ -1555,6 +1564,7 @@ Shared:
     beq BurgerBelow
     rts
 BurgerBelow:
+    inc PlayerNeedsGround
     seta16
     jsl FindFreeProjectileX
     bcc :+
@@ -1639,6 +1649,8 @@ DoBurgerShared:
 
 .a8
 .proc RunAbilityIce
+  lda PlayerNeedsGroundAtAttack
+  bne NoBelow
   lda TailAttackDirection
   and #>KEY_DOWN
   beq NoBelow
@@ -1646,6 +1658,7 @@ DoBurgerShared:
     beq IceBelow
     rts
 IceBelow:
+    inc PlayerNeedsGround
     seta16
     jsl FindFreeProjectileX
     bcc :+
@@ -1683,6 +1696,13 @@ DoIceShared:
 
   stz ActorVX,x
   stz ActorVY,x
+
+  lda TailAttackDirection
+  and #>KEY_UP
+  beq :+
+    lda #.loword(-$30)
+    sta ActorVY,x
+  :
 
   seta8
   lda PlayerDir

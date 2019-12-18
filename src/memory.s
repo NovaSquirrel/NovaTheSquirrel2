@@ -197,9 +197,11 @@ LevelZeroWhenLoad_Start:
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the change
 
   PlayerInvincible: .res 1     ; timer for player invincibility
-LevelZeroWhenLoad_End:
+  PlayerNeedsGround: .res 1     ; resets to zero when touching the ground
+  PlayerNeedsGroundAtAttack: .res 1 ; State at the start of the attack
   NeedAbilityChange:       .res 1
   NeedAbilityChangeSilent: .res 1
+LevelZeroWhenLoad_End:
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)

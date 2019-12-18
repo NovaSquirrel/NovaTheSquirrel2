@@ -31,6 +31,8 @@
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
 .global PlayerInvincible
+.global PlayerNeedsGround
+.global PlayerNeedsGroundAtAttack
 .globalzp PlayerWalkLock
 .globalzp PlayerDownTimer
 .globalzp PlayerJumping
