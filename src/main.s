@@ -156,7 +156,23 @@ forever:
     seta16
   :
 
+  ; Upon switching abilities, remove all player projectiles
+  seta8
+  lda NeedAbilityChange
+  beq NoAbilityChange
+  ; But don't do it if it should be silent! That probably means an unpause or something
+  lda NeedAbilityChangeSilent
+  bne NoAbilityChange
+    seta16
+    lda #ProjectileStart
+  : tax
+    stz ActorType,x
+    add #ActorSize
+    cmp #ProjectileEnd
+    bcc :-
+NoAbilityChange:
 
+  seta16
   lda NeedLevelRerender
   lsr
   bcc :+
@@ -218,22 +234,6 @@ Die:
   jml ResumeLevelFromCheckpoint
   NotDie:
 
-
-  ; Upon switching abilities, remove all player projectiles
-  .a16
-  lda NeedAbilityChange
-  and #255
-  beq NoAbilityChange
-  ; But don't do it if it should be silent! That probably means an unpause or something
-  lda NeedAbilityChangeSilent
-  bne NoAbilityChange
-    lda #ProjectileStart
-  : tax
-    stz ActorType,x
-    add #ActorSize
-    cmp #ProjectileEnd
-    bcc :-
-NoAbilityChange:
 
 
   ; Put all remaining sprites offscreen and generate the second OAM table 
