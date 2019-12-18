@@ -25,7 +25,7 @@
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
 .export BlockSign, BlockSpikes, BlockSpring, BlockLadder, BlockLadderTop
-.export BlockFallthrough, BlockDoor
+.export BlockFallthrough, BlockDoor, BlockCeilingBarrier
 
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
@@ -500,4 +500,12 @@ DoorNormal:
 DoorExit:
   .import ExitToOverworld
   jml ExitToOverworld
+.endproc
+
+.a16
+.i16
+.proc BlockCeilingBarrier
+  lda #$40
+  sta PlayerVY
+  rts
 .endproc

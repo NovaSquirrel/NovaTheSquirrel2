@@ -535,7 +535,7 @@ SpecialConfig:
 ; Set 3
   .word Block::BlueFlowerCircle
   .word Block::BranchPlatformMiddle
-  .word Block::Empty
+  .word Block::CeilingBarrier
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty

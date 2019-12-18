@@ -20,6 +20,11 @@ palette global_palette
 t 0,0 0,0
 t 0,0 0,0
 
++CeilingBarrier
+when Touch, BlockCeilingBarrier
+t 4,1v 0,0
+t 0,0 4,1v
+
 +Bricks
 when Below, BlockBricks
 solid

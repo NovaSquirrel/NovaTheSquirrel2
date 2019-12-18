@@ -84,6 +84,7 @@
 .enum LN3
   BlueFlowerCircle
   BranchPlatformMiddle
+  CeilingBarrier
 .endenum
 
 .enum LN4
