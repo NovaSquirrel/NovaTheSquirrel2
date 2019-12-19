@@ -216,9 +216,16 @@ MaxSpeedRight = 12
     :
   NoTapRun:
 
+  ; Hackish workaround for abilities that end when you press the attack button
+  ; so that they don't immediately trigger again
+  lda TailAttackCooldown
+  beq :+
+    dec TailAttackCooldown
+    bra CantAttack
+  :
 
   lda keynew
-  and #KEY_X|KEY_A|KEY_L|KEY_R
+  and #AttackKeys
   beq :+
     lda #3
     sta PlayerWantsToAttack
@@ -238,6 +245,7 @@ MaxSpeedRight = 12
       lda PlayerNeedsGround
       sta PlayerNeedsGroundAtAttack
   :
+CantAttack:
 
   ; Continue an attack that was started
   lda TailAttackTimer
@@ -1878,8 +1886,6 @@ No:
   lda TailAttackTimer
   cmp #1
   bne NoCreateRocket
-    inc TailAttackTimer
-
     seta16
     jsl FindFreeProjectileX
     bcc NoCreateRocket
@@ -1916,6 +1922,14 @@ No:
     :
 
 NoCreateRocket:
+
+  ; Allow some measure of detecting how long the missile has been out, for the
+  ; early detonation code.
+  lda TailAttackTimer
+  cmp #20
+  beq :+
+    inc TailAttackTimer
+  :
   bra RunAbilityRemote
 .endproc
 
@@ -1960,7 +1974,7 @@ ChargeUp:
   stx OamPtr
 
   lda keydown
-  and #KEY_X|KEY_A|KEY_L|KEY_R
+  and #AttackKeys
   bne :+
     stz TailAttackTimer
     stz AbilityMovementLock

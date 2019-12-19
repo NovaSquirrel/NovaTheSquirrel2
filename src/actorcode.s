@@ -709,6 +709,18 @@ NoTarget:
     lsr ActorVarC,x
   :
 
+  ; Can press attack button again if it's been a few frames
+  ; (to detect that it wasn't the press that created the rocket in the first place)
+  ; and it will explode without having to hit anything.
+  lda keynew
+  and #AttackKeys
+  beq :+
+    lda TailAttackTimer
+    and #255
+    cmp #5
+    bcs ExplodeNow
+  :
+
   ; Explode if necessary
   lda ActorPY,x
   sub #$80
@@ -718,7 +730,10 @@ NoTarget:
   jsl ActorTryVertInteraction
   cmp ActorVarC,x
   bcc :+
+ExplodeNow:
     seta8
+    lda #5
+    sta TailAttackCooldown
     stz AbilityMovementLock
     stz TailAttackTimer
     seta16

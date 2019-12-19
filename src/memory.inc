@@ -213,7 +213,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global RenderBuffer
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
-.global TailAttackTimer, TailAttackDirection, TailAttackFrame
+.global TailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown
 .global AbilityMovementLock
 
 

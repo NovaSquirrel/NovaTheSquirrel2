@@ -70,3 +70,5 @@ PlayerHeight = 16*16+14*16
 .global FindFreeActorX, FindFreeActorY, FindFreeParticleY
 
 .global RandomByte, VelocityLeftOrRight
+
+AttackKeys = KEY_X|KEY_A|KEY_L|KEY_R

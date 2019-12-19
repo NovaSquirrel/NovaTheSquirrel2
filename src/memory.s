@@ -218,6 +218,7 @@ LevelZeroWhenLoad_End:
   TailAttackTimer:     .res 1 ; How far we are into the animation
   TailAttackDirection: .res 1 ; What directional keys were pressed
   TailAttackFrame:     .res 1 ; Current frame to use for the player during the attack
+  TailAttackCooldown:  .res 1 ; Frames before the attack button can be used again
   AbilityMovementLock: .res 1
 
   VWFStackL:     .res VWFStackLen
