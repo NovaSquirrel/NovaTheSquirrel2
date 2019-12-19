@@ -1875,6 +1875,47 @@ No:
 
 .a8
 .proc RunAbilityRocket
+  lda TailAttackTimer
+  cmp #1
+  bne NoCreateRocket
+    inc TailAttackTimer
+
+    seta16
+    jsl FindFreeProjectileX
+    bcc NoCreateRocket
+    lda #Actor::PlayerProjectile16x16*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::RemoteMissile
+    sta ActorProjectileType,x
+
+    lda PlayerPY
+    sub #7<<4
+    sta ActorPY,x
+    lda PlayerPX
+    sta ActorPX,x
+
+    stz ActorVarA,x
+    stz ActorVarB,x ; Angle
+
+    lda #60
+    sta ActorTimer,x
+    seta8
+
+    lda PlayerDir     ; If facing left, make missile face left too
+    beq :+
+      lda #128
+      sta ActorVarB,x ; Angle
+    :
+
+    lda TailAttackDirection
+    and #>(KEY_UP)
+    beq :+
+      lda #192
+      sta ActorVarB,x ; Angle
+    :
+
+NoCreateRocket:
   bra RunAbilityRemote
 .endproc
 

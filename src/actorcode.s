@@ -572,16 +572,201 @@ TilesB:
   rtl
 .endproc
 
+.proc HalfLongVelocity
+  seta8
+  lda 2
+  asl
+  ror 2
+  ror 1
+  ror 0
+
+  lda 5
+  asl
+  ror 5
+  ror 4
+  ror 3
+  rts
+.endproc
+
+.proc ActorApplyLongVelocity
+  XPosExtra = ActorVarA+0 ; Extra position bits
+  YPosExtra = ActorVarA+1 ; Extra position bits
+  seta8
+  lda XPosExtra,x
+  add 0
+  sta XPosExtra,x
+  lda ActorPX+0,x
+  adc 1
+  sta ActorPX+0,x
+  lda ActorPX+1,x
+  adc 2
+  sta ActorPX+1,x
+
+  lda YPosExtra,x
+  add 3
+  sta YPosExtra,x
+  lda ActorPY+0,x
+  adc 4
+  sta ActorPY+0,x
+  lda ActorPY+1,x
+  adc 5
+  sta ActorPY+1,x
+  seta16
+  rts
+.endproc
+
 .a16
 .i16
 .proc RunProjectileRemoteMissile
+  XPosExtra = ActorVarA+0 ; Extra position bits
+  YPosExtra = ActorVarA+1 ; Extra position bits
+  ThisAngle = ActorVarB   ; Angle
+TargetAngle = 0
+AbsDifference = 2
+
+  ; Calculate target angle
+  seta8
+  tdc ; Clear accumulator, for the TAY
+  lda keydown+1
+  and #>(KEY_LEFT|KEY_RIGHT|KEY_UP|KEY_DOWN)
+  beq NoTarget
+    tay
+    seta16 ; Switch to 16-bit to make the math easier
+    lda TargetAngleTable,y
+    and #255
+    cmp #255
+    beq NoTarget
+    sta TargetAngle
+
+    ; Implement the retargeting here
+    lda ThisAngle,x
+    sub TargetAngle
+    absw
+    sta AbsDifference
+
+    ; If the difference is small enough, just snap
+    cmp #4
+    bcs :+
+      lda TargetAngle
+      sta ThisAngle,x
+      bra NoTarget
+    :
+
+    cmp #128
+    bcs :+
+      lda ThisAngle,x
+      cmp TargetAngle
+      bcc :+
+        lda ThisAngle,x
+        sub #3
+        sta ThisAngle,x
+        bra NoTarget
+    :
+
+    lda AbsDifference
+    cmp #128
+    bne :+
+      lda ThisAngle,x
+      eor #128
+      sta ThisAngle,x
+      bra NoTarget
+    :
+    bcc :+
+      lda ThisAngle,x
+      cmp TargetAngle
+      bcs :+
+        lda ThisAngle,x
+        sub #3
+        sta ThisAngle,x
+        bra NoTarget
+    :
+
+    lda ThisAngle,x
+    add #3
+    sta ThisAngle,x
+NoTarget:
+  seta16
+
+  lda ThisAngle,x
+  and #255
+  sta ThisAngle,x
+  asl
+  tay
+  lda #1
+  jsr SpeedAngle2Offset256
+  ; Results in
+  ; 0,1,2 X
+  ; 3,4,5 Y
+  jsr HalfLongVelocity
+  jsr ActorApplyLongVelocity
+
+  ; Calculate a value to compare against; only collide with one-way tiles if going down
+  lda #$8000
+  sta ActorVarC,x
+  lda 4
+  beq :+
+  bmi :+
+    lsr ActorVarC,x
+  :
+
+  ; Explode if necessary
+  lda ActorPY,x
+  sub #$80
+  tay
+  lda ActorPX,x
+  .import ActorTryVertInteraction
+  jsl ActorTryVertInteraction
+  cmp ActorVarC,x
+  bcc :+
+    seta8
+    stz AbilityMovementLock
+    stz TailAttackTimer
+    seta16
+    lda #5*4
+    jmp ChangeToExplosion
+  :
+
   rtl
+TargetAngleTable:
+  .byt 255 ; udlr
+  .byt 0   ; udlR East
+  .byt 128 ; udLr West
+  .byt 255 ; udLR
+  .byt 64  ; uDlr South
+  .byt 32  ; uDlR Southeast
+  .byt 96  ; uDLr Southwest
+  .byt 255 ; uDLR
+  .byt 192 ; Udlr North
+  .byt 224 ; UdlR Northeast
+  .byt 160 ; UdLr Northwest
+  .byt 255 ; UdLR
+  .byt 255 ; UDlr
+  .byt 255 ; UDlR
+  .byt 255 ; UDLr
+  .byt 255 ; UDLR
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileRemoteMissile
-  rtl
+  lda ActorVarB,x
+  add #8
+  lsr ; %01110000
+  lsr ; %00111000
+  lsr ; %00011100
+  lsr ; %00001110
+  and  #%00001110
+  tay
+  lda Frames,y
+  jml DispActor16x16Flipped
+
+Frames:
+Up    = $2a
+Diag  = $2c
+Right = $2e
+  PR = OAM_PRIORITY_2
+  .word PR|Right, PR|Diag|OAM_YFLIP, PR|Up|OAM_YFLIP, PR|Diag|OAM_XFLIP|OAM_YFLIP
+  .word PR|Right|OAM_XFLIP, PR|Diag|OAM_XFLIP, PR|Up, PR|Diag
 .endproc
 
 .a16
@@ -1702,6 +1887,8 @@ StunAndRemove:
   seta8
   lda #ActorStateValue::Stunned
   sta ActorState,x
+  stz AbilityMovementLock
+  stz TailAttackTimer
   seta16
 
   lda #180
