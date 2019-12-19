@@ -1991,7 +1991,7 @@ HitProjectileResponse:
   .word .loword(StunAndRemove-1) ; Mirror
   .word .loword(StunAndRemove-1) ; RC hand
   .word .loword(Bump-1) ; RC car
-  .word .loword(StunAndRemove-1) ; RC missile
+  .word .loword(Nothing-1) ; RC missile
   .word .loword(DamageALittle-1) ; Bubble
   .word .loword(Kill-1) ; Explosion
 
@@ -2021,6 +2021,7 @@ Copy:
   sta NeedAbilityChange
   seta16
 @NoCopy:
+Nothing:
   rtl
 
 CopyEnemy:
