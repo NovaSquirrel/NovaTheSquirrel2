@@ -721,6 +721,24 @@ NoTarget:
     bcs ExplodeNow
   :
 
+
+  lda framecount
+  and #7
+  bne :+
+    jsl FindFreeParticleY
+    bcc :+
+      lda #Particle::SmokeParticle
+      sta ParticleType,y
+      lda ActorPX,x
+      sta ParticlePX,y
+      lda ActorPY,x
+      sub #8*16
+      sta ParticlePY,y
+      lda #30
+      sta ParticleTimer,y
+  :
+
+
   ; Explode if necessary
   lda ActorPY,x
   sub #$80
@@ -1679,8 +1697,8 @@ TilesB:
 ; -------------------------------------
 .a16
 .i16
-.export DrawPoof
-.proc DrawPoof
+.export DrawPoofParticle
+.proc DrawPoofParticle
   lda ParticleTimer,x
   lsr
   and #%110
@@ -1691,8 +1709,8 @@ TilesB:
 
 .a16
 .i16
-.export RunPoof
-.proc RunPoof
+.export RunPoofParticle
+.proc RunPoofParticle
   inc ParticleTimer,x
   lda ParticleTimer,x
   cmp #4*3
@@ -1701,6 +1719,7 @@ TilesB:
   :
   rts
 .endproc
+
 
 .a16
 .i16
@@ -1777,8 +1796,8 @@ Flipped:
 
 .a16
 .i16
-.export RunWarningParticle
-.proc RunWarningParticle
+.export RunParticleDisappear
+.proc RunParticleDisappear
   dec ParticleTimer,x
   bne :+
     stz ParticleType,x
@@ -1786,6 +1805,23 @@ Flipped:
   rts
 .endproc
 
+
+
+.a16
+.i16
+.export DrawSmokeParticle
+.proc DrawSmokeParticle
+  jsl RandomByte
+  and #$11
+  sta 0
+  jsl RandomByte
+  xba
+  and #OAM_XFLIP|OAM_YFLIP
+  ora 0
+  ora #CommonTileBase+$26+OAM_PRIORITY_2
+  jsl DispParticle8x8
+  rts
+.endproc
 
 
 

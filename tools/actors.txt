@@ -186,8 +186,8 @@ size 16x16
 # ---------- particles ----------
 +Poof
 particle
-run RunPoof
-draw DrawPoof
+run RunPoofParticle
+draw DrawPoofParticle
 
 +LandingParticle
 particle
@@ -206,8 +206,13 @@ draw DrawBricksParticle
 
 +WarningParticle
 particle
-run RunWarningParticle
+run RunParticleDisappear
 draw DrawWarningParticle
+
++SmokeParticle
+particle
+run RunParticleDisappear
+draw DrawSmokeParticle
 
 # ---------- static overworld sprites ----------
 +Tree
