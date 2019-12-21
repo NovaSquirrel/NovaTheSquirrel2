@@ -201,6 +201,12 @@ LevelZeroWhenLoad_Start:
   PlayerNeedsGroundAtAttack: .res 1 ; State at the start of the attack
   NeedAbilityChange:       .res 1
   NeedAbilityChangeSilent: .res 1
+
+  TailAttackTimer:     .res 1 ; How far we are into the animation
+  TailAttackDirection: .res 1 ; What directional keys were pressed
+  TailAttackFrame:     .res 1 ; Current frame to use for the player during the attack
+  TailAttackCooldown:  .res 1 ; Frames before the attack button can be used again
+  AbilityMovementLock: .res 1
 LevelZeroWhenLoad_End:
 
   ; For speeding up actor spawning
@@ -214,12 +220,6 @@ LevelZeroWhenLoad_End:
   TapReleaseTimer: .res 1 ; Starts a countdown once left/right are released
   TapReleaseButton: .res 1 ; Indicates if left or right was released
   IsTapRun: .res 1 ; Current run is from a tap
-
-  TailAttackTimer:     .res 1 ; How far we are into the animation
-  TailAttackDirection: .res 1 ; What directional keys were pressed
-  TailAttackFrame:     .res 1 ; Current frame to use for the player during the attack
-  TailAttackCooldown:  .res 1 ; Frames before the attack button can be used again
-  AbilityMovementLock: .res 1
 
   VWFStackL:     .res VWFStackLen
   VWFStackH:     .res VWFStackLen
