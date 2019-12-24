@@ -49,8 +49,8 @@ PlayerHeight = 16*16+14*16
 ; Flags
 .enum ActorFlag
   AutoRemove    = 1
-  GetShot       = 2
-  AutoReset     = 4
+  AutoReset     = 2
+  GetShot       = 4
   WaitUntilNear = 8
   WaitForCameraVertically = 16
   Priority      = %1100000000000000 ; Priority bits
@@ -65,6 +65,7 @@ PlayerHeight = 16*16+14*16
   Stunned = 128|2
   Active  = 128|3
   Init    = 128|4
+  Override= 128|5 ; Call different routine instead of the proper Run routine
 .endenum
 
 .global FindFreeActorX, FindFreeActorY, FindFreeParticleY

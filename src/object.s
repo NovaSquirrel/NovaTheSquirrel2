@@ -43,13 +43,34 @@ SlopeY = 2
   ; Load X with the actual pointer
   ldx #ActorStart
 Loop:
+  ; Don't do anything if it's an empty slot
   lda ActorType,x
-  beq SkipEntity   ; Skip if empty
+  bne :+
+@JmpSkipEntity:
+    jmp SkipEntity 
+  :
+
+
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Override
+  bne NotOverride
+    ; Substitute the run routine for something else
+    phk
+    plb
+
+    ; Call the draw routine now
+    lda ActorType,x
+    jsl CallDraw
+
+    ; Don't run the common routines
+    bra @JmpSkipEntity
+  NotOverride:
 
   ; Call the run and draw routines
-  pha
+  lda ActorType,x ; Reloading is faster than push/pull
   jsl CallRun
-  pla
+  lda ActorType,x
   jsl CallDraw
 
   ; Call the common routines
@@ -76,13 +97,6 @@ Loop:
     pla
   NotAutoRemove:
 
-  lsr ; GetShot
-  bcc NotGetShot
-    pha
-    jsl ActorGetShot
-    pla
-  NotGetShot:
-
   lsr ; AutoReset
   bcc NotAutoReset
     pha
@@ -97,6 +111,13 @@ Loop:
     :
     pla
   NotAutoReset:
+
+  lsr ; GetShot
+  bcc NotGetShot
+    pha
+    jsl ActorGetShot
+    pla
+  NotGetShot:
 
   lsr ; WaitUntilNear
   bcc NotWaitUntilNear
@@ -127,7 +148,7 @@ SkipEntity:
   add #ActorSize
   tax
   cpx #ProjectileEnd ; NOT ActorEnd, go and run the projectiles too
-  bne Loop
+  jne Loop
 
   jmp RunAllParticles
 
@@ -1722,14 +1743,15 @@ Exit:
   ; If already activated, just exit
   lda ActorState,x
   beq Exit
-  cmp #ActorStateValue::Stunned
-  beq Exit
+  cmp #ActorStateValue::Paused
+  beq OK
   ; If it's initializing, automatically start pausing
   cmp #ActorStateValue::Init
-  bne :+ ; change it to paused
-    lda #ActorStateValue::Paused
-    sta ActorState,x
-  :
+  bne Exit
+  ; Change to paused
+  lda #ActorStateValue::Paused
+  sta ActorState,x
+OK:
 
   ; Stop pausing if close enough
   lda PlayerPX+1
@@ -1767,14 +1789,15 @@ Exit:
   ; If already activated, just exit
   lda ActorState,x
   beq Exit
-  cmp #ActorStateValue::Stunned
-  beq Exit
+  cmp #ActorStateValue::Paused
+  beq OK
   ; If it's initializing, automatically start pausing
   cmp #ActorStateValue::Init
-  bne :+ ; change it to paused
-    lda #ActorStateValue::Paused
-    sta ActorState,x
-  :
+  beq Exit
+  ; Change to paused
+  lda #ActorStateValue::Paused
+  sta ActorState,x
+OK:
 
   ; Stop pausing if close enough
   lda ScrollY+1
