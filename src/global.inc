@@ -68,8 +68,15 @@ PlayerHeight = 16*16+14*16
   Override= 128|5 ; Call different routine instead of the proper Run routine
 .endenum
 
+.enum ActorOverrideValue
+  None   = 0
+  Hooked = 2 ; Caught by a hook
+  Flying = 4 ; Fly until it hits something
+.endenum
+
 .global FindFreeActorX, FindFreeActorY, FindFreeParticleY
 
 .global RandomByte, VelocityLeftOrRight
 
 AttackKeys = KEY_X|KEY_A|KEY_L|KEY_R
+DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT

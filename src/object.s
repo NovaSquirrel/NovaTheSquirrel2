@@ -58,6 +58,12 @@ Loop:
     ; Substitute the run routine for something else
     phk
     plb
+    txy ; All override routines will have to TYX
+    lda ActorTimer,x ; Reuse the timer to determine which override to use
+    tax
+    .assert ^RunAllActors = ^ActorRunOverrideList, error, "ActorRunOverrideList must be in the same bank as RunAllActors"
+    .import ActorRunOverrideList
+    jsr (.loword(ActorRunOverrideList),x)
 
     ; Call the draw routine now
     lda ActorType,x
@@ -384,6 +390,7 @@ Loop:
 Found:
   lda #$ffff
   sta ActorIndexInLevel,x
+  stz ActorState,x
   sec
   rtl
 .endproc
@@ -405,6 +412,8 @@ Loop:
 Found:
   lda #$ffff
   sta ActorIndexInLevel,y
+  tdc ; A = 0
+  sta ActorState,y
   sec
   rtl
 .endproc
@@ -1793,7 +1802,7 @@ Exit:
   beq OK
   ; If it's initializing, automatically start pausing
   cmp #ActorStateValue::Init
-  beq Exit
+  bne Exit
   ; Change to paused
   lda #ActorStateValue::Paused
   sta ActorState,x

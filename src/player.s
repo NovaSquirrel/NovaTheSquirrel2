@@ -140,6 +140,7 @@
     stz NeedAbilityChange
     stz NeedAbilityChangeSilent
     stz TailAttackTimer
+    stz AbilityMovementLock
   NoNeedAbilityChange:
 
   plp
@@ -240,6 +241,8 @@ MaxSpeedRight = 12
     bne :+
       stz PlayerWantsToAttack
       inc TailAttackTimer
+      stz TailAttackVariable+0
+      stz TailAttackVariable+1
       lda keydown+1
       sta TailAttackDirection
       lda PlayerNeedsGround
@@ -1834,11 +1837,113 @@ No:
 
 .a8
 .proc RunAbilityFishing
+  lda TailAttackTimer
+  cmp #1
+  bne NoCreateHook
+    seta16
+    jsl FindFreeProjectileX
+    bcc NoCreateHook
+    lda #Actor::PlayerProjectile16x16*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::FishingHook
+    sta ActorProjectileType,x
+
+    lda PlayerPY
+    sub #3<<4
+    sta ActorPY,x
+    lda PlayerPX
+    sta ActorPX,x
+
+    lda #.loword(-$20)
+    sta ActorVY,x
+
+    seta8
+    lda TailAttackDirection
+    and #>(KEY_DOWN)
+    beq :+
+      lda #<(-$10)
+      sta ActorVY,x
+      
+    :
+    lda TailAttackDirection
+    and #>(KEY_UP)
+    beq :+
+      lda #<(-$38)
+      sta ActorVY,x
+    :
+
+    lda PlayerDir
+    sta ActorDirection,x
+NoCreateHook:
+
   lda #1
   sta AbilityMovementLock
   lda #PlayerFrame::FISHING
   sta TailAttackFrame
+
+
+  ; -----
+
+  ; Display fishing rod
+  tdc ; Clear A
+  lda PlayerDir
+  tay
+  ldx OamPtr
+
+  lda PlayerDrawX
+  add RodOffsetX,y
+  sta OAM_XPOS+(4*0),x
+  sta OAM_XPOS+(4*1),x
+  sta OAM_XPOS+(4*2),x
+  add RodOffsetX2,y
+  sta OAM_XPOS+(4*3),x
+
+  lda PlayerDrawY
+  sub #25
+  sta OAM_YPOS+(4*0),x
+  sta OAM_YPOS+(4*3),x
+  add #8
+  sta OAM_YPOS+(4*1),x
+  add #8
+  sta OAM_YPOS+(4*2),x
+
+  lda #$28
+  sta OAM_TILE+(4*0),x
+  lda #$38
+  sta OAM_TILE+(4*1),x
+  lda #$39
+  sta OAM_TILE+(4*2),x
+  lda #$29
+  sta OAM_TILE+(4*3),x
+  lda RodAttrib,y
+  sta OAM_ATTR+(4*0),x
+  sta OAM_ATTR+(4*1),x
+  sta OAM_ATTR+(4*2),x
+  sta OAM_ATTR+(4*3),x
+  seta16
+  stz OAMHI+1+(4*0),x
+  stz OAMHI+1+(4*1),x
+  stz OAMHI+1+(4*2),x
+  stz OAMHI+1+(4*3),x
+  txa
+  add #4*4
+  sta OamPtr
+  seta8
+
+  ; -----
+
+  ; Allow some measure of detecting how long the fishing rod has been out, for the
+  ; early cancel code.
+  lda TailAttackTimer
+  cmp #20
+  beq :+
+    inc TailAttackTimer
+  :
   rts
+RodOffsetX: .lobytes 0, -8
+RodOffsetX2: .lobytes 8, -8
+RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .endproc
 
 .a8
@@ -1849,7 +1954,22 @@ No:
 
 .a8
 .proc RunAbilityWheel
-  jsr StepTailSwish
+  lda #1
+  sta PlayerRolling
+
+  lda retraces
+  lsr
+  lsr
+  and #3
+  add #PlayerFrame::ROLL1
+  sta TailAttackFrame
+
+  lda retraces
+  and #16
+  beq :+
+    inc PlayerFrameXFlip
+    inc PlayerFrameYFlip
+  :
   rts
 .endproc
 

@@ -34,6 +34,7 @@ CommonTileBase = $40
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
 .import PlayerNegIfLeft, ActorNegIfLeft
+.import GetAngle512
 
 ; -------------------------------------
 
@@ -432,6 +433,7 @@ Exit:
 .a16
 .i16
 .proc DrawProjectileFireStill
+  ; Burn and then start flickering once it's about gone
   lda ActorTimer,x
   cmp #8
   bcs Always
@@ -515,13 +517,92 @@ TilesB:
 .a16
 .i16
 .proc RunProjectileFishingHook
+  ; TailAttackVariable:
+  ; bit 0 - Returning hook to the player
+  ; bit 1 - Hook caught something!
+  lda TailAttackVariable
+  lsr
+  bcc NotPlayerSeek
+    jsl PlayerActorCollision
+    php
+    bcs PlayerTouchingAlready
+      lda PlayerPX
+      sub ActorPX,x
+      jsr Divide
+      add ActorPX,x
+      sta ActorPX,x
+
+      lda PlayerPY
+      sub #4*16
+      sub ActorPY,x
+      jsr Divide
+      add ActorPY,x
+      sta ActorPY,x
+    PlayerTouchingAlready:
+    plp
+    bcc NotPlayerTouch
+      .if 0
+      lda TailAttackVariable
+      and #2
+      beq NoCatch
+      ; If something was caught, require a key press to end the ability
+      lda keynew
+      and #DirectionKeys
+      bne :+
+        rtl
+      :
+   NoCatch:
+      .endif
+      stz ActorType,x
+      seta8
+      lda #5
+      sta TailAttackCooldown
+      stz TailAttackTimer
+      stz AbilityMovementLock
+      seta16
+    NotPlayerTouch:
+    rtl
+  NotPlayerSeek:
+
+  jsl ActorFall
+  bcs :+
+    lda #$50
+    jsl ActorWalk
+    jsl ActorAutoBump
+  :
+  ; ActorFall can zero this out, so avoid that
+  lda #Actor::PlayerProjectile16x16*2
+  sta ActorType,x
+
+  ; Can press attack button again if it's been a few frames
+  ; (to detect that it wasn't the press that created the hook in the first place)
+  ; and it bring the hook back
+  lda keynew
+  and #AttackKeys
+  beq :+
+    lda TailAttackTimer
+    and #255
+    cmp #5
+    bcc :+
+      seta8
+      lda #1
+      tsb TailAttackVariable
+      lda keydown+1
+      sta TailAttackDirection
+      seta16
+  :
   rtl
+
+Divide:
+  asr_n_16 3
+  rts
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileFishingHook
-  rtl
+  lda #OAM_PRIORITY_2|$2c
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -1491,6 +1572,7 @@ GoToNotNear:
   bne GoToNotNear
   lda ActorVarA,x ; Don't throw if it's already been done too recently
   bne GoToNotNear
+    wdm 0
     lda #ActorStateValue::Active
     sta ActorState,x
     seta16
@@ -1517,7 +1599,6 @@ GoToNotNear:
       lda PlayerPY
       sub ActorPY,y
       sta 2
-      .import GetAngle512
       jsl GetAngle512
       and #$fffe
       tay
@@ -2037,7 +2118,7 @@ HitProjectileResponse:
   .word .loword(Damage-1) ; Fire still
   .word .loword(DamageAndRemoveHalf-1) ; Water bottle
   .word .loword(Damage-1) ; Hammer
-  .word .loword(Bump-1) ; Fishing hook
+  .word .loword(Hook-1) ; Fishing hook
   .word .loword(Damage-1) ; Yoyo
   .word .loword(StunAndRemove-1) ; Mirror
   .word .loword(StunAndRemove-1) ; RC hand
@@ -2046,6 +2127,22 @@ HitProjectileResponse:
   .word .loword(DamageALittle-1) ; Bubble
   .word .loword(Kill-1) ; Explosion
 
+; Hook an enemy and pull them to the player
+Hook:
+  seta8
+  lda #2
+  tsb TailAttackVariable
+
+  lda #ActorStateValue::Override
+  sta ActorState,x
+  stz AbilityMovementLock
+  seta16
+
+  lda #ActorOverrideValue::Hooked
+  sta ActorTimer,x
+  rtl
+
+; Look up the enemy's type and copy the corresponding ability
 Copy:
   lda #0
   sta ActorType,y
@@ -2279,3 +2376,85 @@ ThwaiteCosineTable:
 Exit:
   rtl
 .endproc
+
+.export ActorRunOverrideList
+.proc ActorRunOverrideList
+  .addr .loword(Nothing)
+  .addr .loword(Hooked)
+  .addr .loword(Flying)
+Nothing:
+  tyx
+  rts
+
+Hooked:
+  tyx
+
+  ; Find the hook!
+  ldy #ProjectileStart
+@Loop:
+  lda ActorType,y
+  cmp #Actor::PlayerProjectile16x16*2
+  bne :+
+  lda ActorProjectileType,y
+  cmp #PlayerProjectileType::FishingHook
+  beq FoundHook
+: tya
+  add #ActorSize
+  tay
+  cpy #ProjectileEnd
+  bne @Loop
+
+; Failed to find the hook
+  lda TailAttackDirection
+  and #>KEY_UP
+  bne :+
+GetStunned:
+    seta8
+    lda #ActorStateValue::Stunned
+    sta ActorState,x
+    seta16
+    stz ActorVX,x
+    lda #180
+    sta ActorTimer,x
+    rts
+  :
+
+  stz ActorVX,x
+  lda TailAttackDirection
+  and #>KEY_LEFT
+  beq :+
+    lda #.loword(-$30)
+    sta ActorVX,x
+  :
+  lda TailAttackDirection
+  and #>KEY_RIGHT
+  beq :+
+    lda #.loword($30)
+    sta ActorVX,x
+  :
+
+
+  lda #ActorOverrideValue::Flying
+  sta ActorTimer,x
+
+  lda #.loword(-$70)
+  sta ActorVY,x
+  rts
+FoundHook:
+  lda ActorPX,y
+  sta ActorPX,x
+  lda ActorPY,y
+  add #12*16
+  sta ActorPY,x
+  rts
+
+Flying:
+  tyx
+
+  jsl ActorApplyXVelocity
+  jsl ActorFall
+  bcs GetStunned
+  jsl ActorGetShot
+  rts
+.endproc
+

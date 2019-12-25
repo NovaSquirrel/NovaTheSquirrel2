@@ -208,6 +208,7 @@ LevelZeroWhenLoad_Start:
   TailAttackCooldown:  .res 1 ; Frames before the attack button can be used again
   AbilityMovementLock: .res 1
 LevelZeroWhenLoad_End:
+  TailAttackVariable:  .res 2
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)
