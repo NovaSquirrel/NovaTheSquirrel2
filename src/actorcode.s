@@ -2020,7 +2020,6 @@ StunAndRemove:
   lda #ActorStateValue::Stunned
   sta ActorState,x
   stz AbilityMovementLock
-  stz TailAttackTimer
   seta16
 
   lda #180
