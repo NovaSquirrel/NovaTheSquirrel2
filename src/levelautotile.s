@@ -152,22 +152,7 @@ No:
   beq NoDirt
   cpx #3*2
   beq NoDirt
-    dey
-    dey
-    lda [MidPointer],y
-    iny
-    iny
-    cmp #Block::LedgeLeftSide
-    beq @Yes
-    cmp #Block::LedgeRightSide
-    beq @Yes
-    cmp #Block::LedgeMiddle
-    bne :+
-@Yes:
-      lda [MidPointer],y
-      add #4*2
-      sta [MidPointer],y
-    :
+    jsr AdjustLedgeForDirt
   NoDirt:
 
   lda ExpandWith,x
@@ -238,6 +223,7 @@ AutotileExpandOther = AutotileExpandDirt::ExpandOther
 
 .export AutotileLedgeSolidLeft
 .proc AutotileLedgeSolidLeft
+;  jsr AdjustLedgeForDirt
   dey
   dey
   lda [MidPointer],y
@@ -287,6 +273,7 @@ Yup:
 
 .export AutotileLedgeSolidRight
 .proc AutotileLedgeSolidRight
+;  jsr AdjustLedgeForDirt
   dey
   dey
   lda [MidPointer],y
@@ -795,5 +782,29 @@ Right:
   iny
   lda #Block::DoorBottom
   sta [MidPointer],y
+  rts
+.endproc
+
+.a16
+.export AdjustLedgeForDirt
+.proc AdjustLedgeForDirt
+  dey
+  dey
+  lda [MidPointer],y
+  iny
+  iny
+  ; These are the types of dirt to check against
+  cmp #Block::LedgeLeftSide
+  beq @Yes
+  cmp #Block::LedgeRightSide
+  beq @Yes
+  cmp #Block::LedgeMiddle
+  bne :+
+@Yes:
+    ; Add dirt to the ledge
+    lda [MidPointer],y
+    add #4*2
+    sta [MidPointer],y
+  :
   rts
 .endproc
