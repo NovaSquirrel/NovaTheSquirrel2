@@ -336,10 +336,10 @@ DJ_Label:
 .endmacro
 
 ; Transfer K to B
-.proc tkb
+.macro tkb
   phk
   plb
-.endproc
+.endmacro
 
 ; Shortcut to typing out .loword() every time
 ; with how much it's needed in 65816 stuff

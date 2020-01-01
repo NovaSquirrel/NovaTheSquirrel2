@@ -110,10 +110,10 @@ Loop:
     beq :+
     dec ActorTimer,x
     bne :+
-      ; Zero the state, keep the variable that ends up in the high byte
-      lda ActorState,x
-      and #$ff00
-      sta ActorState,x
+      ; Clear the state
+      seta8
+      stz ActorState,x
+      seta16
     :
     pla
   NotAutoReset:
