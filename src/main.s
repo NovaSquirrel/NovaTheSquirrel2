@@ -43,13 +43,13 @@
   seta8
   bit a:NMISTATUS  ; Acknowledge NMI
 
-  ; And restore the previous data bank value.
-  plb
-  rti
+  jml [NMIHandler]
 .endproc
 
-.export dummy_interrupt
-.proc dummy_interrupt
+.export NoNMIHandler
+.proc NoNMIHandler
+; Restore the previous data bank
+  plb
   rti
 .endproc
 
@@ -84,6 +84,14 @@
   ldx #0
   txy
   jsl MemClear7F
+
+  ; Reset the NMI handler
+  lda #<NoNMIHandler
+  sta NMIHandler+0
+  lda #>NoNMIHandler
+  sta NMIHandler+1
+  lda #^NoNMIHandler
+  sta NMIHandler+2
 
   ; Clear three screens
   ldx #$c000 >> 1

@@ -133,7 +133,7 @@
   NeedLevelRerender:     .res 1 ; If set, rerender the level again
   RerenderInitEntities:  .res 1 ; If set, init entity lists for next rerender
 
-
+  NMIHandler: .res 3
   IRQHandler: .res 3
 
   OAM:   .res 512
