@@ -2173,7 +2173,7 @@ Right:
   rtl
 Left:
   pla ; Negate
-  negw
+  neg
   rtl
 .endproc
 

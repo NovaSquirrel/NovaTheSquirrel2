@@ -93,7 +93,7 @@ Loop:
     pha
     lda ActorPX,x
     sub PlayerPX
-    absw
+    abs
     cmp #$2000 ; How about two screens of distance does it?
     bcc :+
       pla
@@ -544,7 +544,7 @@ Wavy:
   ; Only speed up if not around player
   lda ActorPX,x
   sub PlayerPX
-  absw
+  abs
   cmp #$300
   bcc TooClose
   lda #4
@@ -589,7 +589,7 @@ Right:
   rtl
 Left:
   pla ; Negate
-  negw
+  neg
   rtl
 .endproc
 
@@ -1862,7 +1862,7 @@ Exit:
 .proc ActorRoverMovement
   lda ActorPX,x
   sub PlayerPX
-  absw
+  abs
   ; Face the player if too far away
   xba
   and #255

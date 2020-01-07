@@ -94,19 +94,17 @@ DJ_Label:
   .addr .loword(This-1)
 .endmacro
 
-; Negate (8-bit)
+; Negate
 .macro neg
-  eor #255
+  .if .asize = 8
+    eor #$ff
+  .else
+    eor #$ffff
+  .endif
   ina
 .endmacro
 
-; Negate (16-bit)
-.macro negw
-  eor #$ffff
-  ina
-.endmacro
-
-; Absolute value (8-bit)
+; Absolute value
 .macro abs
 .local @Skip
   bpl @Skip
@@ -114,27 +112,14 @@ DJ_Label:
 @Skip:
 .endmacro
 
-; Absolute value (16-bit)
-.macro absw
-.local @Skip
-  bpl @Skip
-  negw
-@Skip:
-.endmacro
-
-; Sign extend, A = $00 if positive, $FFFF if negative
+; Sign extend, A = 0 if positive, all 1s if negative
 .macro sex
 .local @Skip
-  ora #$7F
-  bmi @Skip
-  lda #0
-@Skip:
-.endmacro
-
-; Sign extend, A = $0000 if positive, $FFFF if negative
-.macro sexw
-.local @Skip
-  ora #$7FFF
+  .if .asize = 8
+    ora #$7F
+  .else
+    ora #$7FFF
+  .endif
   bmi @Skip
   lda #0
 @Skip:
@@ -324,8 +309,13 @@ DJ_Label:
 
 ; Arithmetic shift right, 8-bit
 .macro asr
-  cmp #$80
-  ror
+  .if .asize = 8
+    cmp #$80
+    ror
+  .else
+    cmp #$8000
+    ror
+  .endif
 .endmacro
 
 ; Toggles carry
@@ -346,39 +336,50 @@ DJ_Label:
 .define lw(value) $ffff & (value)
 
 ; Efficient arithmetic shift right (16-bit)
-.macro asr_n_16 times
-  .if times = 1     ; 4 bytes
-    cmp #$8000
-    ror
-  .elseif times = 2 ; 8 bytes
-    cmp #$8000
-    ror
-    cmp #$8000
-    ror
-  .else             ; 7+n bytes
-    eor #.loword(-$8000)
-    .repeat times
-      lsr
-    .endrep
-    add #.loword(-($8000 >> times))
+.macro asr_n times
+  .if .asize = 8
+    .if times = 1     ; 3 bytes
+      cmp #$80
+      ror
+    .elseif times = 2 ; 6 bytes
+      cmp #$80
+      ror
+      cmp #$80
+      ror
+    .else             ; 5+n bytes
+      eor #.loword(-$80)
+      .repeat times
+        lsr
+      .endrep
+      add #.loword(-($80 >> times))
+    .endif
+  .else
+    .if times = 1     ; 4 bytes
+      cmp #$8000
+      ror
+    .elseif times = 2 ; 8 bytes
+      cmp #$8000
+      ror
+      cmp #$8000
+      ror
+    .else             ; 7+n bytes
+      eor #.loword(-$8000)
+      .repeat times
+        lsr
+      .endrep
+      add #.loword(-($8000 >> times))
+    .endif
   .endif
 .endmacro
 
-; Efficient arithmetic shift right (8-bit)
-.macro asr_n_8 times
-  .if times = 1     ; 3 bytes
-    cmp #$80
-    ror
-  .elseif times = 2 ; 6 bytes
-    cmp #$80
-    ror
-    cmp #$80
-    ror
-  .else             ; 5+n bytes
-    eor #.loword(-$80)
-    .repeat times
-      lsr
-    .endrep
-    add #.loword(-($80 >> times))
+; Reverse Subtract with Accumulator
+; A = memory - A
+.macro rsb param
+  .if .asize = 8
+    eor #$ff
+  .else
+    eor #$ffff
   .endif
+  sec
+  adc param
 .endmacro

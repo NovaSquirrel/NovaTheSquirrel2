@@ -194,7 +194,7 @@ DrawPlayerProjectileTable:
 ; DispActor8x8WithOffset takes pixels, which is a problem.
 ; Shift the subpixels off.
 Reduce:
-  asr_n_16 4
+  asr_n 4
   rts
 .endproc
 
@@ -594,7 +594,7 @@ TilesB:
   rtl
 
 Divide:
-  asr_n_16 3
+  asr_n 3
   rts
 .endproc
 
@@ -722,7 +722,7 @@ AbsDifference = 2
     ; Implement the retargeting here
     lda ThisAngle,x
     sub TargetAngle
-    absw
+    abs
     sta AbsDifference
 
     ; If the difference is small enough, just snap
