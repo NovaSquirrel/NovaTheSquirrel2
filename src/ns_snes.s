@@ -335,7 +335,7 @@ DJ_Label:
 ; with how much it's needed in 65816 stuff
 .define lw(value) $ffff & (value)
 
-; Efficient arithmetic shift right (16-bit)
+; Efficient arithmetic shift right
 .macro asr_n times
   .if .asize = 8
     .if times = 1     ; 3 bytes
@@ -374,12 +374,16 @@ DJ_Label:
 
 ; Reverse Subtract with Accumulator
 ; A = memory - A
-.macro rsb param
+.macro rsb param, index
   .if .asize = 8
     eor #$ff
   .else
     eor #$ffff
   .endif
   sec
-  adc param
+  .if .paramcount = 2
+    adc param, index
+  .else
+    adc param
+  .endif
 .endmacro
