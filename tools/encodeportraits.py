@@ -52,7 +52,6 @@ for f in glob.glob("portraits/*.png"):
 
 	# Get the pixel data and convert it to tiles
 	for th in range(im.height // 8):
-		row = []
 		for tw in range(im.width // 8):
 			imtile = rearrange.crop((tw*8, th*8, tw*8+8, th*8+8))
 			portraits[name]['data'].append(tile_to_bytes(imtile.getdata()))

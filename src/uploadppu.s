@@ -416,3 +416,28 @@ SpriteLoop:
   pla
   rtl
 .endproc
+
+.export WritePPUIncreasing
+.proc WritePPUIncreasing
+: sta PPUDATA
+  ina
+  dex
+  bne :-
+  rtl
+.endproc
+
+.export WritePPURepeated
+.proc WritePPURepeated
+: sta PPUDATA
+  dex
+  bne :-
+  rtl
+.endproc
+
+.export SkipPPUWords
+.proc SkipPPUWords
+: lda PPUDATARD
+  dex
+  bne :-
+  rtl
+.endproc

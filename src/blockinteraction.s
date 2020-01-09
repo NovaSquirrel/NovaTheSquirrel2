@@ -366,6 +366,14 @@ Common:
 .endproc
 
 .proc BlockSign
+  lda keynew
+  and #KEY_UP
+  beq :+
+    .import StartDialog
+    jsl StartDialog
+    .import UploadLevelGraphics
+    jsl UploadLevelGraphics
+  :
   rts
 .endproc
 

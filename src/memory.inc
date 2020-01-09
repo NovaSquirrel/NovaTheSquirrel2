@@ -42,6 +42,7 @@
 .globalzp TempY
 .globalzp TouchTemp
 .globalzp DecodePointer
+.globalzp ScriptPointer
 .globalzp ForceControllerBits
 .globalzp ForceControllerTime
 

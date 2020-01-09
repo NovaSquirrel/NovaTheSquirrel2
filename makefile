@@ -22,7 +22,7 @@ objlist = \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
-  math portraitdata
+  math portraitdata dialog
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -132,22 +132,24 @@ $(objdir)/mktables.s: tools/mktables.py
 $(objdir)/spcimage.o: $(brrlisto)
 
 # Files that depend on enums
+$(objdir)/leveldata.o: $(srcdir)/blockenum.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
-$(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
-$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s 
+$(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/blockenum.s
+$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/overworldcode.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/pathenum.s
 $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/pathenum.s
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
-$(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/vwf.inc
 $(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s
-
+$(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
+$(objdir)/vwf.o: $(srcdir)/vwf.inc
 
 # Automatically insert graphics into the ROM
 $(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt tools/insertthegfx.py

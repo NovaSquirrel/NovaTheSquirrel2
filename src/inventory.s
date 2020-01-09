@@ -35,30 +35,30 @@ StringReset:
   .byt TextCommand::WideText, "Reset"
   .byt TextCommand::EndLine, "Reset to the most recent"
   .byt TextCommand::EndLine, "checkpoint and try again"
-  .byt 0
+  .byt TextCommand::EndText
 
 StringToss:
   .byt TextCommand::WideText, "Toss"
   .byt TextCommand::EndLine, "Remove items from your"
   .byt TextCommand::EndLine, "inventory"
-  .byt 0
+  .byt TextCommand::EndText
 
 StringOptions:
   .byt TextCommand::WideText, "Options"
   .byt TextCommand::EndLine, "Change the control scheme"
   .byt TextCommand::EndLine, "and other options"
-  .byt 0
+  .byt TextCommand::EndText
 
 StringHelp:
   .byt TextCommand::WideText, "Help"
   .byt TextCommand::EndLine, "Check out the enclosed"
   .byt TextCommand::EndLine, "instruction book"
-  .byt 0
+  .byt TextCommand::EndText
 
 StringExitLevel:
   .byt TextCommand::WideText, "Exit level"
   .byt TextCommand::EndLine, "Return to the overworld map"
-  .byt 0
+  .byt TextCommand::EndText
 
 
 .i16
@@ -67,36 +67,13 @@ StringExitLevel:
 .proc OpenInventory
   phk
   plb
-  jsl WaitVblank
 
   stz CursorX
   lda #1
   sta CursorY
 
-  ; Initialize the background scroll effect
-  stz MenuBGScroll
-
+  jsr InventoryDialogSharedInit
   seta8
-  lda #FORCEBLANK
-  sta PPUBRIGHT
-  lda #1|BG3_PRIORITY
-  sta BGMODE
-  ; 32x32 tilemaps on all backgrounds
-  ; (Do this once UploadLevelGraphics can change the sizes back)
-  lda #0 | ($c000 >> 9) ; Foreground
-  sta NTADDR+0
-  lda #0 | ($d000 >> 9) ; Background
-  sta NTADDR+1
-  lda #0 | ($e000 >> 9) ; Text
-  sta NTADDR+2
-
-
-  ; Reset all scrolling
-  ldx #2*3-1
-: stz BGSCROLLX,x
-  stz BGSCROLLX,x
-  dex
-  bpl :-
 
   lda #<(-4)
   sta BGSCROLLY+0
@@ -107,7 +84,7 @@ StringExitLevel:
   lda #<(-1)
   sta BGSCROLLX+4
   lda #>(-1)
-  stz BGSCROLLX+4
+  sta BGSCROLLX+4
   lda #<(-4)
   sta BGSCROLLY+4
   lda #>(-4)
@@ -120,47 +97,9 @@ StringExitLevel:
   ; Write graphics
   lda #GraphicsUpload::InventoryBG
   jsl DoGraphicUpload
-  lda #GraphicsUpload::InventoryBG2
-  jsl DoGraphicUpload
   lda #GraphicsUpload::InventorySprite
   jsl DoGraphicUpload
 
-  ; Clear the screens
-  ldx #$c000 >> 1 ; Foreground
-  ldy #0
-  jsl ppu_clear_nt
-  ldx #$e000 >> 1 ; Text
-  ldy #32*8+31
-  jsl ppu_clear_nt
-
-
-  setaxy16
-  lda #$d000 >> 1
-  sta PPUADDR
-BGFill:
-  ldy #8
-@Loop2:
-  lda #128 | (2<<10)
-  sta 0
-@Loop:
-  ldx #8
-  : lda 0
-    sta PPUDATA
-    ina
-    sta PPUDATA
-    ina
-    sta PPUDATA
-    ina
-    sta PPUDATA
-    dex
-    bne :-
-  lda 0
-  add #4
-  sta 0
-  cmp #128 + (4*4) | (2<<10)
-  bne @Loop
-  dey
-  bne @Loop2
 
 
   ; Temporary until I start actually preloading this with the first selected item
@@ -174,7 +113,7 @@ BGFill:
     sta PPUADDR
     lda #8*32+(I*32)+(4<<10|$2000) ; priority, palette 4
     ldx #16
-    jsr WritePPUIncreasing
+    jsl WritePPUIncreasing
   .endrep
 
   ; Put in background for the VWF area
@@ -196,31 +135,8 @@ VWFBackLoop:
   dey
   bne VWFBackLoop
 
-  ; Set palette for text
-  seta8
-  lda #17
-  sta CGADDR
-  lda #<RGB(0,0,0)
-  sta CGDATA
-  lda #>RGB(0,0,0)
-  sta CGDATA
-  lda #<RGB(31,0,0)
-  sta CGDATA
-  lda #>RGB(31,0,0)
-  sta CGDATA
-  lda #<RGB(0,0,31)
-  sta CGDATA
-  lda #>RGB(0,0,31)
-  sta CGDATA
 
   seta16
-  ; Write palettes for everything else
-  lda #Palette::InventoryBG
-  ldy #0
-  jsl DoPaletteUpload
-  lda #Palette::InventoryBG2
-  ldy #2
-  jsl DoPaletteUpload
   lda #Palette::InventorySprite
   ldy #8
   jsl DoPaletteUpload
@@ -302,7 +218,7 @@ VWFBackLoop:
   sta PPUDATA
   lda #$30
   ldx #8
-  jsr WritePPUIncreasing
+  jsl WritePPUIncreasing
   lda #$3e
   sta PPUDATA
 
@@ -312,7 +228,7 @@ VWFBackLoop:
   sta PPUDATA
   lda #$40
   ldx #8
-  jsr WritePPUIncreasing
+  jsl WritePPUIncreasing
   lda #$4e
   sta PPUDATA
 
@@ -324,7 +240,7 @@ VWFBackLoop:
   sta PPUDATA
   lda #$38
   ldx #6
-  jsr WritePPUIncreasing
+  jsl WritePPUIncreasing
   lda #$3e
   sta PPUDATA
   sta PPUDATA
@@ -336,7 +252,7 @@ VWFBackLoop:
   sta PPUDATA
   lda #$48
   ldx #6
-  jsr WritePPUIncreasing
+  jsl WritePPUIncreasing
   lda #$4e
   sta PPUDATA
   sta PPUDATA
@@ -348,17 +264,17 @@ VWFBackLoop:
   ldy #5
 : jsr CircleTop
   ldx #4
-  jsr SkipXWords
+  jsl SkipPPUWords
   jsr CircleTop
   ldx #8
-  jsr SkipXWords
+  jsl SkipPPUWords
  
   jsr CircleBottom
   ldx #4
-  jsr SkipXWords
+  jsl SkipPPUWords
   jsr CircleBottom
   ldx #8
-  jsr SkipXWords
+  jsl SkipPPUWords
   dey
   bne :-
 
@@ -640,30 +556,7 @@ NotZZZAlternate:
   jsl CopyVWF
   jsl ppu_copy_oam
 
-  ; Slowly move the background diagonally
-  lda MenuBGScroll
-  add #$04
-  sta MenuBGScroll
-  lsr
-  lsr
-  lsr
-  lsr
-  sta 0
-
-  ; Turn rendering on
-  seta8
-  lda #15
-  sta PPUBRIGHT
-
-  lda 0
-  sta BGSCROLLX+2
-  lda 1
-  sta BGSCROLLX+2
-  lda 0
-  sta BGSCROLLY+2
-  lda 1
-  sta BGSCROLLY+2
-
+  jsr InventoryDialogSharedBackground
   jmp Loop
 
 Exit:
@@ -820,14 +713,6 @@ Exit:
   rts
 .endproc
 
-.proc WritePPUIncreasing
-: sta PPUDATA
-  ina
-  dex
-  bne :-
-  rts
-.endproc
-
 .proc CircleTop
   ldx #5
 : lda #$1a
@@ -845,13 +730,6 @@ Exit:
   sta PPUDATA
   ina
   sta PPUDATA
-  dex
-  bne :-
-  rts
-.endproc
-
-.proc SkipXWords
-: bit PPUDATARD
   dex
   bne :-
   rts
@@ -896,4 +774,129 @@ Loop:
   stx OamPtr
   rts
 .endproc
+
+
+.export InventoryDialogSharedInit
+.proc InventoryDialogSharedInit
+  jsl WaitVblank
+  ; Initialize the background scroll effect
+  stz MenuBGScroll
+
+  seta8
+  lda #FORCEBLANK
+  sta PPUBRIGHT
+  lda #1|BG3_PRIORITY
+  sta BGMODE
+  ; 32x32 tilemaps on all backgrounds
+  lda #0 | ($c000 >> 9) ; Foreground
+  sta NTADDR+0
+  lda #0 | ($d000 >> 9) ; Background
+  sta NTADDR+1
+  lda #0 | ($e000 >> 9) ; Text
+  sta NTADDR+2
+
+  ; Reset all scrolling
+  ldx #2*3-1
+: stz BGSCROLLX,x
+  stz BGSCROLLX,x
+  dex
+  bpl :-
+
+  seta16
+  lda #GraphicsUpload::InventoryBG2
+  jsl DoGraphicUpload
+
+  ; Clear the screens
+  ldx #$c000 >> 1 ; Foreground
+  ldy #0
+  jsl ppu_clear_nt
+  ldx #$e000 >> 1 ; Text
+  ldy #32*8+31
+  jsl ppu_clear_nt
+  ; Don't clear D000 because it will be completely overwritten soon
+  setaxy16
+
+  ; Write palettes for everything else
+  lda #Palette::InventoryBG
+  ldy #0
+  jsl DoPaletteUpload
+  lda #Palette::InventoryBG2
+  ldy #2
+  jsl DoPaletteUpload
+
+  lda #$d000 >> 1
+  sta PPUADDR
+BGFill:
+  ldy #8
+@Loop2:
+  lda #128 | (2<<10)
+  sta 0
+@Loop:
+  ldx #8
+  : lda 0
+    sta PPUDATA
+    ina
+    sta PPUDATA
+    ina
+    sta PPUDATA
+    ina
+    sta PPUDATA
+    dex
+    bne :-
+  lda 0
+  add #4
+  sta 0
+  cmp #128 + (4*4) | (2<<10)
+  bne @Loop
+  dey
+  bne @Loop2
+
+  ; Set palette for text
+  seta8
+  lda #17
+  sta CGADDR
+  lda #<RGB(0,0,0)
+  sta CGDATA
+  lda #>RGB(0,0,0)
+  sta CGDATA
+  lda #<RGB(31,0,0)
+  sta CGDATA
+  lda #>RGB(31,0,0)
+  sta CGDATA
+  lda #<RGB(0,0,31)
+  sta CGDATA
+  lda #>RGB(0,0,31)
+  sta CGDATA
+  rts
+.endproc
+
+.export InventoryDialogSharedBackground
+.proc InventoryDialogSharedBackground
+  seta16
+  ; Slowly move the background diagonally
+  lda MenuBGScroll
+  add #$04
+  sta MenuBGScroll
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+
+  ; Turn rendering on
+  seta8
+  lda #15
+  sta PPUBRIGHT
+
+  lda 0
+  sta BGSCROLLX+2
+  lda 1
+  sta BGSCROLLX+2
+  lda 0
+  sta BGSCROLLY+2
+  lda 1
+  sta BGSCROLLY+2
+  rts
+.endproc
+
 

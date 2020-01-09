@@ -23,6 +23,7 @@
 ;
 ; ----- DrawVWF
 ; Interprets the string pointed to via DecodePointer and renders into the text bitmap
+; Returns a VWFReturnCode in X
 ;
 ; ----- PushVWF
 ; Pushes the current DecodePointer on the VWF engine's stack
@@ -151,9 +152,11 @@ SpecialCommand:
   rts
 
 SpecialCommandTable:
-  .addr EndScript-1
+  .addr EndText-1
   .addr EndPage-1
   .addr EndLine-1
+  .addr EndDialog-1
+  .addr Portrait-1
   .addr CallASM-1
   .addr EscapeCode-1
   .addr ExtendedChar-1
@@ -254,14 +257,23 @@ EndLine:
   jmp PreCharacterLoop
 
 .a8
+Portrait:
+  ldx #VWFReturnCode::Portrait
+  jmp ReallyExit
+.a8
+EndDialog:
+  ldx #VWFReturnCode::EndDialog
+  jmp ReallyExit
+.a8
 EndPage:
-  jmp PreCharacterLoop
+  ldx #VWFReturnCode::EndPage
+  jmp ReallyExit
 
 .a8
-EndScript:
+EndText:
   ; Exit if the stack is empty
   lda VWFStackIndex
-  beq ReallyExit
+  beq ReallyExitFromEndOfText
 
   dec VWFStackIndex
 
@@ -285,6 +297,9 @@ TookParameters: ; Step DecodePointer forward by a given number
   sta DecodePointer
   jmp PreCharacterLoop
 
+.a8
+ReallyExitFromEndOfText:
+  ldx #VWFReturnCode::EndText
 ReallyExit:
   setaxy16
 
