@@ -388,6 +388,7 @@ Common1:
   asl
   asl
   asl
+  adc FontDataPointer ; Carry always clear
   tay
   phk ; All the glyphs are in this bank
   plb
@@ -396,7 +397,7 @@ Common1:
   ; Get the tile data
   phx
   ldx #0
-: lda (FontDataPointer),y
+: lda 0,y
   sta 0,x
   iny
   inx
@@ -604,6 +605,7 @@ CharacterLoop:
   asl
   asl
   asl
+  adc FontDataPointer ; Carry always clear
   tay
   tdc ; Clear high byte for the TAX
   seta8
@@ -614,13 +616,13 @@ CharacterLoop:
   sta CPUMCAND ; Keep this constant for the whole glyph
 
   ; Start shifting!
-  lda (FontDataPointer),y
+  lda 0,y
   .repeat 8, I
     sta CPUMUL              ; Kick off the multiplier
     iny                     ; 2 cycles
-    lda (FontDataPointer),y ; 6 cycles
+    lda 0,y                 ; 5 cycles
     ldx CPUPROD             ; 3 cycles before the read
-    stx I*2                 ; =11 cycles waiting
+    stx I*2                 ; =10 cycles waiting
   .endrep
   plp
   plx
