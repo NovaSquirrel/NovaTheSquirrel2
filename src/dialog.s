@@ -278,7 +278,7 @@ StartText:
 
   ; Copy the palette in
   seta8
-  lda #15*16
+  lda #15*16+1
   sta CGADDR
   ldy #30
 : lda f:PortraitPaletteData,x
