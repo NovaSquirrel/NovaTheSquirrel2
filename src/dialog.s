@@ -25,6 +25,7 @@ MenuBGScroll = SpriteTileBase
 .segment "Dialog"
 
 .import DoPortraitUpload ; Uploads portrait A to address Y; be in vblank
+.import PaletteForPortrait, PortraitPaletteData
 .import InitVWF, DrawVWF, CopyVWF
 .import Mode7HappyTimer
 DialogPortrait = Mode7HappyTimer
@@ -159,10 +160,6 @@ DialogPortrait = Mode7HappyTimer
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
-  lda #Palette::SPMaffi
-  ldy #15
-  jsl DoPaletteUpload
-
 
 
 
@@ -259,11 +256,36 @@ StartText:
 
   jsl CopyVWF
   jsl ppu_copy_oam
-
+.a8 ; ppu_copy_oam leaves it 8-bit as a side effect
+  ; Get the portrait ready
   lda DialogPortrait
   ldy #$9000 >> 1
-  jsl DoPortraitUpload
+  jsl DoPortraitUpload ; preserves A
+  seta16
+  ; Get palette number
+  and #255
+  tax
+  lda f:PaletteForPortrait,x
 
+  ; Get index into the list of portrait palettes
+  and #255
+  asl ; * 16 first for the number of colors
+  asl
+  asl
+  asl
+  asl ; * 2 for two bytes per color
+  tax
+
+  ; Copy the palette in
+  seta8
+  lda #15*16
+  sta CGADDR
+  ldy #30
+: lda f:PortraitPaletteData,x
+  sta CGDATA
+  inx
+  dey
+  bne :-
 
 @WaitForKey:
   jsl WaitVblank
