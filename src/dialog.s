@@ -50,6 +50,9 @@ DialogPortrait = Mode7HappyTimer
   ; Write graphics
   lda #GraphicsUpload::DialogBG
   jsl DoGraphicUpload
+  lda #Palette::FGCommon
+  ldy #8
+  jsl DoPaletteUpload
 
   ; Prep the VWF area
   .repeat 6, I
@@ -274,18 +277,20 @@ StartText:
   asl
   asl
   asl ; * 2 for two bytes per color
-  tax
-
+  adc #.loword(PortraitPaletteData)
+  sta DMAADDR
+  lda #DMAMODE_CGDATA
+  sta DMAMODE
+  lda #15*2
+  sta DMALEN
   ; Copy the palette in
   seta8
   lda #15*16+1
   sta CGADDR
-  ldy #30
-: lda f:PortraitPaletteData,x
-  sta CGDATA
-  inx
-  dey
-  bne :-
+  lda #^PortraitPaletteData
+  sta DMAADDRBANK
+  lda #%00000001
+  sta COPYSTART
 
 @WaitForKey:
   jsl WaitVblank
