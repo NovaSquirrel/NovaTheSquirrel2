@@ -262,6 +262,26 @@ DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
   rtl
 .endproc
 
+; Uploads sprite palettes after they've been overwritten
+; by something like the dialog screen
+.export ReuploadSpritePalettes
+.proc ReuploadSpritePalettes
+  seta8
+  ; 24 bytes? a bit better than an unrolled loop
+  ldy #12
+  ldx #0
+: lda SpritePaletteSlots,x
+  phy
+  jsl DoPaletteUpload
+  ply
+  inx
+  inx
+  iny
+  cpy #16
+  bne :-
+.endproc
+; Falls through into UploadLevelGraphics
+
 ; Upload level graphics and palettes,
 ; and also set PPU settings correctly for levels
 .export UploadLevelGraphics

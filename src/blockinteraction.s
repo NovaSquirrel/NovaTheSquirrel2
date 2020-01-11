@@ -371,8 +371,8 @@ Common:
   beq :+
     .import StartDialog
     jsl StartDialog
-    .import UploadLevelGraphics
-    jsl UploadLevelGraphics
+    .import ReuploadSpritePalettes
+    jsl ReuploadSpritePalettes
   :
   rts
 .endproc
