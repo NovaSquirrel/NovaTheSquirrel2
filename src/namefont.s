@@ -109,8 +109,11 @@ HaveCharacterAlready:
   asl           ; %........ tttt0000
   asl           ; %.......t ttt00000
   tax
-
   seta8
+  lda #^NameFontRenderTop
+  pha
+  plb
+
   ; SmallRenderBuffer:
   ; (row 0, byte 0) plane 0 L, plane 0 H, plane 1 L, plane 1 H
   ; (row 1, byte 4) plane 0 L, plane 0 H, plane 1 L, plane 1 H
@@ -118,47 +121,47 @@ HaveCharacterAlready:
   ; Need to rearrange to SNES 4bpp format here
   .repeat 8, I
     seta16
-    lda SmallRenderBuffer+I*4+0
+    lda f:SmallRenderBuffer+I*4+0
     asl
     seta8
-    ora f:NameFontRenderTop+I*2+32,x
-    sta f:NameFontRenderTop+I*2+32,x
+    ora a:NameFontRenderTop+I*2+32,x
+    sta a:NameFontRenderTop+I*2+32,x
     xba
-    ora f:NameFontRenderTop+I*2,x
-    sta f:NameFontRenderTop+I*2,x
+    ora a:NameFontRenderTop+I*2,x
+    sta a:NameFontRenderTop+I*2,x
 
     seta16
-    lda SmallRenderBuffer+I*4+2
+    lda f:SmallRenderBuffer+I*4+2
     asl
     seta8
-    ora f:NameFontRenderTop+I*2+32+1,x
-    sta f:NameFontRenderTop+I*2+32+1,x
+    ora a:NameFontRenderTop+I*2+32+1,x
+    sta a:NameFontRenderTop+I*2+32+1,x
     xba
-    ora f:NameFontRenderTop+I*2+1,x
-    sta f:NameFontRenderTop+I*2+1,x
+    ora a:NameFontRenderTop+I*2+1,x
+    sta a:NameFontRenderTop+I*2+1,x
   .endrep
 
   ; Bottom four rows go into NameFontRenderBottom instead
   .repeat 4, I
     seta16
-    lda SmallRenderBuffer+(I+8)*4+0
+    lda f:SmallRenderBuffer+(I+8)*4+0
     asl
     seta8
-    ora f:NameFontRenderBottom+I*2+32,x
-    sta f:NameFontRenderBottom+I*2+32,x
+    ora a:NameFontRenderBottom+I*2+32,x
+    sta a:NameFontRenderBottom+I*2+32,x
     xba
-    ora f:NameFontRenderBottom+I*2,x
-    sta f:NameFontRenderBottom+I*2,x
+    ora a:NameFontRenderBottom+I*2,x
+    sta a:NameFontRenderBottom+I*2,x
 
     seta16
-    lda SmallRenderBuffer+(I+8)*4+2
+    lda f:SmallRenderBuffer+(I+8)*4+2
     asl
     seta8
-    ora f:NameFontRenderBottom+I*2+32+1,x
-    sta f:NameFontRenderBottom+I*2+32+1,x
+    ora a:NameFontRenderBottom+I*2+32+1,x
+    sta a:NameFontRenderBottom+I*2+32+1,x
     xba
-    ora f:NameFontRenderBottom+I*2+1,x
-    sta f:NameFontRenderBottom+I*2+1,x
+    ora a:NameFontRenderBottom+I*2+1,x
+    sta a:NameFontRenderBottom+I*2+1,x
   .endrep
 
   ; .----------------------------------
@@ -177,7 +180,7 @@ HaveCharacterAlready:
   beq LowerW
   tax
   .import DialogNameFontWidths
-  lda DialogNameFontWidths,x
+  lda f:DialogNameFontWidths,x
   add FontDrawX
   sta FontDrawX
 
