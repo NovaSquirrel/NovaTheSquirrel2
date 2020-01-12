@@ -237,6 +237,8 @@ LevelZeroWhenLoad_End:
   OverworldMap:       .res 1
   OverworldDirection: .res 1
 
+  SmallRenderBuffer: .res 64
+
 GameStateStart:
   YourInventory:    .res InventoryLen*2
   LevelInventory:   .res InventoryLen*2
@@ -258,6 +260,8 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
 .segment "BSS7E"
   RenderBuffer:
   Scratchpad:  .res 4096
+  NameFontRenderTop:    .res 384 ; Enough for 12 tiles
+  NameFontRenderBottom: .res 384 ; Enough for 12 tiles
 
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer

@@ -213,7 +213,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global HDMA_Buffer1
 .global HDMA_Buffer2
 .global Scratchpad
-.global RenderBuffer
+.global RenderBuffer, NameFontRenderTop, NameFontRenderBottom
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable
@@ -248,3 +248,5 @@ VWFStackLen   = 4
 .global OverworldPlayerY
 .global OverworldMap
 .global OverworldDirection
+
+.global SmallRenderBuffer
