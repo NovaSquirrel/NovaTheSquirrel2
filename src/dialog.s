@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2019 NovaSquirrel
+; Copyright (C) 2020 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as
@@ -52,6 +52,9 @@ DialogPortrait = Mode7HappyTimer
   jsl DoGraphicUpload
   lda #Palette::FGCommon
   ldy #8
+  jsl DoPaletteUpload
+  lda #Palette::SPNova
+  ldy #9
   jsl DoPaletteUpload
 
   ; Prep the VWF area
@@ -116,7 +119,7 @@ DialogPortrait = Mode7HappyTimer
   jsr BottomBox
 
 
-  ; Set up demo sprites
+  ; Set up portrait sprites (and name sprites)
   ldx #0
 
   seta8
@@ -131,6 +134,27 @@ DialogPortrait = Mode7HappyTimer
   sta OAM_YPOS+(4*2),x
   sta OAM_YPOS+(4*3),x
 
+  lda #10
+  sta OAM_YPOS+(4*4),x
+  sta OAM_YPOS+(4*5),x
+  sta OAM_YPOS+(4*6),x
+  sta OAM_YPOS+(4*7),x
+  sta OAM_YPOS+(4*8),x
+  sta OAM_YPOS+(4*9),x
+
+  lda #65+(16*0)
+  sta OAM_XPOS+(4*4),x
+  lda #65+(16*1)
+  sta OAM_XPOS+(4*5),x
+  lda #65+(16*2)
+  sta OAM_XPOS+(4*6),x
+  lda #65+(16*3)
+  sta OAM_XPOS+(4*7),x
+  lda #65+(16*4)
+  sta OAM_XPOS+(4*8),x
+  lda #65+(16*5)
+  sta OAM_XPOS+(4*9),x
+
   lda #$80
   sta OAM_TILE+(4*0),x
   ina
@@ -143,28 +167,62 @@ DialogPortrait = Mode7HappyTimer
   ina
   sta OAM_TILE+(4*3),x
 
+  lda #$a0
+  sta OAM_TILE+(4*4),x
+  ina
+  ina
+  sta OAM_TILE+(4*5),x
+  ina
+  ina
+  sta OAM_TILE+(4*6),x
+  ina
+  ina
+  sta OAM_TILE+(4*7),x
+  ina
+  ina
+  sta OAM_TILE+(4*8),x
+  ina
+  ina
+  sta OAM_TILE+(4*9),x
+
   lda #>(OAM_PRIORITY_2|OAM_COLOR_7)
   sta OAM_ATTR+(4*0),x
   sta OAM_ATTR+(4*1),x
   sta OAM_ATTR+(4*2),x
   sta OAM_ATTR+(4*3),x
+  lda #>(OAM_PRIORITY_2|OAM_COLOR_1)
+  sta OAM_ATTR+(4*4),x
+  sta OAM_ATTR+(4*5),x
+  sta OAM_ATTR+(4*6),x
+  sta OAM_ATTR+(4*7),x
+  sta OAM_ATTR+(4*8),x
+  sta OAM_ATTR+(4*9),x
 
   stz OAMHI+0+(4*0),x
   stz OAMHI+0+(4*1),x
   stz OAMHI+0+(4*2),x
   stz OAMHI+0+(4*3),x
+  stz OAMHI+0+(4*4),x
+  stz OAMHI+0+(4*5),x
+  stz OAMHI+0+(4*6),x
+  stz OAMHI+0+(4*7),x
+  stz OAMHI+0+(4*8),x
+  stz OAMHI+0+(4*9),x
   lda #$02
   sta OAMHI+1+(4*0),x
   sta OAMHI+1+(4*1),x
   sta OAMHI+1+(4*2),x
   sta OAMHI+1+(4*3),x
+  sta OAMHI+1+(4*4),x
+  sta OAMHI+1+(4*5),x
+  sta OAMHI+1+(4*6),x
+  sta OAMHI+1+(4*7),x
+  sta OAMHI+1+(4*8),x
+  sta OAMHI+1+(4*9),x
   seta16
-  ldx #4*4
+  ldx #4*10
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
-
-
-
 
   seta8
   ; Set the pointer to a demo script anyway
@@ -218,6 +276,12 @@ OpEnd:
 OpPortrait:
   jsr GetParameter
   sta DialogPortrait
+
+  seta16
+  .import RenderNameFont
+  jsl RenderNameFont
+  seta8
+
   bra StartText
 
 .a8
@@ -291,6 +355,12 @@ StartText:
   sta DMAADDRBANK
   lda #%00000001
   sta COPYSTART
+
+  seta16
+  lda #$9400 >> 1
+  ldy #12*32
+  .import UploadNameFont
+  jsl UploadNameFont
 
 @WaitForKey:
   jsl WaitVblank

@@ -619,10 +619,9 @@ CharacterLoop:
   lda 0,y
   .repeat 8, I
     sta CPUMUL              ; Kick off the multiplier
-    iny                     ; 2 cycles
-    lda 0,y                 ; 5 cycles
+    lda I+1,y               ; 5 cycles
     ldx CPUPROD             ; 3 cycles before the read
-    stx I*2                 ; =10 cycles waiting
+    stx I*2                 ; =8 cycles waiting
   .endrep
   plp
   plx

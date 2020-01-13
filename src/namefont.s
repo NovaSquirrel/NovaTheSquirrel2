@@ -93,11 +93,9 @@ HaveCharacterAlready:
   lda 0,y
   .repeat 24, I
     sta CPUMUL                ; Kick off the multiplier
-    iny                       ; 2 cycles
-    lda 0,y                   ; 5 cycles
-    nop
+    lda I+1,y                 ; 5 cycles
     ldx CPUPROD               ; 3 cycles before the read
-    stx SmallRenderBuffer+I*2 ; =10 cycles waiting
+    stx SmallRenderBuffer+I*2 ; =8 cycles waiting
   .endrep
 
   ; .----------------------------------
