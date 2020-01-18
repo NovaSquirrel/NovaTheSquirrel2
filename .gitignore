@@ -47,3 +47,4 @@ src/m7leveldata.s
 src/portraitenum.s
 src/portraitdata.s
 src/namefontwidth.s
+auto_linker.cfg

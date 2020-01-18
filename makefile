@@ -112,8 +112,10 @@ m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
 backgrounds := $(wildcard backgrounds/*.png)
 chr4allbackground := $(patsubst %.png,%.chrsfc,$(wildcard backgrounds/*.png))
 
-map.txt $(title).sfc: lorom1024k.cfg $(objlisto)
-	$(LD65) -o $(title).sfc -m map.txt --dbgfile $(title).dbg -C $^
+auto_linker.cfg: lorom1024k.cfg $(objlisto)
+	$(PY) tools/philip_banks.py auto_linker.cfg $^
+map.txt $(title).sfc: auto_linker.cfg
+	$(LD65) -o $(title).sfc -m map.txt --dbgfile $(title).dbg -C auto_linker.cfg $(objlisto)
 	$(PY) tools/fixchecksum.py $(title).sfc
 
 spcmap.txt $(title).spc: spc.cfg $(objlistospc)
