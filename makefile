@@ -113,7 +113,7 @@ backgrounds := $(wildcard backgrounds/*.png)
 chr4allbackground := $(patsubst %.png,%.chrsfc,$(wildcard backgrounds/*.png))
 
 auto_linker.cfg: lorom1024k.cfg $(objlisto)
-	$(PY) tools/philip_banks.py auto_linker.cfg $^
+	$(PY) tools/uncle_fill.py auto_linker.cfg $^
 map.txt $(title).sfc: auto_linker.cfg
 	$(LD65) -o $(title).sfc -m map.txt --dbgfile $(title).dbg -C auto_linker.cfg $(objlisto)
 	$(PY) tools/fixchecksum.py $(title).sfc

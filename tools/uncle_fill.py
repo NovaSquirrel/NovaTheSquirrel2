@@ -2,7 +2,7 @@
 import glob, os, subprocess, operator, sys
 
 if len(sys.argv) < 4:
-	print("Syntax: philip_banks.py New.cfg Old.cfg List.o Of.o Objects.o")
+	print("Syntax: uncle_fill.py New.cfg Old.cfg List.o Of.o Objects.o")
 	sys.exit(-1)
 
 bank_max_size = 0x8000
