@@ -63,23 +63,20 @@ with open(sys.argv[2]) as f:
 		ignore_segments.add(name)
 
 # Count up the sizes of all segments
-for i in range(len(sys.argv) - 3):
-	f = sys.argv[i+3]
-	process = subprocess.Popen(["od65", "--dump-segsize", f], stdout=subprocess.PIPE)
-	(output, err) = process.communicate()
-	exit_code = process.wait()
-
-	output = output.decode("utf-8")
-	output = output[output.index('Segment sizes:')+14:].split()
-	for i in range(len(output)//2):
-		name = output[i*2+0].rstrip(':')
-		if name in ignore_segments and name not in static_rom_segments:
-			continue
-		size = int(output[i*2+1])
-		if name in all_segments:
-			all_segments[name] += size
-		else:
-			all_segments[name] = size
+process = subprocess.Popen(["od65", "--dump-segsize"] + sys.argv[3:], stdout=subprocess.PIPE)
+(od65_output, err) = process.communicate()
+exit_code = process.wait()
+od65_output = [x for x in od65_output.decode("utf-8").splitlines() if x.startswith("    ")]
+for line in od65_output:
+	segment = line.split()
+	name = segment[0].rstrip(':')
+	if name in ignore_segments and name not in static_rom_segments:
+		continue
+	size = int(segment[1])
+	if name in all_segments:
+		all_segments[name] += size
+	else:
+		all_segments[name] = size
 
 # Add the static bank segments in first
 for name in static_rom_segments:
