@@ -1742,6 +1742,52 @@ TilesB:
 .endproc
 
 
+.a16
+.i16
+.export RunMirrorRabbit
+.proc RunMirrorRabbit
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawMirrorRabbit
+.proc DrawMirrorRabbit
+  lda #OAM_PRIORITY_2
+  tsb SpriteTileBase
+  lda #.loword(Rabbit)
+  sta DecodePointer
+  jml DispActorMetaRight
+
+Rabbit:
+  .byt 2        ; 2 across
+  .word .loword(-4), .loword(-24)  ; X and Y
+  .byt $00, $01
+  .byt 2        ; 2 across
+  .word .loword(-4), .loword(-16)  ; X and Y
+  .byt $0a, $1a
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(0)     ; X and Y
+  .byt $0b
+  .byt 255
+.endproc
+
+.a16
+.i16
+.export RunMirrorRabbitInHat
+.proc RunMirrorRabbitInHat
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawMirrorRabbitInHat
+.proc DrawMirrorRabbitInHat
+  rtl
+.endproc
+
+
+
 ; A = tile to draw
 .a16
 .i16
@@ -2179,6 +2225,7 @@ CopyEnemy:
   .word Actor::Grillbert*2
   .word Actor::George*2
   .word Actor::Burger*2
+  .word Actor::MirrorRabbit*2
   .word 0
 
 CopyAbility:
@@ -2189,6 +2236,7 @@ CopyAbility:
   .byt Ability::Fire
   .byt Ability::Water
   .byt Ability::Burger
+  .byt Ability::Mirror
 .endproc
 
 

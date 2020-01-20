@@ -1286,12 +1286,18 @@ TempTile = 12
 
 StripStart:
   ; Size bit and count
-  lda (Pointer)  
-  and #15
-  cmp #15
-  beq Exit
-  sta Count
+  lda (Pointer)
   inc Pointer
+  and #255
+  cmp #255
+  beq Exit
+  sta SizeBit
+  and #15
+  sta Count
+
+  lda SizeBit
+  and #128
+  bne SixteenStripStart
 
   ; X
   lda (Pointer)
@@ -1304,35 +1310,20 @@ StripStart:
   ; Y
   lda (Pointer)
   add BasePixelY
-  sub #8
+  sub #7
   sta CurrentY
   inc Pointer
   inc Pointer
 
+.a16
 StripLoop:
   ; Now read off a series of tiles
   lda (Pointer)
   and #64
   bne StripSkip
 
-  lda (Pointer)
-  pha
-  and #31
-  ora SpriteTileBase
-  sta TempTile
-  pla
-  and #%11000000 ; The X and Y flip bits
-  xba            ; Shift them over to where they are in the attributes
-  eor TempTile
-  sta OAM_TILE,y
-
-  seta8
-  lda CurrentX
-  sta OAM_XPOS,y
-  lda CurrentY
-  sta OAM_YPOS,y
-  lda CurrentX+1
-  cmp #%00000001
+  jsr StripLoopCommon
+  .a8
   lda #0
   rol
   sta OAMHI+1,y
@@ -1356,6 +1347,76 @@ StripSkip:
 Exit:
   sty OamPtr
   rtl
+
+; -------------------------------------
+
+.a16
+SixteenStripStart:
+  ; X
+  lda (Pointer)
+  add BasePixelX
+  sub #8
+  sta CurrentX
+  inc Pointer
+  inc Pointer
+
+  ; Y
+  lda (Pointer)
+  add BasePixelY
+  sub #15
+  sta CurrentY
+  inc Pointer
+  inc Pointer
+
+SixteenStripLoop:
+  ; Now read off a series of tiles
+  lda (Pointer)
+  and #64
+  bne SixteenStripSkip
+
+  jsr StripLoopCommon
+  .a8
+  lda #1
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  ; Next sprite
+  iny
+  iny
+  iny
+  iny
+SixteenStripSkip:
+  inc Pointer
+
+  lda CurrentX
+  add #16
+  sta CurrentX
+  dec Count
+  bne SixteenStripLoop
+  jmp StripStart
+
+.a16
+StripLoopCommon:
+  lda (Pointer)
+  pha
+  and #31
+  ora SpriteTileBase
+  sta TempTile
+  pla
+  and #%11000000 ; The X and Y flip bits
+  xba            ; Shift them over to where they are in the attributes
+  eor TempTile
+  sta OAM_TILE,y
+
+  seta8
+  lda CurrentX
+  sta OAM_XPOS,y
+  lda CurrentY
+  sta OAM_YPOS,y
+  lda CurrentX+1
+  cmp #%00000001
+  rts
 .endproc
 
 

@@ -142,6 +142,23 @@ gfx SPGeorge
 pal SPWalker
 size 8x8
 
++MirrorRabbit
+run RunMirrorRabbit
+draw DrawMirrorRabbit
+flag AutoRemove AutoReset GetShot
+gfx SPMirrorRabbit
+pal SPWalker
+size 16x32
+
++MirrorRabbitInHat
+run RunMirrorRabbitInHat
+draw DrawMirrorRabbitInHat
+flag AutoRemove AutoReset GetShot
+gfx SPMirrorRabbit
+pal SPWalker
+size 16x16
+
+
 # ---------- cannon stuff ----------
 +Burger
 flag AutoRemove GetShot
