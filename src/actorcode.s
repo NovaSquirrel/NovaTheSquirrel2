@@ -369,6 +369,24 @@ GliderPushY:
   add 0
   sta PlayerPX
 @NotRiding:
+
+  ; Reimplement a bug from Nova the Squirrel 1 with ice.
+  ; Does the actor still exist?
+  lda ActorType,x
+  bne ActorExists
+    ldy #ProjectileStart
+  : lda ActorType,y
+    cmp #Actor::PlayerProjectile16x16*2
+    beq ActorExists
+    tya
+    add #ActorSize
+    tay
+    cmp #ProjectileEnd
+    bne :-
+    seta8
+    stz PlayerNeedsGround
+    seta16
+ActorExists:
   rtl
 .endproc
 
