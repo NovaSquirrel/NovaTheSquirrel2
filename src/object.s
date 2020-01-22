@@ -1250,17 +1250,31 @@ WithOffset:
 DispActor8x8WithOffset = DispActor8x8::WithOffset
 .export DispActor8x8WithOffset
 
+
+.a16
+.i16
+.export DispActorMetaLeft
+.proc DispActorMetaLeft
+  lda SpriteTileBase
+  eor #OAM_XFLIP
+  sta SpriteTileBase
+
+  lda #.loword(-8)
+  sta 8 ;WidthUnit
+  bra DispActorMetaLeftOrRight
+.endproc
+
 ; Appropriately selects left or right
 .a16
 .i16
 .export DispActorMeta
 .proc DispActorMeta
-  ; Except only right exists for now
+  sta DecodePointer
   seta8
   lda ActorDirection,x
   lsr
   seta16
-  bcs DispActorMetaRight
+  bcs DispActorMetaLeft
   ; Fall into the next routine
 .endproc
 ; -------------------- keep together --------------------
@@ -1268,12 +1282,16 @@ DispActor8x8WithOffset = DispActor8x8::WithOffset
 .i16
 .export DispActorMetaRight
 .proc DispActorMetaRight
+  lda #8
+  sta 8 ;WidthUnit
+.endproc
+.proc DispActorMetaLeftOrRight
 BasePixelX = 0
 BasePixelY = 2
 Pointer = DecodePointer
 CurrentX = 4
 CurrentY = 6
-SizeBit  = 8
+WidthUnit= 8
 Count    = 10
 TempTile = 12
   ldy OamPtr
@@ -1291,16 +1309,21 @@ StripStart:
   and #255
   cmp #255
   beq Exit
-  sta SizeBit
+  pha ; Save size bit
   and #15
   sta Count
 
-  lda SizeBit
+  pla
   and #128
   bne SixteenStripStart
 
   ; X
   lda (Pointer)
+  ; Negate if WidthUnit goes left
+  bit WidthUnit
+  bpl :+
+    neg
+  :
   add BasePixelX
   sub #4
   sta CurrentX
@@ -1338,7 +1361,7 @@ StripSkip:
   inc Pointer
 
   lda CurrentX
-  add #8
+  add WidthUnit
   sta CurrentX
   dec Count
   bne StripLoop
@@ -1352,6 +1375,9 @@ Exit:
 
 .a16
 SixteenStripStart:
+  ; Use 16 pixel units instead
+  asl WidthUnit
+
   ; X
   lda (Pointer)
   add BasePixelX
@@ -1390,10 +1416,15 @@ SixteenStripSkip:
   inc Pointer
 
   lda CurrentX
-  add #16
+  add WidthUnit
   sta CurrentX
   dec Count
   bne SixteenStripLoop
+
+  ; Set WidthUnit back to how it was
+  lda WidthUnit
+  asr
+  sta WidthUnit
   jmp StripStart
 
 .a16
@@ -1418,7 +1449,6 @@ StripLoopCommon:
   cmp #%00000001
   rts
 .endproc
-
 
 .a16
 .proc ParticleDrawPosition
