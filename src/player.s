@@ -609,12 +609,15 @@ PlayerIsntOnLadder:
 
     ; Start rolling
     lda PlayerDownTimer
-    cmp #15
+    cmp #6
     bcc :+
-      lda PlayerRidingSomething
-      bne :+
-        lda #1
-        sta PlayerRolling
+      lda PlayerWantsToJump
+      beq :+
+        lda PlayerRidingSomething
+        bne :+
+          stz PlayerWantsToJump
+          lda #1
+          sta PlayerRolling
     :
     seta16
 
