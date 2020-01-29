@@ -35,6 +35,7 @@ CommonTileBase = $40
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
 .import PlayerNegIfLeft, ActorNegIfLeft
 .import GetAngle512
+.import ActorTryVertInteraction
 
 ; -------------------------------------
 
@@ -843,7 +844,6 @@ NoTarget:
   sub #$80
   tay
   lda ActorPX,x
-  .import ActorTryVertInteraction
   jsl ActorTryVertInteraction
   cmp ActorVarC,x
   bcc :+
@@ -1025,7 +1025,7 @@ Divide:
 .i16
 .export DrawBurger
 .proc DrawBurger
-  lda #0
+  lda #0|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
 
@@ -1033,42 +1033,206 @@ Divide:
 .i16
 .export RunBurger
 .proc RunBurger
-  lda #3
-  jml ActorWalk
+  dec ActorVarB,x
+  bne :+
+    stz ActorType,x
+  :
+
+  jml ActorApplyVelocity
 .endproc
 
 .a16
 .i16
-.export DrawSpikedHat
-.proc DrawSpikedHat
-  lda #(3*2)|OAM_PRIORITY_2
+.export DrawPinkBall
+.proc DrawPinkBall
+  lda #2|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
 
 .a16
 .i16
-.export RunSpikedHat
-.proc RunSpikedHat
+.export RunPinkBall
+.proc RunPinkBall
+  rtl
+.endproc
+
+
+.a16
+.i16
+.export DrawLedgeWalker
+.proc DrawLedgeWalker
+  lda framecount
+  lsr
+  lsr
+  and #2
+  add #(3*2)|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunLedgeWalker
+.proc RunLedgeWalker
   lda #$10
   jsl ActorWalkOnPlatform
   jsl ActorFall
   jml PlayerActorCollisionHurt
 .endproc
 
+.a16
+.i16
+.export RunBounceGuy
+.proc RunBounceGuy
+  lda #$10
+  jsl ActorWalk
+  jsl ActorAutoBump
 
+  jsl ActorFall
+  jsr ActorBounceRandomHeights
+
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.proc ActorBounceRandomHeights
+  bcc :+
+    ; Bounce when reaching the ground, if not stunned
+    seta8
+    lda ActorState,x
+    bne :+
+      jsl RandomByte
+      ora #$80
+      sta ActorVY+0,x
+      lda #255
+      sta ActorVY+1,x
+  :
+  seta16
+  rts
+.endproc
+
+.a16
+.i16
+.export DrawBounceGuy
+.proc DrawBounceGuy
+  lda #$c|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunSpinner
+.proc RunSpinner
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawSpinner
+.proc DrawSpinner
+  rtl
+.endproc
+
+
+.a16
+.i16
+.export RunSmashGuy
+.proc RunSmashGuy
+  lda ActorVarA,x ; if behavior set to 1, home in on player
+  beq :+
+  lda ActorState,x
+  and #255
+  bne :+
+    lda #$10
+    jsl ActorWalk
+    jsl ActorAutoBump
+
+    jsl RandomByte
+    and #7
+    bne :+
+    jsl ActorLookAtPlayer
+  :
+
+  seta8
+  lda ActorState,x
+  cmp #ActorStateValue::Active
+  bne :+
+    seta16
+    jsl ActorFall
+    seta8
+    bcc :+
+      lda #ActorStateValue::Paused
+      sta ActorState,x
+  :
+
+  lda ActorState,x
+  cmp #ActorStateValue::Paused
+  bne :+
+    seta16
+    lda ActorPY,x
+    sub #$10
+    sta ActorPY,x
+
+    ; Check for collision with the ceiling
+    lda ActorPY,x
+    sub #$100
+    tay
+    lda ActorPX,x
+    jsl ActorTryVertInteraction
+    seta8
+    bpl :+
+    ; Snap against the ceiling
+    stz ActorPY,x
+    inc ActorPY+1,x
+    stz ActorState,x
+  :
+
+  .a8
+  lda ActorState,x
+  bne :+
+  lda ActorPX+1,x ; Player within 4 blocks horizontally
+  sub PlayerPX+1
+  abs
+  ldy ActorVarA,x           ; smaller distance if on homing mode
+  cmp DistanceToTrigger,y
+  bcs :+
+    lda #ActorStateValue::Active
+    sta ActorState,x
+    lda ActorVY+1,x ; fix vertical velocity if it's negative
+    bpl :+
+      stz ActorVY+0,x
+      stz ActorVY+1,x
+  :
+  seta16
+
+  jml PlayerActorCollisionHurt
+
+DistanceToTrigger:
+  .byt 4, 2
+.endproc
+
+.a16
+.i16
+.export DrawSmashGuy
+.proc DrawSmashGuy
+  lda #$e|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
 
 .a16
 .i16
 .export DrawCannonH
 .proc DrawCannonH
-  rtl
+  lda #$4|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
 .i16
 .export DrawCannonV
 .proc DrawCannonV
-  rtl
+  lda #$6|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -1336,6 +1500,29 @@ SlowBackDown:
 .i16
 .export RunBurgerCannonH
 .proc RunBurgerCannonH
+  jsr ActorCannonCommon1
+  bcc NoShoot
+    jsl FindFreeActorY
+    bcc NoShoot
+      jsl ActorClearY
+      jsl ActorCopyPosXY
+
+      lda #Actor::Burger*2
+      sta ActorType,y
+      lda #0
+      sta ActorTimer,y
+      sta ActorVY,y
+      lda #25*4
+      sta ActorVarB,y ; Expiration timer
+      lda #$38
+      jsl ActorNegIfLeft
+      sta ActorVX,y
+
+      seta8
+      lda ActorDirection,x
+      sta ActorDirection,y
+      seta16
+NoShoot:
   rtl
 .endproc
 
@@ -1343,8 +1530,45 @@ SlowBackDown:
 .i16
 .export RunBurgerCannonV
 .proc RunBurgerCannonV
+  jsl ActorHover
   rtl
 .endproc
+
+
+; Hover the cannon and control logic relating to when to shoot
+.proc ActorCannonCommon1
+  jsl ActorHover
+NoHover:
+  ; Initialize the timer if object is initializing
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Init
+  beq InitTimer
+
+  ; decrease the timer otherwise
+  dec ActorTimer,x
+  bne NotFire
+  jsr InitTimer
+
+  sec ; Carry set: fire
+  rts
+
+InitTimer:
+  jsl RandomByte
+  and #63
+  add #60
+  sta ActorTimer,x
+NotFire:
+  clc ; Clear carry, don't fire
+  rts
+.endproc
+ActorCannonCommon1NoHover = ActorCannonCommon1::NoHover
+
+; Display an indicator when the cannon is about to fire
+.proc ActorCannonCommon2
+  rts
+.endproc
+
 
 .a16
 .i16
@@ -1764,6 +1988,7 @@ TilesB:
 .i16
 .export RunMirrorRabbit
 .proc RunMirrorRabbit
+  jsl ActorLookAtPlayer
   rtl
 .endproc
 
@@ -1773,9 +1998,17 @@ TilesB:
 .proc DrawMirrorRabbit
   lda #OAM_PRIORITY_2
   tsb SpriteTileBase
-  lda #.loword(Rabbit)
-  sta DecodePointer
-  jml DispActorMetaRight
+  lda #.loword(Rabbit2)
+  jml DispActorMeta
+
+Rabbit2:
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(-16)     ; X and Y
+  .byt $00
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(0)     ; X and Y
+  .byt $02
+  .byt 255
 
 Rabbit:
   .byt 2        ; 2 across

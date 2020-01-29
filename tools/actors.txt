@@ -17,6 +17,14 @@ run RunSneaker
 draw DrawSneaker
 size 16x16
 
++Spinner
+flag AutoRemove AutoReset GetShot
+pal SPWalker
+gfx SPWalker2
+run RunSpinner
+draw DrawSpinner
+size 16x16
+
 +Bunny
 flag AutoRemove AutoReset GetShot WaitForCameraVertically
 pal SPWalker
@@ -25,13 +33,13 @@ run RunBunny
 draw DrawBunny
 size 16x16
 
-+SpikedHat
++LedgeWalker
 flag AutoRemove AutoReset GetShot
 pal SPWalker
 gfx SPWalker2
-run RunSpikedHat
-draw DrawSpikedHat
-size 16x13
+run RunLedgeWalker
+draw DrawLedgeWalker
+size 16x14
 health $20
 
 +MovingPlatformHoriz
@@ -168,6 +176,14 @@ run RunBurger
 draw DrawBurger
 size 16x16
 
++PinkBall
+flag AutoRemove GetShot
+gfx SPCannon
+pal SPCannon
+run RunPinkBall
+draw DrawPinkBall
+size 16x16
+
 +BurgerCannonH
 flag AutoRemove
 gfx SPCannon
@@ -198,6 +214,22 @@ gfx SPCannon
 pal SPCannon
 run RunAnyCannonH
 draw DrawCannonV
+size 16x16
+
++BounceGuy
+flag AutoRemove GetShot AutoReset
+gfx SPCannon
+pal SPCannon
+run RunBounceGuy
+draw DrawBounceGuy
+size 16x16
+
++SmashGuy
+flag AutoRemove GetShot AutoReset
+gfx SPCannon
+pal SPCannon
+run RunSmashGuy
+draw DrawSmashGuy
 size 16x16
 
 # ---------- particles ----------
