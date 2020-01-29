@@ -1038,7 +1038,13 @@ Divide:
     stz ActorType,x
   :
 
-  jml ActorApplyVelocity
+  lda ActorState,x
+  and #255
+  beq :+
+    rtl
+  :
+  jsl ActorApplyVelocity
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
