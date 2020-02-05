@@ -361,9 +361,11 @@ ReallyExit:
 CharacterLoop:
   seta8
   lda [DecodePointer]
+  cmp #TextCommand::ExtendedChar
+  jeq ExtendedChar
   cmp #$20
   jcc DrawVWF::SpecialCommand ; Bail out of wide mode
-
+HaveCharacter:
   jsr Common1
 
   seta16
@@ -380,6 +382,12 @@ CharacterLoop:
 
   jsr Common2
   jmp CharacterLoop
+
+.a8
+ExtendedChar:
+  inc16 DecodePointer
+  lda [DecodePointer]
+  jmp HaveCharacter
 
 Common1:
   ; Compute the address of the character's glyph
@@ -496,9 +504,11 @@ DoubleWide:
 CharacterLoop:
   seta8
   lda [DecodePointer]
+  cmp #TextCommand::ExtendedChar
+  jeq ExtendedChar
   cmp #$20
   jcc DrawVWF::SpecialCommand ; Bail out of wide mode
-
+HaveCharacter:
   jsr WideText::Common1
 
   seta16
@@ -521,6 +531,12 @@ CharacterLoop:
 
   jsr WideText::Common2
   jmp CharacterLoop
+
+.a8
+ExtendedChar:
+  inc16 DecodePointer
+  lda [DecodePointer]
+  jmp HaveCharacter
 .endproc
 
 ; Push the current DecodePointer value
@@ -632,6 +648,8 @@ ShiftTable:
   .byt 128, 64, 32, 16, 8, 4, 2, 1
 .endproc
 
+; Use the font from an auto-converted file instead
+.if 0
 chrData:
   .byt   0,  0,  0,  0,  0,  0,  0,  0,  0,128,128,128,128,  0,128,  0
   .byt   0,160,160,  0,  0,  0,  0,  0,  0, 80,248, 80,248, 80,  0,  0
@@ -693,3 +711,8 @@ chrWidths:
   .byt   3,  5,  5,  5,  5,  5,  4,  5,  5,  2,  3,  5,  3,  6,  5,  5
   .byt   5,  5,  4,  5,  4,  5,  5,  6,  5,  5,  5,  5,  2,  5,  5,  6
   .byt   8,  8,  8,  5,  6,  6,  6,  6
+.endif
+.import VWF_BaseSeven_FontData
+chrData = VWF_BaseSeven_FontData
+.import VWF_BaseSeven_FontWidth
+chrWidths = VWF_BaseSeven_FontWidth

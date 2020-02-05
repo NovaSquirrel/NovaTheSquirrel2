@@ -22,7 +22,7 @@ objlist = \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
-  math portraitdata dialog namefont namefontwidth
+  math portraitdata dialog namefont namefontwidth vwf_fontdata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -155,6 +155,8 @@ $(objdir)/vwf.o: $(srcdir)/vwf.inc
 $(objdir)/namefont.o: tilesets2/DialogNameFont.chrgb $(srcdir)/namefontwidth.s
 $(srcdir)/namefontwidth.s: tilesets2/DialogNameFont.chrgb
 	$(PY) tools/namefontwidthtable.py
+$(srcdir)/vwf_fontdata.s: tools/fonts/BaseSeven.png tools/makefontvwf.py
+	$(PY) tools/makefontvwf.py
 
 # Automatically insert graphics into the ROM
 $(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt tools/insertthegfx.py

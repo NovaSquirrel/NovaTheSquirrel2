@@ -32,3 +32,30 @@
   EndPage   = 4 ; End the page and continue with a new one
   Portrait  = 6 ; End the page and continue with a new one with a new portrait
 .endenum
+
+.enum ExtraChar
+  ButtonA      = $80
+  ButtonB      = $81
+  ButtonX      = $82
+  ButtonY      = $83
+  ArrowUp      = $84
+  ArrowDown    = $85
+  ArrowLeft    = $86
+  ArrowRight   = $87
+  Heart        = $88
+  HeartFull    = $89
+  Copyright    = $8a
+  Registered   = $8b
+  Trademark    = $8c
+  Star         = $8d
+  Check        = $8e
+  ButtonL      = $90
+  ButtonR      = $91
+  Smile        = $92
+  Frown        = $93
+  Mad          = $94
+  Meh          = $95
+  ThumbsUp     = $96
+  ThumbsDown   = $97
+  Think        = $98
+.endenum
