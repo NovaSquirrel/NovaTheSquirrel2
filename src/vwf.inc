@@ -49,6 +49,7 @@
   Trademark    = $8c
   Star         = $8d
   Check        = $8e
+  Eyes         = $8f
   ButtonL      = $90
   ButtonR      = $91
   Smile        = $92
@@ -58,4 +59,6 @@
   ThumbsUp     = $96
   ThumbsDown   = $97
   Think        = $98
+  FlipSmiley   = $99
+  Pawprint     = $9a
 .endenum

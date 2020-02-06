@@ -49,3 +49,4 @@ src/portraitdata.s
 src/namefontwidth.s
 auto_linker.cfg
 src/vwf_fontdata.s
+story/vwf_fontdata.js

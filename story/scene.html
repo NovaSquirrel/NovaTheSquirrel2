@@ -1,0 +1,23 @@
+<html>
+<head>
+<script src="vwf_fontdata.js"></script>
+<script src="scene.js"></script>
+</head>
+<body onload="updatePreview()">
+
+<img id="template" src="template.png" style="display:none;">
+<img id="inventory" src="inventory.png" style="display:none;">
+
+<select id="screenChoice" onchange="updatePreview();">
+  <option value="dialog">Dialog</option>
+  <option value="inventory">Inventory</option>
+</select>
+<strong>Text</strong><br>
+<textarea id="script" rows="10" cols="80" oninput="updatePreview()">{Say:0 Maffi}{C2}Hello world{C1}! You're looking at sample
+text. Type something in here.</textarea>
+<br>
+<strong>Preview</strong><br>
+<canvas id="preview" width="256" height="224" style="border: 1px solid;"></canvas>
+
+</body>
+</html>
