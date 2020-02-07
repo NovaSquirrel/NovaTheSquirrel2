@@ -105,6 +105,31 @@ for(fontName in fontVWF) {
 	fontCanvas[fontName]["big"]   = makeCanvas(256, 256, [0,0,0],   2);
 }
 
+function initEverything() {
+	updatePreview();
+
+    let charSelect = document.getElementById("portraitCharacterChoice"); 
+    while(charSelect.firstChild) {
+      charSelect.removeChild(charSelect.firstChild);
+    }
+	for(let i=0; i<portraitCharacters.length; i++) {
+      let el = document.createElement("option");
+      el.textContent = portraitCharacters[i];
+      el.value = portraitCharacters[i];
+      charSelect.appendChild(el);
+	}
+	portraitCharacterChanged();
+}
+
+function portraitCharacterChanged() {
+	document.getElementById('portrait').src = '../portraits/' + document.getElementById('portraitCharacterChoice').value + '.png';
+	document.getElementById('portrait').onload = function(){
+		updatePreview();
+	}
+	updatePreview();
+}
+
+
 const screenChoices = {
 	"dialog": {
 		"baseX": 66,
@@ -133,6 +158,10 @@ function updatePreview() {
 	const textBaseY = screenChoice["baseY"];
 
 	ctx.drawImage(document.getElementById(screenChoice["template"]), 0, 0);
+	if(document.getElementById('screenChoice').value == 'dialog') {
+		// Draw portrait too
+		ctx.drawImage(document.getElementById('portrait'), 0, document.getElementById('portraitEmotionChoice').value*32, 32, 32, 32, 32, 32, 32);
+	}
 	let font = font1;
 	let fontWidth = fontVWF["BaseSeven"]["width"];
 

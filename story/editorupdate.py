@@ -3,7 +3,7 @@ from PIL import Image
 
 outfile = open("vwf_fontdata.js", "w")
 outfile.write('// This is automatically generated. Edit "editorupdate.py" or other files instead\n')
-outfile.write('let fontVWF = {}\n')
+outfile.write('let fontVWF = {};\n')
 
 def process_font(font_name):
 	im = Image.open("../tools/fonts/" + font_name + ".png")
@@ -32,9 +32,16 @@ def process_font(font_name):
 			glyph_width.append(width)
 	im.close()
 
-	outfile.write('fontVWF["%s"] = {}\n' % font_name)
+	outfile.write('fontVWF["%s"] = {};\n' % font_name)
 	outfile.write('fontVWF["%s"]["data"]  = [%s];\n' % (font_name, ','.join([str(x) for x in glyph_data])))
 	outfile.write('fontVWF["%s"]["width"] = [%s];\n' % (font_name, ','.join([str(x) for x in glyph_width])))
 
 process_font('BaseSeven')
+
+# Write information about all of the portraits
+outfile.write('let portraitCharacters = [];\n');
+for f in glob.glob("../portraits/*.png"):
+	name = os.path.splitext(os.path.basename(f))[0]
+	outfile.write('portraitCharacters.push("%s");\n' % name)
+
 outfile.close()
