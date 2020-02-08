@@ -19,7 +19,7 @@ PlayerHeight = 16*16+14*16
 .global main, nmi_handler, irq_handler
 
 ; uploadppu.s
-.global ppu_copy_oam, ppu_pack_oamhi, ppu_clear_oam
+.global ppu_copy_oam, ppu_pack_oamhi, ppu_clear_oam, ppu_copy_clear_oam
 .global ppu_copy, ppu_clear_nt, ppu_vsync, WaitVblank
 .global DoGraphicUpload, DoPaletteUpload
 .global DoGraphicUploadWithOffset
