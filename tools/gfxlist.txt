@@ -27,3 +27,4 @@ A000 SPGeorge
 C800 Mode7HUD
 0200 DialogBG
 A000 SPMirrorRabbit
+A000 SPBomberTree
