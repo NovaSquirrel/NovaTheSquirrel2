@@ -96,61 +96,6 @@ packloop:
   rtl
 .endproc
 
-
-;;
-; Copies packed OAM data to the S-PPU using DMA channel 0.
-; and writes zeros for unused sprites
-.proc ppu_copy_clear_oam
-  php
-  stx 0
-  setaxy16
-  lda #DMAMODE_OAMDATA
-  sta DMAMODE+$00
-  lda #DMAMODE_OAMDATA|DMA_CONST
-  sta DMAMODE+$10
-
-  stx DMALEN+$00
-  lda #512
-  sub 0
-  sta DMALEN+$10
-
-  lda #OAM
-  sta DMAADDR+$00
-  lda #.loword(f0source)
-  sta DMAADDR+$10
-
-  seta8
-  lda #^f0source
-  sta DMAADDRBANK+$00
-  sta DMAADDRBANK+$10
-
-  lda #3
-  sta COPYSTART
-  ; ---------------------------
-  seta16
-  lda 0
-  lsr ; 256
-  lsr ; 128
-  lsr ; 64
-  lsr ; 32
-  sta DMALEN+$00
-  rsb #32
-  sta DMALEN+$10
-
-  lda #OAMHI
-  sta DMAADDR+$00
-  lda #.loword(f0source)
-  sta DMAADDR+$10
-  seta8
-  lda #3
-  sta COPYSTART
-  plp
-  rtl
-
-f0source:
-  .byt $f0
-.endproc
-
 ;;
 ; Copies packed OAM data to the S-PPU using DMA channel 0.
 .proc ppu_copy_oam
