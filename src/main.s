@@ -244,19 +244,14 @@ Die:
 
 
 
-  ; Put all remaining sprites offscreen and generate the second OAM table 
-  ; from the less compact version in RAM.
-  setaxy16
-  ldx OamPtr
-  jsl ppu_clear_oam
-  jsl ppu_pack_oamhi
-
-  ; -------------------
-
-  ; Backgrounds and OAM can be modified only during vertical blanking.
-  ; Wait for vertical blanking and copy prepared data to OAM.
+  ; Pack the second OAM table together into the format the PPU expects
+  jsl ppu_pack_oamhi_partial
+  ; And once that's out of the way, wait until vertical blank where
+  ; I can actually copy all of the prepared OAM to the PPU
   jsl WaitVblank
-  jsl ppu_copy_oam
+  jsl ppu_copy_oam_partial
+  ; And also do background updates:
+  setaxy16
 
   ; Do row/column updates if required
   lda ColumnUpdateAddress

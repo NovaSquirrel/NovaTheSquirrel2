@@ -63,6 +63,82 @@ lowoamloop:
 
 ;;
 ; Converts high OAM (sizes and X sign bits) to the packed format
+; expected by the S-PPU, and clears the next 3 sprites' high OAM
+; bits for use with ppu_copy_oam_partial. Skips unused sprites.
+.proc ppu_pack_oamhi_partial
+  ldx OamPtr
+  ldy #3
+  seta8
+: cpx #512 ; Don't go past the end of OAM
+  bcs Exit
+  lda #1   ; High X bit set
+  sta OAMHI+1,x
+  lda #$f0 ; Y position if offscreen
+  sta OAM+1,x
+  inx
+  inx
+  inx
+  inx
+  dey
+  bne :-
+Exit:
+  stx OamPtr
+
+  ; -----------------------------------
+  ; Counter for how many times to do this
+  txa
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+
+  setxy16
+  ldx #0
+  txy
+packloop:
+  ; Pack four sprites' size+xhi bits from OAMHI
+  sep #$20
+  lda OAMHI+13,y
+  asl a
+  asl a
+  ora OAMHI+9,y
+  asl a
+  asl a
+  ora OAMHI+5,y
+  asl a
+  asl a
+  ora OAMHI+1,y
+  sta OAMHI,x
+  rep #$21  ; seta16 + clc for following addition
+
+  ; Move to the next set of 4 OAM entries
+  inx
+  tya
+  adc #16
+  tay
+
+  ; Done yet?
+  dec 0
+  bne packloop
+
+  ; -----------------------------------
+  ; Skip over the unused sprites and just
+  ; put in high X bits set to 1 instead of
+  ; trying to pack them
+  seta8
+  lda #%01010101
+: cpx #32
+  beq done
+  sta OAMHI,x
+  inx
+  bra :-
+done:
+  rtl
+.endproc
+
+;;
+; Converts high OAM (sizes and X sign bits) to the packed format
 ; expected by the S-PPU.
 .proc ppu_pack_oamhi
   setxy16
@@ -94,6 +170,64 @@ packloop:
   cpx #32  ; 128 sprites divided by 4 sprites per byte
   bcc packloop
   rtl
+.endproc
+
+;;
+; Copies packed OAM data to the S-PPU using DMA channel 0
+; and hides unused sprites using DMA channel 1
+.proc ppu_copy_oam_partial
+  setaxy16
+  lda OamPtr                     ; If OAM is actually completely full (somehow),
+  cmp #512                       ; then don't use this routine because it'll break
+  bcs ppu_copy_oam               ; (because a DMA length of "zero" is actually 64KB)
+
+  lda #DMAMODE_OAMDATA           ; Actually copy in OAM
+  sta DMAMODE+$00
+  lda #DMAMODE_OAMDATA|DMA_CONST ; Copy in a fixed source byte
+  sta DMAMODE+$10
+
+  lda OamPtr                     ; Copy in the used part of the OAM buffer
+  sta DMALEN+$00
+  lda #512                       ; And the rest should be ignored
+  sub OamPtr
+  sta DMALEN+$10
+
+  lda #OAM
+  sta DMAADDR+$00
+  lda #.loword(oam_source)
+  sta DMAADDR+$10
+
+  seta8
+  lda #^oam_source
+  sta DMAADDRBANK+$00
+  sta DMAADDRBANK+$10
+
+  lda #3
+  sta COPYSTART
+  ; ---------------------------
+  seta16
+
+  lda OamPtr                     ; Divide by 16 for high OAM
+  lsr ; 256
+  lsr ; 128
+  lsr ; 64
+  lsr ; 32
+  sta DMALEN+$00
+  rsb #32
+  sta DMALEN+$10
+  lda #OAMHI
+  sta DMAADDR+$00
+  lda #.loword(hi_source)
+  sta DMAADDR+$10
+  seta8
+  lda #3
+  sta COPYSTART
+  setaxy16
+  rtl
+oam_source:
+  .byt $f0
+hi_source:
+  .byt %01010101 ; upper bit on all X positions set
 .endproc
 
 ;;
