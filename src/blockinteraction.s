@@ -389,6 +389,7 @@ Common:
   lda #30
   sta PlayerJumpCancelLock
   sta PlayerJumping
+  stz PlayerNeedsGround
   seta16
 
   ; Animate the spring changing
