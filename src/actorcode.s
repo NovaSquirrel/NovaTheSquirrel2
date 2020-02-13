@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2019 NovaSquirrel
+; Copyright (C) 2019-2020 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as
@@ -1169,6 +1169,13 @@ Divide:
     bcc :+
       lda #ActorStateValue::Paused
       sta ActorState,x
+      seta16
+      lda #.loword(-4*16)
+      sta 0
+      lda #.loword(-8*16)
+      sta 2
+      jsl ActorMakePoofAtOffset
+      seta8
   :
 
   lda ActorState,x
@@ -1229,6 +1236,9 @@ DistanceToTrigger:
 .i16
 .export DrawCannonH
 .proc DrawCannonH
+  lda #11|OAM_PRIORITY_2
+  jsr DrawCannonIndicator
+
   lda #$4|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
@@ -1237,6 +1247,9 @@ DistanceToTrigger:
 .i16
 .export DrawCannonV
 .proc DrawCannonV
+  lda #11|OAM_PRIORITY_2
+  jsr DrawCannonIndicator
+
   lda #$6|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
@@ -1528,6 +1541,14 @@ SlowBackDown:
       lda ActorDirection,x
       sta ActorDirection,y
       seta16
+
+      lda #16*16
+      jsl ActorNegIfLeft
+      add #.loword(-4*16)
+      sta 0
+      lda #.loword(-8*16)
+      sta 2
+      jsl ActorMakePoofAtOffset
 NoShoot:
   rtl
 .endproc
@@ -1571,7 +1592,66 @@ NotFire:
 ActorCannonCommon1NoHover = ActorCannonCommon1::NoHover
 
 ; Display an indicator when the cannon is about to fire
-.proc ActorCannonCommon2
+.proc DrawCannonIndicator
+  sta TempVal
+
+  lda ActorTimer,x
+  cmp #32
+  bcc :+
+    rts
+  :
+
+  lda framecount
+  and #31
+  tay
+
+  lda #1
+  jsr ThwaiteSpeedAngle2Offset
+
+  ; Remove the subpixels
+  lda 0
+  jsr DrawProjectileCopy::Reduce
+  pha
+  sta 0
+
+  lda 2
+  jsr DrawProjectileCopy::Reduce
+  pha
+  sta 2
+
+  seta8
+  lda 0
+  add #4
+  sta SpriteXYOffset+0
+  lda 2
+  add #4
+  sta SpriteXYOffset+1
+  seta16
+
+  lda TempVal
+  phy
+  jsl DispActor8x8WithOffset
+  ply
+
+  pla
+  sta 2
+  pla
+  sta 0
+
+  ; Negate the offset
+  seta8
+  lda 0
+  neg
+  add #4
+  sta SpriteXYOffset+0
+  lda 2
+  neg
+  add #4
+  sta SpriteXYOffset+1
+  seta16
+
+  lda TempVal
+  jsl DispActor8x8WithOffset
   rts
 .endproc
 
@@ -1696,7 +1776,10 @@ Frames:
 .i16
 .export DrawFireBall
 .proc DrawFireBall
-  rtl
+  lda framecount
+  and #1
+  ora #12|$10|OAM_PRIORITY_2
+  jml DispActor8x8
 .endproc
 
 
@@ -1713,7 +1796,8 @@ Frames:
 .i16
 .export DrawFireBullet
 .proc DrawFireBullet
-  rtl
+  lda #12+OAM_PRIORITY_2
+  jml DispActor8x8
 .endproc
 
 .a16
@@ -1744,6 +1828,106 @@ Nope:
 .i16
 .export RunFireFox
 .proc RunFireFox
+  jsl PlayerActorCollisionHurt
+
+  jsl ActorFall
+  bcs :+
+    lda #$10
+    jsl ActorWalk
+    jml ActorAutoBump
+  :
+
+  jsl RandomByte
+  and #15
+  bne :+
+    jsl ActorLookAtPlayer
+  :
+
+  ; Don't jump or shoot when stunned
+  lda ActorState,x
+  and #255
+  beq Normal
+  cmp #ActorStateValue::Active
+  bne :+
+  lda ActorTimer,x
+  cmp #4
+  beq DoShoot
+:
+  rtl
+Normal:
+
+  ; Sometimes jump
+  jsl RandomByte
+  and #15
+  bne :+
+    lda ActorVarA,x ; Don't jump if alternate behavior is set
+    bne :+
+    lda PlayerPY
+    cmp ActorPY,x
+    bcs LowJump
+    ; Don't do high jumps if close to the player
+    lda ActorPY,x
+    sub PlayerPY
+    cmp #$0300
+    bcc LowJump
+    lda #.loword(-$50)
+    bra DoAJump
+LowJump:
+    lda #.loword(-$30)
+DoAJump:
+    sta ActorVY,x
+  :
+
+  lda PlayerPY
+  sub ActorPY,x
+  abs
+  cmp #$0200
+  bcs TooFar
+
+  lda PlayerPX
+  sub ActorPX,x
+  abs
+  cmp #$0600
+  bcs TooFar
+
+  lda framecount
+  and #31
+  bne :+
+    lda #ActorStateValue::Active
+    sta ActorState,x
+    lda #20
+    sta ActorTimer,x
+  :
+TooFar:
+  rtl
+
+DoShoot:
+  jsl FindFreeActorY
+  bcc :+
+    jsl ActorClearY
+    lda ActorPX,x
+    sta ActorPX,y
+    lda ActorPY,x
+    sub #$58
+    sta ActorPY,y
+
+    ; Shoot fire bullets
+    lda #0
+    sta ActorVY,y
+
+    lda #$30
+    jsl ActorNegIfLeft
+    sta ActorVX,y
+
+    lda #Actor::FireBullet*2
+    sta ActorType,y
+    lda #32
+    sta ActorTimer,y
+    seta8
+    lda ActorDirection,x
+    sta ActorDirection,y
+    seta16
+  :
   rtl
 .endproc
 
@@ -1751,7 +1935,23 @@ Nope:
 .i16
 .export DrawFireFox
 .proc DrawFireFox
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Active
+  beq Shooting
+
+  lda ActorOnGround,x
+  and #255
+  beq InAir
+
+Standing:
   lda #OAM_PRIORITY_2|0
+  jml DispActor16x16
+InAir:
+  lda #OAM_PRIORITY_2|4
+  jml DispActor16x16
+Shooting:
+  lda #OAM_PRIORITY_2|2
   jml DispActor16x16
 .endproc
 
@@ -2676,6 +2876,22 @@ ThwaiteCosineTable:
     lda ActorPY,x
     sub 0
     add #4*16
+    sta ParticlePY,y
+Exit:
+  rtl
+.endproc
+
+.a16
+.proc ActorMakePoofAtOffset
+  jsl FindFreeParticleY
+  bcc Exit
+    lda #Particle::Poof
+    sta ParticleType,y
+    lda ActorPX,x
+    add 0
+    sta ParticlePX,y
+    lda ActorPY,x
+    add 2
     sta ParticlePY,y
 Exit:
   rtl

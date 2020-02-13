@@ -62,7 +62,7 @@ class Rect(object):
 		self.yflip = 'YFlip' in j
 		self.extra = ''
 		if 'Extra' in j:
-			self.extra = j
+			self.extra = j['Extra']
 
 	def __repr__(self):
 		return '%s %d,%d %dx%d' % (self.type, self.x, self.y, self.w, self.h)
