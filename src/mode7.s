@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2019 NovaSquirrel
+; Copyright (C) 2019-2020 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as
@@ -45,7 +45,7 @@ M7C_M7D_Buffer2 = HDMA_Buffer2+1024
 .segment "BSS"
 ; Expose these for reuse by other systems
 .export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted
-.export Mode7SidestepWanted, Mode7ChipsLeft
+.export Mode7SidestepWanted, Mode7ChipsLeft, Mode7HappyTimer, Mode7Oops
 Mode7ScrollX:    .res 2
 Mode7ScrollY:    .res 2
 Mode7PlayerX:    .res 2
