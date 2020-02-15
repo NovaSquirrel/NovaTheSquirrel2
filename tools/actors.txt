@@ -96,7 +96,7 @@ size 16x16
 +FireBall
 run RunFireBall
 draw DrawFireBall
-flag AutoRemove AutoReset GetShot
+flag AutoRemove
 gfx SPFire
 pal SPFire
 size 8x8
@@ -104,7 +104,7 @@ size 8x8
 +FireBullet
 run RunFireBullet
 draw DrawFireBullet
-flag AutoRemove AutoReset GetShot
+flag AutoRemove
 gfx SPFire
 pal SPFire
 size 8x8
