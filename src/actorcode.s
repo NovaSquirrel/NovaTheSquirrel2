@@ -1921,7 +1921,7 @@ DoShoot:
 
     lda #Actor::FireBullet*2
     sta ActorType,y
-    lda #32
+    lda #40
     sta ActorTimer,y
     seta8
     lda ActorDirection,x
