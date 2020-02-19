@@ -9,7 +9,7 @@ A000 SPCannon
 6000 BGForest
 D000 MapBGForest
 0200 InventoryBG
-1000 InventoryBG2
+7E00 InventoryBG2
 8000 InventorySprite
 0200 OWGrassy
 8000 OWNova
@@ -25,6 +25,7 @@ A000 SPFire
 A000 SPFire2
 A000 SPGeorge
 C800 Mode7HUD
-0200 DialogBG
+7C00 DialogBG
 A000 SPMirrorRabbit
 A000 SPBomberTree
+7000 CurlyFont

@@ -15,6 +15,7 @@ alias terrain_palette 2
 #######################################
 base common
 palette global_palette
+tileset FGCommon
 
 +Empty
 t 0,0 0,0
@@ -159,6 +160,7 @@ t 1,0 1,0
 
 # Wood stuff
 base wood
+tileset FGTropicalWood
 
 +LadderTop
 solid_top
@@ -354,6 +356,7 @@ t 10,1 11,1
 #######################################
 base terrain
 palette terrain_palette
+tileset FGGrassy
 
 +Ledge
 autotile AutotileLedge
@@ -637,6 +640,7 @@ t 12,4 13,4
 #######################################
 base terrain_rocks
 palette global_palette
+tileset FGForestStone
 
 +SandLeft
 solid
@@ -761,6 +765,7 @@ t 3,0 5,0
 #######################################
 base small_trees
 palette terrain_palette
+tileset FGSmallTrees
 
 +LeafCube
 q 0,0
@@ -857,6 +862,7 @@ t 3,2 4,2
 
 base common_pal_flowertops
 palette global_palette
+tileset FGCommonPalFlowertops
 
 +BlueFlowerSpiral
 autotile AutotileVines
