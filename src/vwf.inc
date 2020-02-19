@@ -23,6 +23,14 @@
   Portrait      ; Followed by a portrait number and VWF text
   CallAsm       ; Followed by a 3-byte pointer
   Narrate       ; Followed by VWF text
+
+  Background2bpp ; Load and display a 2bpp background
+  UploadGraphics ; Upload a series of pictures
+  UploadPalettes ; Upload a series of palettes
+  ClearMetatiles ; Clear out all of the metatiles
+  SceneMetatiles ; Draw a series of level metatiles
+  SceneTiles     ; Draw a series of 8x8 tiles
+  SceneText      ; Draw a series of text strings
 .endenum
 
 ; Code the VWF engine returns to the dialog engine when it stops

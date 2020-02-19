@@ -819,7 +819,7 @@ Loop:
   ldy #0
   jsl ppu_clear_nt
   ldx #InventoryTilemapText >> 1 ; Text
-  ldy #32*8+31
+  ldy #48*16+31
   jsl ppu_clear_nt
   ; Don't clear D000 because it will be completely overwritten soon
   setaxy16

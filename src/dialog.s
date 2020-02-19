@@ -44,9 +44,36 @@ DialogPortrait = Mode7HappyTimer
   .assert ^InventoryDialogSharedBackground = ^StartDialog, error, "Dialog and inventory must be in the same bank"
   jsr InventoryDialogSharedInit
 
+  seta16
+  lda #(<WINDOWMAIN <<8) | DMA_LINEAR | DMA_FORWARD
+  sta DMAMODE+$20
+  lda #(<BG3HOFS    <<8) | DMA_00     | DMA_FORWARD
+  sta DMAMODE+$30
+  lda #.loword(DialogHDMA_WindowEnable)
+  sta DMAADDR+$20
+  lda #.loword(DialogHDMA_ScrollX)
+  sta DMAADDR+$30
+
   seta8
   lda #%00010111  ; enable sprites, plane 0, 1 and 2
   sta BLENDMAIN
+
+  ; Set up the windows
+  lda #%00100000
+  sta BG12WINDOW
+  lda #32
+  sta WINDOW1L
+  lda #224
+  sta WINDOW1R
+  lda #%10
+  sta WINDOWMAIN
+
+  lda #^DialogHDMA_WindowEnable
+  sta DMAADDRBANK+$20
+  sta DMAADDRBANK+$30
+
+  lda #%1100
+  sta HDMASTART
 
   seta16
   ; Write graphics
@@ -55,7 +82,10 @@ DialogPortrait = Mode7HappyTimer
   lda #Palette::FGCommon
   ldy #8
   jsl DoPaletteUpload
-  lda #Palette::SPNova
+  lda #Palette::FGCommon
+  ldy #1
+  jsl DoPaletteUpload
+  lda #Palette::SPNova ; I think I'm just using this for the name font
   ldy #9
   jsl DoPaletteUpload
 
@@ -235,6 +265,7 @@ DialogPortrait = Mode7HappyTimer
   lda #^DemoScript
   sta ScriptPointer+2
 
+  ; Adjust background's scroll to make the text line up correctly
   lda #<(-2)
   sta BGSCROLLX+4
   lda #>(-2)
@@ -257,6 +288,13 @@ HandleDialogOpcode:
   .addr OpPortrait
   .addr OpCallAsm
   .addr OpNarrate
+  .addr OpBackground2bpp
+  .addr OpUploadGraphics
+  .addr OpUploadPalettes
+  .addr OpClearMetatiles
+  .addr OpSceneMetatiles
+  .addr OpSceneTiles
+  .addr OpSceneText
 
 .a8
 ReturnEndDialog:
@@ -270,6 +308,11 @@ OpEnd:
   sta PPUBRIGHT
   lda #%00010011 ; Enable only layer 1 and 2
   sta f:BLENDMAIN
+
+  ; Disable window again
+  stz BG12WINDOW
+  stz WINDOWMAIN
+  stz HDMASTART
 
   plp
   rtl
@@ -301,6 +344,60 @@ OpCallAsm:
 .a8
 OpNarrate:
   bra StartText
+
+.a8
+OpBackground2bpp:
+  rts
+
+.a8
+OpUploadGraphics:
+: jsr GetParameter
+  cmp #255
+  beq @Exit
+  jsl DoGraphicUpload
+  bra :-
+@Exit:
+  rts
+
+.a8
+OpUploadPalettes:
+  ldy #2
+: jsr GetParameter
+  cmp #255
+  beq @Exit
+  jsl DoPaletteUpload
+  iny
+  bra :-
+@Exit:
+  rts
+
+.a8
+OpClearMetatiles:
+  seta16
+  lda #(InventoryTilemapMenu>>1)|(4+13*32)
+  sta PPUADDR
+  ldy #12
+: lda #0
+  ldx #24
+  jsl WritePPURepeated
+  ldx #8
+  jsl SkipPPUWords
+  dey
+  bne :-
+  seta8
+  rts
+
+.a8
+OpSceneMetatiles:
+  rts
+
+.a8
+OpSceneTiles:
+  rts
+
+.a8
+OpSceneText:
+  rts
 
 .a8
 ; Get one byte of parameter
@@ -367,7 +464,7 @@ StartText:
 @WaitForKey:
   jsl WaitVblank
   jsl WaitKeysReady
-  jsr InventoryDialogSharedBackground
+  jsr InventoryDialogSharedBackground ; Also turns rendering on
   seta16
   lda keynew
   and #KEY_A
@@ -458,8 +555,23 @@ ReturnPortrait:
   rts
 .endproc
 
+DialogHDMA_ScrollX:
+  .byt 100, <(-2), >(-2)
+  .byt 100, 0, 0
+  .byt 0
+DialogHDMA_WindowEnable:
+  .byt 100, 0
+  .byt 100, %10
+  .byt 1,   0
+  .byt 0
+
+
+
 .include "portraitenum.s"
 DemoScript:
+  .byt DialogCommand::ClearMetatiles
+  .byt DialogCommand::UploadGraphics, GraphicsUpload::CurlyFont, 255
+
   .byt DialogCommand::Portrait, Portrait::Maffi
     .byt TextCommand::Color2, "Hello world", TextCommand::Color1, "! You're looking at an", TextCommand::EndLine, TextCommand::Color3, "example text box", TextCommand::Color1, "! It's actually in the", TextCommand::EndLine, "game this time instead of being a", TextCommand::EndLine, "mockup! This ", TextCommand::Color2, "box", TextCommand::Color1, " can fit a lot of", TextCommand::EndLine, TextCommand::Color3, "text", TextCommand::Color1, ". Maybe that's not a great idea.", TextCommand::EndPage
     .byt "Hello world!", TextCommand::EndLine, "This is another line!", TextCommand::EndLine, TextCommand::BigText, "Hopefully this", TextCommand::EndLine, TextCommand::EndLine, TextCommand::BigText, "works!", TextCommand::ExtendedChar, ExtraChar::Think, TextCommand::EndText
