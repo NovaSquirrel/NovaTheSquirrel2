@@ -27,6 +27,11 @@ CursorTopMenu = CursorX + 1
 MenuBGScroll = SpriteTileBase
 .include "vwf.inc"
 
+InventoryTilemapMenu = $c000
+InventoryTilemapBG   = $c800
+InventoryTilemapText = $d000
+InventoryPalette     = 7<<10
+.export InventoryTilemapMenu, InventoryTilemapBG, InventoryTilemapText, InventoryPalette
 
 TopMenuStrings:
   .addr StringReset, StringToss, StringOptions, StringHelp, StringExitLevel
@@ -109,9 +114,9 @@ StringExitLevel:
   ; Prep the VWF area
   seta16
   .repeat 5, I
-    lda #($e000>>1)|(8+(21+I)*32)
+    lda #(InventoryTilemapText>>1)|(8+(21+I)*32)
     sta PPUADDR
-    lda #8*32+(I*32)+(4<<10|$2000) ; priority, palette 4
+    lda #48*16+(I*32)+(3<<10|$2000) ; priority, palette 4
     ldx #16
     jsl WritePPUIncreasing
   .endrep
@@ -122,7 +127,7 @@ StringExitLevel:
   ldy #5
 VWFBackLoop:
   ldx #16
-  lda #$3e
+  lda #$3e|InventoryPalette
 : sta PPUDATA
   dex
   bne :-
@@ -145,39 +150,39 @@ VWFBackLoop:
 
   lda #$0a0c
   sta 0
-  lda #(ForegroundBG + (5*64 + 3*2))>>1
+  lda #(InventoryTilemapMenu + (5*64 + 3*2))>>1
   jsr MakeWindow
 
   lda #$0a0c
   sta 0
-  lda #(ForegroundBG + (5*64 + 17*2))>>1
+  lda #(InventoryTilemapMenu + (5*64 + 17*2))>>1
   jsr MakeWindow
 
   lda #$0702
   sta 0
-  lda #(ForegroundBG + (0*64 + 3*2))>>1
+  lda #(InventoryTilemapMenu + (0*64 + 3*2))>>1
   jsr MakeWindow
 
   lda #$0e02
   sta 0
-  lda #(ForegroundBG + (0*64 + 13*2))>>1
+  lda #(InventoryTilemapMenu + (0*64 + 13*2))>>1
   jsr MakeWindow
 
   lda #$1005
   sta 0
-  lda #(ForegroundBG + (20*64 + 7*2))>>1
+  lda #(InventoryTilemapMenu + (20*64 + 7*2))>>1
   jsr MakeWindow
 
   ; Money (Top row)
-  lda #(ForegroundBG + (1*64 + 4*2))>>1
+  lda #(InventoryTilemapMenu + (1*64 + 4*2))>>1
   sta PPUADDR
-  lda #$5a
+  lda #$5a|InventoryPalette
   sta PPUDATA
   ina
   sta PPUDATA
   lda MoneyAmount+2
   and #255
-  ora #$50
+  ora #$50|InventoryPalette
   sta PPUDATA
   lda MoneyAmount+1
   jsr MoneyTop
@@ -185,15 +190,15 @@ VWFBackLoop:
   jsr MoneyTop
 
   ; Money (Bottom row)
-  lda #(ForegroundBG + (2*64 + 4*2))>>1
+  lda #(InventoryTilemapMenu + (2*64 + 4*2))>>1
   sta PPUADDR
-  lda #$6a
+  lda #$6a|InventoryPalette
   sta PPUDATA
   ina
   sta PPUDATA
   lda MoneyAmount+2
   and #255
-  ora #$60
+  ora #$60|InventoryPalette
   sta PPUDATA
   lda MoneyAmount+1
   jsr MoneyBottom
@@ -201,64 +206,64 @@ VWFBackLoop:
   jsr MoneyBottom
 
   ; Action icons
-  lda #(ForegroundBG + (1*64 + 14*2))>>1
+  lda #(InventoryTilemapMenu + (1*64 + 14*2))>>1
   sta PPUADDR
   ldx #.loword(IconStringTop)
   jsr PutStringX
 
-  lda #(ForegroundBG + (2*64 + 14*2))>>1
+  lda #(InventoryTilemapMenu + (2*64 + 14*2))>>1
   sta PPUADDR
   ldx #.loword(IconStringBottom)
   jsr PutStringX
   
   ; Inventory titles
-  lda #(ForegroundBG + (6*64 + 4*2))>>1
+  lda #(InventoryTilemapMenu + (6*64 + 4*2))>>1
   sta PPUADDR
-  lda #$3e
+  lda #$3e|InventoryPalette
   sta PPUDATA
-  lda #$30
+  lda #$30|InventoryPalette
   ldx #8
   jsl WritePPUIncreasing
-  lda #$3e
+  lda #$3e|InventoryPalette
   sta PPUDATA
 
-  lda #(ForegroundBG + (7*64 + 4*2))>>1
+  lda #(InventoryTilemapMenu + (7*64 + 4*2))>>1
   sta PPUADDR
-  lda #$4e
+  lda #$4e|InventoryPalette
   sta PPUDATA
-  lda #$40
+  lda #$40|InventoryPalette
   ldx #8
   jsl WritePPUIncreasing
-  lda #$4e
+  lda #$4e|InventoryPalette
   sta PPUDATA
 
 
-  lda #(ForegroundBG + (6*64 + 18*2))>>1
+  lda #(InventoryTilemapMenu + (6*64 + 18*2))>>1
   sta PPUADDR
-  lda #$3e
+  lda #$3e|InventoryPalette
   sta PPUDATA
   sta PPUDATA
-  lda #$38
+  lda #$38|InventoryPalette
   ldx #6
   jsl WritePPUIncreasing
-  lda #$3e
+  lda #$3e|InventoryPalette
   sta PPUDATA
   sta PPUDATA
 
-  lda #(ForegroundBG + (7*64 + 18*2))>>1
+  lda #(InventoryTilemapMenu + (7*64 + 18*2))>>1
   sta PPUADDR
-  lda #$4e
+  lda #$4e|InventoryPalette
   sta PPUDATA
   sta PPUDATA
-  lda #$48
+  lda #$48|InventoryPalette
   ldx #6
   jsl WritePPUIncreasing
-  lda #$4e
+  lda #$4e|InventoryPalette
   sta PPUDATA
   sta PPUDATA
 
   ; Circles!
-  lda #(ForegroundBG + (8*64 + 4*2))>>1
+  lda #(InventoryTilemapMenu + (8*64 + 4*2))>>1
   sta PPUADDR
 
   ldy #5
@@ -280,7 +285,7 @@ VWFBackLoop:
 
 .if 0
   ; Maffi platform
-  lda #(ForegroundBG + (22*64 + 26*2))>>1
+  lda #(InventoryTilemapMenu + (22*64 + 26*2))>>1
   sta PPUADDR
   lda #$1f
   sta PPUDATA
@@ -602,11 +607,11 @@ ItemDescription:
   lsr
   lsr
   lsr
-  ora #$50
+  ora #$50|InventoryPalette
   sta PPUDATA
   pla
   and #$0f
-  ora #$50
+  ora #$50|InventoryPalette
   sta PPUDATA
   rts
 .endproc
@@ -619,11 +624,11 @@ ItemDescription:
   lsr
   lsr
   lsr
-  ora #$60
+  ora #$60|InventoryPalette
   sta PPUDATA
   pla
   and #$0f
-  ora #$60
+  ora #$60|InventoryPalette
   sta PPUDATA
   rts
 .endproc
@@ -638,10 +643,10 @@ ItemDescription:
 
   ; Top row
   sta PPUADDR
-  lda #$1c
+  lda #$1c|InventoryPalette
   sta PPUDATA
   jsr Horizontal
-  lda #$1d
+  lda #$1d|InventoryPalette
   sta PPUDATA
   
   ; Bottom row
@@ -654,10 +659,10 @@ ItemDescription:
   add #32
   add Address
   sta PPUADDR
-  lda #$2c
+  lda #$2c|InventoryPalette
   sta PPUDATA
   jsr Horizontal
-  lda #$2d
+  lda #$2d|InventoryPalette
   sta PPUDATA
 
   ; Vertical writes
@@ -684,14 +689,14 @@ ItemDescription:
 
 Horizontal:
   ldx Width
-  lda #$1e
+  lda #$1e|InventoryPalette
 : sta PPUDATA
   dex
   bne :-
   rts
 Vertical:
   ldx Height
-  lda #$2e
+  lda #$2e|InventoryPalette
 : sta PPUDATA
   dex
   bne :-
@@ -706,6 +711,7 @@ IconStringBottom: .byt $20, $21, $3e, $22, $23, $3e, $24, $25, $3e, $26, $27, $3
   lda a:0,x
   and #255
   beq Exit
+  ora #InventoryPalette
   sta PPUDATA
   inx
   bra PutStringX
@@ -715,7 +721,7 @@ Exit:
 
 .proc CircleTop
   ldx #5
-: lda #$1a
+: lda #$1a|InventoryPalette
   sta PPUDATA
   ina
   sta PPUDATA
@@ -726,7 +732,7 @@ Exit:
 
 .proc CircleBottom
   ldx #5
-: lda #$2a
+: lda #$2a|InventoryPalette
   sta PPUDATA
   ina
   sta PPUDATA
@@ -788,12 +794,14 @@ Loop:
   lda #1|BG3_PRIORITY
   sta BGMODE
   ; 32x32 tilemaps on all backgrounds
-  lda #0 | ($c000 >> 9) ; Foreground
+  lda #0 | (InventoryTilemapMenu >> 9) ; Foreground
   sta NTADDR+0
-  lda #0 | ($d000 >> 9) ; Background
+  lda #0 | (InventoryTilemapBG   >> 9) ; Background
   sta NTADDR+1
-  lda #0 | ($e000 >> 9) ; Text
+  lda #0 | (InventoryTilemapText >> 9) ; Text
   sta NTADDR+2
+  lda #$c>>1
+  sta BGCHRADDR+1                      ; Text CHR at $d000
 
   ; Reset all scrolling
   ldx #2*3-1
@@ -807,10 +815,10 @@ Loop:
   jsl DoGraphicUpload
 
   ; Clear the screens
-  ldx #$c000 >> 1 ; Foreground
+  ldx #InventoryTilemapMenu >> 1 ; Foreground
   ldy #0
   jsl ppu_clear_nt
-  ldx #$e000 >> 1 ; Text
+  ldx #InventoryTilemapText >> 1 ; Text
   ldy #32*8+31
   jsl ppu_clear_nt
   ; Don't clear D000 because it will be completely overwritten soon
@@ -818,18 +826,19 @@ Loop:
 
   ; Write palettes for everything else
   lda #Palette::InventoryBG
-  ldy #0
+  ldy #7
   jsl DoPaletteUpload
   lda #Palette::InventoryBG2
-  ldy #2
+  ldy #0
   jsl DoPaletteUpload
 
-  lda #$d000 >> 1
+  ; Fill up the scrolling background
+  lda #InventoryTilemapBG >> 1
   sta PPUADDR
 BGFill:
   ldy #8
 @Loop2:
-  lda #128 | (2<<10)
+  lda #1008 | (0<<10)
   sta 0
 @Loop:
   ldx #8
@@ -846,14 +855,14 @@ BGFill:
   lda 0
   add #4
   sta 0
-  cmp #128 + (4*4) | (2<<10)
+  cmp #1008 + (4*4) | (0<<10)
   bne @Loop
   dey
   bne @Loop2
 
   ; Set palette for text
   seta8
-  lda #17
+  lda #13
   sta CGADDR
   lda #<RGB(0,0,0)
   sta CGDATA
@@ -898,5 +907,3 @@ BGFill:
   sta BGSCROLLY+2
   rts
 .endproc
-
-

@@ -238,7 +238,7 @@ ShiftTable:
 .endmacro
 
 TestText:
-  NameFontText "Waluigi"
+  NameFontText "Maffi"
 
 ; Copies NameFontRenderTop and NameFontRenderBottom
 ; A = address to upload to

@@ -23,6 +23,8 @@ MenuBGScroll = SpriteTileBase
 .smart
 
 .segment "Dialog"
+.import InventoryTilemapMenu, InventoryTilemapBG, InventoryTilemapText, InventoryPalette
+DialogTileBase = $3e0|InventoryPalette
 
 .import DoPortraitUpload ; Uploads portrait A to address Y; be in vblank
 .import PaletteForPortrait, PortraitPaletteData
@@ -59,60 +61,60 @@ DialogPortrait = Mode7HappyTimer
 
   ; Prep the VWF area
   .repeat 6, I
-    lda #($e000>>1)|(8+(3+I)*32)
+    lda #(InventoryTilemapText>>1)|(8+(3+I)*32)
     sta PPUADDR
-    lda #8*32+(I*32)+(4<<10|$2000) ; priority, palette 4
+    lda #48*16+(I*32)+(3<<10|$2000) ; priority, palette 3
     ldx #20
     jsl WritePPUIncreasing
   .endrep
 
   ; Create the text box
-  lda #($c000>>1)|(3+2*32)
+  lda #(InventoryTilemapMenu>>1)|(3+2*32)
   sta PPUADDR
   jsr TopBox
   ; Do the middle
   ldy #6
 : ldx #6
   jsl SkipPPUWords
-  lda #$15 ; Left vertical bar
+  lda #DialogTileBase|$05 ; Left vertical bar
   sta PPUDATA
-  lda #$03 ; Portrait area
+  lda #$03|InventoryPalette ; Portrait area
   ldx #4
   jsl WritePPURepeated
-  lda #$18 ; Separator between portrait and text
+  lda #DialogTileBase|$08 ; Separator between portrait and text
   sta PPUDATA
-  lda #$01 ; Text area
+  lda #$01|InventoryPalette ; Text area
   ldx #19
   jsl WritePPURepeated
-  lda #$15 ; Right vertical bar
+  lda #DialogTileBase|$05 ; Right vertical bar
   sta PPUDATA
   dey
   bne :-
   ldx #6
   jsl SkipPPUWords
   ; Do the bottom
-  lda #$12
+  lda #DialogTileBase|$02
   sta PPUDATA
   ldx #24
-  lda #$14
+  lda #DialogTileBase|$04
   jsl WritePPURepeated
-  lda #$13
+  lda #DialogTileBase|$03
   sta PPUDATA
 
   ; Create the scene box
-  lda #($c000>>1)|(3+12*32)
+  lda #(InventoryTilemapMenu>>1)|(3+12*32)
   sta PPUADDR
   jsr TopBox
   ; Do the middle
   ldy #12
 : ldx #6
   jsl SkipPPUWords
-  lda #$15 ; Left vertical bar
+  lda #DialogTileBase|$05 ; Left vertical bar
   sta PPUDATA
-  lda #$01 ; Placeholder area
+  lda #$00 ; Placeholder area
   ldx #24
   jsl WritePPURepeated
-  lda #$15 ; Right vertical bar
+  lda #DialogTileBase|$05 ; Right vertical bar
   sta PPUDATA
   dey
   bne :-
@@ -430,12 +432,12 @@ ReturnPortrait:
 .a16
 .i16
 .proc TopBox
-  lda #$10
+  lda #DialogTileBase|$00
   sta PPUDATA
   ldx #24
-  lda #$14
+  lda #DialogTileBase|$04
   jsl WritePPURepeated
-  lda #$11
+  lda #DialogTileBase|$01
   sta PPUDATA
   rts
 .endproc
@@ -446,12 +448,12 @@ ReturnPortrait:
   ldx #6
   jsl SkipPPUWords
   ; Do the bottom
-  lda #$12
+  lda #DialogTileBase|$02
   sta PPUDATA
   ldx #24
-  lda #$14
+  lda #DialogTileBase|$04
   jsl WritePPURepeated
-  lda #$13
+  lda #DialogTileBase|$03
   sta PPUDATA
   rts
 .endproc
@@ -460,5 +462,5 @@ ReturnPortrait:
 DemoScript:
   .byt DialogCommand::Portrait, Portrait::Maffi
     .byt TextCommand::Color2, "Hello world", TextCommand::Color1, "! You're looking at an", TextCommand::EndLine, TextCommand::Color3, "example text box", TextCommand::Color1, "! It's actually in the", TextCommand::EndLine, "game this time instead of being a", TextCommand::EndLine, "mockup! This ", TextCommand::Color2, "box", TextCommand::Color1, " can fit a lot of", TextCommand::EndLine, TextCommand::Color3, "text", TextCommand::Color1, ". Maybe that's not a great idea.", TextCommand::EndPage
-    .byt "Hello world!", TextCommand::EndLine, "This is another line!", TextCommand::EndLine, TextCommand::BigText, "Hopefully this", TextCommand::EndLine, TextCommand::EndLine, TextCommand::BigText, "works!", TextCommand::EndText
+    .byt "Hello world!", TextCommand::EndLine, "This is another line!", TextCommand::EndLine, TextCommand::BigText, "Hopefully this", TextCommand::EndLine, TextCommand::EndLine, TextCommand::BigText, "works!", TextCommand::ExtendedChar, ExtraChar::Think, TextCommand::EndText
   .byt DialogCommand::End
