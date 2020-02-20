@@ -327,7 +327,7 @@ OpPortrait:
   jsl RenderNameFont
   seta8
 
-  bra StartText
+  jmp StartText
 
 .a8
 OpCallAsm:
@@ -343,7 +343,7 @@ OpCallAsm:
 
 .a8
 OpNarrate:
-  bra StartText
+  jmp StartText
 
 .a8
 OpBackground2bpp:
@@ -389,6 +389,140 @@ OpClearMetatiles:
 
 .a8
 OpSceneMetatiles:
+  ; %tttt tttP - Block low,  P=reposition
+  ; %FRtt tttt - Block high, F=final, R=repeat
+  ; %DYYY XXXX - D=down, YX=position (if P set)
+  ; %.HHH LLLL - L=amount to repeat (if R set)
+  ;              if H is nonzero then it's a rectangle fill with L=width, H=height
+.scope MetatileDraw
+  BlockID     = 0 ; Block with flags embedded in it
+  Direction   = 2 ; 2 or 64, add after applying the block
+  Position    = 4 ; VRAM position
+  Length      = 6 ; Number of times to repeat horizontally or vertically
+  Height      = 8 ; If nonzero, it's a rectangle fill, and Length is a width
+  seta16
+
+Loop:
+  ; Get one metatile, plus flags
+  lda [ScriptPointer]
+  inc ScriptPointer
+  inc ScriptPointer
+  sta BlockID
+
+  tdc ; A = 0
+  ina ; A = 1
+  sta Length
+  stz Height
+  trb BlockID
+  beq KeepPosition
+    lda [ScriptPointer]
+    and #%1110000
+    asl
+    asl
+    sta Position
+    lda [ScriptPointer]
+    and #%0001111
+    asl
+    ora Position
+    add #(InventoryTilemapMenu>>1)|(4+13*32)
+    sta Position
+
+    ; Select whether to write across or down
+    lda #2
+    sta Direction
+    lda [ScriptPointer]
+    and #128
+    beq :+
+      lda #64
+      sta Direction
+    :
+
+    inc ScriptPointer
+KeepPosition:
+
+  lda #$4000
+  trb BlockID
+  beq NoRepeat
+    lda [ScriptPointer]
+    and #$0f
+    sta Length
+    lda [ScriptPointer]
+    and #$f0
+    lsr
+    lsr
+    lsr
+    lsr
+    sta Height
+
+    inc ScriptPointer
+NoRepeat:
+
+  ; Save whether or not to finish after this block
+  lda #$8000
+  trb BlockID
+  php
+
+  ; If no height, just do a rectangle fill
+  lda Height
+  beq WriteMetatileLoop
+WriteMetatileRect:
+@NextRow:
+  lda Position
+  pha
+  lda Length
+  pha
+
+@Row:
+  jsr DrawOneMetatile
+  inc Position
+  inc Position
+  dec Length
+  bne @Row
+
+  pla
+  sta Length
+  pla
+  add #64      ; Next row of metatiles
+  sta Position
+  dec Height
+  bne @NextRow
+  bra Done
+
+; Write a line of metatiles across or down
+WriteMetatileLoop:
+  jsr DrawOneMetatile
+  lda Position
+  add Direction ; 2 or 64, to go right or down
+  sta Position
+  dec Length
+  bne WriteMetatileLoop
+
+; Pull the "finished" bit from the stack
+Done:
+  plp
+  jeq Loop
+  seta8
+.endscope
+  rts
+
+.a16
+; Draw a single metatile on the screen at a position
+DrawOneMetatile:
+  .import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
+  lda MetatileDraw::Position
+  sta PPUADDR
+  ldx MetatileDraw::BlockID
+  lda f:BlockTopLeft,x
+  sta PPUDATA
+  lda f:BlockTopRight,x
+  sta PPUDATA
+  lda MetatileDraw::Position
+  add #32
+  sta PPUADDR
+  lda f:BlockBottomLeft,x
+  sta PPUDATA
+  lda f:BlockBottomRight,x
+  sta PPUDATA
   rts
 
 .a8
@@ -568,8 +702,28 @@ DialogHDMA_WindowEnable:
 
 
 .include "portraitenum.s"
+
+MT_Reposition = $0001
+MT_Repeat     = $4000
+MT_Finish     = $8000
+
 DemoScript:
   .byt DialogCommand::ClearMetatiles
+
+  .byt DialogCommand::SceneMetatiles
+  .word MT_Reposition|8
+  .byt $00 ; 0,0
+  .word MT_Reposition|4
+  .byt $11 ; 1,1
+  .word MT_Reposition|8
+  .byt $33 ; 3,3
+  .word MT_Reposition|MT_Repeat|8
+  .byt $55 ; 5,5
+  .byt 4   ; 4 blocks long
+  .word MT_Finish|MT_Reposition|MT_Repeat|4
+  .byt $05 ; 5,0
+  .byt $33 ; rectangle fill: 3 by 3
+
   .byt DialogCommand::UploadGraphics, GraphicsUpload::CurlyFont, 255
 
   .byt DialogCommand::Portrait, Portrait::Maffi
