@@ -31,6 +31,10 @@
   SceneMetatiles ; Draw a series of level metatiles
   SceneTiles     ; Draw a series of 8x8 tiles
   SceneText      ; Draw a series of text strings
+
+  MT_Reposition = $0001
+  MT_Repeat     = $4000
+  MT_Finish     = $8000
 .endenum
 
 ; Code the VWF engine returns to the dialog engine when it stops

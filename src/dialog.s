@@ -531,7 +531,44 @@ OpSceneTiles:
 
 .a8
 OpSceneText:
+  seta16
+  ; Calculate the position from the X,Y first
+  lda [ScriptPointer]
+  inc ScriptPointer
+  and #255
+  sta 0
+  lda [ScriptPointer]
+  and #255
+  inc ScriptPointer
+  asl
+  asl
+  asl
+  asl
+  asl
+  ora 0
+  add #(InventoryTilemapMenu>>1)|(4+13*32)
+  sta 2 ; Backup
+  sta PPUADDR
+@Loop:
+  lda [ScriptPointer]
+  inc ScriptPointer
+  and #255
+  beq @Done
+  cmp #10 ; Newline character
+  beq @NextLine
+  add #(896-32)|(1<<10)
+  sta PPUDATA
+  bra @Loop
+@Done:
+  seta8
   rts
+.a16
+@NextLine:
+  lda 2
+  add #32
+  sta PPUADDR
+  sta 2
+  bra @Loop
 
 .a8
 ; Get one byte of parameter
@@ -725,6 +762,8 @@ DemoScript:
   .byt $33 ; rectangle fill: 3 by 3
 
   .byt DialogCommand::UploadGraphics, GraphicsUpload::CurlyFont, 255
+
+  .byt DialogCommand::SceneText, 4,4, "Hello world!",10,"Multiple lines!",0
 
   .byt DialogCommand::Portrait, Portrait::Maffi
     .byt TextCommand::Color2, "Hello world", TextCommand::Color1, "! You're looking at an", TextCommand::EndLine, TextCommand::Color3, "example text box", TextCommand::Color1, "! It's actually in the", TextCommand::EndLine, "game this time instead of being a", TextCommand::EndLine, "mockup! This ", TextCommand::Color2, "box", TextCommand::Color1, " can fit a lot of", TextCommand::EndLine, TextCommand::Color3, "text", TextCommand::Color1, ". Maybe that's not a great idea.", TextCommand::EndPage
