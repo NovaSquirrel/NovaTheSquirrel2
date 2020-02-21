@@ -250,3 +250,4 @@ VWFStackLen   = 4
 .global OverworldDirection
 
 .global SmallRenderBuffer
+.global DecompressBuffer

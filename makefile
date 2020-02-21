@@ -22,7 +22,8 @@ objlist = \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
-  math portraitdata dialog namefont namefontwidth vwf_fontdata
+  math portraitdata dialog namefont namefontwidth vwf_fontdata \
+  lz4
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -36,6 +37,9 @@ srcdir := src
 imgdir4 := tilesets4
 imgdir2 := tilesets2
 bgdir := backgrounds
+
+lz4_flags    := -f -9
+lz4_compress := tools/lz4
 
 ifndef SNESEMU
 SNESEMU := ./mesen-s
@@ -104,7 +108,7 @@ palettes := $(wildcard palettes/*.png)
 portaits := $(wildcard portraits/*.png)
 levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
-m7levels_hfm := $(patsubst %.bin,%.hfm,$(wildcard m7levels/*.bin))
+m7levels_lz4 := $(patsubst %.bin,%.lz4,$(wildcard m7levels/*.bin))
 m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
 
 # Background conversion
@@ -189,11 +193,12 @@ $(srcdir)/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
 $(srcdir)/sincos_data.s: tools/makesincos.py
 	$(PY) tools/makesincos.py
-m7levels/%.hfm: m7levels/%.bin
-	tools/huffmunch -B $< $@
+m7levels/%.lz4: m7levels/%.bin
+	$(lz4_compress) $(lz4_flags) $< $@
+	@touch $@
 m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py
 	$(PY) tools/m7levelconvert.py $< $@
-$(srcdir)/m7leveldata.s: $(m7levels_hfm) $(m7levels_bin) tools/m7levelinsert.py
+$(srcdir)/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py
 
 
@@ -220,7 +225,10 @@ tools/M7TilesetRearranged.png: tools/M7Tileset.png
 tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py
-$(objdir)/mode7.o: tools/M7Tileset.chrm7 $(m7levels)
+$(objdir)/mode7.o: tools/M7Tileset.chrm7.lz4 $(m7levels)
+tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
+	$(lz4_compress) $(lz4_flags) $< $@
+	@touch $@
 
 
 

@@ -10,7 +10,7 @@ all_m7pointers = []
 
 for f in sorted(glob.glob("m7levels/*.tmx")):
 	plain_name = os.path.splitext(os.path.basename(f))[0]
-	compressed_name = os.path.splitext(f)[0]+'.hfm'
+	compressed_name = os.path.splitext(f)[0]+'.lz4'
 
 	outfile.write('.export M7Level_%s\n' % plain_name)
 	outfile.write('M7Level_%s:\n' % plain_name)

@@ -271,3 +271,5 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in
   HDMA_Buffer2: .res 2048    ; for double buffering the previous
+
+  DecompressBuffer: .res 8192

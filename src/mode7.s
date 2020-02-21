@@ -169,21 +169,21 @@ PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
   ; -----------------------------------
 
   ; Upload graphics
+  .import LZ4_DecompressToMode7Tiles, SFX_LZ4_decompress
+  ldx #.loword(Mode7Tiles)
+  lda #^Mode7Tiles
   stz PPUADDR
-  lda #DMAMODE_PPUHIDATA
-  ldx #$ffff & Mode7Tiles
-  ldy #Mode7TilesEnd-Mode7Tiles
-  jsl ppu_copy
+  jsl LZ4_DecompressToMode7Tiles
 
   ; -----------------------------------
 
-  ; Clear level map with a checkerboard pattern
+  ; Put a checkerboard map in the alternate level map
   ldx #0
   lda #$0102
 CheckerLoop:
   ldy #32
   xba
-: sta f:Mode7LevelMap,x
+: sta f:LevelBufAlt,x
   inx
   inx
   dey
@@ -228,27 +228,26 @@ CheckerLoop:
   sta Mode7RealAngle
   inc16 hm_node
 
+  ; Decompress the level map
   seta16
-  ldx #0
-  jsl huffmunch_load_snes
+  ldx hm_node
+  ldy #.loword(Mode7LevelMap)
+  lda #(^Mode7LevelMap <<8) | ^M7Level_sample2
+  jsl SFX_LZ4_decompress
+  .a16
 
-  ; Read out the level
-  tay ; Y = compressed file size
-  ldx #0
+  ; Add in the checkerboard
   seta8
-DecompressReadLoop:
-  phx
-  phy
-  jsl huffmunch_read_snes
-  ply
-  plx
-  cmp #1 ; Keep the checkerboard if it's 1
-  beq :+
+  ldx #4095
+CheckerboardAdd:
+  lda f:Mode7LevelMap,x
+  cmp #1
+  bne :+
+    lda f:LevelBufAlt,x
     sta f:Mode7LevelMap,x
   :
-  inx
-  dey
-  bne DecompressReadLoop
+  dex
+  bne CheckerboardAdd
   seta16
 
 RestoredFromCheckpoint:
@@ -988,8 +987,7 @@ Block:
 .endproc
 
 Mode7Tiles:
-.incbin "../tools/M7Tileset.chrm7"
-Mode7TilesEnd:
+.incbin "../tools/M7Tileset.chrm7.lz4"
 
 .include "m7palettedata.s"
 
