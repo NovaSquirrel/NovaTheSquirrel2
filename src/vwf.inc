@@ -24,6 +24,8 @@
   CallAsm       ; Followed by a 3-byte pointer
   Narrate       ; Followed by VWF text
 
+  Call           ; Call a shared scene part
+  Return         ; Return from a shared scene part
   Background2bpp ; Load and display a 2bpp background
   UploadGraphics ; Upload a series of pictures
   UploadPalettes ; Upload a series of palettes

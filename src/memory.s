@@ -227,6 +227,10 @@ LevelZeroWhenLoad_End:
   VWFStackH:     .res VWFStackLen
   VWFStackB:     .res VWFStackLen
   VWFStackIndex: .res 1
+  DialogStackL:     .res DialogStackLen
+  DialogStackH:     .res DialogStackLen
+  DialogStackB:     .res DialogStackLen
+  DialogStackIndex: .res 1
 
   CursorX:       .res 2
   CursorY:       .res 2

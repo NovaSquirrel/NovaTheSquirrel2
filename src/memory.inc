@@ -243,6 +243,11 @@ VWFStackLen   = 4
 .global VWFStackH
 .global VWFStackB
 .global VWFStackIndex
+DialogStackLen = 4
+.global DialogStackL
+.global DialogStackH
+.global DialogStackB
+.global DialogStackIndex
 
 .global OverworldPlayerX
 .global OverworldPlayerY

@@ -57,6 +57,7 @@ DialogPortrait = Mode7HappyTimer
   seta8
   lda #%00010111  ; enable sprites, plane 0, 1 and 2
   sta BLENDMAIN
+  stz DialogStackIndex
 
   ; Set up the windows
   lda #%00100000
@@ -188,6 +189,7 @@ DialogPortrait = Mode7HappyTimer
   lda #65+(16*5)
   sta OAM_XPOS+(4*9),x
 
+  ; Portrait
   lda #$80
   sta OAM_TILE+(4*0),x
   ina
@@ -200,6 +202,7 @@ DialogPortrait = Mode7HappyTimer
   ina
   sta OAM_TILE+(4*3),x
 
+  ; Name
   lda #$a0
   sta OAM_TILE+(4*4),x
   ina
@@ -289,6 +292,8 @@ HandleDialogOpcode:
   .addr OpPortrait
   .addr OpCallAsm
   .addr OpNarrate
+  .addr OpCallDialog
+  .addr OpReturn
   .addr OpBackground2bpp
   .addr OpUploadGraphics
   .addr OpUploadPalettes
@@ -317,6 +322,52 @@ OpEnd:
 
   plp
   rtl
+
+.a8
+OpCallDialog:
+  tdc
+  lda DialogStackIndex
+  tax
+
+  ; Save old pointer
+  lda ScriptPointer+0
+  add #3 ; Skip over the pointer after this
+  sta DialogStackL,x
+  lda ScriptPointer+1
+  adc #0
+  sta DialogStackH,x
+  lda ScriptPointer+2
+  sta DialogStackB,x
+
+  inc DialogStackIndex
+
+  jsr GetParameter ; Low
+  pha
+  jsr GetParameter ; High
+  pha
+  jsr GetParameter ; Bank
+  sta ScriptPointer+2
+  pla
+  sta ScriptPointer+1
+  pla
+  sta ScriptPointer+0
+  rts
+
+.a8
+OpReturn:
+  dec DialogStackIndex
+  tdc
+  lda DialogStackIndex
+  tax
+
+  ; Restore the pointer
+  lda DialogStackL,x
+  sta ScriptPointer+0
+  lda DialogStackH,x
+  sta ScriptPointer+1
+  lda DialogStackB,x
+  sta ScriptPointer+2
+  rts
 
 .a8
 OpPortrait:
@@ -791,7 +842,24 @@ MT_Reposition = $0001
 MT_Repeat     = $4000
 MT_Finish     = $8000
 
+DemoScriptScene:
+  .byt DialogCommand::Background2bpp, GraphicsUpload::DialogForest, VariablePalette::ForestBG
+  .byt DialogCommand::SceneMetatiles
+  .word MT_Reposition|MT_Repeat|MT_Finish|128
+  .byt $50
+  .byt 12
+  .byt DialogCommand::Return
+
 DemoScript:
+  .byt DialogCommand::Call
+  .faraddr DemoScriptScene
+
+  .byt DialogCommand::Portrait, Portrait::Maffi
+    .byt TextCommand::Color2, "Hello world", TextCommand::Color1, TextCommand::ExtendedChar, ExtraChar::Pawprint, TextCommand::EndText
+  .byt DialogCommand::End
+
+
+.if 0
   .byt DialogCommand::ClearMetatiles
 
   .byt DialogCommand::SceneMetatiles
@@ -818,3 +886,4 @@ DemoScript:
     .byt TextCommand::Color2, "Hello world", TextCommand::Color1, "! You're looking at an", TextCommand::EndLine, TextCommand::Color3, "example text box", TextCommand::Color1, "! It's actually in the", TextCommand::EndLine, "game this time instead of being a", TextCommand::EndLine, "mockup! This ", TextCommand::Color2, "box", TextCommand::Color1, " can fit a lot of", TextCommand::EndLine, TextCommand::Color3, "text", TextCommand::Color1, ". Maybe that's not a great idea.", TextCommand::EndPage
     .byt "Hello world!", TextCommand::EndLine, "This is another line!", TextCommand::EndLine, TextCommand::BigText, "Hopefully this", TextCommand::EndLine, TextCommand::EndLine, TextCommand::BigText, "works!", TextCommand::ExtendedChar, ExtraChar::Think, TextCommand::EndText
   .byt DialogCommand::End
+.endif
