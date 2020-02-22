@@ -107,6 +107,7 @@ chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 chr4_lz4          := $(patsubst %.png,%.chrsfc.lz4,$(wildcard tilesets4/lz4/*.png))
 chr2_lz4          := $(patsubst %.png,%.chrgb.lz4,$(wildcard tilesets2/lz4/*.png))
 palettes := $(wildcard palettes/*.png)
+variable_palettes := $(wildcard palettes/variable/*.png)
 portaits := $(wildcard portraits/*.png)
 levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
@@ -182,8 +183,8 @@ $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 $(srcdir)/portraitdata.s: $(portraits)
 $(srcdir)/portraitenum.s: $(portraits) tools/encodeportraits.py
 	$(PY) tools/encodeportraits.py
-$(srcdir)/palettedata.s: $(palettes)
-$(srcdir)/paletteenum.s: $(palettes)
+$(srcdir)/palettedata.s: $(palettes) $(variable_palettes)
+$(srcdir)/paletteenum.s: $(palettes) $(variable_palettes) tools/encodepalettes.py
 	$(PY) tools/encodepalettes.py
 $(srcdir)/actorenum.s: tools/actors.txt tools/makeactor.py
 	$(PY) tools/makeactor.py

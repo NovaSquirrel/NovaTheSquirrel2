@@ -151,6 +151,7 @@ DialogPortrait = Mode7HappyTimer
   jsr BottomBox
 
 
+
   ; Set up portrait sprites (and name sprites)
   ldx #0
 
@@ -347,6 +348,52 @@ OpNarrate:
 
 .a8
 OpBackground2bpp:
+  ; Parameter 1 = the compressed bitmap to draw
+  jsr GetParameter
+  jsl DoGraphicUpload
+
+  ; Parameter 2 = the palette to draw it with
+  jsr GetParameter
+  seta16
+  and #255
+  asl
+  tax
+  .import VariablePaletteDirectory, VariablePaletteData
+  lda f:VariablePaletteDirectory,x
+  tax
+  inx ; Skip the first byte, which is the size
+  seta8
+  ; First color is the background color
+  stz CGADDR
+  jsr OneColorFromVariablePalette
+  lda #5
+  sta CGADDR
+  ; Now do the remaining three colors
+  ldy #3
+: jsr OneColorFromVariablePalette
+  dey
+  bne :-
+
+  seta16
+  ; Put increasing tiles on the background
+  lda #(InventoryTilemapText>>1)|(4+13*32)
+  sta PPUADDR
+  lda #384+(1<<10) ; palette 1
+  ldy #12
+: ldx #24
+  jsl WritePPUIncreasing
+  ldx #8
+  jsl SkipPPUWords
+  dey
+  bne :-
+  seta8
+  rts
+
+OneColorFromVariablePalette:
+  jsr :+
+: lda f:VariablePaletteData,x
+  sta CGDATA
+  inx
   rts
 
 .a8
@@ -760,6 +807,8 @@ DemoScript:
   .word MT_Finish|MT_Reposition|MT_Repeat|4
   .byt $05 ; 5,0
   .byt $33 ; rectangle fill: 3 by 3
+
+  .byt DialogCommand::Background2bpp, GraphicsUpload::DialogForest, VariablePalette::ForestBG
 
   .byt DialogCommand::UploadGraphics, GraphicsUpload::CurlyFont, 255
 
