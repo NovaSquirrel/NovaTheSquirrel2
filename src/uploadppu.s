@@ -438,6 +438,13 @@ DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
 .proc UploadLevelGraphics
   seta8
 
+  ; Fix the background color
+  stz CGADDR
+  lda LevelBackgroundColor+0
+  sta CGDATA
+  lda LevelBackgroundColor+1
+  sta CGDATA
+
   ; Upload level sprite graphics
   ldx #0
 SpriteLoop:
