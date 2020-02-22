@@ -39,13 +39,6 @@ PrintedCharacter = TouchTemp + 1
   seta8
   stz FontDrawX
 
-  lda #<TestText
-  sta DecodePointer+0
-  lda #>TestText
-  sta DecodePointer+1
-  lda #^TestText
-  sta DecodePointer+2
-
   ; -----------------------------------
 CharacterLoop:
   ; .----------------------------------
@@ -219,26 +212,8 @@ ShiftTable:
   .byt 128, 64, 32, 16, 8, 4, 2, 1
 .endproc
 
-.macro NameFontText String
-  .repeat .strlen(String), I
-    .scope
-      Char = .strat(String, I)
-      .if Char = ' '
-        .byt 1
-      .endif
-      .if Char >= 'A' && Char <= 'Z'
-        .byt 2 + Char-'A'
-      .endif
-      .if Char >= 'a' && Char <= 'z'
-        .byt 2 + Char-'a'+26
-      .endif
-    .endscope
-  .endrep
-  .byt 0
-.endmacro
 
-TestText:
-  NameFontText "Maffi"
+
 
 ; Copies NameFontRenderTop and NameFontRenderBottom
 ; A = address to upload to

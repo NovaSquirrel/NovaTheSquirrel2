@@ -82,3 +82,21 @@ PlayerHeight = 16*16+14*16
 
 AttackKeys = KEY_X|KEY_A|KEY_L|KEY_R
 DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
+
+.macro NameFontText String
+  .repeat .strlen(String), I
+    .scope
+      Char = .strat(String, I)
+      .if Char = ' ' || Char = '_'
+        .byt 1
+      .endif
+      .if Char >= 'A' && Char <= 'Z'
+        .byt 2 + Char-'A'
+      .endif
+      .if Char >= 'a' && Char <= 'z'
+        .byt 2 + Char-'a'+26
+      .endif
+    .endscope
+  .endrep
+  .byt 0
+.endmacro

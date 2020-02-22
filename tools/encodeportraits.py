@@ -84,8 +84,9 @@ for f in glob.glob("portraits/*.png"):
 outfile = open("src/portraitdata.s", "w")
 outfile.write('; This is automatically generated. Edit "portraits" directory instead\n')
 outfile.write('.include "snes.inc"\n')
+outfile.write('.include "global.inc"\n')
 outfile.write('.segment "Portraits"\n')
-outfile.write('.export PortraitData, PaletteForPortrait, PortraitPaletteData\n\n')
+outfile.write('.export PortraitData, PaletteForPortrait, NameForPortrait, PortraitPaletteData\n\n')
 
 outfile.write('.proc PortraitData\n')
 for pic, data in portraits.items():
@@ -102,6 +103,15 @@ for pic, data in portraits.items():
 		outfile.write('  .byt %d\n' % data['palette'])
 outfile.write('.endproc\n')
 
+outfile.write('\n.proc NameForPortrait\n')
+for pic, data in portraits.items():
+	for i in range(data['count']):
+		outfile.write('  .addr PortraitName_%s\n' % pic)
+outfile.write('.endproc\n\n')
+
+for pic, data in portraits.items():
+	outfile.write('PortraitName_%s:\n' % pic)
+	outfile.write('  NameFontText \"%s\"\n' % pic)
 
 outfile.write('\n.proc PortraitPaletteData\n')
 for pal in all_palettes_actual:

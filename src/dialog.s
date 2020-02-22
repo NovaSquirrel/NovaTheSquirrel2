@@ -27,7 +27,7 @@ MenuBGScroll = SpriteTileBase
 DialogTileBase = $3e0|InventoryPalette
 
 .import DoPortraitUpload ; Uploads portrait A to address Y; be in vblank
-.import PaletteForPortrait, PortraitPaletteData
+.import PaletteForPortrait, NameForPortrait, PortraitPaletteData
 .import InitVWF, DrawVWF, CopyVWF
 .import Mode7HappyTimer
 DialogPortrait = Mode7HappyTimer
@@ -376,6 +376,15 @@ OpPortrait:
 
   seta16
   .import RenderNameFont
+  and #255
+  asl
+  tax
+  lda f:NameForPortrait,x
+  sta DecodePointer
+  seta8
+  lda #^NameForPortrait
+  sta DecodePointer+2
+  seta16
   jsl RenderNameFont
   seta8
 
@@ -697,7 +706,7 @@ StartText:
   ldy #$9000 >> 1
   jsl DoPortraitUpload ; preserves A
   seta16
-  ; Get palette number
+  ; Get palette number from the portrait
   and #255
   tax
   lda f:PaletteForPortrait,x
@@ -855,7 +864,7 @@ DemoScript:
   .faraddr DemoScriptScene
 
   .byt DialogCommand::Portrait, Portrait::Maffi
-    .byt TextCommand::Color2, "Hello world", TextCommand::Color1, TextCommand::ExtendedChar, ExtraChar::Pawprint, TextCommand::EndText
+    .byt TextCommand::Color2, "Hello", TextCommand::Color3, " world", TextCommand::Color1, TextCommand::ExtendedChar, ExtraChar::Pawprint, TextCommand::EndText
   .byt DialogCommand::End
 
 
