@@ -1,7 +1,9 @@
 Nova the Squirrel 2
 ===================
 
-An upcoming sequel to Nova the Squirrel 1, for the SNES.
+An upcoming sequel to Nova the Squirrel 1, for the SNES. Nova the Squirrel 2 will have a stronger focus on story, and it generally tries to be a more refined version of the first game's experience. It features new copy abilities, new enemies, and special new puzzle levels that take place in Mode 7.
+
+![Screenshot](https://i.imgur.com/UEvmxUZ.png)
 
 Some parts based on [LoROM template](https://github.com/pinobatch/lorom-template)
 
@@ -16,6 +18,7 @@ You'll need the following:
 * GNU Make
 * [ca65](https://cc65.github.io/)
 * [Huffmunch](https://github.com/bbbradsmith/huffmunch) compressor (Windows build included)
+* [lz4](https://github.com/lz4/lz4/releases) compressor (Windows build included)
 
 With that in place, just enter `make`.
 
