@@ -29,3 +29,4 @@ C800 Mode7HUD
 A000 SPMirrorRabbit
 A000 SPBomberTree
 7000 CurlyFont
+D800 DialogForest

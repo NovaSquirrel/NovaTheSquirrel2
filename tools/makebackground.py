@@ -126,5 +126,5 @@ def convert(f):
 	outfile.close()
 
 print(sys.argv)
-print("Converting "+sys.argv[0])
+print("Converting "+sys.argv[1])
 convert(sys.argv[1])

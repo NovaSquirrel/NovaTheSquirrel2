@@ -18,7 +18,8 @@ for line in text:
 
 	# Look to see if the resource exists as a 2bpp or 4bpp image
 	filename = ""
-	for tryfile in ["tilesets4/%s.chrsfc", "tilesets2/%s.chrgb", "backgrounds/%s.chrsfc", "backgrounds/%s.namsfc"]:
+	for tryfile in ["tilesets4/%s.chrsfc", "tilesets2/%s.chrgb", "tilesets4/lz4/%s.chrsfc.lz4",
+		"tilesets2/lz4/%s.chrgb.lz4", "backgrounds/%s.chrsfc", "backgrounds/%s.namsfc"]:
 		if os.path.isfile(tryfile % name):
 			if len(filename):
 				print("Error: graphic %s exists in more than one format")
@@ -34,6 +35,7 @@ for line in text:
 	graphic['address'] = address
 	graphic['filename'] = "../%s" % filename
 	graphic['size'] = os.path.getsize(filename)
+	graphic['lz4'] = filename.endswith('lz4')
 	all_graphics.append(graphic)
 all_graphics = sorted(all_graphics, key=lambda g: g['size'], reverse=True) 
 
@@ -76,6 +78,8 @@ outfile.write('; Pointer, destination address, and then size\n')
 outfile.write('.proc GraphicsDirectory\n')
 for f in ordered_files:
 	outfile.write('  .faraddr File_%s\n' % f['name'])
+	if f['lz4']:
+		f['size'] = 0xffff # Mark it as lz4 compressed
 	outfile.write('  .word $%.4x>>1, $%.4x\n' % (f['address'], f['size']))
 outfile.write('.endproc\n')
 

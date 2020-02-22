@@ -104,6 +104,8 @@ objlistospc = $(foreach o,$(objlistspc),$(objdir)/$(o).o)
 brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
+chr4_lz4          := $(patsubst %.png,%.chrsfc.lz4,$(wildcard tilesets4/lz4/*.png))
+chr2_lz4          := $(patsubst %.png,%.chrgb.lz4,$(wildcard tilesets2/lz4/*.png))
 palettes := $(wildcard palettes/*.png)
 portaits := $(wildcard portraits/*.png)
 levels := $(wildcard levels/*.json)
@@ -163,7 +165,7 @@ $(srcdir)/vwf_fontdata.s: tools/fonts/BaseSeven.png tools/makefontvwf.py
 	$(PY) tools/makefontvwf.py
 
 # Automatically insert graphics into the ROM
-$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) tools/gfxlist.txt tools/insertthegfx.py
+$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) $(chr4_lz4) $(chr2_lz4) tools/gfxlist.txt tools/insertthegfx.py
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
@@ -216,8 +218,14 @@ $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
 # Try generating it in the folder it's for
 $(imgdir2)/%.chrgb: $(imgdir2)/%.png
 	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
+#$(imgdir2)/lz4/%.chrgb: $(imgdir2)/lz4/%.png
+#	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
 $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+#$(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
+#	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+
+
 $(bgdir)/%.chrsfc: $(bgdir)/%.png
 	$(PY) tools/makebackground.py $<
 tools/M7TilesetRearranged.png: tools/M7Tileset.png
@@ -227,6 +235,13 @@ tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
 	$(PY) tools/mode7palette.py
 $(objdir)/mode7.o: tools/M7Tileset.chrm7.lz4 $(m7levels)
 tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
+	$(lz4_compress) $(lz4_flags) $< $@
+	@touch $@
+
+tilesets4/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc
+	$(lz4_compress) $(lz4_flags) $< $@
+	@touch $@
+tilesets2/lz4/%.chrgb.lz4: tilesets2/lz4/%.chrgb
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
 

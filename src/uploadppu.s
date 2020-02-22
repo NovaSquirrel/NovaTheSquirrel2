@@ -301,25 +301,26 @@ KeepOffset:
   sub 0
   tax
 
-  ; Upload to VRAM
-  lda #DMAMODE_PPUDATA
-  sta DMAMODE
-
   ; Now access the stuff from GraphicsDirectory:
   ; ppp dd ss - pointer, destination, size
-
-  ; Source address
-  lda f:GraphicsDirectory+0,x
-  sta DMAADDR
 
   ; Destination address
   lda f:GraphicsDirectory+3,x
   add GraphicUploadOffset
   sta PPUADDR
 
-  ; Size
+  ; Size can indicate that it's compressed
   lda f:GraphicsDirectory+5,x
+  bmi Compressed
   sta DMALEN
+
+  ; Upload to VRAM
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE
+
+  ; Source address
+  lda f:GraphicsDirectory+0,x
+  sta DMAADDR
 
   ; Source bank
   seta8
@@ -339,6 +340,23 @@ WithOffset: ; Alternate entrance for using destination address offsets
   php
   setaxy16
   bra KeepOffset
+
+.a16
+.i16
+Compressed:
+  phy ; This is trashed by the decompress routine
+
+  lda f:GraphicsDirectory+0,x ; Source address
+  pha
+  lda f:GraphicsDirectory+2,x ; Source bank, don't care about high byte
+  plx
+  .import LZ4_DecompressToVRAM
+  jsl LZ4_DecompressToVRAM
+
+  ply
+  plp
+  plx
+  rtl
 .endproc
 DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
 ;;
@@ -405,9 +423,7 @@ DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
   ldy #12
   ldx #0
 : lda SpritePaletteSlots,x
-  phy
   jsl DoPaletteUpload
-  ply
   inx
   inx
   iny
@@ -447,9 +463,7 @@ SpriteLoop:
   ; Upload background palettes
   ldy #0
 : lda BackgroundPaletteSlots,y
-  phy
   jsl DoPaletteUpload
-  ply
   iny
   cpy #8
   bne :-
@@ -590,8 +604,18 @@ SpriteLoop:
 
 .export SkipPPUWords
 .proc SkipPPUWords
-: lda PPUDATARD
+: bit PPUDATARD
   dex
   bne :-
   rtl
 .endproc
+
+
+.a16
+.i16
+.export WriteScriptedImage
+.proc WriteScriptedImage
+  lda [DecodePointer]
+  rtl
+.endproc
+
