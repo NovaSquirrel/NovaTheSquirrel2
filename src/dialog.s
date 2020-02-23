@@ -235,7 +235,7 @@ Pointer = 1
   sta Slot
   tay ; Slot number
   pla
-  and #128
+  and #64
   sta DialogCharacterFlip,y
 
   jsr GetParameter
@@ -950,7 +950,6 @@ CharacterDrawLoop:
   ora #%00100001 ; Second 256 tiles, and priority
   sta Attribute
   lda DialogCharacterFlip,x
-  lsr
   tsb Attribute ; Direction bit is 64
 
   ; Copy this data so the slot isn't needed to access it
@@ -1057,9 +1056,9 @@ DemoScript:
   .faraddr DemoScriptScene
 
   .byt DialogCommand::PutNPC, 0, DialogNPC::Maffi, 32*2, 184
-  .byt DialogCommand::PutNPC, 1, DialogNPC::Spring, 32*3, 184
-  .byt DialogCommand::PutNPC, 3|128, DialogNPC::Star, 32*4, 184
-  .byt DialogCommand::PutNPC, 2|128, DialogNPC::Sherbet, 32*5, 184
+  .byt DialogCommand::PutNPC, 1, DialogNPC::Rosy, 32*3, 184
+  .byt DialogCommand::PutNPC, 3|64, DialogNPC::Star, 32*4, 184
+  .byt DialogCommand::PutNPC, 2|64, DialogNPC::Sherbet, 32*5, 184
 
   .byt DialogCommand::Portrait, Portrait::Maffi
     .byt TextCommand::Color2, "Hello", TextCommand::Color3, " world", TextCommand::Color1, TextCommand::ExtendedChar, ExtraChar::Pawprint, TextCommand::EndText
