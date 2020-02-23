@@ -59,6 +59,13 @@ DialogPortrait = Mode7HappyTimer
   sta BLENDMAIN
   stz DialogStackIndex
 
+  ; Clear active character list
+  lda #255
+  ldx #5
+: sta DialogCharacterId,x
+  dex
+  bpl :-
+
   ; Set up the windows
   lda #%00100000
   sta BG12WINDOW
@@ -151,115 +158,6 @@ DialogPortrait = Mode7HappyTimer
   bne :-
   jsr BottomBox
 
-
-
-  ; Set up portrait sprites (and name sprites)
-  ldx #0
-
-  seta8
-  lda #4*8
-  sta OAM_XPOS+(4*0),x
-  sta OAM_XPOS+(4*2),x
-  sta OAM_YPOS+(4*0),x
-  sta OAM_YPOS+(4*1),x
-  lda #6*8
-  sta OAM_XPOS+(4*1),x
-  sta OAM_XPOS+(4*3),x
-  sta OAM_YPOS+(4*2),x
-  sta OAM_YPOS+(4*3),x
-
-  lda #10
-  sta OAM_YPOS+(4*4),x
-  sta OAM_YPOS+(4*5),x
-  sta OAM_YPOS+(4*6),x
-  sta OAM_YPOS+(4*7),x
-  sta OAM_YPOS+(4*8),x
-  sta OAM_YPOS+(4*9),x
-
-  lda #65+(16*0)
-  sta OAM_XPOS+(4*4),x
-  lda #65+(16*1)
-  sta OAM_XPOS+(4*5),x
-  lda #65+(16*2)
-  sta OAM_XPOS+(4*6),x
-  lda #65+(16*3)
-  sta OAM_XPOS+(4*7),x
-  lda #65+(16*4)
-  sta OAM_XPOS+(4*8),x
-  lda #65+(16*5)
-  sta OAM_XPOS+(4*9),x
-
-  ; Portrait
-  lda #$80
-  sta OAM_TILE+(4*0),x
-  ina
-  ina
-  sta OAM_TILE+(4*1),x
-  ina
-  ina
-  sta OAM_TILE+(4*2),x
-  ina
-  ina
-  sta OAM_TILE+(4*3),x
-
-  ; Name
-  lda #$a0
-  sta OAM_TILE+(4*4),x
-  ina
-  ina
-  sta OAM_TILE+(4*5),x
-  ina
-  ina
-  sta OAM_TILE+(4*6),x
-  ina
-  ina
-  sta OAM_TILE+(4*7),x
-  ina
-  ina
-  sta OAM_TILE+(4*8),x
-  ina
-  ina
-  sta OAM_TILE+(4*9),x
-
-  lda #>(OAM_PRIORITY_2|OAM_COLOR_7)
-  sta OAM_ATTR+(4*0),x
-  sta OAM_ATTR+(4*1),x
-  sta OAM_ATTR+(4*2),x
-  sta OAM_ATTR+(4*3),x
-  lda #>(OAM_PRIORITY_2|OAM_COLOR_1)
-  sta OAM_ATTR+(4*4),x
-  sta OAM_ATTR+(4*5),x
-  sta OAM_ATTR+(4*6),x
-  sta OAM_ATTR+(4*7),x
-  sta OAM_ATTR+(4*8),x
-  sta OAM_ATTR+(4*9),x
-
-  stz OAMHI+0+(4*0),x
-  stz OAMHI+0+(4*1),x
-  stz OAMHI+0+(4*2),x
-  stz OAMHI+0+(4*3),x
-  stz OAMHI+0+(4*4),x
-  stz OAMHI+0+(4*5),x
-  stz OAMHI+0+(4*6),x
-  stz OAMHI+0+(4*7),x
-  stz OAMHI+0+(4*8),x
-  stz OAMHI+0+(4*9),x
-  lda #$02
-  sta OAMHI+1+(4*0),x
-  sta OAMHI+1+(4*1),x
-  sta OAMHI+1+(4*2),x
-  sta OAMHI+1+(4*3),x
-  sta OAMHI+1+(4*4),x
-  sta OAMHI+1+(4*5),x
-  sta OAMHI+1+(4*6),x
-  sta OAMHI+1+(4*7),x
-  sta OAMHI+1+(4*8),x
-  sta OAMHI+1+(4*9),x
-  seta16
-  ldx #4*10
-  jsl ppu_clear_oam
-  jsl ppu_pack_oamhi
-
   seta8
   ; Set the pointer to a demo script anyway
   lda #<DemoScript
@@ -301,6 +199,7 @@ HandleDialogOpcode:
   .addr OpSceneMetatiles
   .addr OpSceneTiles
   .addr OpSceneText
+  .addr OpPutNPC
 
 .a8
 ReturnEndDialog:
@@ -322,6 +221,90 @@ OpEnd:
 
   plp
   rtl
+
+.a8
+OpPutNPC:
+.scope
+Slot = 0
+Pointer = 1
+  tdc ; Clear all of accumulator
+  jsr GetParameter
+
+  pha
+  and #3
+  sta Slot
+  tay ; Slot number
+  pla
+  and #128
+  sta DialogCharacterFlip,y
+
+  jsr GetParameter
+  sta DialogCharacterId,y
+  pha
+  jsr GetParameter
+  sta DialogCharacterX,y
+  jsr GetParameter
+  sta DialogCharacterY,y
+  pla ; Get character ID back
+  ; Look up the character in the directory
+  asl
+  tax
+  .import DialogNPCDirectory
+  lda f:DialogNPCDirectory+0,x
+  sta Pointer+0
+  lda f:DialogNPCDirectory+1,x
+  sta Pointer+1
+  lda #^DialogNPCDirectory
+  sta Pointer+2
+  sta DMAADDRBANK
+
+  ; Copy the palette
+  lda Slot
+  add #8+2
+  asl ; Multiply by 16
+  asl
+  asl
+  asl
+  ina
+  sta CGADDR
+  ldx #15*2
+  ldy #0
+: lda [Pointer],y
+  sta CGDATA
+  iny
+  dex
+  bne :-
+
+  ; Copy the graphics
+  lda [Pointer],y
+  pha
+  iny
+  lda [Pointer],y
+  sta Pointer+1
+  pla
+  sta Pointer+0
+
+  ; Copy the graphics
+  ldy #2
+  seta16
+  lda [Pointer] ; Length
+  sta DMALEN
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE
+  lda Slot
+  and #255
+  xba ; * 256
+  asl ; * 512
+  adc #$a000 >> 1
+  sta PPUADDR
+  lda Pointer
+  add #2
+  sta DMAADDR
+  seta8
+  lda #1
+  sta COPYSTART
+.endscope
+  rts
 
 .a8
 OpCallDialog:
@@ -699,6 +682,7 @@ StartText:
   jsl WaitVblank
 
   jsl CopyVWF
+  jsr DialogGenerateSprites
   jsl ppu_copy_oam
 .a8 ; ppu_copy_oam leaves it 8-bit as a side effect
   ; Get the portrait ready
@@ -742,7 +726,7 @@ StartText:
 @WaitForKey:
   jsl WaitVblank
   jsl WaitKeysReady
-  jsr InventoryDialogSharedBackground ; Also turns rendering on
+  jsr InventoryDialogSharedBackground
   seta16
   lda keynew
   and #KEY_A
@@ -833,6 +817,214 @@ ReturnPortrait:
   rts
 .endproc
 
+.a16
+.i16
+.proc DialogGenerateSprites
+  ; Set up portrait sprites (and name sprites)
+  ldx #0
+
+  seta8
+  lda #4*8
+  sta OAM_XPOS+(4*0),x
+  sta OAM_XPOS+(4*2),x
+  sta OAM_YPOS+(4*0),x
+  sta OAM_YPOS+(4*1),x
+  lda #6*8
+  sta OAM_XPOS+(4*1),x
+  sta OAM_XPOS+(4*3),x
+  sta OAM_YPOS+(4*2),x
+  sta OAM_YPOS+(4*3),x
+
+  lda #10
+  sta OAM_YPOS+(4*4),x
+  sta OAM_YPOS+(4*5),x
+  sta OAM_YPOS+(4*6),x
+  sta OAM_YPOS+(4*7),x
+  sta OAM_YPOS+(4*8),x
+  sta OAM_YPOS+(4*9),x
+
+  lda #65+(16*0)
+  sta OAM_XPOS+(4*4),x
+  lda #65+(16*1)
+  sta OAM_XPOS+(4*5),x
+  lda #65+(16*2)
+  sta OAM_XPOS+(4*6),x
+  lda #65+(16*3)
+  sta OAM_XPOS+(4*7),x
+  lda #65+(16*4)
+  sta OAM_XPOS+(4*8),x
+  lda #65+(16*5)
+  sta OAM_XPOS+(4*9),x
+
+  ; Portrait
+  lda #$80
+  sta OAM_TILE+(4*0),x
+  ina
+  ina
+  sta OAM_TILE+(4*1),x
+  ina
+  ina
+  sta OAM_TILE+(4*2),x
+  ina
+  ina
+  sta OAM_TILE+(4*3),x
+
+  ; Name
+  lda #$a0
+  sta OAM_TILE+(4*4),x
+  ina
+  ina
+  sta OAM_TILE+(4*5),x
+  ina
+  ina
+  sta OAM_TILE+(4*6),x
+  ina
+  ina
+  sta OAM_TILE+(4*7),x
+  ina
+  ina
+  sta OAM_TILE+(4*8),x
+  ina
+  ina
+  sta OAM_TILE+(4*9),x
+
+  lda #>(OAM_PRIORITY_2|OAM_COLOR_7)
+  sta OAM_ATTR+(4*0),x
+  sta OAM_ATTR+(4*1),x
+  sta OAM_ATTR+(4*2),x
+  sta OAM_ATTR+(4*3),x
+  lda #>(OAM_PRIORITY_2|OAM_COLOR_1)
+  sta OAM_ATTR+(4*4),x
+  sta OAM_ATTR+(4*5),x
+  sta OAM_ATTR+(4*6),x
+  sta OAM_ATTR+(4*7),x
+  sta OAM_ATTR+(4*8),x
+  sta OAM_ATTR+(4*9),x
+
+  stz OAMHI+0+(4*0),x
+  stz OAMHI+0+(4*1),x
+  stz OAMHI+0+(4*2),x
+  stz OAMHI+0+(4*3),x
+  stz OAMHI+0+(4*4),x
+  stz OAMHI+0+(4*5),x
+  stz OAMHI+0+(4*6),x
+  stz OAMHI+0+(4*7),x
+  stz OAMHI+0+(4*8),x
+  stz OAMHI+0+(4*9),x
+  lda #$02
+  sta OAMHI+1+(4*0),x
+  sta OAMHI+1+(4*1),x
+  sta OAMHI+1+(4*2),x
+  sta OAMHI+1+(4*3),x
+  sta OAMHI+1+(4*4),x
+  sta OAMHI+1+(4*5),x
+  sta OAMHI+1+(4*6),x
+  sta OAMHI+1+(4*7),x
+  sta OAMHI+1+(4*8),x
+  sta OAMHI+1+(4*9),x
+
+  ; Use Y for the OAM Pointer
+  ldx #4*10
+  stx OamPtr
+  Attribute = 10
+  TileNum   = 11
+  Slot      = 12
+  XOffset   = 13
+  YOffset   = 14
+  Direction = 15
+  lda #0
+  sta Slot
+CharacterDrawLoop:
+  tdc
+  lda Slot
+  tax
+  asl ; * 32
+  asl
+  asl
+  asl
+  asl
+  sta TileNum
+  lda Slot
+  asl
+  adc #%00000100 ; Palette starts from 2
+  ora #%00100001 ; Second 256 tiles, and priority
+  sta Attribute
+  lda DialogCharacterFlip,x
+  lsr
+  tsb Attribute ; Direction bit is 64
+
+  ; Copy this data so the slot isn't needed to access it
+  lda DialogCharacterX,x
+  sta XOffset
+  lda DialogCharacterY,x
+  sta YOffset
+  lda DialogCharacterFlip,x
+  sta Direction
+  lda DialogCharacterId,x
+  bmi SkipThisSlot
+  asl
+  tax
+  .import DialogNPCDirectory
+  lda f:DialogNPCDirectory+0,x
+  sta 0
+  lda f:DialogNPCDirectory+1,x
+  sta 1
+  lda #^DialogNPCDirectory
+  sta 2
+  ldy #32
+CharacterDrawTileLoop:
+  lda [0],y
+  cmp #255
+  beq SkipThisSlot ; Done
+
+  ldx OamPtr
+  add XOffset
+  sta OAM_XPOS,x
+
+  ; Flip if needed
+  lda Direction
+  beq :+
+    lda #8
+    sub [0],y ; Reload it
+    add XOffset
+    sta OAM_XPOS,x
+  :
+
+  iny
+  lda [0],y
+  add YOffset
+  sta OAM_YPOS,x  
+  iny
+
+  lda Attribute
+  sta OAM_ATTR,x
+  lda TileNum
+  sta OAM_TILE,x
+  inc TileNum
+  stz OAMHI,x
+  stz OAMHI+1,x
+
+  inx
+  inx
+  inx
+  inx
+  stx OamPtr
+  bra CharacterDrawTileLoop
+SkipThisSlot:
+  lda Slot
+  ina
+  sta Slot
+  cmp #5
+  jne CharacterDrawLoop
+
+  seta16
+  ldx OamPtr
+  jsl ppu_clear_oam
+  jsl ppu_pack_oamhi
+  rts
+.endproc
+
+
 DialogHDMA_ScrollX:
   .byt 100, <(-2), >(-2)
   .byt 100, 0, 0
@@ -846,6 +1038,7 @@ DialogHDMA_WindowEnable:
 
 
 .include "portraitenum.s"
+.include "dialog_npc_enum.s"
 
 MT_Reposition = $0001
 MT_Repeat     = $4000
@@ -862,6 +1055,11 @@ DemoScriptScene:
 DemoScript:
   .byt DialogCommand::Call
   .faraddr DemoScriptScene
+
+  .byt DialogCommand::PutNPC, 0, DialogNPC::Maffi, 32*2, 184
+  .byt DialogCommand::PutNPC, 1, DialogNPC::Spring, 32*3, 184
+  .byt DialogCommand::PutNPC, 3|128, DialogNPC::Star, 32*4, 184
+  .byt DialogCommand::PutNPC, 2|128, DialogNPC::Sherbet, 32*5, 184
 
   .byt DialogCommand::Portrait, Portrait::Maffi
     .byt TextCommand::Color2, "Hello", TextCommand::Color3, " world", TextCommand::Color1, TextCommand::ExtendedChar, ExtraChar::Pawprint, TextCommand::EndText

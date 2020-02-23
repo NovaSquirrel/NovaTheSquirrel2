@@ -232,6 +232,12 @@ LevelZeroWhenLoad_End:
   DialogStackB:     .res DialogStackLen
   DialogStackIndex: .res 1
 
+  ; Reusable for other things
+  DialogCharacterId:   .res DialogCharacterLen
+  DialogCharacterX:    .res DialogCharacterLen
+  DialogCharacterY:    .res DialogCharacterLen
+  DialogCharacterFlip: .res DialogCharacterLen
+
   CursorX:       .res 2
   CursorY:       .res 2
   AutoRepeatTimer: .res 1

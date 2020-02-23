@@ -59,7 +59,7 @@ for f in glob.glob("portraits/*.png"):
 			imtile = rearrange.crop((tw*8, th*8, tw*8+8, th*8+8))
 			portraits[name]['data'].append(tile_to_bytes(imtile.getdata()))
 
-	# Read palette but don't do anything with it yet
+	# Read palette
 	pal = im.getpalette()[3:]
 	triplets = []
 	for i in range(15):

@@ -1,0 +1,76 @@
+{
+	"Nova": {
+		"species": "squirrel",
+		"pronouns": "she/her",
+		"graphic": "nova.png"
+	},
+
+	"Maffi": {
+		"species": "mouse",
+		"pronouns": "she/her",
+		"graphic": "maffi.png"
+	},
+
+	"Rosy": {
+		"name": "Rosy Sky",
+		"species": "fox",
+		"pronouns": "she/her",
+		"graphic": "rosy.png"
+	},
+
+	"Honeybloom": {
+		"species": "unicorn",
+		"pronouns": "she/her",
+		"graphic": "honeybloom.png"
+	},
+
+	"Dawn": {
+		"species": "deer",
+		"pronouns": "she/her",
+		"graphic": "dawn.png"
+	},
+
+	"Prima": {
+		"species": "jerboa",
+		"pronouns": "they/them",
+		"graphic": "prima.png"
+	},
+
+	"Rebecca": {
+		"species": "beaver taur",
+		"pronouns": "she/her",
+		"graphic": "rebecca.png",
+		"height": 48
+	},
+
+	"Sherbet": {
+		"species": "fox taur",
+		"pronouns": "she/her",
+		"graphic": "sherbet.png",
+		"height": 40
+	},
+
+	"Sophie": {
+		"species": "mouse",
+		"pronouns": "she/her",
+		"graphic": "sophie.png"
+	},
+
+	"Spring": {
+		"species": "fox",
+		"pronouns": "she/her",
+		"graphic": "spring.png"
+	},
+
+	"Star": {
+		"species": "rabbit",
+		"pronouns": "she/her",
+		"graphic": "star.png"
+	},
+
+	"Stella": {
+		"species": "skunk",
+		"pronouns": "she/her",
+		"graphic": "stella.png"
+	}
+}

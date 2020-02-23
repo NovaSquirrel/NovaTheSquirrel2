@@ -23,7 +23,7 @@ objlist = \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
-  lz4
+  lz4 dialog_npc_data
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -113,6 +113,7 @@ levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
 m7levels_lz4 := $(patsubst %.bin,%.lz4,$(wildcard m7levels/*.bin))
 m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
+all_npc_gfx := $(wildcard npc/*.png)
 
 # Background conversion
 # (nametable conversion is implied)
@@ -183,6 +184,10 @@ $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 $(srcdir)/portraitdata.s: $(portraits)
 $(srcdir)/portraitenum.s: $(portraits) tools/encodeportraits.py
 	$(PY) tools/encodeportraits.py
+$(objdir)/dialog.o: $(srcdir)/dialog_npc_enum.s
+$(srcdir)/dialog_npc_data.s: $(srcdir)/dialog_npc_enum.s
+$(srcdir)/dialog_npc_enum.s: $(portraits) $(all_npc_gfx) tools/makenpc.py
+	$(PY) tools/makenpc.py
 $(srcdir)/palettedata.s: $(palettes) $(variable_palettes)
 $(srcdir)/paletteenum.s: $(palettes) $(variable_palettes) tools/encodepalettes.py
 	$(PY) tools/encodepalettes.py
@@ -245,7 +250,6 @@ tilesets4/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc
 tilesets2/lz4/%.chrgb.lz4: tilesets2/lz4/%.chrgb
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
-
 
 
 # Rules for audio

@@ -248,6 +248,13 @@ DialogStackLen = 4
 .global DialogStackH
 .global DialogStackB
 .global DialogStackIndex
+DialogCharacterLen = 5
+.global DialogCharacterId
+.global DialogCharacterX
+.global DialogCharacterY
+.global DialogCharacterFlip
+
+
 
 .global OverworldPlayerX
 .global OverworldPlayerY
