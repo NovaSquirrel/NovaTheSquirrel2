@@ -23,7 +23,7 @@ objlist = \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
-  lz4 dialog_npc_data
+  lz4 dialog_npc_data dialog_text_data
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -161,6 +161,7 @@ $(objdir)/actorcode.o: $(srcdir)/actorenum.s
 $(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/vwf.o: $(srcdir)/vwf.inc
 $(objdir)/namefont.o: tilesets2/DialogNameFont.chrgb $(srcdir)/namefontwidth.s
+$(objdir)/dialog_text_data.s.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/dialog_npc_enum.s $(srcdir)/vwf.inc $(srcdir)/blockenum.s $(srcdir)/portraitenum.s
 $(srcdir)/namefontwidth.s: tilesets2/DialogNameFont.chrgb
 	$(PY) tools/namefontwidthtable.py
 $(srcdir)/vwf_fontdata.s: tools/fonts/BaseSeven.png tools/makefontvwf.py
@@ -201,6 +202,8 @@ $(srcdir)/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
 $(srcdir)/sincos_data.s: tools/makesincos.py
 	$(PY) tools/makesincos.py
+$(srcdir)/dialog_text_data.s: tools/makedialog.py story/dialog.txt
+	$(PY) tools/makedialog.py
 m7levels/%.lz4: m7levels/%.bin
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@

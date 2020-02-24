@@ -1,0 +1,46 @@
+--- ForestWithFlatGround
+{UploadGFX FGGrassy}
+{UploadPal FGGrassy}
+{Background DialogForest ForestBG}
+{FG Ledge 12 0,5}
+{Return}
+
+
+
+--- NovaMaffiTest
+{Call ForestWithFlatGround}
+{Actor 0 Maffi 32,80 R}
+{Actor 1 Nova 64,80 L}
+{Say 0 Maffi 0}
+{C2}Hello world{C1}! You're looking at sample
+text. This is a test.
+{-}
+{Say 0 Maffi 1}
+Different portrait {pawprint}
+{-}
+{Say 0 Maffi 2}
+Another different portrait!
+{-}
+{Say 0 Maffi 2}
+Same portrait! {think}
+{-}
+{Say 1 Nova 0}
+This is a test script. I guess.
+{wide}Hope this works{c1}
+{-}
+{Say 0 Maffi 0}
+Here is another page from me, Maffi!
+And another line of text
+and another
+another!
+{-}
+{End}
+
+
+--- RebeccaTest
+{Call ForestWithFlatGround}
+{Actor 0 Rebecca 32,80 R}
+{Say 0 Maffi 0}
+Hi I'm a taur!
+{-}
+{End}

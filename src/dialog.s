@@ -160,11 +160,12 @@ DialogPortrait = Mode7HappyTimer
 
   seta8
   ; Set the pointer to a demo script anyway
-  lda #<DemoScript
+  .import DialogScene_NovaMaffiTest
+  lda #<DialogScene_NovaMaffiTest
   sta ScriptPointer+0
-  lda #>DemoScript
+  lda #>DialogScene_NovaMaffiTest
   sta ScriptPointer+1
-  lda #^DemoScript
+  lda #^DialogScene_NovaMaffiTest
   sta ScriptPointer+2
 
   ; Adjust background's scroll to make the text line up correctly
@@ -231,7 +232,7 @@ Pointer = 1
   jsr GetParameter
 
   pha
-  and #3
+  and #7
   sta Slot
   tay ; Slot number
   pla
@@ -680,9 +681,10 @@ StartText:
   jsl DrawVWF
   phx
   jsl WaitVblank
-
   jsl CopyVWF
   jsr DialogGenerateSprites
+
+  jsl WaitVblank
   jsl ppu_copy_oam
 .a8 ; ppu_copy_oam leaves it 8-bit as a side effect
   ; Get the portrait ready
@@ -983,7 +985,7 @@ CharacterDrawTileLoop:
   ; Flip if needed
   lda Direction
   beq :+
-    lda #8
+    lda #<-8
     sub [0],y ; Reload it
     add XOffset
     sta OAM_XPOS,x

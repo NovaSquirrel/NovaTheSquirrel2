@@ -53,3 +53,4 @@ story/vwf_fontdata.js
 *.lz4
 src/dialog_npc_enum.s
 src/dialog_npc_data.s
+src/dialog_text_data.s
