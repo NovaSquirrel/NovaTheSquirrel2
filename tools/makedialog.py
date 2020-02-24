@@ -286,6 +286,8 @@ outfile.write('.include "paletteenum.s"\n')
 outfile.write('.include "blockenum.s"\n')
 outfile.write('.include "portraitenum.s"\n')
 outfile.write('.include "vwf.inc"\n')
+if len(import_list):
+	outfile.write('.import %s\n' % ', '.join(list(import_list)))
 outfile.write('MT_Reposition = $0001\nMT_Repeat     = $4000\nMT_Finish     = $8000\n\n')
 outfile.write('.segment "DialogText"\n')
 for name, data in all_scenes.items():
