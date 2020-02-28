@@ -232,6 +232,12 @@ class DialogScene(object):
 				self.bytes.append(position[0]+'+32')
 				self.bytes.append(position[1]+'+104')
 
+			elif c == 'preloadactor':
+				self.bytes.append(DC+'PreloadNPC')
+				# [Actor Slot*2 CharacterID]
+				self.bytes.append(first[1]) # Slot
+				self.bytes.append('DialogNPC::'+first[2])
+
 			elif c == 'background':
 				self.bytes.append(DC+'Background2bpp')
 				self.bytes.append('GraphicsUpload::'+first[1])

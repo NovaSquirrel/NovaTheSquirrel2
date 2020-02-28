@@ -34,6 +34,7 @@
   SceneTiles     ; Draw a series of 8x8 tiles
   SceneText      ; Draw a series of text strings
   PutNPC         ; Adds an NPC to the picture
+  PreloadNPC     ; Loads an NPC's tiles
 
   MT_Reposition = $0001
   MT_Repeat     = $4000

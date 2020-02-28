@@ -88,7 +88,7 @@ outfile.write('; This is automatically generated. Edit "npc" directory instead\n
 outfile.write('.include "snes.inc"\n')
 outfile.write('.include "global.inc"\n')
 outfile.write('.segment "DialogNPC"\n')
-outfile.write('.export DialogNPCDirectory\n\n')
+outfile.write('.export DialogNPCDirectory, DialogNPCPalettes\n\n')
 
 # Write the directory
 outfile.write('.proc DialogNPCDirectory\n')
@@ -101,8 +101,7 @@ for character, data in all_npc.items():
 	outfile.write('.proc DialogNPC_%s\n' % character)
 	# Write the palette for the NPC
 	outfile.write('  ; Palette\n')
-	for triplet in all_palettes_actual[data['palette']]:
-		outfile.write("  .word RGB8(%d, %d, %d)\n" % (triplet[0],triplet[1],triplet[2]))
+	outfile.write('  .byt %d\n' % data['palette'])
 	outfile.write('  ; Tile positions\n')
 	outfile.write("  .addr TileData\n")
 	for position in data['tile_pos']:
@@ -115,6 +114,13 @@ for character, data in all_npc.items():
 		outfile.write('  .byt %s\n' % ', '.join(['$%.2x' % n for n in tile]))
 	outfile.write('.endproc\n\n')
 
+outfile.write('.proc DialogNPCPalettes\n')
+for palette in all_palettes_actual:
+	outfile.write("  ; ---\n")
+	for triplet in palette:
+		outfile.write("  .word RGB8(%d, %d, %d)\n" % (triplet[0],triplet[1],triplet[2]))
+	outfile.write("  .word 0 ; Dummy\n");
+outfile.write('.endproc\n\n')
 outfile.close()
 
 # Do the enum in a separate file because I can't export enums

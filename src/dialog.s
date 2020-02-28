@@ -201,6 +201,7 @@ HandleDialogOpcode:
   .addr OpSceneTiles
   .addr OpSceneText
   .addr OpPutNPC
+  .addr OpPreloadNPC
 
 .a8
 ReturnEndDialog:
@@ -222,6 +223,52 @@ OpEnd:
 
   plp
   rtl
+
+.a8
+OpPreloadNPC:
+.scope
+Slot = 0
+Pointer = 1
+  tdc ; Clear all of accumulator
+  jsr GetParameter
+  sta Slot
+
+  lda #^DialogNPCDirectory
+  sta Pointer+2
+  sta DMAADDRBANK
+
+  jsr GetParameter
+  asl
+  tax
+  seta16
+  .import DialogNPCDirectory
+  lda f:DialogNPCDirectory,x
+  ina ; Skip the palette byte
+  sta Pointer
+
+  lda [Pointer] ; Read pointer to the graphics data
+  sta Pointer
+  ina ; INA INA is smaller than CLC ADC #2
+  ina
+  sta DMAADDR
+  lda [Pointer]
+  sta DMALEN
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE
+
+  ; VRAM address
+  lda Slot
+  and #255
+  xba ; * 256
+      ; Don't shift again
+  add #$a000 >> 1
+  sta PPUADDR
+
+  seta8
+  lda #1
+  sta COPYSTART
+.endscope
+  rts
 
 .a8
 OpPutNPC:
@@ -250,7 +297,7 @@ Pointer = 1
   ; Look up the character in the directory
   asl
   tax
-  .import DialogNPCDirectory
+  .import DialogNPCDirectory, DialogNPCPalettes
   lda f:DialogNPCDirectory+0,x
   sta Pointer+0
   lda f:DialogNPCDirectory+1,x
@@ -259,7 +306,20 @@ Pointer = 1
   sta Pointer+2
   sta DMAADDRBANK
 
+  ; Get palette ID
+  seta16
+  lda [Pointer]
+  and #255
+  asl ; * 2
+  asl ; * 4
+  asl ; * 8
+  asl ; * 16
+  asl ; * 32
+  tax
+  seta8
+
   ; Copy the palette
+  ldy #15*2
   lda Slot
   add #8+2
   asl ; Multiply by 16
@@ -268,15 +328,15 @@ Pointer = 1
   asl
   ina
   sta CGADDR
-  ldx #15*2
-  ldy #0
-: lda [Pointer],y
+: lda f:DialogNPCPalettes,x
   sta CGDATA
-  iny
-  dex
+  inx
+  dey
   bne :-
 
   ; Copy the graphics
+  ; (Get the pointer first)
+  ldy #1
   lda [Pointer],y
   pha
   iny
@@ -972,7 +1032,7 @@ CharacterDrawLoop:
   sta 1
   lda #^DialogNPCDirectory
   sta 2
-  ldy #32
+  ldy #3
 CharacterDrawTileLoop:
   lda [0],y
   cmp #255
