@@ -369,10 +369,23 @@ Common:
   lda keynew
   and #KEY_UP
   beq :+
+    pha
+    jsl GetBlockX
+    asl
+    tax
+    seta8
+    lda f:ColumnWords+0,x
+    sta ScriptPointer+0
+    lda f:ColumnWords+1,x
+    sta ScriptPointer+1
+    lda f:ColumnWords+2,x
+    sta ScriptPointer+2
+    seta16
     .import StartDialog
     jsl StartDialog
     .import ReuploadSpritePalettes
     jsl ReuploadSpritePalettes
+    plx
   :
   rts
 .endproc

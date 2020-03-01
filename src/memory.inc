@@ -103,7 +103,7 @@ MaxDelayedBlockEdits = 15
 .global GetLevelPtrXY_Ptr
 .global LevelBuf
 .global LevelBufAlt
-.global ColumnBytes
+.global ColumnWords
 .global ParallaxTilemap
 .global LevelActorList
 .global FirstActorOnScreen

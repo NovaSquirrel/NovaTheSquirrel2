@@ -123,8 +123,8 @@
   sta SpritePaletteSlots+2*2
   sta SpritePaletteSlots+2*3
 
-  ldx #.loword(ColumnBytes)
-  ldy #256
+  ldx #.loword(ColumnWords)
+  ldy #512
   jsl MemClear7F
 
   ; Set defaults for horizontal levels
@@ -403,9 +403,9 @@ SpecialCommand:
 SpecialCommandTable:
   .addr SpecialFinished
   .addr SpecialSetX
-  .addr SpecialWrite1Column
-  .addr SpecialWrite2Column
-  .addr SpecialWrite3Column
+  .addr SpecialWrite1Byte
+  .addr SpecialWrite2Byte
+  .addr SpecialWrite3Byte
   .addr SpecialXMinus16
   .addr SpecialXPlus16
   .addr SpecialConfig
@@ -417,11 +417,36 @@ SpecialSetX:
   jsr NextLevelByte
   sta DecodeColumn
   rts
-SpecialWrite3Column:
+
+
+; Helper routine
+ColumnWriteIndex:
+  seta16
+  lda DecodeColumn
+  and #255
+  asl
+  tax
+  seta8
   rts
-SpecialWrite2Column:
+ColumnWriteOne:
+  jsr NextLevelByte
+  sta f:ColumnWords,x
+  inx
   rts
-SpecialWrite1Column:
+SpecialWrite3Byte:
+  jsr ColumnWriteIndex
+  jsr ColumnWriteOne
+  jsr ColumnWriteOne
+  jsr ColumnWriteOne
+  rts
+SpecialWrite2Byte:
+  jsr ColumnWriteIndex
+  jsr ColumnWriteOne
+  jsr ColumnWriteOne
+  rts
+SpecialWrite1Byte:
+  jsr ColumnWriteIndex
+  jsr ColumnWriteOne
   rts
 SpecialXMinus16:
   lda DecodeColumn

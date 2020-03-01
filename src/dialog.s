@@ -159,15 +159,6 @@ DialogPortrait = Mode7HappyTimer
   jsr BottomBox
 
   seta8
-  ; Set the pointer to a demo script anyway
-  .import DialogScene_NovaMaffiTest
-  lda #<DialogScene_NovaMaffiTest
-  sta ScriptPointer+0
-  lda #>DialogScene_NovaMaffiTest
-  sta ScriptPointer+1
-  lda #^DialogScene_NovaMaffiTest
-  sta ScriptPointer+2
-
   ; Adjust background's scroll to make the text line up correctly
   lda #<(-2)
   sta BGSCROLLX+4
@@ -176,7 +167,6 @@ DialogPortrait = Mode7HappyTimer
   stz BGSCROLLY+4
   stz BGSCROLLY+4
 
-  seta8
 DialogLoop:
   tdc ; Clear accumulator
   lda [ScriptPointer]

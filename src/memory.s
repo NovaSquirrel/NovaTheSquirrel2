@@ -276,7 +276,7 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
   LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
-  ColumnBytes: .res 256
+  ColumnWords: .res 512
 
   ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in
