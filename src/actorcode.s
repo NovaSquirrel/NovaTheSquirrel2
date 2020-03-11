@@ -26,7 +26,7 @@ CommonTileBase = $40
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
 .import DispParticle16x16
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute
-.import DispActorMeta, DispActorMetaRight
+.import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import ActorTurnAround
 .import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
@@ -2189,6 +2189,176 @@ TilesB:
   .word $0f|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
 .endproc
 
+.a16
+.i16
+.export RunBomberTree
+.proc RunBomberTree
+  .import LakituMovement
+  jsl LakituMovement
+
+  lda framecount
+  and #255
+  bne NoShoot
+    jsl FindFreeActorY
+    bcc NoShoot
+      jsl ActorClearY ; Includes clearing VarA and velocity and such
+      jsl ActorCopyPosXY
+      lda #Actor::BomberTreeSeed*2
+      sta ActorType,y
+  NoShoot:
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawBomberTree
+.proc DrawBomberTree
+  lda #.loword(Tree)
+  jml DispActorMetaPriority2
+Tree:
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(-16)     ; X and Y
+  .byt $00
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(0)     ; X and Y
+  .byt $02
+  .byt 255
+.endproc
+
+.a16
+.i16
+.export RunBomberTreeSeed
+.proc RunBomberTreeSeed
+  jsl ActorFall
+  bcc NotLanded
+    inc ActorVarA,x
+    lda ActorVarA,x
+    cmp #32
+    bne NotLanded
+      stz ActorVarA,x ; Used for "emerged" flag
+      lda #Actor::BomberTreeTurnip*2
+      sta ActorType,x
+      lda #.loword(-$30)
+      sta ActorVY,x
+
+      lda ActorPY,x
+      add #$0100
+      sta ActorPY,x
+      add #$0010
+      sta ActorVarB,x
+NotLanded:
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawBomberTreeSeed
+.proc DrawBomberTreeSeed
+  lda ActorVarA,x
+  bne DrawSprout
+  lda #$4+OAM_PRIORITY_2
+  jml DispActor8x8
+
+DrawSprout:
+  lda #.loword(Sprout)
+  jml DispActorMetaPriority2
+Sprout:
+  .byt 2        ; 2 across
+  .word .loword(-4), .loword(0)  ; X and Y
+  .byt $14, $15
+  .byt 255
+.endproc
+
+.a16
+.i16
+.export RunBomberTreeTurnip
+.proc RunBomberTreeTurnip
+  jsl ActorFall
+
+  ; Stop appearing behind the background
+  lda ActorVY,x
+  bmi GoingUp
+    lda #1
+    sta ActorVarA,x
+GoingUp:
+
+
+  lda framecount
+  and #31
+  bne :+
+    jsl ActorLookAtPlayer
+  :
+
+  lda #10
+  jsl ActorWalk
+  jsl ActorAutoBump
+
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawBomberTreeTurnip
+.proc DrawBomberTreeTurnip
+  lda ActorVarA,x
+  bne NotInGround
+    lda SpriteTileBase
+    pha
+    stz SpriteTileBase
+    lda ActorPY,x
+    pha
+    lda ActorVarB,x
+    sta ActorPY,x
+
+    lda #CommonTileBase+$04+OAM_PRIORITY_1
+    jsl DispActor16x16
+
+    ; Fix stuff back to normal
+    pla
+    sta ActorPY,x
+    pla
+    sta SpriteTileBase
+NotInGround:
+
+  lda framecount
+  and #16
+  beq :+
+  lda #.loword(Turnip)
+  jml DispActorMetaPriority2
+: lda #.loword(Turnip2)
+  jml DispActorMetaPriority2
+
+Turnip:
+  .byt 2        ; 2 across
+  .word .loword(-4), .loword(-16)  ; X and Y
+  .byt $14, $15
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(0)     ; X and Y
+  .byt $06
+  .byt 255
+Turnip2:
+  .byt 2        ; 2 across
+  .word .loword(-4), .loword(-16)  ; X and Y
+  .byt $14, $15
+  .byt 1|128    ; 16x16
+  .word .loword(0), .loword(0)     ; X and Y
+  .byt $08
+  .byt 255
+.endproc
+
+.a16
+.i16
+.export RunBomberTreeTurnipCool
+.proc RunBomberTreeTurnipCool
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawBomberTreeTurnipCool
+.proc DrawBomberTreeTurnipCool
+  rtl
+.endproc
 
 .a16
 .i16
@@ -2202,10 +2372,8 @@ TilesB:
 .i16
 .export DrawMirrorRabbit
 .proc DrawMirrorRabbit
-  lda #OAM_PRIORITY_2
-  tsb SpriteTileBase
   lda #.loword(Rabbit2)
-  jml DispActorMeta
+  jml DispActorMetaPriority2
 
 Rabbit2:
   .byt 1|128    ; 16x16

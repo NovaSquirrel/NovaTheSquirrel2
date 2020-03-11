@@ -560,7 +560,7 @@ Wavy:
   :
 
   cmp #$0030
-  bcs :+
+  bcc :+
     lda #$0030
   :
 
@@ -1262,6 +1262,17 @@ DispActor8x8WithOffset = DispActor8x8::WithOffset
   lda #.loword(-8)
   sta 8 ;WidthUnit
   bra DispActorMetaLeftOrRight
+.endproc
+
+.a16
+.i16
+.export DispActorMetaPriority2
+.proc DispActorMetaPriority2
+  pha
+  lda #OAM_PRIORITY_2
+  tsb SpriteTileBase
+  pla
+  bra DispActorMeta
 .endproc
 
 ; Appropriately selects left or right
