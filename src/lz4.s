@@ -35,11 +35,26 @@ LZ4_DecompressToPPU:
   seta16
   rtl
 
+; Separate routine, because it needs >8KB files and needs to only write the high bytes
 .a16
 LZ4_DecompressToMode7Tiles:
   ldy #DMAMODE_PPUHIDATA
   sty DMAMODE
-  bra LZ4_DecompressToPPU
+  seta8
+  xba ; Set B to the destination bank
+  lda #^LevelBuf
+  sta DMAADDRBANK
+  xba
+
+  ldy #.loword(LevelBuf)
+  sty DMAADDR
+  jsl SFX_LZ4_decompress
+  sta DMALEN
+  seta8
+  lda #1
+  sta COPYSTART
+  seta16
+  rtl
 
 ;-------------------------------------------------------------------------------
 ;  SFX_LZ4_decompress
