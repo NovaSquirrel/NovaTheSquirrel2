@@ -542,21 +542,112 @@ SpriteLoop:
   jml RenderLevelScreens
 .endproc
 
+
 .a16
 .i16
-; Uploads portrait A to address Y
 .export DoPortraitUpload
 .proc DoPortraitUpload
   pha
+  phy
+  jsl DecompressPortrait
+  ply
+  jsl DecompressedPortraitUpload
+  pla
+  rtl
+.endproc
+
+.a16
+.i16
+.export DecompressPortrait
+.proc DecompressPortrait
+Pointer     = 0
+TilePointer = 3
+PortraitNum = 6
+TileBase    = 7
+SixteenTilesCounter = 9
+
+  .import InfoForPortrait
+  php
+  phb
+  seta16
+  and #255
+  sta PortraitNum
+  asl
+  tax ; X = portrait 
+  lda f:InfoForPortrait,x
+  add #3 ; Skip to tile stuff
+  sta Pointer
+  lda #^InfoForPortrait
+  seta8
+  sta Pointer+2
+  sta TilePointer+2
+
+  ; Set data bank to DecompressBuffer's to save cycles
+  lda #^DecompressBuffer
+  pha
+  plb
+
+  tdc
+  lda PortraitNum
+  sub [Pointer] ; First portrait number for character
+  inc Pointer
+  seta16
+  asl
+  asl
+  asl
+  asl
+  tay ; Y = base for the sixteen tile numbers
+
+  lda [Pointer]
+  sta TileBase
+  inc Pointer
+  inc Pointer
+
+  ldx #0
+  lda #16
+  sta SixteenTilesCounter
+SixteenTileLoop:
+  lda [Pointer],y
+  and #255
+  asl
+  asl
+  asl
+  asl
+  asl
+  add TileBase
+  sta TilePointer
+
+  phy
+  ldy #0
+: lda [TilePointer],y
+  sta a:DecompressBuffer,x
+  inx
+  inx
+  iny
+  iny
+  cpy #32
+  bne :-  
+  ply
+
+  iny
+  dec SixteenTilesCounter
+  bne SixteenTileLoop
+
+  plb
+  plp
+  rtl
+.endproc
+
+.a16
+.i16
+; Uploads portrait to address Y
+.export DecompressedPortraitUpload
+.proc DecompressedPortraitUpload
   php
   seta16
-
-  and #255         ; Zero extend
-  xba              ; *256
-  asl              ; *512
-  ora #$8000
+  lda #.loword(DecompressBuffer)
   sta DMAADDR+$00
-  ora #256
+  lda #.loword(DecompressBuffer)|256
   sta DMAADDR+$10
 
   ; Set DMA parameters  
@@ -570,8 +661,7 @@ SpriteLoop:
 
   sty PPUADDR
   seta8
-  .import PortraitData
-  lda #^PortraitData
+  lda #^DecompressBuffer
   sta DMAADDRBANK+$00
   sta DMAADDRBANK+$10
 
@@ -588,7 +678,6 @@ SpriteLoop:
   sta COPYSTART
 
   plp
-  pla
   rtl
 .endproc
 

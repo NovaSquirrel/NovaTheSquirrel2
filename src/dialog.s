@@ -26,8 +26,9 @@ MenuBGScroll = SpriteTileBase
 .import InventoryTilemapMenu, InventoryTilemapBG, InventoryTilemapText, InventoryPalette
 DialogTileBase = $3e0|InventoryPalette
 
-.import DoPortraitUpload ; Uploads portrait A to address Y; be in vblank
-.import PaletteForPortrait, NameForPortrait, PortraitPaletteData
+.import DecompressPortrait ; Decompress portrait A
+.import DecompressedPortraitUpload   ; Uploads portrait to address Y; be in vblank
+.import InfoForPortrait, PortraitPaletteData
 .import InitVWF, DrawVWF, CopyVWF
 .import Mode7HappyTimer
 DialogPortrait = Mode7HappyTimer
@@ -413,12 +414,15 @@ OpPortrait:
   and #255
   asl
   tax
-  lda f:NameForPortrait,x
+  lda f:InfoForPortrait,x
+  ina
   sta DecodePointer
   seta8
-  lda #^NameForPortrait
+  lda #^InfoForPortrait
   sta DecodePointer+2
   seta16
+  lda [DecodePointer] ; Load the name pointer
+  sta DecodePointer
   jsl RenderNameFont
   seta8
 
@@ -720,6 +724,10 @@ GetParameter:
 
 .a8
 StartText:
+  ; Get the portrait ready
+  lda DialogPortrait
+  jsl DecompressPortrait
+
   ; Copy over the pointer
   lda ScriptPointer+0
   sta DecodePointer+0
@@ -737,15 +745,19 @@ StartText:
   jsl WaitVblank
   jsl ppu_copy_oam
 .a8 ; ppu_copy_oam leaves it 8-bit as a side effect
-  ; Get the portrait ready
-  lda DialogPortrait
   ldy #$9000 >> 1
-  jsl DoPortraitUpload ; preserves A
+  jsl DecompressedPortraitUpload
   seta16
   ; Get palette number from the portrait
+  lda DialogPortrait
   and #255
+  asl
   tax
-  lda f:PaletteForPortrait,x
+  lda f:InfoForPortrait,x
+  sta 0
+  lda #^InfoForPortrait
+  sta 2
+  lda [0]
 
   ; Get index into the list of portrait palettes
   and #255

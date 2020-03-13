@@ -50,14 +50,27 @@ for f in glob.glob("portraits/*.png"):
 		rearrange.paste(im.crop((0, base+8,  32, base+8+8)),  (0, base+16))
 		rearrange.paste(im.crop((0, base+24, 32, base+24+8)), (0, base+24))
 
-	portraits[name] = {'index': portrait_count, 'data': [], 'count': count}
+	all_tile_data = []
+	all_tile_numbers = []
+	portraits[name] = {'index': portrait_count, 'data': all_tile_data, 'tiles': all_tile_numbers, 'count': count}
 	portrait_count += count
 
 	# Get the pixel data and convert it to tiles
 	for th in range(im.height // 8):
+		row = []
 		for tw in range(im.width // 8):
 			imtile = rearrange.crop((tw*8, th*8, tw*8+8, th*8+8))
-			portraits[name]['data'].append(tile_to_bytes(imtile.getdata()))
+			data = tile_to_bytes(imtile.getdata())
+			tile_used = None
+
+			if data not in all_tile_data:
+				tile_used = len(all_tile_data)
+				all_tile_data.append(data)
+			else:
+				tile_used = all_tile_data.index(data)
+			row.append(tile_used)
+		all_tile_numbers.append(row)
+	print("Unique tiles: " + str(len(all_tile_data)))
 
 	# Read palette
 	pal = im.getpalette()[3:]
@@ -85,28 +98,28 @@ outfile = open("src/portraitdata.s", "w")
 outfile.write('; This is automatically generated. Edit "portraits" directory instead\n')
 outfile.write('.include "snes.inc"\n')
 outfile.write('.include "global.inc"\n')
+outfile.write('.include "portraitenum.s"\n')
 outfile.write('.segment "Portraits"\n')
-outfile.write('.export PortraitData, PaletteForPortrait, NameForPortrait, PortraitPaletteData\n\n')
+outfile.write('.export InfoForPortrait, PortraitPaletteData\n\n')
 
-outfile.write('.proc PortraitData\n')
 for pic, data in portraits.items():
-	outfile.write('  ; %s\n' % pic)
+	outfile.write('.proc PortraitInfo_%s\n' % pic)
+	outfile.write('  .byt %d ; Palette\n' % data['palette'])
+	outfile.write('  .addr PortraitName_%s\n' % pic)
+	outfile.write('  .byt Portrait::%s\n' % pic)
+	outfile.write('  .addr TileData\n')
+	outfile.write('; Tile numbers\n')
+	for row in data['tiles']:
+		outfile.write('  .byt %s\n' % ', '.join(['$%.2x' % n for n in row]))
+	outfile.write('TileData:\n')
 	for tile in data['data']:
-		outfile.write('  .byt %s\n' % ', '.join(['$%.2x' % n for n in tile]))	
-outfile.write('.endproc\n')
+		outfile.write('  .byt %s\n' % ', '.join(['$%.2x' % n for n in tile]))
+	outfile.write('.endproc\n\n')
 
-
-outfile.write('\n.proc PaletteForPortrait\n')
-for pic, data in portraits.items():
-	outfile.write('  ; %s\n' % pic)
-	for i in range(data['count']):
-		outfile.write('  .byt %d\n' % data['palette'])
-outfile.write('.endproc\n')
-
-outfile.write('\n.proc NameForPortrait\n')
+outfile.write('\n.proc InfoForPortrait\n')
 for pic, data in portraits.items():
 	for i in range(data['count']):
-		outfile.write('  .addr PortraitName_%s\n' % pic)
+		outfile.write('  .addr PortraitInfo_%s\n' % pic)
 outfile.write('.endproc\n\n')
 
 for pic, data in portraits.items():
