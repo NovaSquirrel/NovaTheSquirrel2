@@ -166,6 +166,37 @@ gfx SPMirrorRabbit
 pal SPWalker
 size 16x16
 
++BomberTree
+run RunBomberTree
+draw DrawBomberTree
+flag AutoRemove GetShot AutoReset
+gfx SPBomberTree
+pal SPWalker
+size 16x32
+
++BomberTreeSeed
+run RunBomberTreeSeed
+draw DrawBomberTreeSeed
+flag AutoRemove
+gfx SPBomberTree
+pal SPWalker
+size 8x8
+
++BomberTreeTurnip
+run RunBomberTreeTurnip
+draw DrawBomberTreeTurnip
+flag AutoRemove GetShot AutoReset
+gfx SPBomberTree
+pal SPWalker
+size 16x16
+
++BomberTreeTurnipCool
+run RunBomberTreeTurnipCool
+draw DrawBomberTreeTurnipCool
+flag AutoRemove GetShot AutoReset
+gfx SPBomberTree
+pal SPWalker
+size 16x16
 
 # ---------- cannon stuff ----------
 +Burger
