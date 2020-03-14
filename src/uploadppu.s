@@ -561,11 +561,10 @@ SpriteLoop:
 .export DecompressPortrait
 .proc DecompressPortrait
 Pointer     = 0
-TilePointer = 3
 PortraitNum = 6
 TileBase    = 7
 SixteenTilesCounter = 9
-
+MvnBuffer = 12
   .import InfoForPortrait
   php
   phb
@@ -577,15 +576,17 @@ SixteenTilesCounter = 9
   lda f:InfoForPortrait,x
   add #3 ; Skip to tile stuff
   sta Pointer
-  lda #^InfoForPortrait
   seta8
+  lda #^InfoForPortrait
   sta Pointer+2
-  sta TilePointer+2
+  sta MvnBuffer+2 ; MVN source
 
-  ; Set data bank to DecompressBuffer's to save cycles
+  lda #$54 ; MVN
+  sta MvnBuffer+0
   lda #^DecompressBuffer
-  pha
-  plb
+  sta MvnBuffer+1 ; MVN destination
+  lda #$60 ; RTS
+  sta MvnBuffer+3
 
   tdc
   lda PortraitNum
@@ -596,18 +597,22 @@ SixteenTilesCounter = 9
   asl
   asl
   asl
-  tay ; Y = base for the sixteen tile numbers
+  pha
 
   lda [Pointer]
   sta TileBase
-  inc Pointer
-  inc Pointer
+  pla
+  add Pointer
+  ina ; Skip the tile base (16-bit value)
+  ina
+  sta Pointer
 
-  ldx #0
   lda #16
   sta SixteenTilesCounter
+  ldy #.loword(DecompressBuffer) ; Destination is in Y
 SixteenTileLoop:
-  lda [Pointer],y
+  lda [Pointer] ; Get one of the sixteen tile numbers that make up the portrait
+  inc Pointer
   and #255
   asl
   asl
@@ -615,21 +620,11 @@ SixteenTileLoop:
   asl
   asl
   add TileBase
-  sta TilePointer
+  tax ; Source is in X
 
-  phy
-  ldy #0
-: lda [TilePointer],y
-  sta a:DecompressBuffer,x
-  inx
-  inx
-  iny
-  iny
-  cpy #32
-  bne :-  
-  ply
+  lda #32-1
+  jsr MvnBuffer
 
-  iny
   dec SixteenTilesCounter
   bne SixteenTileLoop
 
