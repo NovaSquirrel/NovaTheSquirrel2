@@ -13,6 +13,7 @@ available_rectangles = set()
 available_nybble = [set(), set(), set()]
 available_state = None
 available_special = {} # Uses a Python function to handle it
+has_metadata = {} # Uses a Python function to insert metadata
 
 for line in define_lines:
 	if not len(line): # Skip empty lines
@@ -98,6 +99,20 @@ def encode_slope(r, offset):
 		print("Unhandled slope ratio %f" % ratio)
 available_special['LedgeSlope'] = encode_slope
 
+def add_import(s):
+	if s in all_imports:
+		return
+	all_imports.add(s)
+	outfile.write('.import %s\n' % s)
+	
+def encode_sign(r, extra):
+	symbol = 'DialogScene_' + extra
+	add_import(symbol)
+	return ("LWriteCol <%s, >%s, ^%s" % (symbol, symbol, symbol)), 4
+
+has_metadata['Sign'] = encode_sign
+has_metadata['DialogPoint'] = encode_sign
+
 def convert_layer(layer):
 	# Sort by X coordinate
 	layer = sorted(layer, key=lambda r: r.x)
@@ -165,9 +180,16 @@ def convert_layer(layer):
 		else:
 			print("Unhandled rectangle: %s" % r)
 
+		# Encode metadata if it's present
+		if (r.type in has_metadata) and len(r.extra):
+			o, s = has_metadata[r.type](r, r.extra)
+			output.append(o)
+			byte_count += s
+
 	return output, byte_count
 
 all_levels = []
+all_imports = set()
 
 outfile = open("src/leveldata.s", "w")
 outfile.write('; This is automatically generated. Edit level JSON files instead\n')
