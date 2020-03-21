@@ -350,6 +350,17 @@ priority
 t 0:0 0:0
 t 10,1 11,1
 
++LogPlatform
+solid
+q 12,2
+
++LogPlatformSupportLeft
+t 14,2 15,2
+t 14,3 0:0
+
++LogPlatformSupportRight
+t 15,2h 14,2h
+t 0:0 14,3h
 
 #######################################
 # Terrain

@@ -561,9 +561,9 @@ SpecialConfig:
   .word Block::BlueFlowerCircle
   .word Block::BranchPlatformMiddle
   .word Block::CeilingBarrier
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::LogPlatform
+  .word Block::LogPlatformSupportLeft
+  .word Block::LogPlatformSupportRight
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty

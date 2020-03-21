@@ -85,6 +85,9 @@
   BlueFlowerCircle
   BranchPlatformMiddle
   CeilingBarrier
+  LogPlatform
+  LogPlatformSupportLeft
+  LogPlatformSupportRight
 .endenum
 
 .enum LN4
