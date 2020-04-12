@@ -7,8 +7,10 @@ alias terrain_rocks $1c00
 alias wood $2000
 alias small_trees $2800
 alias common_pal_flowertops $2e00
+alias colored_locks $3000
 alias global_palette 1
 alias terrain_palette 2
+alias locks_palette 3
 
 #######################################
 # Global tile stuff
@@ -889,4 +891,100 @@ t 10,0 11,0
 autotile AutotileVines
 t 12,0 13,0
 t 14,0 15,0
+
+
+#######################################
+# Colored stuff
+#######################################
+base colored_locks
+palette locks_palette
+tileset FGSuitLocks
+
++HeartsKey
+when Touch, BlockKey
+class Collectible
+q 0,0
+
++ClubsKey
+when Touch, BlockKey
+class Collectible
+q 2,0
+
++DiamondsKey
+when Touch, BlockKey
+class Collectible
+q 4,0
+
++SpadesKey
+when Touch, BlockKey
+class Collectible
+q 6,0
+
++HeartsLock
+when Touch, BlockLock
+solid
+q 8,0
+
++ClubsLock
+when Touch, BlockLock
+solid
+q 10,0
+
++DiamondsLock
+when Touch, BlockLock
+solid
+q 12,0
+
++SpadesLock
+when Touch, BlockLock
+solid
+q 14,0
+
++HeartsLockTop
+when Touch, BlockLockTop
+solid
+autotile AutotileBottomLock
+t 0:0 0:0
+t 8,0 9,0
+
++ClubsLockTop
+when Touch, BlockLockTop
+solid
+autotile AutotileBottomLock
+t 0:0 0:0
+t 10,0 11,0
+
++DiamondsLockTop
+when Touch, BlockLockTop
+solid
+autotile AutotileBottomLock
+t 0:0 0:0
+t 12,0 13,0
+
++SpadesLockTop
+when Touch, BlockLockTop
+solid
+autotile AutotileBottomLock
+t 0:0 0:0
+t 14,0 15,0
+
++HeartsLockBottom
+solid
+t 8,1 9,1
+t 0:0 0:0
+
++ClubsLockBottom
+solid
+t 10,1 11,1
+t 0:0 0:0
+
++DiamondsLockBottom
+solid
+t 12,1 13,1
+t 0:0 0:0
+
++SpadesLockBottom
+solid
+t 14,1 15,1
+t 0:0 0:0
 

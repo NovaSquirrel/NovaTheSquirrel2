@@ -1,0 +1,61 @@
+# This is the list of items in the game, automatically inserted and formatted.
+# The "Empty" item type is created automatically, no need to specify here.
+
++PizzaSlice
+name Pizza slice
+run ItemPizzaSlice
+
++Berry
+name Berry
+run ItemBerry
+
++Watermelon
+name Watermelon
+run ItemWatermelon
+
++Strawberry
+name Strawberry
+run ItemStrawberry
+
++Balloon
+name Balloon
+
++AutoBalloon
+name Auto Balloon
+
++LampOil
+name Lamp Oil
+
++Rope
+name Rope
+
++Bombs
+name Bombs
+
++HeartsKey
+level-only
+name Hearts Key
+
++ClubsKey
+level-only
+name Clubs Key
+
++DiamondsKey
+level-only
+name Diamonds Key
+
++SpadesKey
+level-only
+name Spades Key
+
++Spring
+level-only
+name Spring
+
++Block
+level-only
+name Block
+
++WholePizza
+name Pizza
+

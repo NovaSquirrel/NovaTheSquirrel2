@@ -23,7 +23,7 @@ objlist = \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
-  lz4 dialog_npc_data dialog_text_data
+  lz4 dialog_npc_data dialog_text_data itemcode itemdata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -155,9 +155,11 @@ $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/vwf.inc
 $(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s
-$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s
+$(srcdir)/itemdata.s: $(srcdir)/itemenum.s
+$(objdir)/itemcode.o: $(srcdir)/itemenum.s
 $(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/vwf.o: $(srcdir)/vwf.inc
 $(objdir)/namefont.o: tilesets2/DialogNameFont.chrgb $(srcdir)/namefontwidth.s
@@ -182,7 +184,7 @@ $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 	$(PY) tools/makeoverworldblocks.py
 
 
-$(srcdir)/portraitdata.s: $(portraits)
+$(objdir)/portraitdata.o: $(portraits) $(srcdir)/portraitenum.s
 $(srcdir)/portraitenum.s: $(portraits) tools/encodeportraits.py
 	$(PY) tools/encodeportraits.py
 $(objdir)/dialog.o: $(srcdir)/dialog_npc_enum.s
@@ -194,6 +196,8 @@ $(srcdir)/paletteenum.s: $(palettes) $(variable_palettes) tools/encodepalettes.p
 	$(PY) tools/encodepalettes.py
 $(srcdir)/actorenum.s: tools/actors.txt tools/makeactor.py
 	$(PY) tools/makeactor.py
+$(srcdir)/itemenum.s: tools/items.txt tools/makeitems.py
+	$(PY) tools/makeitems.py
 $(srcdir)/leveldata.s: $(levels) tools/levelconvert.py
 	$(PY) tools/levelconvert.py
 $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py

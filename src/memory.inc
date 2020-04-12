@@ -232,6 +232,8 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 GameStateSize = GameStateEnd-GameStateStart
 InventoryLen = 25
 
+.global YourInventory, LevelInventory, InventoryEnd
+
 .global CheckpointState, CheckpointX, CheckpointY, LevelHeaderPointer
 
 .global CursorX

@@ -250,8 +250,9 @@ LevelZeroWhenLoad_End:
   SmallRenderBuffer: .res 64
 
 GameStateStart:
-  YourInventory:    .res InventoryLen*2
+  YourInventory:    .res InventoryLen*2 ; Type, Amount pairs
   LevelInventory:   .res InventoryLen*2
+  InventoryEnd:
 GameStateEnd:
 SaveDataStart:
   SavedGameState:   .res GameStateEnd-GameStateStart

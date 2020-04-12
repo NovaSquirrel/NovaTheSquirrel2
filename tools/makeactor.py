@@ -10,7 +10,6 @@ def separateFirstWord(text, lowercaseFirst=True):
 		command = command.lower()
 	return (command, arg)
 
-# Don't think I'm really using numbers yet?
 def parseNumber(number):
 	if number in aliases:
 		return parseNumber(aliases[number])
@@ -49,7 +48,6 @@ for line in text:
 	if line.startswith("+"): # new actor
 		saveActor()
 		# Reset to prepare for the new actor
-		priority = False
 		actor = {"name": line[1:], "particle": False, "owdecoration": False, "pic": 0, "size": [16, 16],
 			"run": "ActorNothing", "draw": "ActorNothing", "flags": [], "health": "$10",
 			"gfx": None, "pal": None, "essential": False, "secondary": False}

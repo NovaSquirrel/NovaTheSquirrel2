@@ -808,3 +808,14 @@ Right:
   :
   rts
 .endproc
+
+.a16
+.export AutotileBottomLock
+.proc AutotileBottomLock
+  lda [MidPointer],y
+  add #4*2
+  iny
+  iny
+  sta [MidPointer],y
+  rts
+.endproc

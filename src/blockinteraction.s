@@ -18,6 +18,7 @@
 .include "global.inc"
 .include "blockenum.s"
 .include "actorenum.s"
+.include "itemenum.s"
 .smart
 
 .segment "BlockInteraction"
@@ -25,13 +26,15 @@
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks
 .export BlockSign, BlockSpikes, BlockSpring, BlockLadder, BlockLadderTop
-.export BlockFallthrough, BlockDoor, BlockCeilingBarrier
+.export BlockFallthrough, BlockDoor, BlockCeilingBarrier, BlockKey
 
 ; Export the interaction runners
 .export BlockRunInteractionAbove, BlockRunInteractionBelow
 .export BlockRunInteractionSide, BlockRunInteractionInsideHead
 .export BlockRunInteractionInsideBody, BlockRunInteractionActorInside
 .export BlockRunInteractionActorTopBottom, BlockRunInteractionActorSide
+
+.import InventoryGiveItem, InventoryTakeItem, InventoryHasItem
 
 ; .-------------------------------------
 ; | Runners for interactions
@@ -529,5 +532,67 @@ DoorExit:
 .proc BlockCeilingBarrier
   lda #$40
   sta PlayerVY
+  rts
+.endproc
+
+.a16
+.i16
+.proc BlockKey
+  lda [LevelBlockPtr]
+  sub #Block::HeartsKey
+  lsr
+  add #InventoryItem::HeartsKey
+  jsl InventoryGiveItem
+  bcs :+
+    rts
+  :
+
+  lda #Block::Empty
+  jsl ChangeBlock
+
+  jsl FindFreeParticleY
+  bcc :+
+    lda #Particle::LandingParticle
+    sta ParticleType,y
+    jmp ParticleAtBlock
+  :
+  rts
+.endproc
+
+.a16
+.i16
+.export BlockLockTop
+.proc BlockLockTop
+  lda [LevelBlockPtr]
+  sub #Block::HeartsLockTop
+  lsr
+  add #InventoryItem::HeartsKey
+  jsl InventoryTakeItem
+  bcc :+
+    lda #Block::Empty
+    jsl ChangeBlock
+    inc LevelBlockPtr
+    inc LevelBlockPtr
+    lda #Block::Empty
+    jsl ChangeBlock
+    dec LevelBlockPtr ; Maybe not required?
+    dec LevelBlockPtr
+  :
+  rts
+.endproc
+
+.a16
+.i16
+.export BlockLock
+.proc BlockLock
+  lda [LevelBlockPtr]
+  sub #Block::HeartsLock
+  lsr
+  add #InventoryItem::HeartsKey
+  jsl InventoryTakeItem
+  bcc :+
+    lda #Block::Empty
+    jsl ChangeBlock
+  :
   rts
 .endproc
