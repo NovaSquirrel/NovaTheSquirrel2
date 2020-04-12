@@ -29,7 +29,7 @@
 .proc InventoryHasItem
   php
   seta8
-  ldy #InventoryEnd-2
+  ldy #InventoryEnd-YourInventory-2
 : cmp YourInventory,y
   beq Found
   dey

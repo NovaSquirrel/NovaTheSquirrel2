@@ -593,6 +593,9 @@ DoorExit:
   bcc :+
     lda #Block::Empty
     jsl ChangeBlock
+
+    jsr BlockBricks::Create
+    jsr BlockBricks::Create
   :
   rts
 .endproc
