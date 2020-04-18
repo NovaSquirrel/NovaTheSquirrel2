@@ -157,7 +157,7 @@ $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir
 $(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
-$(objdir)/actorcode.o: $(srcdir)/actorenum.s
+$(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(srcdir)/itemdata.s: $(srcdir)/itemenum.s
 $(objdir)/itemcode.o: $(srcdir)/itemenum.s
 $(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s

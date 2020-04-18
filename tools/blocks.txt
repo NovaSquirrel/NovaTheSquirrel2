@@ -7,7 +7,8 @@ alias terrain_rocks $1c00
 alias wood $2000
 alias small_trees $2800
 alias common_pal_flowertops $2e00
-alias colored_locks $3000
+alias colored_locks $5c00
+alias special_push $5800
 alias global_palette 1
 alias terrain_palette 2
 alias locks_palette 3
@@ -988,3 +989,29 @@ solid
 t 14,1 15,1
 t 0:0 0:0
 
++InvisibleWall
+solid
+t 0:0 0:0
+t 0:0 0:0
+
+#######################################
+# Special push
+#######################################
+base special_push
+palette global_palette
+tileset FGSpecialPush
+
++NoGravityPushBlock
+when Side, BlockPushNoGravity
+solid
+q 0,0
+
++CloneUpPushBlock
+when Side, BlockCloneUpPushBlock
+solid
+q 2,0
+
++CloneDownPushBlock
+when Side, BlockCloneDownPushBlock
+solid
+q 4,0

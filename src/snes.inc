@@ -384,11 +384,10 @@ DMAADDRBANK = $4304
 DMALEN = $4305  ; number of bytes, not number of transfers; 0 means 65536
 DMALENHI = $4306
 
-; A future demo that includes HDMA effects would include port definitions.
-;HDMAINDBANK = $4307
-;HDMATABLELO = $4308
-;HDMATABLEHI = $4309
-;HDMALINE = $430A
+HDMAINDBANK = $4307
+HDMATABLELO = $4308
+HDMATABLEHI = $4309
+HDMALINE = $430A
 
 ; composite values for use with 16-bit writes to DMAMODE
 DMAMODE_PPULOFILL = (<PPUDATA << 8)       | DMA_LINEAR | DMA_CONST

@@ -40,7 +40,6 @@ gfx SPWalker2
 run RunLedgeWalker
 draw DrawLedgeWalker
 size 16x14
-health $20
 
 +MovingPlatformHoriz
 essential
@@ -261,6 +260,11 @@ gfx SPCannon
 pal SPCannon
 run RunSmashGuy
 draw DrawSmashGuy
+size 16x16
+
++ActivePushBlock
+run RunActivePushBlock
+draw DrawActivePushBlock
 size 16x16
 
 # ---------- particles ----------

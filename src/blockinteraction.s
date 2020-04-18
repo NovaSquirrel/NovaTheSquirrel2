@@ -283,7 +283,234 @@ Skip:
   rts
 .endproc
 
+
+.a16
+.proc BlockPushForwardShared
+OldPointer = 2
+WasPushed = 4
+  stz WasPushed
+  lda LevelBlockPtr
+  sta OldPointer
+
+  jsl GetBlockX
+  xba
+  ora #$80
+  cmp PlayerPX
+
+  ; Carry clear if push right, set if push left
+  lda LevelBlockPtr
+  bcc PushLeft
+PushRight:
+  add LevelColumnSize
+  bra WasPushRight
+PushLeft:
+  sub LevelColumnSize
+WasPushRight:
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  rts
+.endproc
+
+.proc PoofAtBlock
+  ; Need a free slot first
+  jsl FindFreeParticleY
+  bcs :+
+    rts
+  :
+  lda #Particle::Poof
+  sta ParticleType,y
+
+  ; Position it where the block is
+  jsl GetBlockX
+  xba
+  ora #$80
+  sta ParticlePX,y
+
+  ; For a 16x16 particle
+  jsl GetBlockY
+  xba
+  ora #$40
+  sta ParticlePY,y
+  rts
+.endproc
+
+.a16
+.proc BlockPushForwardCleanup
+  lda BlockPushForwardShared::OldPointer
+  sta LevelBlockPtr
+  lda BlockPushForwardShared::WasPushed
+  beq NotPushed
+    lda #Block::Empty
+    jsl ChangeBlock
+    bra PoofAtBlock
+NotPushed:
+  rts
+.endproc
+
+.a16
+.export BlockCloneUpPushBlock
+.proc BlockCloneUpPushBlock
+  jsr BlockPushForwardShared
+  bne NotForward
+    inc BlockPushForwardShared::WasPushed
+    lda #Block::CloneUpPushBlock
+    jsl ChangeBlock
+NotForward:
+
+  dec LevelBlockPtr
+  dec LevelBlockPtr
+  lda [LevelBlockPtr]
+  bne NotUp
+    inc BlockPushForwardShared::WasPushed
+    lda #Block::CloneUpPushBlock
+    jsl ChangeBlock
+NotUp:
+  bra BlockPushForwardCleanup
+.endproc
+
+.a16
+.export BlockPushNoGravity
+.proc BlockPushNoGravity
+  jsr BlockPushForwardShared
+  bne NotForward
+    inc BlockPushForwardShared::WasPushed
+    lda #Block::NoGravityPushBlock
+    jsl ChangeBlock
+NotForward:
+  bra BlockPushForwardCleanup
+.endproc
+
+.a16
+.export BlockCloneDownPushBlock
+.proc BlockCloneDownPushBlock
+  jsr BlockPushForwardShared
+  bne NotForward
+    inc BlockPushForwardShared::WasPushed
+    lda #Block::CloneDownPushBlock
+    jsl ChangeBlock
+NotForward:
+
+  inc LevelBlockPtr
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  bne NotDown
+    inc BlockPushForwardShared::WasPushed
+    lda #Block::CloneDownPushBlock
+    jsl ChangeBlock
+NotDown:
+
+  bra BlockPushForwardCleanup
+.endproc
+
+
+
+
+.a16
 .proc BlockPushBlock
+TempPtr = BlockTemp + 2
+  ; Fail to push if no actor slots free
+  jsl FindFreeActorY
+  bcs :+
+  rts
+:
+
+  ; Get the X and Y positions from the block itself
+  jsl GetBlockX
+  xba
+  ora #$80
+  sta ActorPX,y
+  ; ---
+  jsl GetBlockY
+  inc
+  xba
+  sta ActorPY,y
+
+  ; Determine if pushing from the left (go right) or pushing from the right (go left)
+  lda PlayerPX
+  cmp ActorPX,y
+  lda #0
+  adc #0 ; 0 if push right, 1 if push left
+  sta ActorVarC,y
+
+  ; Copy over the old block pointer, so it can change the InvisibleWall to nothing once it's done moving
+  lda LevelBlockPtr
+  sta ActorVarA,y
+  sta TempPtr
+
+  ; Don't try to push if there's a block above
+  dea
+  dea
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  cmp #Block::PushBlock
+  beq Nevermind
+  cmp #Block::InvisibleWall
+  beq Nevermind
+  inc LevelBlockPtr
+  inc LevelBlockPtr
+
+  lda #8
+  sta ActorTimer,y
+  lda #0
+  sta ActorDirection,y ; Also zeros state, since it's 16-bit
+  sta ActorVY,y
+
+  ; Calculate the pointer we're pushing into
+  lda ActorVarC,y
+  beq PushRight
+PushLeft:
+  lda LevelBlockPtr
+  sub LevelColumnSize
+  bra WasPushLeft
+PushRight:
+  lda LevelBlockPtr
+  add LevelColumnSize
+WasPushLeft:
+  sta ActorVarB,y
+
+  ; Also check for an invisible wall in front and above
+  dea
+  dea
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  cmp #Block::InvisibleWall
+  beq Nevermind
+  inc LevelBlockPtr
+  inc LevelBlockPtr
+
+  ; Try to climb otherwise
+  lda [LevelBlockPtr]
+  beq DontClimb
+  lda #.loword(-2*16) ; Go upward
+  sta ActorVY,y
+  dec LevelBlockPtr
+  dec LevelBlockPtr
+  lda LevelBlockPtr
+  sta ActorVarB,y ; Update the destination block
+  lda [LevelBlockPtr]
+  bne Nevermind
+DontClimb:
+  ; Destination should be a barrier too
+  lda #Block::InvisibleWall
+  jsl ChangeBlock
+
+  ; Set the type, which actually activates everything
+  lda #Actor::ActivePushBlock*2
+  sta ActorType,y
+
+  ; Change LevelBlockPtr back
+  lda TempPtr
+  sta LevelBlockPtr
+
+  ; Change the old block to a barrier
+  lda #Block::InvisibleWall
+  jsl ChangeBlock
+  rts
+
+Nevermind:
+  ; Change LevelBlockPtr back anyway
+  lda TempPtr
+  sta LevelBlockPtr
   rts
 .endproc
 

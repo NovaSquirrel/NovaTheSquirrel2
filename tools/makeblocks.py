@@ -179,6 +179,8 @@ outfile.write('.endproc\n\n')
 
 outfile.write(".proc BlockNothing\n  rts\n.endproc\n\n")
 
+print("Interaction sets: %d" % len(all_interaction_sets))
+
 # Write all interaction type tables corresponding to each interaction set
 interaction_types = ["Above", "Below", "Side", "InsideHead", "InsideBody", "ActorInside", "ActorTopBottom", "ActorSide"]
 for interaction in interaction_types:

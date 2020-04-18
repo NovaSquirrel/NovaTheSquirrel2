@@ -30,4 +30,5 @@ A000 SPMirrorRabbit
 A000 SPBomberTree
 7000 CurlyFont
 D800 DialogForest
-3000 FGSuitLocks
+5C00 FGSuitLocks
+5800 FGSpecialPush

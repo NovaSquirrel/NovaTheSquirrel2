@@ -18,6 +18,7 @@
 .include "snes.inc"
 .include "global.inc"
 .include "actorenum.s"
+.include "blockenum.s"
 .smart
 
 .segment "ActorData"
@@ -2443,6 +2444,103 @@ Rabbit:
 
 
 
+.a16
+.i16
+.export RunActivePushBlock
+.proc RunActivePushBlock
+  lda ActorVarC,x
+  cmp #2
+  beq Falling
+  asl
+  tay
+  lda MoveTable,y
+  add ActorPX,x
+  sta ActorPX,x
+
+  lda ActorVY,x
+  add ActorPY,x
+  sta ActorPY,x
+
+  ; Finish the move if needed
+  dec ActorTimer,x
+  beq :+
+    rtl
+  :
+
+  ; Erase block at starting position's pointer
+  lda ActorVarA,x ; Starting pointer
+  sta LevelBlockPtr
+  lda #Block::Empty
+  jsl ChangeBlock
+
+  ; Check if it should start falling, or if it moved onto solid ground
+  lda ActorVarB,x
+  ina
+  ina
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  beq StartFalling
+
+DidLand:
+  ; Just moved onto ground, so cancel
+  lda ActorVarB,x ; Destination pointer
+  sta LevelBlockPtr
+  lda #Block::PushBlock
+  jsl ChangeBlock
+  stz ActorType,x
+  rtl
+
+StartFalling:
+  lda #2
+  sta ActorVarC,x  
+  rtl
+
+MoveTable:
+  .word 2*16, .loword(-2*16)
+
+Falling:
+  ; Bottom of the screen?
+  lda LevelColumnSize
+  lsr
+  sta 0
+  lda ActorPY,x
+  xba
+  cmp 0
+  beq DidLand
+
+  ; Landed on something?
+  lda ActorVarB,x
+  ina
+  ina
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  bne DidLand
+
+  ; Update the boundaries
+  lda #Block::InvisibleWall
+  sta [LevelBlockPtr]
+  dec LevelBlockPtr
+  dec LevelBlockPtr
+  lda #Block::Empty
+  sta [LevelBlockPtr]
+
+  ; Probably safe to increment the top byte since it shouldn't overflow
+  inc ActorPY+1,x
+  inc ActorVarB,x
+  inc ActorVarB,x
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawActivePushBlock
+.proc DrawActivePushBlock
+  lda #$40|OAM_PRIORITY_2
+  sta SpriteTileBase
+  lda #6
+  jml DispActor16x16
+.endproc
+
 
 
 
@@ -3145,4 +3243,3 @@ Flying:
   jsl ActorGetShot
   rts
 .endproc
-

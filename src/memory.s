@@ -106,7 +106,7 @@
   ActorOnGround     = 22 ; Nonzero means on ground
   ActorOnScreen     = 23 ; Nonzero means on screen
   ActorDamage       = 24 ; Amount of damage the actor has
-  ActorProjectileType = ActorIndexInLevel
+  ActorProjectileType = ActorIndexInLevel ; Safe to reuse, since this is only checked on normal actor slots
 
   ; For less important, light entities
   ParticleSize = 7*2
