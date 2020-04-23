@@ -32,3 +32,4 @@ A000 SPBomberTree
 D800 DialogForest
 5C00 FGSuitLocks
 5800 FGSpecialPush
+8400 InventoryItem

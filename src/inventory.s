@@ -104,6 +104,8 @@ StringExitLevel:
   jsl DoGraphicUpload
   lda #GraphicsUpload::InventorySprite
   jsl DoGraphicUpload
+  lda #GraphicsUpload::InventoryItem
+  jsl DoGraphicUpload
 
 
 
@@ -144,6 +146,9 @@ VWFBackLoop:
   seta16
   lda #Palette::InventorySprite
   ldy #8
+  jsl DoPaletteUpload
+  lda #Palette::InventoryItem
+  ldy #9
   jsl DoPaletteUpload
 
   ; ---------------
@@ -463,7 +468,7 @@ CursorWasNotTopRow:
   ldx #4*4
   stx OamPtr
 
-
+  jsr DrawInventoryItems
 
 
 
@@ -905,5 +910,97 @@ BGFill:
   sta BGSCROLLY+2
   lda 1
   sta BGSCROLLY+2
+  rts
+.endproc
+
+.a8
+.i16
+.proc DrawInventoryItems
+Row    = 0
+Column = 1
+Index  = 2
+XOffset = 3
+  ldy OamPtr
+
+  ; Do the left inventory
+  lda #4*8
+  sta XOffset
+  stz Row
+  stz Column
+  stz Index
+Loop:
+  tdc ; Clear all of the accumulator
+  lda Index
+  tax
+  lda YourInventory,x
+  jsr CommonLoop
+  bne Loop
+
+  ; Do the right inventory
+  lda #18*8
+  sta XOffset
+  stz Row
+  stz Column
+  stz Index
+LevelLoop:
+  tdc ; Clear all of the accumulator
+  lda Index
+  tax
+  lda LevelInventory,x
+  jsr CommonLoop
+  bne LevelLoop
+
+  sty OamPtr
+  rts
+
+CommonLoop:
+  ; Don't draw empty item slots
+  bne :+
+  bra Skip
+: tax
+  ; Draw the sprite
+  .import ItemPic
+  lda f:ItemPic,x
+  add #32
+  sta OAM_TILE,y
+  lda #>(OAM_PRIORITY_2|OAM_COLOR_1)
+  sta OAM_ATTR,y
+  lda Row
+  asl
+  asl
+  asl
+  asl
+  adc #8*8+4-1
+  sta OAM_YPOS,y
+  lda Column
+  asl
+  asl
+  asl
+  asl
+  adc XOffset
+  sta OAM_XPOS,y
+  lda #$02
+  sta OAMHI+1,y
+  tdc ; Clear accumulator
+  sta OAMHI+0,y
+  iny
+  iny
+  iny
+  iny
+
+Skip:
+  ; Step the counters ahead
+  inc Column
+  lda Column
+  cmp #5
+  bne :+
+    stz Column
+    inc Row
+  :
+  lda Index
+  ina
+  ina
+  sta Index
+  cmp #25*2
   rts
 .endproc

@@ -4,58 +4,73 @@
 +PizzaSlice
 name Pizza slice
 run ItemPizzaSlice
+pic 0,1
 
 +Berry
 name Berry
 run ItemBerry
+pic 1,1
 
 +Watermelon
 name Watermelon
 run ItemWatermelon
+pic 2,1
 
 +Strawberry
 name Strawberry
 run ItemStrawberry
+pic 0,2
 
 +Balloon
 name Balloon
+pic 3,1
 
 +AutoBalloon
 name Auto Balloon
+pic 4,1
 
 +LampOil
 name Lamp Oil
+pic 5,1
 
 +Rope
 name Rope
+pic 6,1
 
 +Bombs
 name Bombs
+pic 7,1
 
 +HeartsKey
 level-only
 name Hearts Key
+pic 0,0
 
 +ClubsKey
 level-only
 name Clubs Key
+pic 1,0
 
 +DiamondsKey
 level-only
 name Diamonds Key
+pic 2,0
 
 +SpadesKey
 level-only
 name Spades Key
+pic 3,0
 
 +Spring
 level-only
 name Spring
+pic 4,0
 
 +Block
 level-only
 name Block
+pic 5,0
 
 +WholePizza
 name Pizza
-
+pic 1,2
