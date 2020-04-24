@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Automatically packs ca65 segments into banks
 import glob, os, subprocess, operator, sys
 
@@ -59,7 +60,7 @@ with open(sys.argv[2]) as f:
 		# If it loads in ROM, it's not dynamically allocated, but takes up space in the bank specified
 		if info['load'].startswith('ROM'):
 			static_rom_segments.add(name)
-			static_rom_seg_bank[name] = int(info['load'][3:], 16)
+			static_rom_seg_bank[name] = int(info['load'][3:])
 		ignore_segments.add(name)
 
 # Count up the sizes of all segments
@@ -113,7 +114,7 @@ with open(sys.argv[1], 'w') as f:
 	f.write('\n  # Automatically placed segments\n')
 	for bank in range(bank_count):
 		for segment in bank_segments[bank]:
-			f.write("  %s: load = ROM%.2x, type = ro;\n" % (segment, bank))
+			f.write("  %s: load = ROM%d, type = ro;\n" % (segment, bank))
 	f.write(original_config_end)
 
 # Print total ROM space used
