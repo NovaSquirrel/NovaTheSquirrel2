@@ -1,21 +1,4 @@
-# Helper functions
-def separateFirstWord(text, lowercaseFirst=True):
-	space = text.find(" ")
-	command = text
-	arg = ""
-	if space >= 0:
-		command = text[0:space]
-		arg = text[space+1:]
-	if lowercaseFirst:
-		command = command.lower()
-	return (command, arg)
-
-def parseNumber(number):
-	if number in aliases:
-		return parseNumber(aliases[number])
-	if number.startswith("$"):
-		return int(number[1:], 16)
-	return int(number)
+from nts2shared import *
 
 # Globals
 aliases = {}
@@ -40,7 +23,7 @@ for line in text:
 	if line.startswith("+"): # new item
 		saveItem()
 		# Reset to prepare for the new actor
-		item = {"name": line[1:], "run": "0", "display_name": "", "description": [], "level-only": False, "pic": 0}
+		item = {"name": line[1:], "run": "0", "display_name": "", "description": [], "level-only": False, "pic": 0, "description": []}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -60,6 +43,8 @@ for line in text:
 			all_subroutines.append(arg)
 	elif word in ["level-only"]:
 		item[word] = True
+	elif word == "i":
+		item["description"].append(arg)
 
 # Save the last one
 saveItem()
@@ -70,9 +55,9 @@ saveItem()
 outfile = open("src/itemdata.s", "w")
 
 outfile.write('; This is automatically generated. Edit "items.txt" instead\n')
-outfile.write('.include "snes.inc"\n.include "global.inc"\n')
+outfile.write('.include "snes.inc"\n.include "global.inc"\n.include "vwf.inc"\n')
 
-outfile.write('.export ItemFlags, ItemRun, ItemName, ItemPic\n')
+outfile.write('.export ItemFlags, ItemRun, ItemName, ItemPic, ItemDescription\n')
 
 outfile.write('.import %s\n' % str(", ".join(all_subroutines)))
 outfile.write('\n.segment "ItemData"\n\n')
@@ -100,8 +85,19 @@ for b in all_items:
 	outfile.write('  .addr .loword(ItemName_%s)\n' % b["name"])
 outfile.write('.endproc\n\n')
 
+outfile.write('.proc ItemDescription\n  .addr 0\n')
+for b in all_items:
+	outfile.write('  .addr .loword(ItemDescription_%s)\n' % b["name"])
+outfile.write('.endproc\n\n')
+
+
 for b in all_items:
 	outfile.write('ItemName_%s:\n  .byt "%s", 0\n' % (b["name"], b["display_name"]))
+outfile.write('\n')
+
+for b in all_items:
+	joined = ", ".join(EncodeOnlyTextbox(b["description"]))
+	outfile.write('ItemDescription_%s:\n  .byt %s, TextCommand::EndText\n' % (b["name"], joined))
 outfile.write('\n')
 
 outfile.close()

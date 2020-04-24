@@ -728,7 +728,7 @@ Exit:
   seta8
 
   lda CursorY
-  bne ItemDescription
+  bne DrawItemDescription
   tdc ; Clear A
   lda CursorTopMenu
   asl
@@ -742,7 +742,38 @@ Exit:
   jsl DrawVWF
   rts
 
-ItemDescription:
+DrawItemDescription:
+  tdc ; Clear all of accumulator
+  lda CursorX
+  sta 0
+  cmp #5
+  bcc :+
+    ; Carry always set
+    adc #InventoryLen-5-1 ; -1 for the carry
+    sta 0
+  :
+  lda CursorY
+  asl ; * 5
+  asl
+  adc CursorY
+  adc 0
+  sub #5 ; Compensate for the inventory row starting at 1
+  asl ; Every item is two bytes
+  tax
+  lda YourInventory,x
+  bne :+ ; Skip empty items
+    rts
+  :
+  .import ItemDescription
+  asl
+  tax
+  lda f:ItemDescription+0,x
+  sta DecodePointer+0
+  lda f:ItemDescription+1,x
+  sta DecodePointer+1
+  lda #^ItemDescription
+  sta DecodePointer+2
+  jsl DrawVWF
   rts
 .endproc
 
