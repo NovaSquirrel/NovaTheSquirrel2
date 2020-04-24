@@ -33,6 +33,10 @@ InventoryTilemapText = $d000
 InventoryPalette     = 7<<10
 .export InventoryTilemapMenu, InventoryTilemapBG, InventoryTilemapText, InventoryPalette
 
+.import Mode7ScrollX, Mode7ScrollY
+InventorySwapRow    = Mode7ScrollY
+InventorySwapColumn = Mode7ScrollX
+
 TopMenuStrings:
   .addr StringReset, StringToss, StringOptions, StringHelp, StringExitLevel
 
@@ -79,6 +83,8 @@ StringExitLevel:
 
   jsr InventoryDialogSharedInit
   seta8
+  lda #255
+  sta InventorySwapRow
 
   lda #<(-4)
   sta BGSCROLLY+0
@@ -332,7 +338,7 @@ Loop:
 
   ; Handle horizontal cursor movement
   lda CursorY
-  beq CursorTopRow
+  jeq CursorTopRow
 CursorNotTopRow:
 
   lda keynew+1
@@ -353,6 +359,87 @@ CursorNotTopRow:
     bne :+
       stz CursorX
   :
+
+  lda keynew+1
+  and #>KEY_SELECT
+  jeq @NoSelect
+  lda CursorY
+  beq @NoSelect
+     lda InventorySwapRow
+     ina
+     beq @NotSetYet
+   @AlreadySet:
+     ; Don't allow swapping between the two inventories
+     stz 0
+     lda InventorySwapColumn
+     cmp #5
+     rol 0
+     lda CursorX
+     cmp #5
+     rol 0
+     lda 0
+     cmp #%01
+     beq @CancelSwap
+     cmp #%10
+     beq @CancelSwap
+
+     tdc ; Clear all of accumulator
+
+     ; Find the two inventory indexes
+     lda CursorX
+     sta 0
+     cmp #5
+     bcc :+
+       ; Carry always set
+       adc #InventoryLen-5-1 ; -1 for the carry
+       sta 0
+     :
+     lda CursorY
+     asl ; * 5
+     asl
+     adc CursorY
+     adc 0
+     sub #5 ; Compensate for the inventory row starting at 1
+     asl ; Every item is two bytes
+     tax
+     ; ---
+     lda InventorySwapColumn
+     sta 0
+     cmp #5
+     bcc :+
+       ; Carry always set
+       adc #InventoryLen-5-1 ; -1 for the carry
+       sta 0
+     :
+     lda InventorySwapRow
+     asl ; * 5
+     asl
+     adc InventorySwapRow
+     adc 0
+     sub #5 ; Compensate for the inventory row starting at 1
+     asl ; Every item is two bytes
+     tay
+
+     seta16
+     lda YourInventory,x
+     pha
+     lda YourInventory,y
+     sta YourInventory,x
+     pla
+     sta YourInventory,y
+     seta8
+
+     ; Cancel out the swap
+   @CancelSwap:
+     lda #255
+     sta InventorySwapRow
+     bra @NoSelect
+   @NotSetYet:
+     lda CursorX
+     sta InventorySwapColumn
+     lda CursorY
+     sta InventorySwapRow
+  @NoSelect:
 
   bra CursorWasNotTopRow
 CursorTopRow:
@@ -446,30 +533,86 @@ CursorWasNotTopRow:
   stz OAM_TILE+(4*1)
   stz OAM_TILE+(4*2)
   stz OAM_TILE+(4*3)
+  lda #2
+  sta OAM_TILE+(4*4) ; Swap
+  sta OAM_TILE+(4*5) ; Swap
+  sta OAM_TILE+(4*6) ; Swap
+  sta OAM_TILE+(4*7) ; Swap
   lda #>(OAM_PRIORITY_2)
   sta OAM_ATTR+(4*0)
+  sta OAM_ATTR+(4*4) ; Swap
   lda #>(OAM_PRIORITY_2|OAM_XFLIP)
   sta OAM_ATTR+(4*1)
+  sta OAM_ATTR+(4*5) ; Swap
   lda #>(OAM_PRIORITY_2|OAM_YFLIP)
   sta OAM_ATTR+(4*2)
+  sta OAM_ATTR+(4*6) ; Swap
   lda #>(OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP)
   sta OAM_ATTR+(4*3)
+  sta OAM_ATTR+(4*7) ; Swap
 
   stz OAMHI+0+(4*0)
   stz OAMHI+0+(4*1)
   stz OAMHI+0+(4*2)
   stz OAMHI+0+(4*3)
+  stz OAMHI+0+(4*4) ; Swap
+  stz OAMHI+0+(4*5) ; Swap
+  stz OAMHI+0+(4*6) ; Swap
+  stz OAMHI+0+(4*7) ; Swap
   lda #$02
   sta OAMHI+1+(4*0)
   sta OAMHI+1+(4*1)
   sta OAMHI+1+(4*2)
   sta OAMHI+1+(4*3)
+  sta OAMHI+1+(4*4) ; Swap
+  sta OAMHI+1+(4*5) ; Swap
+  sta OAMHI+1+(4*6) ; Swap
+  sta OAMHI+1+(4*7) ; Swap
 
   ldx #4*4
   stx OamPtr
 
-  jsr DrawInventoryItems
+  ; Display swap cursor if needed
+  lda InventorySwapRow
+  ina ; Compare against 255
+  beq SwapCursorNotDisplayed
+    lda InventorySwapColumn
+    cmp #5
+    bcc :+
+      ina
+      ina
+    :
+    asl
+    asl
+    asl
+    asl
+    adc #<-3 ; Carry always zero here
+    add #4*8
+    sta OAM_XPOS+(4*4)
+    sta OAM_XPOS+(4*6)
+    add #6
+    sta OAM_XPOS+(4*5)
+    sta OAM_XPOS+(4*7)
 
+    lda InventorySwapRow
+    asl
+    asl
+    asl
+    asl
+    add #(8-2)*8
+    sta OAM_YPOS+(4*4)
+    sta OAM_YPOS+(4*5)
+    add #6
+    sta OAM_YPOS+(4*6)
+    sta OAM_YPOS+(4*7)
+
+    ldx #8*4
+    stx OamPtr
+SwapCursorNotDisplayed:
+
+
+
+  jsr DrawInventoryItems
 
 
   lda keynew+1
