@@ -146,6 +146,8 @@
   ; simpler.
 
   GetLevelPtrXY_Ptr: .res 2 ; Pointer for how to handle getting a pointer from an X and Y position
+  GetBlockX_Ptr: .res 2     ; Pointer for how to get the X position (in blocks) from a level pointer
+  GetBlockY_Ptr: .res 2     ; Pointer for how to get the Y position (in blocks) from a level pointer
 
   PlayerAccelSpeed: .res 2
   PlayerDecelSpeed: .res 2

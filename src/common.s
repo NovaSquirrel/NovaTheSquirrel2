@@ -305,6 +305,12 @@ Exit:
 ; Gets the column number of LevelBlockPtr
 .a16
 .proc GetBlockX
+  jmp (GetBlockX_Ptr)
+.endproc
+
+.a16
+.export GetBlockX_Horizontal
+.proc GetBlockX_Horizontal
   lda LevelBlockPtr ; Get level column
   asl
   asl
@@ -316,6 +322,12 @@ Exit:
 ; Get the row number of LevelBlockPtr
 .a16
 .proc GetBlockY
+  jmp (GetBlockY_Ptr)
+.endproc
+
+.a16
+.export GetBlockY_Horizontal
+.proc GetBlockY_Horizontal
   lda LevelBlockPtr ; Get level row
   lsr
   and #31

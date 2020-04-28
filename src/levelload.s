@@ -21,7 +21,7 @@
 .include "leveldata.inc"
 .smart
 .import GameMainLoop, AutotileLevel, UploadLevelGraphics
-.import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
+.import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical, GetBlockX_Horizontal, GetBlockY_Horizontal
 
 .segment "LevelDecompress"
 
@@ -130,6 +130,10 @@
   ; Set defaults for horizontal levels
   lda #.loword(GetLevelPtrXY_Horizontal)
   sta GetLevelPtrXY_Ptr
+  lda #.loword(GetBlockX_Horizontal)
+  sta GetBlockX_Ptr
+  lda #.loword(GetBlockY_Horizontal)
+  sta GetBlockY_Ptr
   lda #32*2 ; 32 blocks tall
   sta LevelColumnSize
 

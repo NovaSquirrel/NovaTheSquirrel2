@@ -101,6 +101,8 @@ MaxDelayedBlockEdits = 15
 
 .globalzp LevelColumnSize
 .global GetLevelPtrXY_Ptr
+.global GetBlockX_Ptr
+.global GetBlockY_Ptr
 .global LevelBuf
 .global LevelBufAlt
 .global ColumnWords
