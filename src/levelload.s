@@ -34,6 +34,28 @@
   ; Taken from the overworld and used for level-specific flags
   sta StartedLevelNumber
 
+
+  lda #1
+  sta YourInventory+2*0
+  lda #2
+  sta YourInventory+2*1
+  lda #3
+  sta YourInventory+2*2
+  lda #4
+  sta YourInventory+2*3
+  lda #5
+  sta YourInventory+2*4
+  lda #6
+  sta YourInventory+2*5
+  lda #7
+  sta YourInventory+2*6
+  lda #8
+  sta YourInventory+2*7
+  lda #9
+  sta YourInventory+2*8
+
+
+
   jsr StartLevelCommon
   jsl UploadLevelGraphics
   jsl MakeCheckpoint

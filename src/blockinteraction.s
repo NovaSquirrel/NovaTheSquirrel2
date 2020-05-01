@@ -292,8 +292,7 @@ WasPushed = 4
   lda LevelBlockPtr
   sta OldPointer
 
-  jsl GetBlockX
-  xba
+  jsl GetBlockXCoord
   ora #$80
   cmp PlayerPX
 
@@ -321,14 +320,12 @@ WasPushRight:
   sta ParticleType,y
 
   ; Position it where the block is
-  jsl GetBlockX
-  xba
+  jsl GetBlockXCoord
   ora #$80
   sta ParticlePX,y
 
   ; For a 16x16 particle
-  jsl GetBlockY
-  xba
+  jsl GetBlockYCoord
   ora #$40
   sta ParticlePY,y
   rts
@@ -415,14 +412,12 @@ TempPtr = BlockTemp + 2
 :
 
   ; Get the X and Y positions from the block itself
-  jsl GetBlockX
-  xba
+  jsl GetBlockXCoord
   ora #$80
   sta ActorPX,y
   ; ---
-  jsl GetBlockY
-  inc
-  xba
+  jsl GetBlockYCoord
+  add #$0100
   sta ActorPY,y
 
   ; Determine if pushing from the left (go right) or pushing from the right (go left)
@@ -679,7 +674,8 @@ Exit:
 .a16
 .proc BlockLadderTop
   ; Make sure you're standing on it
-  jsl GetBlockX
+  jsl GetBlockXCoord
+  xba
   seta8
   cmp PlayerPX+1
   seta16
@@ -722,13 +718,11 @@ Exit:
 
 .a16
 .proc ParticleAtBlock
-  jsl GetBlockX
-  xba
+  jsl GetBlockXCoord
   ora #$80
   sta ParticlePX,y
 
-  jsl GetBlockY
-  xba
+  jsl GetBlockYCoord
   ora #$80
   sta ParticlePY,y
   rts

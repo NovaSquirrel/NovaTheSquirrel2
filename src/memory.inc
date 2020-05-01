@@ -103,6 +103,8 @@ MaxDelayedBlockEdits = 15
 .global GetLevelPtrXY_Ptr
 .global GetBlockX_Ptr
 .global GetBlockY_Ptr
+.global GetBlockXCoord_Ptr
+.global GetBlockYCoord_Ptr
 .global LevelBuf
 .global LevelBufAlt
 .global ColumnWords

@@ -46,7 +46,7 @@ PlayerHeight = 16*16+14*16
 .global BlockFlags
 
 .global ChangeBlock, DelayChangeBlock
-.global GetBlockX, GetBlockY
+.global GetBlockX, GetBlockY, GetBlockXCoord, GetBlockYCoord
 
 ; Flags
 .enum ActorFlag

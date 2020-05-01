@@ -319,6 +319,21 @@ Exit:
   rtl
 .endproc
 
+.a16
+.proc GetBlockXCoord
+  jmp (GetBlockXCoord_Ptr)
+.endproc
+
+.a16
+.export GetBlockXCoord_Horizontal
+.proc GetBlockXCoord_Horizontal
+  lda LevelBlockPtr ; Get level column
+  asl
+  asl
+  and #$ff00
+  rtl
+.endproc
+
 ; Get the row number of LevelBlockPtr
 .a16
 .proc GetBlockY
@@ -334,6 +349,21 @@ Exit:
   rtl
 .endproc
 
+
+.a16
+.proc GetBlockYCoord
+  jmp (GetBlockYCoord_Ptr)
+.endproc
+
+.a16
+.export GetBlockYCoord_Horizontal
+.proc GetBlockYCoord_Horizontal
+  lda LevelBlockPtr ; Get level row
+  lsr
+  and #31
+  xba
+  rtl
+.endproc
 
 
 ; Random number generator
