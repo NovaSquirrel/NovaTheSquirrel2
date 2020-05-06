@@ -258,6 +258,8 @@ for f in glob.glob("levels/*.json"):
 			flags |= 0x20
 		elif flag == "TwoLayerInteraction":
 			flags |= 0x10
+		elif flag == "GlassForeground":
+			flags |= 0x08
 	outfile.write('  .byt $%.2x\n' % flags)
 	outfile.write('  .word %s\n' % level_json["Header"]["BGColor"])
 	if level_json["Header"]["Background"]:

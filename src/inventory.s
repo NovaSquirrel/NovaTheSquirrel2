@@ -83,6 +83,10 @@ StringExitLevel:
 
   jsr InventoryDialogSharedInit
   seta8
+  stz CGWSEL
+  stz CGADSUB
+  stz BLENDSUB
+
   lda #255
   sta InventorySwapRow
 

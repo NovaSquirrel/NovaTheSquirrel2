@@ -535,8 +535,24 @@ SpriteLoop:
   stz PPURES
   lda #%00010011  ; enable sprites, plane 0 and 1
   sta BLENDMAIN
+  stz BLENDSUB
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
+  stz CGWSEL
+  stz CGADSUB
+
+  lda GlassForegroundEffect
+  beq :+
+    lda #%00010010  ; enable sprites, plane 1
+    sta BLENDMAIN
+    lda #%00000001
+    sta BLENDSUB
+    lda #%00100110  ; add, enable on layers 0, 1 and backdrop
+    sta CGADSUB
+
+    lda #%00000010
+    sta CGWSEL
+  :
 
   seta16
   jml RenderLevelScreens

@@ -3,7 +3,7 @@
 '---------------------------------------
 
 0        1        2        3
-DMMMMMMM XXXXXXXX ...YYYYY VvLI.... 
+DMMMMMMM XXXXXXXX ...YYYYY VvLIg... 
 D = If 1, player starts facing left
 M = Background music
 X = Starting X position (or Y position, for vertical levels)
@@ -12,6 +12,7 @@ V = Vertical level
 v = Enable vertical scrolling (or horizontal scrolling, for vertical levels)
 L = Layer 2 level
 I = Layer 2 interaction
+g = Translucent foreground
 Room for more flags
 
 4        5

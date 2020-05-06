@@ -12,6 +12,7 @@ alias special_push $5800
 alias global_palette 1
 alias terrain_palette 2
 alias locks_palette 3
+alias glass_palette 4
 
 #######################################
 # Global tile stuff
@@ -1015,3 +1016,40 @@ q 2,0
 when Side, BlockCloneDownPushBlock
 solid
 q 4,0
+
+#######################################
+# Glass
+#######################################
+base $2800
+palette glass_palette
+
++GlassRedSolid
+solid
+q 0,0
+
++GlassBlueSolid
+solid
+q 2,0
+
++GlassWhiteSolid
+solid
+q 4,0
+
++GlassPillarTop
+q 6,0
+
++GlassPillarMiddle
+t 6,1 7,1
+t 6,1 7,1
+
++GlassPillarBottom
+t 6,1 7,1
+t 8,0 9,0
+
++GlassNonsolidRed
+q 10,0
+
++GlassNonsolidBlue
+q 12,0
+
+

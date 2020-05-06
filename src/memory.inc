@@ -207,6 +207,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
+.global GlassForegroundEffect
 
 .globalzp random1
 .globalzp random2

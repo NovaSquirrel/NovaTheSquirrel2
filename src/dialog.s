@@ -58,6 +58,9 @@ DialogPortrait = Mode7HappyTimer
   seta8
   lda #%00010111  ; enable sprites, plane 0, 1 and 2
   sta BLENDMAIN
+  stz BLENDSUB
+  stz CGWSEL
+  stz CGADSUB
   stz DialogStackIndex
 
   ; Clear active character list

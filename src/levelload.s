@@ -222,6 +222,11 @@
   beq :+
     dec VerticalScrollEnabled ; Set it to 255
   :
+  lda [DecodePointer],y
+  and #$08
+  beq :+
+    dec GlassForegroundEffect
+  :
   ; (TODO: use the other flags)
 
 
