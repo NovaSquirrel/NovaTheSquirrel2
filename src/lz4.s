@@ -99,8 +99,8 @@ SFX_LZ4_decompress_block:
 ZPAD = 0
 .define LZ_source   ZPAD+$00    ;Source (indirect long)
 .define LZ_dest     ZPAD+$03    ;Destination (indirect long)
-.define LZ_mvl      ZPAD+$06    ;Literal block move (mvn + banks + return)
-.define LZ_mvm      ZPAD+$0a    ;Match block move (mvn + banks + return)
+.define LZ_mvl      $4310 ;ZPAD+$06    ;Literal block move (mvn + banks + return)
+.define LZ_mvm      $4314 ;ZPAD+$0a    ;Match block move (mvn + banks + return)
 .define LZ_blockend ZPAD+$0e    ;End address for current block
 
 Setup:
