@@ -2021,7 +2021,6 @@ GoToNotNear:
   bne GoToNotNear
   lda ActorVarA,x ; Don't throw if it's already been done too recently
   bne GoToNotNear
-    wdm 0
     lda #ActorStateValue::Active
     sta ActorState,x
     seta16
