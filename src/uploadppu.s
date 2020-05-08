@@ -497,7 +497,13 @@ SpriteLoop:
   ldy #9
   jsl DoPaletteUpload
 
-  lda #GraphicsUpload::MapBGForest
+  ; Get level backround map from the background list
+  lda LevelBackgroundId
+  and #255
+  tax
+  .import BackgroundMap
+  lda f:BackgroundMap,x
+  and #255
   jsl DoGraphicUpload
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload

@@ -13,7 +13,7 @@
 	},
 	"Header":	{
 		"Music":	null,
-		"Background":	null,
+		"Background":	"Forest",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
@@ -186,6 +186,20 @@
 					"Y":	29,
 					"W":	3,
 					"H":	1
+				}, {
+					"Id":	"DialogPoint",
+					"X":	7,
+					"Y":	26,
+					"W":	1,
+					"H":	1,
+					"Extra":	"NovaMaffiTest2"
+				}, {
+					"Id":	"Sign",
+					"X":	3,
+					"Y":	26,
+					"W":	1,
+					"H":	1,
+					"Extra":	"NovaMaffiTest"
 				}]
 		}, {
 			"Name":	"Sprites",

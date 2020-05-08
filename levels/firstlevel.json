@@ -13,7 +13,7 @@
 	},
 	"Header":	{
 		"Music":	null,
-		"Background":	null,
+		"Background":	"Forest",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	[],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],

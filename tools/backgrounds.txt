@@ -1,0 +1,7 @@
++Forest
+map BGForest
+size tall
+
++GlassStars
+map BGGlass
+size tall

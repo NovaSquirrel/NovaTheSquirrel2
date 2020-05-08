@@ -164,7 +164,7 @@
   PlayerOAMIndex: .res 2
 
   LevelBackgroundColor:   .res 2
-
+  LevelBackgroundId:      .res 1
 
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:

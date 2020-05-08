@@ -13,7 +13,7 @@
 	},
 	"Header":	{
 		"Music":	null,
-		"Background":	null,
+		"Background":	"Forest",
 		"SpriteGFX":	["SPWalker", "SPWalker2", "SPGeorge", "SPFire", "SPFire2", "SPCannon"],
 		"Flags":	[],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
@@ -52,7 +52,7 @@
 					"Id":	"Ledge",
 					"X":	20,
 					"Y":	23,
-					"W":	4,
+					"W":	8,
 					"H":	1
 				}, {
 					"Id":	"Sand",
@@ -62,285 +62,285 @@
 					"H":	5
 				}, {
 					"Id":	"Ledge",
-					"X":	25,
+					"X":	29,
 					"Y":	27,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	31,
+					"X":	35,
 					"Y":	27,
 					"W":	3,
 					"H":	3,
 					"XFlip":	true
 				}, {
 					"Id":	"Ledge",
-					"X":	34,
+					"X":	38,
 					"Y":	30,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	44,
+					"X":	48,
 					"Y":	27,
 					"W":	4,
 					"H":	2
 				}, {
 					"Id":	"Spring",
-					"X":	25,
+					"X":	29,
 					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	48,
+					"X":	52,
 					"Y":	24,
 					"W":	3,
 					"H":	3
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	40,
+					"X":	44,
 					"Y":	29,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	51,
+					"X":	55,
 					"Y":	22,
 					"W":	4,
 					"H":	2
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	55,
+					"X":	59,
 					"Y":	21,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
-					"X":	59,
+					"X":	63,
 					"Y":	21,
 					"W":	5,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	64,
+					"X":	68,
 					"Y":	21,
 					"W":	1,
 					"H":	11
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	36,
+					"X":	40,
 					"Y":	26,
 					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	37,
+					"X":	41,
 					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	43,
+					"X":	47,
 					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	42,
+					"X":	46,
 					"Y":	22,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	50,
+					"X":	54,
 					"Y":	23,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	40,
+					"X":	44,
 					"Y":	28,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"Money",
-					"X":	43,
-					"Y":	27,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"Money",
-					"X":	45,
-					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
 					"X":	47,
-					"Y":	25,
+					"Y":	27,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	53,
-					"Y":	21,
+					"X":	49,
+					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
 					"X":	51,
-					"Y":	22,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"Money",
-					"X":	55,
-					"Y":	20,
+					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
 					"X":	57,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	55,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	59,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	61,
 					"Y":	19,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	48,
+					"X":	52,
 					"Y":	24,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
-					"X":	68,
+					"X":	72,
 					"Y":	23,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
-					"X":	70,
+					"X":	74,
 					"Y":	26,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
-					"X":	66,
+					"X":	70,
 					"Y":	29,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	67,
+					"X":	71,
 					"Y":	28,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
-					"X":	84,
+					"X":	88,
 					"Y":	24,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	87,
+					"X":	91,
 					"Y":	24,
 					"W":	4,
 					"H":	4,
 					"XFlip":	true
 				}, {
 					"Id":	"Ledge",
-					"X":	91,
+					"X":	95,
 					"Y":	28,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	74,
+					"X":	78,
 					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	85,
+					"X":	89,
 					"Y":	23,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	76,
+					"X":	80,
 					"Y":	20,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	75,
+					"X":	79,
 					"Y":	21,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	98,
+					"X":	102,
 					"Y":	21,
 					"W":	4,
 					"H":	2
 				}, {
 					"Id":	"Ledge",
-					"X":	102,
+					"X":	106,
 					"Y":	21,
 					"W":	6,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	93,
+					"X":	97,
 					"Y":	23,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	93,
+					"X":	97,
 					"Y":	27,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	84,
+					"X":	88,
 					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	86,
+					"X":	90,
 					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	85,
+					"X":	89,
 					"Y":	21,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	84,
+					"X":	88,
 					"Y":	19,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"SmallTreeTopLeft",
-					"X":	68,
-					"Y":	19,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"SmallTreeTopLeft",
-					"X":	70,
-					"Y":	19,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"SmallTreeTopLeft",
 					"X":	72,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	74,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	76,
 					"Y":	19,
 					"W":	1,
 					"H":	1
@@ -352,7 +352,7 @@
 					"H":	1
 				}, {
 					"Id":	"Grass",
-					"X":	30,
+					"X":	34,
 					"Y":	26,
 					"W":	1,
 					"H":	1
@@ -388,255 +388,978 @@
 					"H":	1
 				}, {
 					"Id":	"RedFlower",
-					"X":	36,
+					"X":	40,
 					"Y":	29,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"DialogPoint",
-					"X":	37,
+					"X":	41,
 					"Y":	29,
 					"W":	1,
 					"H":	1,
 					"Extra":	"NovaWhatIsSlope"
 				}, {
 					"Id":	"Pier",
-					"X":	38,
+					"X":	42,
 					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	35,
+					"X":	39,
 					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	27,
+					"X":	31,
 					"Y":	21,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"Grass",
-					"X":	26,
+					"X":	30,
 					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Prize",
-					"X":	76,
-					"Y":	23,
+					"X":	80,
+					"Y":	22,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	67,
+					"X":	71,
 					"Y":	23,
 					"W":	1,
 					"H":	4
 				}, {
 					"Id":	"Fence",
-					"X":	35,
+					"X":	39,
 					"Y":	25,
 					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	108,
+					"X":	112,
 					"Y":	21,
 					"W":	1,
 					"H":	3
 				}, {
 					"Id":	"Ledge",
-					"X":	109,
+					"X":	113,
 					"Y":	29,
 					"W":	8,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidBottom",
-					"X":	97,
+					"X":	101,
 					"Y":	24,
 					"W":	12,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	108,
+					"X":	112,
 					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	97,
+					"X":	101,
 					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Spring",
-					"X":	111,
+					"X":	114,
 					"Y":	28,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
-					"X":	109,
+					"X":	113,
 					"Y":	24,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidLeft",
-					"X":	97,
+					"X":	101,
 					"Y":	23,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Fence",
-					"X":	76,
+					"X":	80,
 					"Y":	25,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidBottom",
-					"X":	114,
+					"X":	118,
 					"Y":	24,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidLeft",
-					"X":	114,
+					"X":	118,
 					"Y":	16,
 					"W":	1,
 					"H":	8
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	116,
+					"X":	120,
 					"Y":	16,
 					"W":	1,
 					"H":	8
 				}, {
 					"Id":	"Ledge",
-					"X":	115,
+					"X":	119,
 					"Y":	16,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	116,
+					"X":	120,
 					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Pier",
-					"X":	114,
+					"X":	118,
 					"Y":	25,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Fence",
-					"X":	83,
+					"X":	87,
 					"Y":	23,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"LedgeSlope",
-					"X":	117,
+					"X":	121,
 					"Y":	24,
 					"W":	5,
 					"H":	5
 				}, {
 					"Id":	"Ledge",
-					"X":	122,
+					"X":	126,
 					"Y":	24,
 					"W":	4,
 					"H":	1
 				}, {
 					"Id":	"Grass",
-					"X":	94,
+					"X":	98,
 					"Y":	27,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"RedFlower",
-					"X":	66,
+					"X":	70,
 					"Y":	28,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SmallTreeBushTopLeft",
-					"X":	102,
+					"X":	106,
 					"Y":	19,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SmallTreeBushTopLeft",
-					"X":	104,
+					"X":	108,
 					"Y":	19,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"SmallTreeTopLeft",
-					"X":	106,
+					"X":	110,
 					"Y":	17,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Grass",
-					"X":	115,
+					"X":	119,
 					"Y":	28,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Grass",
-					"X":	112,
+					"X":	116,
 					"Y":	28,
 					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"Vines",
-					"X":	99,
+					"X":	103,
 					"Y":	25,
 					"W":	1,
 					"H":	4
 				}, {
 					"Id":	"Vines",
-					"X":	101,
+					"X":	105,
 					"Y":	25,
 					"W":	1,
 					"H":	6
 				}, {
 					"Id":	"Vines",
-					"X":	103,
+					"X":	107,
 					"Y":	25,
 					"W":	1,
 					"H":	2
 				}, {
 					"Id":	"Vines",
-					"X":	105,
+					"X":	109,
 					"Y":	25,
 					"W":	1,
 					"H":	3
 				}, {
 					"Id":	"LogPlatform",
-					"X":	76,
+					"X":	80,
 					"Y":	26,
 					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LogPlatformSupportLeft",
-					"X":	76,
+					"X":	80,
 					"Y":	27,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"LogPlatform",
-					"X":	83,
+					"X":	87,
 					"Y":	24,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"LogPlatformSupportRight",
-					"X":	83,
+					"X":	87,
 					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LogPlatform",
+					"X":	130,
+					"Y":	24,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"LogPlatformSupportLeft",
+					"X":	130,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	130,
+					"Y":	23,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"LogPlatformSupportRight",
+					"X":	134,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	135,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	136,
+					"Y":	24,
+					"W":	1,
+					"H":	5
+				}, {
+					"Id":	"Ledge",
+					"X":	137,
+					"Y":	28,
+					"W":	8,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	138,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	140,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	126,
+					"Y":	23,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	135,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	129,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	145,
+					"Y":	26,
+					"W":	4,
+					"H":	2
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	149,
+					"Y":	23,
+					"W":	3,
+					"H":	3
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	152,
+					"Y":	21,
+					"W":	4,
+					"H":	2
+				}, {
+					"Id":	"Ledge",
+					"X":	156,
+					"Y":	21,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	160,
+					"Y":	21,
+					"W":	1,
+					"H":	9
+				}, {
+					"Id":	"Ledge",
+					"X":	161,
+					"Y":	29,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	142,
+					"Y":	27,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	156,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	158,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	159,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Prize",
+					"X":	127,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Prize",
+					"X":	137,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	131,
+					"Y":	25,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Vines",
+					"X":	133,
+					"Y":	25,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"LogPlatform",
+					"X":	161,
+					"Y":	21,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	161,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LogPlatformSupportLeft",
+					"X":	161,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	179,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	168,
+					"Y":	22,
+					"W":	12,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	179,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	168,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	168,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	169,
+					"Y":	21,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	175,
+					"Y":	20,
+					"W":	2,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	171,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	173,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	177,
+					"Y":	21,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	169,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	170,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	177,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	178,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	163,
+					"Y":	28,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	165,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	165,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallHeart",
+					"X":	70,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Heart",
+					"X":	169,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	145,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	147,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	149,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	151,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	153,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	161,
+					"Y":	24,
+					"W":	2,
+					"H":	3
+				}, {
+					"Id":	"Bridge",
+					"X":	169,
+					"Y":	29,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	173,
+					"Y":	29,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Prize",
+					"X":	173,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	184,
+					"Y":	29,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	38,
+					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	184,
+					"Y":	26,
+					"W":	4,
+					"H":	2
+				}, {
+					"Id":	"Ledge",
+					"X":	185,
+					"Y":	21,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	184,
+					"Y":	24,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	189,
+					"Y":	21,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	184,
+					"Y":	21,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Bridge",
+					"X":	180,
+					"Y":	21,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"SolidBlock",
+					"X":	189,
+					"Y":	25,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	117,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	173,
+					"Y":	19,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	137,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	188,
+					"Y":	31,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	190,
+					"Y":	30,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	190,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	190,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	190,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	192,
+					"Y":	21,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	198,
+					"Y":	20,
+					"W":	2,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	194,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	196,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	200,
+					"Y":	21,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	200,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	196,
+					"Y":	19,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	202,
+					"Y":	21,
+					"W":	1,
+					"H":	11
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	191,
+					"Y":	21,
+					"W":	1,
+					"H":	11
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	190,
+					"Y":	28,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	190,
+					"Y":	25,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	170,
+					"Y":	23,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Vines",
+					"X":	175,
+					"Y":	23,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Vines",
+					"X":	177,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"RedFlowerSpiral",
+					"X":	174,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LogPlatform",
+					"X":	203,
+					"Y":	21,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"LogPlatformSupportLeft",
+					"X":	203,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	203,
+					"Y":	20,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	69,
+					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	212,
+					"Y":	25,
+					"W":	12,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	220,
+					"Y":	26,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Vines",
+					"X":	218,
+					"Y":	26,
+					"W":	1,
+					"H":	6
+				}, {
+					"Id":	"Vines",
+					"X":	216,
+					"Y":	26,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Vines",
+					"X":	214,
+					"Y":	26,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Ledge",
+					"X":	213,
+					"Y":	22,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	212,
+					"Y":	22,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	223,
+					"Y":	23,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"SolidBlock",
+					"X":	168,
+					"Y":	29,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Rock",
+					"X":	188,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LogPlatform",
+					"X":	224,
+					"Y":	23,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"LogPlatformSupportLeft",
+					"X":	224,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	224,
+					"Y":	22,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	212,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"DoorExit",
+					"X":	222,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	224,
+					"Y":	21,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	185,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeBushTopLeft",
+					"X":	191,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Grass",
+					"X":	214,
+					"Y":	21,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"RedFlower",
+					"X":	219,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	223,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BlueFlowerSpiral",
+					"X":	220,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	217,
+					"Y":	22,
+					"W":	2,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Ledge",
+					"X":	219,
+					"Y":	23,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	184,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	24,
+					"Y":	19,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	26,
+					"Y":	19,
 					"W":	1,
 					"H":	1
 				}]
@@ -653,14 +1376,14 @@
 					"XFlip":	true
 				}, {
 					"Id":	"George",
-					"X":	28,
+					"X":	32,
 					"Y":	20,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
 				}, {
 					"Id":	"SlowSneaker",
-					"X":	58,
+					"X":	65,
 					"Y":	20,
 					"W":	1,
 					"H":	1,
@@ -680,43 +1403,132 @@
 					"H":	1
 				}, {
 					"Id":	"FireFox",
-					"X":	69,
+					"X":	73,
 					"Y":	22,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
 				}, {
 					"Id":	"FireFox",
-					"X":	94,
+					"X":	98,
 					"Y":	27,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
 				}, {
 					"Id":	"Sneaker",
-					"X":	100,
+					"X":	104,
 					"Y":	20,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
 				}, {
 					"Id":	"FireFox",
-					"X":	70,
+					"X":	74,
 					"Y":	28,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"BurgerCannonH",
-					"X":	106,
+					"X":	110,
 					"Y":	27,
 					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"LedgeWalker",
-					"X":	111,
+					"X":	115,
 					"Y":	23,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"FireFox",
+					"X":	133,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	156,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	158,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	160,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	154,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	177,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Sneaker",
+					"X":	175,
+					"Y":	19,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"Checkpoint",
+					"X":	119,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FireFox",
+					"X":	187,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"George",
+					"X":	162,
+					"Y":	28,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeWalker",
+					"X":	215,
+					"Y":	21,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	207,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"SlowSneaker",
+					"X":	205,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
 				}]
 		}, {
 			"Name":	"Control",
@@ -726,6 +1538,12 @@
 					"Id":	"PLAYER_START_R",
 					"X":	3,
 					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SCROLL_LOCK",
+					"X":	239,
+					"Y":	16,
 					"W":	1,
 					"H":	1
 				}]

@@ -197,6 +197,7 @@ outfile.write('.include "snes.inc"\n')
 outfile.write('.include "actorenum.s"\n')
 outfile.write('.include "graphicsenum.s"\n')
 outfile.write('.include "paletteenum.s"\n')
+outfile.write('.include "backgroundenum.s"\n')
 outfile.write('.include "blockenum.s"\n')
 outfile.write('.include "leveldata.inc"\n\n')
 outfile.write('.segment "LevelBank1"\n\n')
@@ -263,7 +264,7 @@ for f in glob.glob("levels/*.json"):
 	outfile.write('  .byt $%.2x\n' % flags)
 	outfile.write('  .word %s\n' % level_json["Header"]["BGColor"])
 	if level_json["Header"]["Background"]:
-		outfile.write('  .word %s\n' % level_json["Header"]["Background"])
+		outfile.write('  .word LevelBackground::%s\n' % level_json["Header"]["Background"])
 	else:
 		outfile.write('  .word $ffff\n')
 	outfile.write('  .addr .loword(level_%s_sp)\n' % plain_name)

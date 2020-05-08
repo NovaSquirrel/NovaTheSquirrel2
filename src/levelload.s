@@ -243,7 +243,8 @@
 
   iny ; Y = 6
   ; Background, two bytes
-  ; (Don't do anything with yet)
+  lda [DecodePointer],y
+  sta LevelBackgroundId
   iny ; Y = 7
   ; Unused background byte
 

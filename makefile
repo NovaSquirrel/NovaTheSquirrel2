@@ -23,7 +23,8 @@ objlist = \
   mode7 perspective_data sincos_data huffmunch inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
-  lz4 dialog_npc_data dialog_text_data itemcode itemdata
+  lz4 dialog_npc_data dialog_text_data itemcode itemdata \
+  backgrounddata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -142,13 +143,12 @@ $(objdir)/mktables.s: tools/mktables.py
 $(objdir)/spcimage.o: $(brrlisto)
 
 # Files that depend on enums
-$(objdir)/leveldata.o: $(srcdir)/blockenum.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/blockenum.s
-$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/backgroundenum.s
 $(objdir)/overworldcode.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/pathenum.s
 $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/pathenum.s
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
@@ -198,6 +198,8 @@ $(srcdir)/actorenum.s: tools/actors.txt tools/makeactor.py
 	$(PY) tools/makeactor.py
 $(srcdir)/itemenum.s: tools/items.txt tools/makeitems.py
 	$(PY) tools/makeitems.py
+$(srcdir)/backgroundenum.s: tools/backgrounds.txt tools/makebackgrounds.py
+	$(PY) tools/makebackgrounds.py
 $(srcdir)/leveldata.s: $(levels) tools/levelconvert.py
 	$(PY) tools/levelconvert.py
 $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
@@ -240,7 +242,7 @@ $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png
-	$(PY) tools/makebackground.py $<
+	$(PY) tools/makebackgroundmap.py $<
 tools/M7TilesetRearranged.png: tools/M7Tileset.png
 	$(PY) tools/rearrangem7.py
 tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
