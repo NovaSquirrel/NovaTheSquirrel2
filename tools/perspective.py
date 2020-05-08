@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import math
 
 raw_tables = True # Don't do premade HDMA tables

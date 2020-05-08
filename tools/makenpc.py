@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Convert png NPC pictures to SNES format and create enums
 import PIL, glob, os, json
 from PIL import Image

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import PIL, sys
 from PIL import Image
 

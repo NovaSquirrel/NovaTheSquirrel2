@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Convert the palette for the Mode 7 tileset image specifically
 import PIL
 from PIL import Image

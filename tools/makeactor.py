@@ -1,21 +1,6 @@
+#!/usr/bin/env python3
 # Helper functions
-def separateFirstWord(text, lowercaseFirst=True):
-	space = text.find(" ")
-	command = text
-	arg = ""
-	if space >= 0:
-		command = text[0:space]
-		arg = text[space+1:]
-	if lowercaseFirst:
-		command = command.lower()
-	return (command, arg)
-
-def parseNumber(number):
-	if number in aliases:
-		return parseNumber(aliases[number])
-	if number.startswith("$"):
-		return int(number[1:], 16)
-	return int(number)
+from nts2shared import *
 
 # Globals
 aliases = {}

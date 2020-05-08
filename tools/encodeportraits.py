@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Convert png portraits to SNES format and create enums
 import PIL, glob, os
 from PIL import Image

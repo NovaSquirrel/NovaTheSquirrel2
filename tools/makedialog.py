@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Automatically converts dialog scripts to the game's native format
 from nts2shared import *
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Rearranges the Mode 7 tileset images so that the four tiles that make up a block are sequential
 import PIL, sys
 from PIL import Image

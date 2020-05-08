@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # convert PNG backgrounds to Nova the Squirrel 2 background maps
 import PIL, sys, os
 from PIL import Image

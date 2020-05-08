@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # The purpose of this script is to rearrange the frames of a player animation
 # so that the 32x32 player animation frame (made of four 16x16 tiles)
 # can be uploaded and used with two DMAs.

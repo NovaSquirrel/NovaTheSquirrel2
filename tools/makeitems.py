@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from nts2shared import *
 
 # Globals

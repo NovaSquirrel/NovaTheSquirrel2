@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import math
 
 def output_tables():

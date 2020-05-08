@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Convert png palettes to SNES palettes
 import PIL, glob, os
 from PIL import Image

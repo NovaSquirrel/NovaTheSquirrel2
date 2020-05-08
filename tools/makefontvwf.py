@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import PIL, glob, os
 from PIL import Image
 
