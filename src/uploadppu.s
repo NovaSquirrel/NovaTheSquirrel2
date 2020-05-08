@@ -533,8 +533,14 @@ SpriteLoop:
 
   lda #1 | ($c000 >> 9)
   sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
-  lda #2 | ($d000 >> 9)
-  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens tall
+  tdc
+  lda LevelBackgroundId
+  tax
+  .import BackgroundFlags
+  lda f:BackgroundFlags,x
+  and #3
+  ora #$d000 >> 9
+  sta NTADDR+1   ; plane 1 nametable also at $d000, size specified by BackgroundFlags
   lda #0 | ($e000 >> 9)
   sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
 
