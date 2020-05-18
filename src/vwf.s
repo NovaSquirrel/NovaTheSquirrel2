@@ -396,7 +396,7 @@ Common1:
   asl
   asl
   asl
-  adc FontDataPointer ; Carry always clear
+  adc FontDataPointer ; assert((PS & 1) == 0) Carry always clear
   tay
   phk ; All the glyphs are in this bank
   plb

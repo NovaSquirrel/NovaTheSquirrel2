@@ -2524,7 +2524,7 @@ Falling:
   sta [LevelBlockPtr]
 
   ; Probably safe to increment the top byte since it shouldn't overflow
-  inc ActorPY+1,x
+  inc ActorPY+1,x ;assert([ActorPY+1+x]!=255)
   inc ActorVarB,x
   inc ActorVarB,x
   rtl

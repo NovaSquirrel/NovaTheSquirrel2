@@ -875,7 +875,7 @@ Skip:
       jsr ActorIsSlope
       bcc :+
         lda ActorPY,x
-        sbc #$0100 ; Carry already set
+        sbc #$0100 ; assert((PS & 1) == 1) Carry already set
         ora SlopeHeightTable,y
         sta SlopeY
     :

@@ -491,7 +491,7 @@ CursorWasNotTopRow:
   asl
   asl
   asl
-  adc #<-3 ; Carry always zero here
+  adc #<-3  ; assert((PS & 1) == 0) Carry is always zero here
   add #4*8
   sta 0
 
@@ -590,7 +590,7 @@ CursorWasNotTopRow:
     asl
     asl
     asl
-    adc #<-3 ; Carry always zero here
+    adc #<-3 ; assert((PS & 1) == 0) Carry is always zero here
     add #4*8
     sta OAM_XPOS+(4*4)
     sta OAM_XPOS+(4*6)

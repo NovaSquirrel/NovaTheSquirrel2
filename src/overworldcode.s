@@ -793,7 +793,7 @@ Yes:
   ; Multiply OverworldMap by 3 bytes per pointer
   lda 0
   asl
-  adc 0 ; (Carry is probably clear)
+  adc 0 ; assert((PS & 1) == 0) Carry is clear
   tay
 
   ; Copy over the level header pointer

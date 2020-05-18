@@ -51,7 +51,7 @@ CharacterLoop:
   bne :+
     ; 1 = Space
     lda FontDrawX
-    adc #4-1 ; Carry always set
+    adc #4-1 ; assert((PS & 1) == 1) Carry always set
     sta FontDrawX
     jmp NextCharacter
   :

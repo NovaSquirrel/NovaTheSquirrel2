@@ -124,7 +124,7 @@
     xba
     asl
     asl
-    adc #.loword(AbilityGraphics) ; Carry always clear here
+    adc #.loword(AbilityGraphics) ; assert((PS & 1) == 0) Carry always clear here
     sta DMAADDR
 
     lda #1024 ; Two rows of tiles
@@ -858,7 +858,7 @@ GetSlopeYPos:
       jsr IsSlope
       bcc :+
         lda PlayerPY
-        sbc #$0100 ; Carry already set
+        sbc #$0100 ; assert((PS & 1) == 1) Carry already set
         ora f:SlopeHeightTable,x
         sta SlopeY
     :

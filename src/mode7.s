@@ -318,7 +318,7 @@ RenderMapLoop:
     pha
     sed
     lda Mode7ChipsLeft
-    adc #0 ; Carry will be set
+    adc #0 ; assert((PS & 1) == 1) Carry will be set
     sta Mode7ChipsLeft
     cld
     pla
