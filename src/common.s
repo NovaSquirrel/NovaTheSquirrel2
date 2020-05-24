@@ -125,8 +125,8 @@
 loop1:
   bit VBLSTATUS  ; Wait for leaving previous vblank
   bmi loop1
-  wai
 loop2:
+  wai
   bit VBLSTATUS  ; Wait for start of this vblank
   bpl loop2
   plp
