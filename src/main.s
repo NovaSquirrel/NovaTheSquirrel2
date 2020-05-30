@@ -331,11 +331,11 @@ padwait:
   sta 0
 
   lda ScrollY
+  lsr
+  lsr
+  lsr
+  lsr
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
-  lsr
-  lsr
-  lsr
-  lsr
   sta 2
   seta8
 
