@@ -298,7 +298,7 @@ YPos = 6
   asl
   tay
 
-  ; Generate the top or bottom as needed
+  ; Generate the left or right as needed
   lda Temp
   lsr
   bcc :+
