@@ -2007,6 +2007,7 @@ Loop:
   bne Loop
 
   plx
+  tya
   rtl
 .endproc
 
