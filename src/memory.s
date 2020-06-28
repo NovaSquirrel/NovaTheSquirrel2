@@ -163,8 +163,16 @@
   PlayerDrawY: .res 1
   PlayerOAMIndex: .res 2
 
-  LevelBackgroundColor:   .res 2
-  LevelBackgroundId:      .res 1
+  ; Mirrors, for effects
+  FGScrollXPixels: .res 2
+  FGScrollYPixels: .res 2
+  BGScrollXPixels: .res 2
+  BGScrollYPixels: .res 2
+  ; Storage, for effects
+  BGEffectRAM:     .res 8
+
+  LevelBackgroundColor:   .res 2 ; Palette entry
+  LevelBackgroundId:      .res 1 ; Backgrounds specified in backgrounds.txt
 
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:

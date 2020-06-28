@@ -13,11 +13,11 @@
 	},
 	"Header":	{
 		"Music":	null,
-		"Background":	"Forest",
+		"Background":	"Lake",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	[],
-		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
-		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops"],
+		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGLake"],
+		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGLake", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops"],
 		"BGColor":	"RGB(15,23,31)"
 	},
 	"Layers":	[{

@@ -329,6 +329,7 @@ padwait:
   lsr
   lsr
   sta 0
+  sta FGScrollXPixels
 
   lda ScrollY
   lsr
@@ -337,6 +338,7 @@ padwait:
   lsr
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
   sta 2
+  sta FGScrollYPixels
   seta8
 
   lda 0
@@ -352,10 +354,13 @@ padwait:
   seta16
   lsr 0
   lsr 2
+  lda 0
+  sta BGScrollXPixels
 
   lda 2
   add #128
   sta 2
+  sta BGScrollYPixels
   seta8
   lda 0
   sta BGSCROLLX+2
@@ -365,6 +370,10 @@ padwait:
   sta BGSCROLLY+2
   lda 3
   sta BGSCROLLY+2
+
+  seta16
+  .import BGEffectRun
+  jsl BGEffectRun
 
   jmp forever
 .endproc

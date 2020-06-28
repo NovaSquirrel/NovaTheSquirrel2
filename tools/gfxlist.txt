@@ -36,3 +36,7 @@ D800 DialogForest
 2800 FGGlassBlocks
 6000 BGGlass
 D000 MapBGGlass
+D000 MapBGHillsMountains
+6000 BGHillsMountains
+6000 BGLake
+D000 MapBGLake

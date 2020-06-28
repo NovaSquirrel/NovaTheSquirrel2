@@ -205,6 +205,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global ScreenFlagsDummy
 .global LevelBackgroundColor
 .global LevelBackgroundId
+.global FGScrollXPixels, FGScrollYPixels, BGScrollXPixels, BGScrollYPixels, BGEffectRAM
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled

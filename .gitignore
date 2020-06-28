@@ -57,3 +57,4 @@ src/dialog_text_data.s
 src/itemdata.s
 src/backgrounddata.s
 src/backgroundenum.s
+*.namsfc
