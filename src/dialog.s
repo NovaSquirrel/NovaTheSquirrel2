@@ -62,6 +62,7 @@ DialogPortrait = Mode7HappyTimer
   stz CGWSEL
   stz CGADSUB
   stz DialogStackIndex
+  stz HDMASTART
 
   ; Clear active character list
   lda #255

@@ -53,30 +53,30 @@ No:
 
 .export SetupSkyGradient
 .proc SetupSkyGradient
+  seta8
   lda #^HDMARedTable
   sta DMAADDRBANK+$20 ;R
   sta DMAADDRBANK+$30 ;G
   sta DMAADDRBANK+$40 ;B
   sta DMAADDRBANK+$50 ;Scroll
   stz HDMAINDBANK+$50
-  seta16
-  lda #(<COLDATA << 8) | DMA_LINEAR
-  sta DMAMODE+$20
-  sta DMAMODE+$30
-  sta DMAMODE+$40
-  lda #(<BG2HOFS << 8) | DMA_00 | DMA_INDIRECT
-  sta DMAMODE+$50
 
-  lda #.loword(HDMARedTable)
-  sta DMAADDR+$20
-  lda #.loword(HDMAGreenTable)
-  sta DMAADDR+$30
-  lda #.loword(HDMABlueTable)
-  sta DMAADDR+$40
-  lda #.loword(HDMAScrollTable)
-  sta DMAADDR+$50
+  ldx #(<COLDATA << 8) | DMA_LINEAR
+  stx DMAMODE+$20
+  stx DMAMODE+$30
+  stx DMAMODE+$40
+  ldx #(<BG2HOFS << 8) | DMA_00 | DMA_INDIRECT
+  stx DMAMODE+$50
 
-  seta8
+  ldx #.loword(HDMARedTable)
+  stx DMAADDR+$20
+  ldx #.loword(HDMAGreenTable)
+  stx DMAADDR+$30
+  ldx #.loword(HDMABlueTable)
+  stx DMAADDR+$40
+  ldx #.loword(HDMAScrollTable)
+  stx DMAADDR+$50
+
   lda #%111100
   sta HDMASTART
   lda #%00100000 ; On backgrounds
