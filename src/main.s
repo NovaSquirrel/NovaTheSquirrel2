@@ -296,8 +296,48 @@ SkipBlock:
   dex
   bpl BlockUpdateLoop
 
+  ; Do generic DMA updates
+  ldx #(GENERIC_UPDATE_COUNT-1)*2
+GenericUpdateLoop:
+  lda GenericUpdateLength,x
+  beq SkipGeneric
+  sta DMALEN
+  stz GenericUpdateLength,x ; Mark the update slot as free
+  lda GenericUpdateSource,x
+  sta DMAADDR
+  lda GenericUpdateDestination,x
+  bmi WasPalette
+  ; ---------------
+  sta PPUADDR
+  lda #DMAMODE_PPUDATA
+  sta DMAMODE
+  seta8
+  lda GenericUpdateFlags,x
+  sta DMAADDRBANK
+  lda #1
+  sta COPYSTART
+  seta16
+  bra SkipGeneric
+  ; ---------------
+WasPalette:
+  seta8
+  sta CGADDR
+  stz DMAMODE   ; Linear, increasing DMA
+  lda #<CGDATA
+  sta DMAPPUREG
+  lda GenericUpdateFlags,x
+  sta DMAADDRBANK
+  lda #1
+  sta COPYSTART
+  seta16
+SkipGeneric:
+  dex
+  dex
+  bpl GenericUpdateLoop
+
 
   ; Handle palette requests
+  ; (Maybe this should be combined into the generic updates later?)
   lda PaletteRequestIndex
   and #255
   beq :+

@@ -200,12 +200,20 @@ LevelZeroWhenLoad_Start:
   RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
   RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
 
+  ; For ChangeBlock
   BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
 
+  ; VRAM/CGRAM updates, for tiles and palette updates
+  GenericUpdateDestination: .res GENERIC_UPDATE_COUNT*2
+  GenericUpdateLength:      .res GENERIC_UPDATE_COUNT*2
+  GenericUpdateSource:      .res GENERIC_UPDATE_COUNT*2
+  GenericUpdateFlags:       .res GENERIC_UPDATE_COUNT*2 ; Bank
+
+  ; Delayed ChangeBlock updates
   DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in
   DelayedBlockEditAddr: .res MaxDelayedBlockEdits*2 ; Address to put the block at
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the change

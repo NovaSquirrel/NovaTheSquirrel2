@@ -24,6 +24,7 @@ PlayerHeight = 16*16+14*16
 .global ppu_copy, ppu_clear_nt, ppu_vsync, WaitVblank
 .global DoGraphicUpload, DoPaletteUpload
 .global DoGraphicUploadWithOffset
+.global QueueGenericUpdate, QueueGenericUpdateSameBank
 .global WritePPUIncreasing, WritePPURepeated, SkipPPUWords
 
 ; blarggapu.s

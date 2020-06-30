@@ -98,6 +98,11 @@ MaxDelayedBlockEdits = 15
 .global DelayedBlockEditTime
 .global DelayedBlockEditAddr
 
+GENERIC_UPDATE_COUNT = 4
+.global GenericUpdateDestination
+.global GenericUpdateLength
+.global GenericUpdateSource
+.global GenericUpdateFlags
 
 .globalzp LevelColumnSize
 .global GetLevelPtrXY_Ptr

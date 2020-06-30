@@ -724,6 +724,7 @@ SixteenTileLoop:
   rtl
 .endproc
 
+; Write increasing values to VRAM
 .export WritePPUIncreasing
 .proc WritePPUIncreasing
 : sta PPUDATA
@@ -733,6 +734,7 @@ SixteenTileLoop:
   rtl
 .endproc
 
+; Write the same value to VRAM repeatedly
 .export WritePPURepeated
 .proc WritePPURepeated
 : sta PPUDATA
@@ -741,6 +743,7 @@ SixteenTileLoop:
   rtl
 .endproc
 
+; Skip forward some amount of VRAM words
 .export SkipPPUWords
 .proc SkipPPUWords
 : bit PPUDATARD
@@ -749,7 +752,7 @@ SixteenTileLoop:
   rtl
 .endproc
 
-
+.if 0
 .a16
 .i16
 .export WriteScriptedImage
@@ -757,4 +760,70 @@ SixteenTileLoop:
   lda [DecodePointer]
   rtl
 .endproc
+.endif
 
+.a16
+.i16
+; Queues a DMA to happen during the next vblank
+; A = Source address (CPU)
+; 0 = Source bank
+; X = Destination address (PPU)
+; Y = Number of bytes to copy
+; Returns success in carry
+.proc QueueGenericUpdate
+Flags = 0
+Source = 2
+Destination = 4
+Length = 6
+  sta Source
+  stx Destination
+  sty Length
+Already:
+
+  ldx #(GENERIC_UPDATE_COUNT-1)*2
+FindFree:
+  lda GenericUpdateLength,x
+  beq Found
+  dex
+  dex
+  bpl FindFree
+Fail:
+  clc
+  rtl
+
+Found:
+  lda Flags
+  sta GenericUpdateFlags,x
+  lda Source
+  sta GenericUpdateSource,x
+  lda Destination
+  sta GenericUpdateDestination,x
+  lda Length
+  sta GenericUpdateLength,x
+  sec
+  rtl
+.endproc
+
+.if 0
+.a16
+.i16
+; Queues a DMA to happen during the next vblank
+; A = Source address (CPU)
+; DBR = Source bank
+; X = Destination address (PPU)
+; Y = Number of bytes to copy
+; Returns success in carry
+.export QueueGenericUpdateSameBank
+.proc QueueGenericUpdateSameBank
+  sta 2
+  stx 4
+  sty 6
+  seta8 ; Get the current bank
+  phb
+  pla
+  sta 0
+  stz 1
+  seta16
+  bra QueueGenericUpdateWithBank::Already
+.endproc
+.endif
