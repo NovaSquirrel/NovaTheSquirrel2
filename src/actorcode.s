@@ -36,7 +36,7 @@ CommonTileBase = $40
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
 .import PlayerNegIfLeft, ActorNegIfLeft
 .import GetAngle512
-.import ActorTryVertInteraction
+.import ActorTryUpInteraction, ActorTryDownInteraction
 
 ; -------------------------------------
 
@@ -801,15 +801,6 @@ NoTarget:
   jsr HalfLongVelocity
   jsr ActorApplyLongVelocity
 
-  ; Calculate a value to compare against; only collide with one-way tiles if going down
-  lda #$8000
-  sta ActorVarC,x
-  lda 4
-  beq :+
-  bmi :+
-    lsr ActorVarC,x
-  :
-
   ; Can press attack button again if it's been a few frames
   ; (to detect that it wasn't the press that created the rocket in the first place)
   ; and it will explode without having to hit anything.
@@ -840,14 +831,26 @@ NoTarget:
   :
 
 
+  ; Calculate a value to compare against; only collide with one-way tiles if going down
+  lda 4 ; Vertical speed positive and not zero
+  beq :+
+  bmi :+
+    lda ActorPY,x
+    sub #$80
+    tay
+    lda ActorPX,x
+    jsl ActorTryDownInteraction
+    cmp #$4000
+    bcs ExplodeNow   
+  :
+
   ; Explode if necessary
   lda ActorPY,x
   sub #$80
   tay
   lda ActorPX,x
-  jsl ActorTryVertInteraction
-  cmp ActorVarC,x
-  bcc :+
+  jsl ActorTryUpInteraction
+  bpl :+
 ExplodeNow:
     seta8
     lda #5
@@ -858,7 +861,6 @@ ExplodeNow:
     lda #5*4
     jmp ChangeToExplosion
   :
-
   rtl
 TargetAngleTable:
   .byt 255 ; udlr
@@ -1192,7 +1194,7 @@ Divide:
     sub #$100
     tay
     lda ActorPX,x
-    jsl ActorTryVertInteraction
+    jsl ActorTryUpInteraction
     seta8
     bpl :+
     ; Snap against the ceiling

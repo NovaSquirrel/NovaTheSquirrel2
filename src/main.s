@@ -219,6 +219,39 @@ DelayedBlockLoop:
   jsl RunPlayer
   jsl AdjustCamera
 
+  lda FG2OffsetX
+  sta OldFG2OffsetX
+  lda keydown
+  and #KEY_L
+  beq :+
+    dec FG2OffsetX
+    dec FG2OffsetX
+    dec FG2OffsetX
+    dec FG2OffsetX
+    dec FG2OffsetX
+    dec FG2OffsetX
+    dec FG2OffsetX
+    dec FG2OffsetX
+  :
+  lda keydown
+  and #KEY_R
+  beq :+
+    inc FG2OffsetX
+    inc FG2OffsetX
+    inc FG2OffsetX
+    inc FG2OffsetX
+    inc FG2OffsetX
+    inc FG2OffsetX
+    inc FG2OffsetX
+    inc FG2OffsetX
+  :
+
+  bit TwoLayerLevel-1
+  bpl :+
+    .import FG2TilemapUpdate
+    jsl FG2TilemapUpdate
+  :
+
   ; Make a 5 sprite hole to fill later
   lda OamPtr
   sta PlayerOAMIndex
@@ -269,6 +302,17 @@ Die:
   beq :+
     jsl RenderLevelRowUpload
     stz RowUpdateAddress
+  :
+  ; Do row/column updates for second layer
+  lda ColumnUpdateAddress2
+  beq :+
+    jsl RenderLevelColumnUpload2
+    stz ColumnUpdateAddress2
+  :
+  lda RowUpdateAddress2
+  beq :+
+    jsl RenderLevelRowUpload2
+    stz RowUpdateAddress2
   :
   ; -----------------------------------
   ; Do block updates
@@ -390,7 +434,11 @@ padwait:
   lda 3
   sta BGSCROLLY
 
-  ; Background layer
+  ; If in a two-layer level, don't scroll second layer as if it's a background
+  lda TwoLayerLevel
+  bne SetScrollForTwoLayerLevel
+
+  ; Regular background layer
   seta16
   lsr 0
   lsr 2
@@ -411,9 +459,45 @@ padwait:
   lda 3
   sta BGSCROLLY+2
 
+; Jump back here if the second layer's scrolling was already set
+ReturnFromTwoLayer:
   seta16
   .import BGEffectRun
   jsl BGEffectRun
 
   jmp forever
+
+; ---------------------------------------------------------
+SetScrollForTwoLayerLevel:
+  seta16
+  seta16
+  lda ScrollX
+  add FG2OffsetX
+  lsr
+  lsr
+  lsr
+  lsr
+  sta 0
+  sta BGScrollXPixels
+
+  lda ScrollY
+  add FG2OffsetY
+  lsr
+  lsr
+  lsr
+  lsr
+  dec a ; SNES displays lines 1-224 so shift it up to 0-223
+  sta 2
+  sta BGScrollYPixels
+  seta8
+
+  lda 0
+  sta BGSCROLLX+2
+  lda 1
+  sta BGSCROLLX+2
+  lda 2
+  sta BGSCROLLY+2
+  lda 3
+  sta BGSCROLLY+2
+  jmp ReturnFromTwoLayer
 .endproc

@@ -3,8 +3,10 @@
 .globalzp keydown
 .globalzp keylast
 .globalzp keynew
-.globalzp ScrollX
-.globalzp ScrollY
+.globalzp ScrollX, ScrollY
+.global   OldScrollX, OldScrollY
+.globalzp FG2OffsetX, FG2OffsetY
+.global   OldFG2OffsetX, OldFG2OffsetY
 .globalzp LevelBlockPtr
 .globalzp BlockFlag
 .globalzp BlockRealX
@@ -81,10 +83,10 @@
 .global PlayerDrawY
 .global PlayerOAMIndex
 
-.global ColumnUpdateAddress
-.global ColumnUpdateBuffer
-.global RowUpdateAddress
-.global RowUpdateBuffer
+.global ColumnUpdateAddress, ColumnUpdateAddress2
+.global ColumnUpdateBuffer, ColumnUpdateBuffer2
+.global RowUpdateAddress, RowUpdateAddress2
+.global RowUpdateBuffer, RowUpdateBuffer2
 
 BLOCK_UPDATE_COUNT = 8
 .global BlockUpdateAddress
@@ -214,7 +216,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
-.global GlassForegroundEffect
+.global GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction
 
 .globalzp random1
 .globalzp random2

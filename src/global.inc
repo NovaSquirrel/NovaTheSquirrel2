@@ -33,12 +33,10 @@ PlayerHeight = 16*16+14*16
 ; Common
 .global GetLevelColumnPtr, GetLevelPtrXY, GetBlockFlag
 .global RenderLevelScreens
-.global RenderLevelColumnUpload
-.global RenderLevelColumnLeft
-.global RenderLevelColumnRight
-.global RenderLevelRowUpload
-.global RenderLevelRowTop
-.global RenderLevelRowBottom
+.global RenderLevelColumnUpload, RenderLevelColumnLeft, RenderLevelColumnRight
+.global RenderLevelRowUpload, RenderLevelRowTop, RenderLevelRowBottom
+.global RenderLevelColumnUpload2, RenderLevelColumnLeft2, RenderLevelColumnRight2
+.global RenderLevelRowUpload2, RenderLevelRowTop2, RenderLevelRowBottom2
 .global PlayerFrameUpload
 .global FadeIn, FadeOut, WaitKeysReady
 .global MemClear, MemClear7F

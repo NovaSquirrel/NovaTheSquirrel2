@@ -30,8 +30,10 @@
   keylast:  .res 2
   keynew:   .res 2
 
-  ScrollX:  .res 2
+  ScrollX:  .res 2   ; Primary foreground
   ScrollY:  .res 2
+  FG2OffsetX: .res 2 ; Secondary foreground
+  FG2OffsetY: .res 2
 
   random1:  .res 2
   random2:  .res 2
@@ -174,13 +176,20 @@
   LevelBackgroundColor:   .res 2 ; Palette entry
   LevelBackgroundId:      .res 1 ; Backgrounds specified in backgrounds.txt
 
+  OldFG2OffsetX: .res 2 ; Secondary foreground
+  OldFG2OffsetY: .res 2
+  OldScrollX: .res 2
+  OldScrollY: .res 2
+
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:
   ScreenFlags:            .res 16
   ScreenFlagsDummy:       .res 1
-  VerticalLevelFlag:      .res 1
-  VerticalScrollEnabled:  .res 1
+  VerticalLevelFlag:      .res 1 ; Level is vertical instead of horizontal
+  VerticalScrollEnabled:  .res 1 ; Enable vertical scrolling
   GlassForegroundEffect:  .res 1
+  TwoLayerLevel:          .res 1 ; Two foreground layer level
+  TwoLayerInteraction:    .res 1 ; Interaction with the second layer is enabled
 
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4
@@ -199,6 +208,12 @@ LevelZeroWhenLoad_Start:
   ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
   RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
   RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
+
+  ; Second layer
+  ColumnUpdateAddress2: .res 2     ; Address to upload to, or zero for none
+  ColumnUpdateBuffer2:  .res 32*2  ; 32 tiles vertically
+  RowUpdateAddress2:    .res 2     ; Address to upload to, or zero for none
+  RowUpdateBuffer2:     .res 64*2  ; 64 tiles horizontally
 
   ; For ChangeBlock
   BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2

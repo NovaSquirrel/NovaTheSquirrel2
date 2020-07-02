@@ -23,8 +23,8 @@
 .a16
 .i16
 .proc AdjustCamera
-ScrollOldX = 0
-ScrollOldY = 2
+ScrollOldX = OldScrollX
+ScrollOldY = OldScrollY
 TargetX = 4
 TargetY = 6
 

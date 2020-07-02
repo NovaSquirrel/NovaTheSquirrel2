@@ -25,97 +25,176 @@
 
 .a16
 .i16
-.proc RenderLevelScreens
-  ; Set the correct scroll value
-  lda PlayerPX
-  sub #(8*256)
-  bcs :+
-    lda #0
-: sta ScrollX
+.export FG2TilemapUpdate
+.proc FG2TilemapUpdate
+  lda ScrollX
+  add FG2OffsetX
+  sta 0
+  lda OldScrollX
+  add OldFG2OffsetX
+  sta 2
 
-  lda PlayerPY
-  sub #(8*256)
-  bcs :+
-    lda #0
-: cmp #((32-14)*256)
-  bcc :+
-    lda #((32-14)*256)
-  :
-  sta ScrollY
+  ; Is a column update required?
+  lda 0
+  eor 2
+  and #$80
+  beq NoUpdateColumn
+    lda 0
+    cmp 2
+    jsr ToTiles
+    bcs UpdateRight
+  UpdateLeft:
+    sub #2             ; Two tiles to the left
+    jsr UpdateColumn2
+    bra NoUpdateColumn
+  UpdateRight:
+    add #34            ; Two tiles past the end of the screen on the right
+    jsr UpdateColumn2
+  NoUpdateColumn:
 
-  ; If vertical scrolling is not enabled, lock to the bottom of the level
-  lda VerticalScrollEnabled
+  lda ScrollY
+  add FG2OffsetY
+  sta 0
+  lda OldScrollY
+  add OldFG2OffsetY
+  sta 2
+
+  ; Is a row update required?
+  lda 0
+  eor 2
+  and #$80
+  beq NoUpdateRow
+    lda 0
+    cmp 2
+    jsr ToTiles
+    bcs UpdateDown
+  UpdateUp:
+    jsr UpdateRow2
+    bra NoUpdateRow
+  UpdateDown:
+    add #29            ; Just past the screen height
+    jsr UpdateRow2
+  NoUpdateRow:
+  rtl
+
+; Convert a 12.4 scroll position to a number of tiles
+ToTiles:
+  php
+  lsr ; \ shift out the subpixels
+  lsr ;  \
+  lsr ;  /
+  lsr ; /
+
+  lsr ; \
+  lsr ;  | shift out 8 pixels
+  lsr ; /
+  plp
+  rts
+.endproc
+
+.a16
+.i16
+.proc UpdateRow2
+Temp = 4
+YPos = 6
+  sta Temp
+
+  ; Calculate the address of the row
+  ; (Always starts at the leftmost column
+  ; and extends all the way to the right.)
+  and #31
+  asl ; Multiply by 32, the number of words per row in a screen
+  asl
+  asl
+  asl
+  asl
+  ora #BackgroundBG>>1
+  sta RowUpdateAddress2
+
+  ; Get level pointer address
+  ; (Always starts at the leftmost column of the screen)
+  lda ScrollX
+  add FG2OffsetX
+  xba
+  dec a
+  jsl GetLevelColumnPtr
+  lda #$4000
+  tsb LevelBlockPtr
+
+  ; Get index for the buffer
+  lda ScrollX
+  add FG2OffsetX
+  xba
+  dec a
+  asl
+  asl
+  and #(64*2)-1
+  tax
+
+  ; Take the Y position, rounded to blocks,
+  ; as the column of level data to read
+  lda Temp
+  and #<~1
+  tay
+
+  ; Generate the top or the bottom as needed
+  lda Temp
   lsr
   bcs :+
-    lda #((32-14)*256)
-    sta ScrollY
+  jsl RenderLevelRowTop2
+  rts
+: jsl RenderLevelRowBottom2
+  rts
+.endproc
+
+.proc UpdateColumn2
+Temp = 4
+YPos = 6
+  sta Temp
+
+  ; Calculate address of the column
+  and #31
+  ora #BackgroundBG>>1
+  sta ColumnUpdateAddress2
+
+  ; Use the second screen if required
+  lda Temp
+  and #32
+  beq :+
+    lda #2048>>1
+    tsb ColumnUpdateAddress2
   :
 
-  ; -------------------
+  ; Get level pointer address
+  lda Temp ; Get metatile count
+  lsr
+  jsl GetLevelColumnPtr
+  lda #$4000
+  tsb LevelBlockPtr
 
-  lda RerenderInitEntities
-  and #255
-  beq NoInitEntities
+  ; Use the Y scroll position in blocks
+  lda ScrollY
+  xba
+  and #LEVEL_HEIGHT-1
+  asl
+  tay
 
-  seta8
-  stz RerenderInitEntities
-  seta16
-
-  ; Init actors
-  ldx #ActorStart
-  ldy #ProjectileEnd-ActorStart
-  jsl MemClear
-
-  ; Init particles
-  ldx #ParticleStart
-  ldy #ParticleEnd-ParticleStart
-  jsl MemClear
-
-  seta8
-  Low = 4
-  High = 5
-  ; Try to spawn actors.
-  ; First find the minimum and maximum columns to check.
-  lda ScrollX+1
-  sub #4
-  bcs :+
-    lda #0
-  :
-  sta Low
-  ; - get high column
-  lda ScrollX+1
-  add #25
+  ; Generate the left or right as needed
+  lda Temp
+  lsr
   bcc :+
-    lda #255
-  :
-  sta High
-  ; Now look through the list
-  ldy #0
-EnemyLoop:
-  lda [LevelActorPointer],y
-  cmp #255
-  beq Exit
-  cmp Low
-  bcc Nope
-  cmp High
-  bcs Nope
-  .import TryMakeActor
-  jsl TryMakeActor
-Nope:
-  iny
-  iny
-  iny
-  iny
-  bne EnemyLoop
-Exit:
+  jsl RenderLevelColumnRight2
+  rts
+: jsl RenderLevelColumnLeft2
+  rts 
+.endproc
 
-NoInitEntities:
-  seta16
+; -------------------------------------
 
-
-
-  ; -------------------
-
+.a16
+.i16
+.export RenderLevelScreens2
+.proc RenderLevelScreens2
 BlockNum = 0
 BlocksLeft = 2
 YPos = 4
@@ -125,6 +204,9 @@ YPos = 4
   sub #4   ; Render out past the left side a bit
   sta BlockNum
   jsl GetLevelColumnPtr
+  lda #$4000
+  tsb LevelBlockPtr
+
   lda #26  ; Go 26 blocks forward
   sta BlocksLeft
 
@@ -139,30 +221,31 @@ Loop:
   lda BlockNum
   and #15
   asl
-  ora #ForegroundBG>>1
-  sta ColumnUpdateAddress
+  ora #BackgroundBG>>1
+  sta ColumnUpdateAddress2
 
   ; Use the other nametable if necessary
   lda BlockNum
   and #16
   beq :+
     lda #2048>>1
-    tsb ColumnUpdateAddress
+    tsb ColumnUpdateAddress2
   :
 
   ; Upload two columns
   ldy YPos
-  jsl RenderLevelColumnLeft
-  jsl RenderLevelColumnUpload
-  inc ColumnUpdateAddress
+  jsl RenderLevelColumnLeft2
+  jsl RenderLevelColumnUpload2
+  inc ColumnUpdateAddress2
   ldy YPos
-  jsl RenderLevelColumnRight
-  jsl RenderLevelColumnUpload
+  jsl RenderLevelColumnRight2
+  jsl RenderLevelColumnUpload2
 
   ; Move onto the next block
   lda LevelBlockPtr
   add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
+  ora #$4000
   sta LevelBlockPtr
   inc BlockNum
 
@@ -170,25 +253,20 @@ Loop:
   bne Loop
 
 
-  stz ColumnUpdateAddress
-
-  ; Go and do layer 2 if needed!
-  bit TwoLayerLevel-1
-  .import RenderLevelScreens2
-  jmi RenderLevelScreens2
+  stz ColumnUpdateAddress2
   rtl
 .endproc
 
-.proc RenderLevelColumnUpload
+.proc RenderLevelColumnUpload2
   php
   seta16
 
   ; Set DMA parameters  
-  lda ColumnUpdateAddress
+  lda ColumnUpdateAddress2
   sta PPUADDR
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  lda #ColumnUpdateBuffer
+  lda #ColumnUpdateBuffer2
   sta DMAADDR
   lda #32*2
   sta DMALEN
@@ -208,7 +286,7 @@ Loop:
   rtl
 .endproc
 
-.proc RenderLevelRowUpload
+.proc RenderLevelRowUpload2
   php
 
   ; .------------------
@@ -217,11 +295,11 @@ Loop:
   seta16
 
   ; Set DMA parameters  
-  lda RowUpdateAddress
+  lda RowUpdateAddress2
   sta PPUADDR
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  lda #RowUpdateBuffer
+  lda #RowUpdateBuffer2
   sta DMAADDR
   lda #32*2
   sta DMALEN
@@ -238,10 +316,10 @@ Loop:
   seta16
 
   ; Reset the counters. Don't need to do DMAMODE again I assume?
-  lda RowUpdateAddress
+  lda RowUpdateAddress2
   ora #2048>>1
   sta PPUADDR
-  lda #RowUpdateBuffer+32*2
+  lda #RowUpdateBuffer2+32*2
   sta DMAADDR
   lda #32*2
   sta DMALEN
@@ -262,7 +340,7 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
-.proc RenderLevelColumnLeft
+.proc RenderLevelColumnLeft2
   phb
   phk
   plb
@@ -279,11 +357,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
-  sta ColumnUpdateBuffer,x
+  sta ColumnUpdateBuffer2,x
   inx
   inx
   lda BlockBottomLeft,y
-  sta ColumnUpdateBuffer,x
+  sta ColumnUpdateBuffer2,x
   inx
   inx
   ply
@@ -306,7 +384,7 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
-.proc RenderLevelColumnRight
+.proc RenderLevelColumnRight2
   phb
   phk
   plb
@@ -323,11 +401,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopRight,y
-  sta ColumnUpdateBuffer,x
+  sta ColumnUpdateBuffer2,x
   inx
   inx
   lda BlockBottomRight,y
-  sta ColumnUpdateBuffer,x
+  sta ColumnUpdateBuffer2,x
   inx
   inx
   ply
@@ -352,7 +430,7 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
-.proc RenderLevelRowTop
+.proc RenderLevelRowTop2
   phb
   phk
   plb
@@ -365,11 +443,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
-  sta RowUpdateBuffer,x
+  sta RowUpdateBuffer2,x
   inx
   inx
   lda BlockTopRight,y
-  sta RowUpdateBuffer,x
+  sta RowUpdateBuffer2,x
   inx
   inx
   ply
@@ -378,6 +456,7 @@ Loop:
   lda LevelBlockPtr
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
+  ora #$4000
   sta LevelBlockPtr
 
   ; Wrap around in the buffer
@@ -399,7 +478,7 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
-.proc RenderLevelRowBottom
+.proc RenderLevelRowBottom2
   phb
   phk
   plb
@@ -412,11 +491,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockBottomLeft,y
-  sta RowUpdateBuffer,x
+  sta RowUpdateBuffer2,x
   inx
   inx
   lda BlockBottomRight,y
-  sta RowUpdateBuffer,x
+  sta RowUpdateBuffer2,x
   inx
   inx
   ply
@@ -425,6 +504,7 @@ Loop:
   lda LevelBlockPtr
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
+  ora #$4000
   sta LevelBlockPtr
 
   ; Wrap around in the buffer

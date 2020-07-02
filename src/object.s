@@ -633,7 +633,7 @@ ActorApplyYVelocity = ActorApplyVelocity::YOnly
   lda #8*16
   jsl ActorNegIfLeft
   add ActorPX,x
-  jsl ActorTryVertInteraction
+  jsl ActorTryDownInteraction
 
   cmp #$4000 ; Test for solid on top
   bcs :+
@@ -643,10 +643,16 @@ ActorApplyYVelocity = ActorApplyVelocity::YOnly
 .endproc
 
 ; Look up the block at a coordinate and run the interaction routine it has, if applicable
-.export ActorTryVertInteraction
+; Will try the second layer if the first is not solid
+; A = X coordinate, Y = Y coordinate
+.export ActorTryUpInteraction
 .import BlockRunInteractionActorTopBottom
-.proc ActorTryVertInteraction
+.proc ActorTryUpInteraction
+  bit TwoLayerInteraction-1
+  bmi TwoLayer
+FirstLayer:
   jsl GetLevelPtrXY
+Run:
   phx
   tax
   lda f:BlockFlags,x
@@ -655,18 +661,117 @@ ActorApplyYVelocity = ActorApplyVelocity::YOnly
   jsl BlockRunInteractionActorTopBottom
   lda BlockFlag
   rtl
+
+TwoLayer:
+  pha
+  phy
+  jsl FirstLayer
+  bmi FirstSolid
+
+  ; Try second layer
+  pla
+  add FG2OffsetY
+  tay
+  pla
+  add FG2OffsetX
+  jsl GetLevelPtrXY
+  lda #$4000
+  tsb LevelBlockPtr
+  lda [LevelBlockPtr]
+  bra Run
+
+FirstSolid:
+  ply
+  pla
+  lda BlockFlag
+  rtl
 .endproc
 
+; Look up the block at a coordinate and run the interaction routine it has, if applicable
+; Will try the second layer if the first is not solid or solid on top
+; A = X coordinate, Y = Y coordinate
+.export ActorTryDownInteraction
+.proc ActorTryDownInteraction
+  bit TwoLayerInteraction-1
+  bmi TwoLayer
+FirstLayer:
+  jsl GetLevelPtrXY
+Run:
+  phx
+  tax
+  lda f:BlockFlags,x
+  sta BlockFlag
+  plx
+  jsl BlockRunInteractionActorTopBottom
+  lda BlockFlag
+  rtl
+
+TwoLayer:
+  pha
+  phy
+  jsl FirstLayer
+  cmp #$4000
+  bcs FirstSolid
+
+  ; Try second layer
+  pla
+  add FG2OffsetY
+  tay
+  pla
+  add FG2OffsetX
+  jsl GetLevelPtrXY
+  lda #$4000
+  tsb LevelBlockPtr
+  lda [LevelBlockPtr]
+  bra Run
+
+FirstSolid:
+  ply
+  pla
+  lda BlockFlag
+  rtl
+.endproc
+
+; Look up the block at a coordinate and run the interaction routine it has, if applicable
+; A = X coordinate, Y = Y coordinate
 .export ActorTrySideInteraction
 .import BlockRunInteractionActorSide
 .proc ActorTrySideInteraction
+  bit TwoLayerInteraction-1
+  bmi TwoLayer
+FirstLayer:
   jsl GetLevelPtrXY
+Run:
   phx
   tax
   lda f:BlockFlags,x
   sta BlockFlag
   plx
   jsl BlockRunInteractionActorSide
+  lda BlockFlag
+  rtl
+
+TwoLayer:
+  pha
+  phy
+  jsl FirstLayer
+  bmi FirstSolid
+
+  ; Try second layer
+  pla
+  add FG2OffsetY
+  tay
+  pla
+  add FG2OffsetX
+  jsl GetLevelPtrXY
+  lda #$4000
+  tsb LevelBlockPtr
+  lda [LevelBlockPtr]
+  bra Run
+
+FirstSolid:
+  ply
+  pla
   lda BlockFlag
   rtl
 .endproc
@@ -800,7 +905,7 @@ Skip:
     adc ActorPY,x
     tay
     lda ActorPX,x
-    jsl ActorTryVertInteraction
+    jsl ActorTryUpInteraction
     asl
     bcc :+
       lda #$20
@@ -830,7 +935,7 @@ Skip:
   ; Maybe add checks for the sides
   ldy ActorPY,x
   lda ActorPX,x
-  jsl ActorTryVertInteraction
+  jsl ActorTryDownInteraction
   cmp #$4000
   rol 0
 

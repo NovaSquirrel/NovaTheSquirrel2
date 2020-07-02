@@ -558,6 +558,11 @@ SpriteLoop:
   and #3
   ora #$d000 >> 9
   sta NTADDR+1   ; plane 1 nametable also at $d000, size specified by BackgroundFlags
+  lda TwoLayerLevel ; Force two screens wide on two-layer levels
+  beq :+
+    lda #1 | ($d000 >> 9)
+    sta NTADDR+1   ; plane 0 nametable at $d000, 2 screens wide  
+  :
   lda #0 | ($e000 >> 9)
   sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
 

@@ -217,10 +217,17 @@ for f in glob.glob("levels/*.json"):
 	num_layers = len(level_json["Layers"])
 
 	foreground = []
+	secondary = []
 	for z in range(len(level_json["Layers"][0]["Data"])):
 		foreground.append(Rect(level_json["Layers"][0]["Data"][z], z))
-	actors = [Rect(x) for x in level_json["Layers"][1]["Data"]]
-	control = [Rect(x) for x in level_json["Layers"][2]["Data"]]
+	if level_json["Layers"][1]["Type"] == "Rectangle":
+		for z in range(len(level_json["Layers"][1]["Data"])):
+			secondary.append(Rect(level_json["Layers"][1]["Data"][z], z))
+		actors = [Rect(x) for x in level_json["Layers"][2]["Data"]]
+		control = [Rect(x) for x in level_json["Layers"][3]["Data"]]
+	else:
+		actors = [Rect(x) for x in level_json["Layers"][1]["Data"]]
+		control = [Rect(x) for x in level_json["Layers"][2]["Data"]]
 
 	# ---------------------------------
 	player_x, player_y, player_dir = 5, 5, False
@@ -267,7 +274,7 @@ for f in glob.glob("levels/*.json"):
 	if level_json["Header"]["Background"]:
 		outfile.write('  .word LevelBackground::%s\n' % level_json["Header"]["Background"])
 	else:
-		outfile.write('  .word $ffff\n')
+		outfile.write('  .word $0000\n')
 	outfile.write('  .addr .loword(level_%s_sp)\n' % plain_name)
 	outfile.write('  .dbyt %d\n\n' % boundaries)
 	for i in range(8):
@@ -297,6 +304,15 @@ for f in glob.glob("levels/*.json"):
 	outfile.write("level_%s_fg:\n" % plain_name)
 	for line in fg_data:
 		outfile.write("  %s\n" % line)
+	if secondary != []:
+		outfile.write("  .byt LSpecialCmd, LevelSpecialConfig::ALTERNATE_BUFFER\n")
+		total_level_size += 2
+
+		# Write the secondary foreground data
+		fg_data, fg_size = convert_layer(secondary)
+		total_level_size += fg_size
+		for line in fg_data:
+			outfile.write("  %s\n" % line)
 	outfile.write("  LFinished\n\n")
 
 	# Write the actor data

@@ -223,6 +223,18 @@
     dec VerticalScrollEnabled ; Set it to 255
   :
   lda [DecodePointer],y
+  and #$20
+  beq :+
+    dec TwoLayerLevel
+    stz FG2OffsetX
+    stz FG2OffsetY
+  :
+  lda [DecodePointer],y
+  and #$10
+  beq :+
+    dec TwoLayerInteraction
+  :
+  lda [DecodePointer],y
   and #$08
   beq :+
     dec GlassForegroundEffect
@@ -334,6 +346,7 @@
   phk
   plb
   stz DecodeColumn
+  stz SecondLayer
   jsr LevelDecodeLoop
 
   ; Put the registers back in their expected sizes
@@ -391,6 +404,7 @@ DecodeWidth  = 3
 DecodeHeight = 4
 DecodeColumn = 5 ; Current column to write to
 DecodeValue  = 6 ; and 7
+SecondLayer  = 8
 .a8
 .i16
 .proc LevelDecodeCommand
@@ -473,9 +487,22 @@ SpecialXPlus16:
   add #16
   sta DecodeColumn
   rts
+
 SpecialConfig:
-  jsr NextLevelByte
   ; Call additional table
+  tdc
+  jsr NextLevelByte
+  asl
+  tax
+  jmp (.loword(SpecialConfigTable),x)
+
+SpecialConfigTable:
+  .addr UseAlternateBuffer
+
+.a8
+UseAlternateBuffer:
+  stz DecodeColumn
+  dec SecondLayer ; Roll around to -1
   rts
 .endproc
 
@@ -984,6 +1011,14 @@ Horizontal:
   lda DecodeColumn
   seta16
   jsl GetLevelColumnPtr
+
+  ; 16-bit read, we really want the sign bit on SecondLayer here
+  bit SecondLayer-1
+  bpl :+
+    lda #$4000			; OR it with 16KB
+    tsb LevelBlockPtr
+  :
+
   ; Set Y to the height * 2
   lda 0
   and #255

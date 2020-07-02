@@ -140,7 +140,6 @@ HDMAScrollTable:
    .addr BGEffectRAM+0
    .byt 1
    .addr BGScrollXPixels
-
    .byt 0
 .endproc
 
