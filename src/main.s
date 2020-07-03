@@ -221,29 +221,22 @@ DelayedBlockLoop:
 
   lda FG2OffsetX
   sta OldFG2OffsetX
+  lda FG2OffsetY
+  sta OldFG2OffsetY
+
   lda keydown
   and #KEY_L
   beq :+
-    dec FG2OffsetX
-    dec FG2OffsetX
-    dec FG2OffsetX
-    dec FG2OffsetX
-    dec FG2OffsetX
-    dec FG2OffsetX
-    dec FG2OffsetX
-    dec FG2OffsetX
+    lda FG2OffsetY
+    sub #$10
+    sta FG2OffsetY
   :
   lda keydown
   and #KEY_R
   beq :+
-    inc FG2OffsetX
-    inc FG2OffsetX
-    inc FG2OffsetX
-    inc FG2OffsetX
-    inc FG2OffsetX
-    inc FG2OffsetX
-    inc FG2OffsetX
-    inc FG2OffsetX
+    lda FG2OffsetY
+    add #$10
+    sta FG2OffsetY
   :
 
   bit TwoLayerLevel-1

@@ -41,6 +41,7 @@ NOVA_RUN_SPEED = 4
 Temp = 2
 SideXPos = 8
 BottomCmp = 8
+
 SlopeY = 6
 MaxSpeedLeft = 10
 MaxSpeedRight = 12
@@ -416,10 +417,6 @@ HandleLadder:
 PlayerIsntOnLadder:
 
 
-  bit TwoLayerInteraction-1
-  bpl :+
-    jsr PlayerSecondLayerInteraction
-  :
 
   ; Allow canceling a jump
   lda PlayerVY
@@ -550,7 +547,7 @@ SkipGroundCheck:
   ; Above
   lda PlayerPY
   sub #PlayerHeight ; Top of the head
-  sta PlayerPYTop
+  sta PlayerPYTop   ; Used in collision detection with enemies
   tay
   lda PlayerPX
   jsr TryBelowInteraction
@@ -565,6 +562,10 @@ SkipGroundCheck:
   jsl BlockRunInteractionInsideBody
 
 
+  bit TwoLayerInteraction-1
+  bpl :+
+    jsr PlayerSecondLayerInteraction
+  :
 
 
   ; -------------------
@@ -842,6 +843,7 @@ OfferJumpFromGracePeriod:
 ; Interact with the second foreground layer!
 .proc PlayerSecondLayerInteraction
 SideXPos = 8
+BottomCmp = 8
 
   ; -----------------------------------
   ; Right
@@ -889,6 +891,50 @@ SideXPos = 8
   lda SideXPos
   jsr TryLeftInteraction
 
+  ; -----------------------------------
+  ; Floor
+  ; -----------------------------------
+  lda #$8000
+  sta BottomCmp
+  lda PlayerVY
+  bmi :+
+    seta8
+    stz PlayerJumping
+    seta16
+    lda #$4000
+    sta BottomCmp
+  :
+
+  lda PlayerVY
+  bmi :+
+  ; Left foot
+  lda PlayerPY
+  add FG2OffsetY
+  tay
+  lda PlayerPX
+  add FG2OffsetX
+  sub #4*16
+  jsr TryAboveInteraction
+  ; Right foot
+  lda PlayerPY
+  add FG2OffsetY
+  tay
+  lda PlayerPX
+  add FG2OffsetX
+  add #3*16
+  jsr TryAboveInteraction
+:
+
+  ; -----------------------------------
+  ; Ceiling
+  ; -----------------------------------
+  lda PlayerPY
+  sub #PlayerHeight ; Top of the head
+  add FG2OffsetY
+  tay
+  lda PlayerPX
+  add FG2OffsetX
+  jsr TryBelowInteraction
   rts
 
 
@@ -939,6 +985,62 @@ TryRightInteraction:
     rts
   @NotSolid:
   rts
+
+TryAboveInteraction:
+  jsl GetLevelPtrXY
+  jsr GetFG2BlockFlag
+  jsl BlockRunInteractionAbove
+  ; Solid?
+  lda BlockFlag
+  cmp BottomCmp
+  bcc :+
+    lda FG2OffsetY
+    and #$00ff
+    sta 0
+
+    lda PlayerPY
+    add 0
+    and #$ff00
+    sub 0
+    sta PlayerPY
+    
+    sta PlayerPY
+    stz PlayerVY
+
+    seta8
+    inc PlayerOnGround
+    stz PlayerOnLadder
+    lda PlayerRidingSomething
+    bne DoesntCount
+      stz PlayerNeedsGround
+    DoesntCount:
+    seta16
+    rts
+  :
+  rts
+
+TryBelowInteraction:
+  jsl GetLevelPtrXY
+  jsr GetFG2BlockFlag
+  jsl BlockRunInteractionBelow
+
+  lda BlockFlag
+  bpl @NotSolid
+    lda FG2OffsetY
+    and #$00ff
+    sta 0
+
+    stz PlayerVY
+
+    lda PlayerPY
+    add 0
+    and #$ff00
+    ora #14*16
+    sub 0
+    sta PlayerPY
+  @NotSolid:
+  rts
+
 .endproc
 
 .a16

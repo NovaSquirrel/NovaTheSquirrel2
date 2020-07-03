@@ -227,7 +227,9 @@
   beq :+
     dec TwoLayerLevel
     stz FG2OffsetX
+    stz FG2OffsetX+1
     stz FG2OffsetY
+    stz FG2OffsetY+1
   :
   lda [DecodePointer],y
   and #$10

@@ -163,6 +163,10 @@ Found:
   tax
   ; Now the accumulator is free to do other things
 
+  ; Use the second routine if it's on the second foreground layer
+  lda LevelBlockPtr
+  and #$4000
+  jne ChangeBlockFG2
   ; -----------------------------------
 
   ; First, make sure the block is actually onscreen (Horizontally)
@@ -241,6 +245,7 @@ Found:
   ora #ForegroundBG>>1
   sta BlockUpdateAddress,y
 
+CalculateRestOfAddress:
   ; Add in X
   lda LevelBlockPtr
   asl
@@ -266,6 +271,96 @@ Exit:
   ply
   plx
   rtl
+.endproc
+
+; Continuation of ChangeBlock for the second foreground layer
+.a16
+.i16
+.proc ChangeBlockFG2
+Temp = ChangeBlock::Temp
+Exit = ChangeBlock::Exit
+  ; First, make sure the block is actually onscreen (Horizontally)
+  lda LevelBlockPtr ; Get level column
+  asl
+  asl
+  xba
+  seta8
+  sta Temp ; Store column so it can be compared against
+
+  jmp InRange
+  lda ScrollX+1
+  add FG2OffsetX+1
+  sub #1
+  bcc @FineLeft
+  cmp Temp
+  bcc @FineLeft
+  jmp Exit
+@FineLeft:
+
+  lda ScrollX+1
+  add FG2OffsetX+1
+  add #16+1
+  bcs @FineRight
+  cmp Temp
+  bcs @FineRight
+  jmp Exit
+@FineRight:
+  seta16
+
+  ; -----------------------------------
+
+  ; Second, make sure the block is actually onscreen (Vertically)
+  lda LevelBlockPtr ; Get level row
+  lsr
+  and #31
+  seta8
+  sta Temp ; Store row so it can be compared against
+
+  lda ScrollY+1
+  add FG2OffsetY+1
+  sub #1
+  bcc @FineUp
+  cmp Temp
+  bcc @FineUp
+  jmp Exit
+@FineUp:
+
+  lda ScrollY+1
+  add FG2OffsetY+1
+  add #16+1
+  bcs @FineDown
+  cmp Temp
+  bcs @FineDown
+  jmp Exit
+@FineDown:
+InRange:
+  seta16
+
+  ; -----------------------------------
+
+  ; Copy the block appearance into the update buffer
+  lda f:BlockTopLeft,x
+  sta BlockUpdateDataTL,y
+  lda f:BlockTopRight,x
+  sta BlockUpdateDataTR,y
+  lda f:BlockBottomLeft,x
+  sta BlockUpdateDataBL,y
+  lda f:BlockBottomRight,x
+  sta BlockUpdateDataBR,y
+
+  ; Now calculate the PPU address
+  ; LevelBlockPtr is 00xxxxxxxxyyyyy0
+  ; Needs to become  0....pyyyyyxxxxx
+  lda LevelBlockPtr
+  and #%11110 ; Grab Y & 15
+  asl
+  asl
+  asl
+  asl
+  asl
+  ora #BackgroundBG>>1
+  sta BlockUpdateAddress,y
+  jmp ChangeBlock::CalculateRestOfAddress
 .endproc
 
 ; Changes a block, in the future!
@@ -328,9 +423,19 @@ Exit:
 .export GetBlockXCoord_Horizontal
 .proc GetBlockXCoord_Horizontal
   lda LevelBlockPtr ; Get level column
+  bit #$4000
+  bne SecondLayer
   asl
   asl
   and #$ff00
+  rtl
+
+SecondLayer:
+  and #$3fff
+  asl
+  asl
+  and #$ff00
+  sub FG2OffsetX
   rtl
 .endproc
 
@@ -359,9 +464,19 @@ Exit:
 .export GetBlockYCoord_Horizontal
 .proc GetBlockYCoord_Horizontal
   lda LevelBlockPtr ; Get level row
+  bit #$4000
+  bne SecondLayer
   lsr
   and #31
   xba
+  rtl
+
+SecondLayer:
+  and #$3fff
+  lsr
+  and #31
+  xba
+  sub FG2OffsetY
   rtl
 .endproc
 
