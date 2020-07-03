@@ -1034,7 +1034,10 @@ TryBelowInteraction:
     and #$00ff
     sta 0
 
-    stz PlayerVY
+    lda PlayerVY
+    bpl :+
+      stz PlayerVY
+    :
 
     lda PlayerPY
     add 0

@@ -943,13 +943,37 @@ Skip:
   seta8
   sta ActorOnGround,x
   ; React to touching the ground
-  beq :+
+  beq NotSnapToGround
+    lda LevelBlockPtr+1
+    and #$40
+    bne SecondLayer
+
     stz ActorPY,x ; Clear the low byte
     seta16
     stz ActorVY,x
     sec
     rtl
-  :
+  ; On the second layer, take the Y offset into account
+  SecondLayer:
+    ; Mark as standing on the second layer
+    stz ActorVY,x
+    seta8
+    lda #128
+    ora ActorOnGround,x
+    sta ActorOnGround,x
+    seta16
+
+    lda FG2OffsetY
+    and #$00ff
+    sta 0
+    lda ActorPY,x
+    add 0
+    and #$ff00
+    sub 0
+    sta ActorPY,x
+    sec
+    rtl
+  NotSnapToGround:
   seta16
   clc
   rtl

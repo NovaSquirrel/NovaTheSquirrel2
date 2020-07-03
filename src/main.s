@@ -224,6 +224,7 @@ DelayedBlockLoop:
   lda FG2OffsetY
   sta OldFG2OffsetY
 
+.if 0
   lda keydown
   and #KEY_L
   beq :+
@@ -238,10 +239,20 @@ DelayedBlockLoop:
     add #$10
     sta FG2OffsetX
   :
+.endif
+  .import MathSinTable
+  lda framecount
+  and #$ff
+  asl
+  tax
+  lda f:MathSinTable,x
+  asr_n 5
+  sta FG2OffsetY
 
+  ; Update foreground layer 2
   bit TwoLayerLevel-1
   bpl @NotTwoLayer
-    ; Carry the player along if they're riding on layer 2
+    ; Carry the player along if they're riding on foreground layer 2
     lda PlayerRidingFG2
     and #255
     beq :+
@@ -266,6 +277,34 @@ DelayedBlockLoop:
   sta OamPtr
 
   jsl DrawPlayerStatus
+
+  ; Move all of the actors that are standing on 
+  bit TwoLayerInteraction-1
+  bpl @NotTwoLayerForActors
+    ldx #ActorStart
+  @TwoLayerActorLoop:
+    lda ActorType,x
+    beq :+
+      lda ActorOnGround,x
+      and #128
+      beq :+
+        lda OldFG2OffsetX
+        sub FG2OffsetX
+        add ActorPX,x
+        sta ActorPX,x
+
+        lda OldFG2OffsetY
+        sub FG2OffsetY
+        add ActorPY,x
+        sta ActorPY,x
+    :
+    txa
+    add #ActorSize
+    tax
+    cpx #ActorEnd
+    bne @TwoLayerActorLoop
+  @NotTwoLayerForActors:
+
   jsl RunAllActors
   jsl DrawPlayer
   .a16
