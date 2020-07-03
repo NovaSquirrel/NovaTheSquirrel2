@@ -227,23 +227,37 @@ DelayedBlockLoop:
   lda keydown
   and #KEY_L
   beq :+
-    lda FG2OffsetY
+    lda FG2OffsetX
     sub #$10
-    sta FG2OffsetY
+    sta FG2OffsetX
   :
   lda keydown
   and #KEY_R
   beq :+
-    lda FG2OffsetY
+    lda FG2OffsetX
     add #$10
-    sta FG2OffsetY
+    sta FG2OffsetX
   :
 
   bit TwoLayerLevel-1
-  bpl :+
+  bpl @NotTwoLayer
+    ; Carry the player along if they're riding on layer 2
+    lda PlayerRidingFG2
+    and #255
+    beq :+
+      lda OldFG2OffsetX
+      sub FG2OffsetX
+      add PlayerPX
+      sta PlayerPX
+
+      lda OldFG2OffsetY
+      sub FG2OffsetY
+      add PlayerPY
+      sta PlayerPY
+    :
     .import FG2TilemapUpdate
     jsl FG2TilemapUpdate
-  :
+  @NotTwoLayer:
 
   ; Make a 5 sprite hole to fill later
   lda OamPtr

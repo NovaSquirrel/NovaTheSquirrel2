@@ -178,7 +178,6 @@ Horizontal:
   phx
   lda PlayerPY
   sub #PlayerHeight+$80 ; Top of the head
-  sta PlayerPYTop
   tay
   lda PlayerPX
   jsl GetLevelPtrXY
@@ -188,11 +187,35 @@ Horizontal:
 
   lda BlockFlag
   bpl NotSolid
+SolidFromFG2:
     lda PlayerPY
     add #$0100
     sta ActorPY,x
     bra WasSolid
 NotSolid:
+
+  ; If the second layer exists and has interaction, try it too
+  bit TwoLayerInteraction-1
+  bpl NotTwoLayer
+    phx
+    lda PlayerPY
+    sub #PlayerHeight+$80 ; Top of the head
+    add FG2OffsetY
+    tay
+    lda PlayerPX
+    add FG2OffsetX
+    jsl GetLevelPtrXY
+    lda #$4000
+    tsb LevelBlockPtr
+    lda [LevelBlockPtr]
+    tax
+    lda f:BlockFlags,x
+    sta BlockFlag
+    jsl BlockRunInteractionBelow
+    plx
+    lda BlockFlag
+    bmi SolidFromFG2
+NotTwoLayer:
 
   lda PlayerPY
   sta ActorPY,x

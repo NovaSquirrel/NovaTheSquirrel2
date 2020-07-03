@@ -78,7 +78,7 @@
 .global PlayerAccelSpeed
 .global PlayerDecelSpeed
 .global JumpGracePeriod
-.global PlayerRidingSomething
+.global PlayerRidingSomething, PlayerRidingFG2
 .global PlayerDrawX
 .global PlayerDrawY
 .global PlayerOAMIndex

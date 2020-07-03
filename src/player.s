@@ -844,6 +844,9 @@ OfferJumpFromGracePeriod:
 .proc PlayerSecondLayerInteraction
 SideXPos = 8
 BottomCmp = 8
+  seta8
+  stz PlayerRidingFG2
+  seta16
 
   ; -----------------------------------
   ; Right
@@ -1008,12 +1011,13 @@ TryAboveInteraction:
     stz PlayerVY
 
     seta8
+    inc PlayerRidingFG2
     inc PlayerOnGround
     stz PlayerOnLadder
-    lda PlayerRidingSomething
-    bne DoesntCount
-      stz PlayerNeedsGround
-    DoesntCount:
+;    lda PlayerRidingSomething
+;    bne DoesntCount
+    stz PlayerNeedsGround
+;    DoesntCount:
     seta16
     rts
   :

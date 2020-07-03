@@ -62,7 +62,7 @@
   PlayerDir:        .res 1     ; currently facing left?
   PlayerJumping:    .res 1     ; true if jumping (not falling)
   PlayerOnGround:   .res 1     ; true if on ground
-  PlayerOnGroundLast: .res 1   ; true if on ground last frame
+  PlayerOnGroundLast: .res 1   ; true if on ground last frame - used to display the landing particle
   PlayerWalkLock:   .res 1     ; timer for the player being unable to move left/right
   PlayerDownTimer:  .res 1     ; timer for how long the player has been holding down
                                ; (used for fallthrough platforms)
@@ -161,6 +161,8 @@
   PlayerWantsToJump: .res 1    ; true if player pressed the jump button
   PlayerWantsToAttack: .res 1  ; true if player pressed the attack button
   PlayerRidingSomething: .res 1 ; if 1, player is treated to be standing on a solid and can jump
+  PlayerRidingFG2: .res 1
+
   PlayerDrawX: .res 1
   PlayerDrawY: .res 1
   PlayerOAMIndex: .res 2

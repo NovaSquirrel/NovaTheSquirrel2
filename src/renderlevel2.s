@@ -200,6 +200,7 @@ BlocksLeft = 2
 YPos = 4
   ; Start rendering
   lda ScrollX+1 ; Get the column number in blocks
+  add FG2OffsetX+1
   and #$ff
   sub #4   ; Render out past the left side a bit
   sta BlockNum
@@ -211,6 +212,7 @@ YPos = 4
   sta BlocksLeft
 
   lda ScrollY
+  add FG2OffsetY
   xba
   and #LEVEL_HEIGHT-1
   asl
