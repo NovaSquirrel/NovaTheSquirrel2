@@ -2544,6 +2544,128 @@ Falling:
 
 
 
+.i16
+.a16
+.export DrawFlyingArrow
+.proc DrawFlyingArrow
+  lda ActorVarA,x
+  tay
+  lda Table,y
+  jml DispActor16x16Flipped
+Table:
+  .word 0|OAM_PRIORITY_2
+  .word 2|OAM_PRIORITY_2
+  .word 0|OAM_PRIORITY_2|OAM_XFLIP
+  .word 2|OAM_PRIORITY_2|OAM_YFLIP
+.endproc
+
+.i16
+.a16
+.export RunFlyingArrow
+.proc RunFlyingArrow
+  .import CreateBrickBreakParticles
+  dec ActorTimer,x
+  bne :+
+    stz ActorType,x
+  :
+
+  ; Move forward
+  ldy ActorVarA,x
+  lda ActorPX,x
+  add VXTable,y
+  sta ActorPX,x
+
+  lda ActorPY,x
+  add VYTable,y
+  sta ActorPY,x
+
+  ; Interact with other crates
+  lda ActorPY,x
+  sub #$80
+  tay
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+  lda [LevelBlockPtr]
+  cmp #Block::WoodArrowRight
+  bcc NotCrate
+  cmp #Block::MetalForkDown+1
+  bcs NotCrate
+  ; How should it be handled?
+  cmp #Block::MetalArrowUp+1
+  bcc TurnArrow
+  cmp #Block::WoodCrate
+  beq DestroyCrate
+  cmp #Block::MetalCrate
+  beq DestroyCrate
+  cmp #Block::MetalForkUp
+  beq ForkUp
+  cmp #Block::MetalForkDown
+  beq ForkDown
+NotCrate:
+  rtl
+
+VXTable:
+  .word $28, 0, .loword(-$28), 0
+VYTable:
+  .word 0, $28, 0, .loword(-$28)
+
+; Destroy the block and rotate
+TurnArrow:
+  sub #Block::WoodArrowRight
+  sta ActorVarA,x
+
+  lda #120
+  sta ActorTimer,x
+
+  jsl GetBlockXCoord
+  ora #$80
+  sta ActorPX,x
+  ; ---
+  jsl GetBlockYCoord
+  add #$0100
+  sta ActorPY,x
+
+  ; Fall into DestroyCrate
+  bra JustDestroyCrate
+DestroyCrate:
+  stz ActorType,x
+JustDestroyCrate:
+  lda #Block::Empty
+  jsl ChangeBlock
+  jml CreateBrickBreakParticles
+
+ForkUp:
+  lda #3*2
+  sta 0
+  bra MakeForkedArrow
+ForkDown:
+  lda #1*2
+  sta 0
+MakeForkedArrow:
+  jsl FindFreeActorY
+  bcc :+
+    ; Set up the new arrow
+    lda #Actor::FlyingArrow*2
+    sta ActorType,y
+
+    jsl GetBlockXCoord
+    ora #$80
+    sta ActorPX,y
+    ; ---
+    jsl GetBlockYCoord
+    add #$0100
+    sta ActorPY,y
+
+    lda 0
+    sta ActorVarA,y
+
+    lda #120
+    sta ActorTimer,x
+    sta ActorTimer,y
+  :
+  bra JustDestroyCrate
+.endproc
+
 
 ; -------------------------------------
 .a16

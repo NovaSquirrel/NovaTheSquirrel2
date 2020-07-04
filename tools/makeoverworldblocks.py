@@ -57,9 +57,9 @@ for line in text:
 	elif word == "t": # add tiles
 		split = arg.split(" ")
 		for tile in split:
-			block["tiles"].append(parseTile(tile))
+			block["tiles"].append(parseMetatileTile(tile, default_palette, default_base, priority))
 	elif word == "q": # add four tiles at once
-		tile = parseTile(arg)
+		tile = parseMetatileTile(arg, default_palette, default_base, priority)
 		block["tiles"] = [tile, tile+1, tile+16, tile+17]
 
 # Save the last one

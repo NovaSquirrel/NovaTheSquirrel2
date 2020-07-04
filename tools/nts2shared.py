@@ -20,6 +20,8 @@ Text commands:
 {xy X Y}
 """
 
+aliases = {}
+
 DialogScenePrefix = 'DialogScene_'
 
 import_list = set()
@@ -269,9 +271,8 @@ def parseNumber(number):
 		return int(number[1:], 16)
 	return int(number)
 
-def parseMetatileTile(tile):
+def parseMetatileTile(tile, default_palette, default_base, priority=False):
 	""" Parse the nametable value for one tile """
-	global default_palette, default_base
 	value = default_base
 
 	if tile.find(":") >= 0: # Base override

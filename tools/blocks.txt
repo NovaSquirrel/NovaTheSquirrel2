@@ -1022,6 +1022,7 @@ q 4,0
 #######################################
 base $2800
 palette glass_palette
+tileset FGGlassBlocks
 
 +GlassRedSolid
 solid
@@ -1052,4 +1053,62 @@ q 10,0
 +GlassNonsolidBlue
 q 12,0
 
+#######################################
+# Arrow blocks
+#######################################
+base $5000
+palette global_palette
+tileset FGHannah
 
++WoodArrowRight
+when Touch, BlockWoodArrow
+solid
+q 8,0
+
++WoodArrowDown
+when Touch, BlockWoodArrow
+solid
+q 4,0
+
++WoodArrowLeft
+when Touch, BlockWoodArrow
+solid
+q 2,0
+
++WoodArrowUp
+when Touch, BlockWoodArrow
+solid
+q 6,0
+
++MetalArrowRight
+solid
+q 8,2
+
++MetalArrowDown
+solid
+q 4,2
+
++MetalArrowLeft
+solid
+q 2,2
+
++MetalArrowUp
+solid
+q 6,2
+
++WoodCrate
+when Above, BlockWoodCrate
+solid
+q 0,0
+
++MetalCrate
+solid
+q 0,2
+
++MetalForkUp
+solid
+q 10,2
+
++MetalForkDown
+solid
+q 12,2

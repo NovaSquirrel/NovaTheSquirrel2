@@ -550,7 +550,7 @@ Nevermind:
   jsl ChangeBlock
 
   jsr Create
-  jmp Create
+;  jmp Create
 
 Create:
   ; Create one facing right
@@ -588,6 +588,13 @@ Common:
   sta ParticleType,y
   jsr ParticleAtBlock
   rts
+.endproc
+
+.export CreateBrickBreakParticles
+.proc CreateBrickBreakParticles
+  jsr BlockBricks::Create
+  jsr BlockBricks::Create
+  rtl
 .endproc
 
 .proc BlockSign
@@ -818,5 +825,77 @@ DoorExit:
     jsr BlockBricks::Create
     jsr BlockBricks::Create
   :
+  rts
+.endproc
+
+.a16
+.i16
+.export BlockWoodCrate
+.proc BlockWoodCrate
+  dec LevelBlockPtr
+  dec LevelBlockPtr
+  lda [LevelBlockPtr]
+  inc LevelBlockPtr
+  inc LevelBlockPtr
+  cmp #Block::WoodCrate
+
+  lda #16
+  sta BlockTemp
+  lda #Block::Empty
+  jsl DelayChangeBlock
+  lda #Block::Spring
+  jsl ChangeBlock
+  jsr BlockBricks::Create
+  jsr BlockBricks::Create
+
+  ; Snap player to the block
+;  jsl GetBlockYCoord
+;  cmp PlayerPY        <-- original checks if player is actually above the block, seems to work without it
+;  bcc NoSnap              (probably since it originally responded from all edges instead of only the top)
+    jsl GetBlockXCoord
+    add #$0088
+    sta PlayerPX
+    stz PlayerVX
+    seta8
+    lda #3
+    sta PlayerWalkLock
+    seta16
+  NoSnap:
+  rts
+.endproc
+
+.a16
+.i16
+.export BlockWoodArrow
+.proc BlockWoodArrow
+  jsl FindFreeActorY
+  bcs :+
+  rts
+:
+
+  ; Get the X and Y positions from the block itself
+  jsl GetBlockXCoord
+  ora #$80
+  sta ActorPX,y
+  ; ---
+  jsl GetBlockYCoord
+  add #$0100
+  sta ActorPY,y
+
+  lda #Actor::FlyingArrow*2
+  sta ActorType,y
+
+  lda [LevelBlockPtr]
+  sub #Block::WoodArrowRight
+  sta ActorVarA,y ; Already an even number so it can be plugged into a 16-bit table later
+
+  lda #120
+  sta ActorTimer,y
+
+  ; Remove the block
+  lda #Block::Empty
+  jsl ChangeBlock
+  jsr BlockBricks::Create
+  jsr BlockBricks::Create
   rts
 .endproc

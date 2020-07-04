@@ -40,3 +40,5 @@ D000 MapBGHillsMountains
 6000 BGHillsMountains
 6000 BGLake
 D000 MapBGLake
+5000 FGHannah
+A000 SPHannah

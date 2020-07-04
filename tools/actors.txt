@@ -267,6 +267,12 @@ run RunActivePushBlock
 draw DrawActivePushBlock
 size 16x16
 
++FlyingArrow
+gfx SPHannah
+run RunFlyingArrow
+draw DrawFlyingArrow
+size 16x16
+
 # ---------- particles ----------
 +Poof
 particle

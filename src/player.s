@@ -55,6 +55,7 @@ MaxSpeedRight = 12
   countdown PlayerJumpCancelLock
   countdown PlayerOnLadder
   countdown PlayerInvincible
+  countdown PlayerWalkLock
   stz PlayerOnSlope
 
 
@@ -203,6 +204,7 @@ NotWalkSpeed:
 
   ; Don't walk if the ability prevents it
   lda AbilityMovementLock
+  ora PlayerWalkLock
   lsr
   bcs NotWalk
 
