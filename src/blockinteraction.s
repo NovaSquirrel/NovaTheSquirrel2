@@ -638,10 +638,30 @@ Common:
   seta16
 
   ; Animate the spring changing
+  ; but only if the spring isn't scheduled to disappear before it'd pop back up
+  ldx #(MaxDelayedBlockEdits-1)*2
+DelayedBlockLoop:
+  ; Count down the timer, if there is a timer
+  lda DelayedBlockEditTime,x
+  beq :+
+    ; Is it this block?
+    lda DelayedBlockEditAddr,x
+    cmp LevelBlockPtr
+    bne :+
+    lda DelayedBlockEditTime,x
+    cmp #6
+    bcc DontSpringUp
+: dex
+  dex
+  bpl DelayedBlockLoop
+
+  ; No problems? Go ahead and schedule it
   lda #5
   sta BlockTemp
   lda #Block::Spring
   jsl DelayChangeBlock
+DontSpringUp:
+
   lda #Block::SpringPressed
   jsl ChangeBlock
   rts
