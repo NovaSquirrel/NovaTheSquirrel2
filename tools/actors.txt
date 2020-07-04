@@ -294,6 +294,11 @@ particle
 run RunBricksParticle
 draw DrawBricksParticle
 
++GrayBricksParticle
+particle
+run RunBricksParticle
+draw DrawGrayBricksParticle
+
 +WarningParticle
 particle
 run RunParticleDisappear

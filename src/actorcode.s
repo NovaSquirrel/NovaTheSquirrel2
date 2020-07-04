@@ -2564,6 +2564,7 @@ Table:
 .export RunFlyingArrow
 .proc RunFlyingArrow
   .import CreateBrickBreakParticles
+  .import CreateGrayBrickBreakParticles
   dec ActorTimer,x
   bne :+
     stz ActorType,x
@@ -2629,10 +2630,27 @@ TurnArrow:
   bra JustDestroyCrate
 DestroyCrate:
   stz ActorType,x
+
 JustDestroyCrate:
+  ; Look up whether to have brown or gray particles
+  lda [LevelBlockPtr]
+  sub #Block::WoodArrowRight
+  lsr
+  tay
+  lda Metal,y
+  lsr
+  bcs @DoMetal
+@DoWood:
+  jsl CreateBrickBreakParticles
+  bra @DidWood
+@DoMetal:
+  jsl CreateGrayBrickBreakParticles
+@DidWood:
+
   lda #Block::Empty
-  jsl ChangeBlock
-  jml CreateBrickBreakParticles
+  jml ChangeBlock
+
+Metal: .byt 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1
 
 ForkUp:
   lda #3*2
@@ -2803,6 +2821,15 @@ Flipped:
 .export DrawBricksParticle
 .proc DrawBricksParticle
   lda #CommonTileBase+$3c+OAM_PRIORITY_2
+  jsl DispParticle8x8
+  rts
+.endproc
+
+.a16
+.i16
+.export DrawGrayBricksParticle
+.proc DrawGrayBricksParticle
+  lda #CommonTileBase+$3b+OAM_PRIORITY_2
   jsl DispParticle8x8
   rts
 .endproc

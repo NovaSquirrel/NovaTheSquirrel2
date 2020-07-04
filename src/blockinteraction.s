@@ -597,6 +597,40 @@ Common:
   rtl
 .endproc
 
+.export CreateGrayBrickBreakParticles
+.proc CreateGrayBrickBreakParticles
+  jsr Create
+  jsr Create
+  rtl
+Create:
+  ; Create one facing right
+  jsl FindFreeParticleY
+  bcc :+
+    jsl RandomByte
+    and #15
+    sta ParticleVX,y
+
+    jsr BlockBricks::Common
+    lda #Particle::GrayBricksParticle
+    sta ParticleType,y
+  :
+
+  ; Create one facing left
+  jsl FindFreeParticleY
+  bcc :+
+    jsl RandomByte
+    and #15
+    eor #$ffff
+    inc a
+    sta ParticleVX,y
+
+    jsr BlockBricks::Common
+    lda #Particle::GrayBricksParticle
+    sta ParticleType,y
+  :
+  rts
+.endproc
+
 .proc BlockSign
   lda keynew
   and #KEY_UP
