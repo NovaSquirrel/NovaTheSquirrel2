@@ -2543,6 +2543,21 @@ Falling:
 .endproc
 
 
+.a16
+.i16
+.export RunBoulder
+.proc RunBoulder
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawBoulder
+.proc DrawBoulder
+  lda #6|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
 
 .i16
 .a16
@@ -2589,7 +2604,7 @@ Table:
   lda [LevelBlockPtr]
   cmp #Block::WoodArrowRight
   bcc NotCrate
-  cmp #Block::MetalForkDown+1
+  cmp #Block::ArrowRevealSolid+1
   bcs NotCrate
   ; How should it be handled?
   cmp #Block::MetalArrowUp+1
@@ -2599,9 +2614,11 @@ Table:
   cmp #Block::MetalCrate
   beq DestroyCrate
   cmp #Block::MetalForkUp
-  beq ForkUp
+  jeq ForkUp
   cmp #Block::MetalForkDown
-  beq ForkDown
+  jeq ForkDown
+  cmp #Block::ArrowRevealSolid
+  beq ArrowRevealSolid
 NotCrate:
   rtl
 
@@ -2610,9 +2627,25 @@ VXTable:
 VYTable:
   .word 0, $28, 0, .loword(-$28)
 
+ArrowRevealSolid:
+  jsl FindFreeParticleY
+  bcc :+
+    lda #Particle::Poof
+    sta ParticleType,y
+    jsl GetBlockXCoord
+    add #$0080
+    sta ParticlePX,y
+    jsl GetBlockYCoord
+    add #$0040
+    sta ParticlePY,y
+  :
+  lda #Block::SolidBlock
+  jml ChangeBlock
+
 ; Destroy the block and rotate
 TurnArrow:
   sub #Block::WoodArrowRight
+  and #3*2
   sta ActorVarA,x
 
   lda #120

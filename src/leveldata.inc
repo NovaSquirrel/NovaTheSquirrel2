@@ -10,6 +10,9 @@
   Wide3
   Tall3
   Rect3
+  Wide4
+  Tall4
+  Rect4
   R_Empty
   R_Bricks
   R_SolidBlock
@@ -88,9 +91,22 @@
   LogPlatform
   LogPlatformSupportLeft
   LogPlatformSupportRight
+  WoodArrowRight
+  WoodArrowDown
+  WoodArrowLeft
+  WoodArrowUp
+  MetalArrowRight
+  MetalArrowDown
+  MetalArrowLeft
+  MetalArrowUp
+  WoodCrate
+  MetalCrate
 .endenum
 
 .enum LN4
+  MetalForkUp
+  MetalForkDown
+  ArrowRevealSolid
 .endenum
 
 .macro LSpr Type, Direction, XPos, YPos, Extra

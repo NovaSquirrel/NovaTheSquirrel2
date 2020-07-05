@@ -1112,3 +1112,7 @@ q 10,2
 +MetalForkDown
 solid
 q 12,2
+
++ArrowRevealSolid
+t 0:0 0:0
+t 0:0 0:0

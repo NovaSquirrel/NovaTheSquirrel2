@@ -527,6 +527,9 @@ UseAlternateBuffer:
   .word $ffff&BlockWideList,        32*2
   .word $ffff&BlockTallList,        32*2
   .word $ffff&BlockRectList,        32*2
+  .word $ffff&BlockWideList,        32*3
+  .word $ffff&BlockTallList,        32*3
+  .word $ffff&BlockRectList,        32*3
 
   .word $ffff&BlockRectangle,       Block::Empty
   .word $ffff&BlockRectangle,       Block::Bricks
@@ -608,20 +611,20 @@ UseAlternateBuffer:
   .word Block::LogPlatform
   .word Block::LogPlatformSupportLeft
   .word Block::LogPlatformSupportRight
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::WoodArrowRight
+  .word Block::WoodArrowDown
+  .word Block::WoodArrowLeft
+  .word Block::WoodArrowUp
+  .word Block::MetalArrowRight
+  .word Block::MetalArrowDown
+  .word Block::MetalArrowLeft
+  .word Block::MetalArrowUp
+  .word Block::WoodCrate
+  .word Block::MetalCrate
 ; Set 4
-  .word Block::Empty
-  .word Block::Empty
-  .word Block::Empty
+  .word Block::MetalForkUp
+  .word Block::MetalForkDown
+  .word Block::ArrowRevealSolid
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty

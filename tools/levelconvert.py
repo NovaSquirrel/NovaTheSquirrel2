@@ -11,7 +11,7 @@ define_file.close()
 
 available_singles = set()
 available_rectangles = set()
-available_nybble = [set(), set(), set()]
+available_nybble = [set(), set(), set(), set()]
 available_state = None
 available_special = {} # Uses a Python function to handle it
 has_metadata = {} # Uses a Python function to insert metadata
