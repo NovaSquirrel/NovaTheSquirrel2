@@ -3,7 +3,6 @@
 from nts2shared import *
 
 # Globals
-aliases = {}
 default_palette = 0
 default_base = 0
 block = None
