@@ -357,27 +357,51 @@ NoFixWalkSpeed:
   NoSlopeDown:
   seta16
 
-  ; Check for moving into a wall
+  ; Check for moving into a wall on the right
+  lda PlayerVX
+  bmi SkipRight
   lda PlayerPX
   add #3*16
-  bit PlayerVX
-  bpl :+
-    sub #3*16+4*16 ; Subtract off the right and subtract again
-  :
   sta SideXPos
 
-  ; Side middle
+  ; Right middle
   lda PlayerPY
   sub #12*16
   tay
   lda SideXPos
-  jsr TrySideInteraction
-  ; Side head
+  jsr TryRightInteraction
+  ; Right head
   lda PlayerPY
   sub #16*23 ;#16*16+14*16 ; Top of the head
   tay
   lda SideXPos
-  jsr TrySideInteraction
+  jsr TryRightInteraction
+SkipRight:
+
+  ; -------------------------
+
+  lda PlayerVX
+  beq :+
+  bpl SkipLeft
+:
+  ; Check for moving into a wall on the left
+  lda PlayerPX
+  sub #4*16
+  sta SideXPos
+
+  ; Left middle
+  lda PlayerPY
+  sub #12*16
+  tay
+  lda SideXPos
+  jsr TryLeftInteraction
+  ; Left head
+  lda PlayerPY
+  sub #16*23 ;#16*16+14*16 ; Top of the head
+  tay
+  lda SideXPos
+  jsr TryLeftInteraction
+SkipLeft:
 
   ; -------------------  
 
@@ -657,7 +681,10 @@ TryBelowInteraction:
 
   lda BlockFlag
   bpl @NotSolid
-    stz PlayerVY
+    lda PlayerVY
+    bpl :+
+      stz PlayerVY
+    :
 
     lda PlayerPY
     and #$ff00
@@ -696,26 +723,30 @@ HasGroundAfterAll:
   bne HasGroundAfterAll
   rts
 
-TrySideInteraction:
+TryLeftInteraction:
   jsl GetLevelPtrXY
   jsl GetBlockFlag
   jsl BlockRunInteractionSide
   ; Solid?
   lda BlockFlag
   bpl @NotSolid
-    lda SideXPos
-    cmp PlayerPX
-    bcs :+
-      ; Left
-      lda PlayerPX
-      sub PlayerVX ; Undo the horizontal movement
-      and #$ff00   ; Snap to the block
-      add #4*16    ; Add to the offset to press against the block
-      sta PlayerPX
-      stz PlayerVX ; Stop moving horizontally
-      rts
-    :
+    ; Left
+    lda PlayerPX
+    sub PlayerVX ; Undo the horizontal movement
+    and #$ff00   ; Snap to the block
+    add #4*16    ; Add to the offset to press against the block
+    sta PlayerPX
+    stz PlayerVX ; Stop moving horizontally
+  @NotSolid:
+  rts
 
+TryRightInteraction:
+  jsl GetLevelPtrXY
+  jsl GetBlockFlag
+  jsl BlockRunInteractionSide
+  ; Solid?
+  lda BlockFlag
+  bpl @NotSolid
     ; Right
     lda PlayerPX
     sub PlayerVX  ; Undo the horizontal movement
@@ -725,6 +756,7 @@ TrySideInteraction:
     stz PlayerVX  ; Stop moving horizontally
   @NotSolid:
   rts
+
 
 .a16
 ; Get the Y position of the slope under the player's hotspot (SlopeY)
