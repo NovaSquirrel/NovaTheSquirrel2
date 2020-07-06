@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 #
-# Makefile for LoROM template
+# Based on the makefile for LoROM template
 # Copyright 2014-2015 Damian Yerrick
 #
 # Copying and distribution of this file, with or without
@@ -113,7 +113,7 @@ variable_palettes := $(wildcard palettes/variable/*.png)
 portaits := $(wildcard portraits/*.png)
 levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
-m7levels_lz4 := $(patsubst %.bin,%.lz4,$(wildcard m7levels/*.bin))
+m7levels_lz4 := $(patsubst %.tmx,%.lz4,$(wildcard m7levels/*.tmx))
 m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
 all_npc_gfx := $(wildcard npc/*.png)
 
@@ -220,6 +220,7 @@ m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py
 $(srcdir)/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py
 $(objdir)/m7leveldata.o: $(m7levels_lz4) $(m7levels_bin) $(srcdir)/m7leveldata.s
+$(objdir)/backgrounddata.o: $(srcdir)/backgroundenum.s
 
 
 

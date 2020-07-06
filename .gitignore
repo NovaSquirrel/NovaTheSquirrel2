@@ -58,3 +58,4 @@ src/itemdata.s
 src/backgrounddata.s
 src/backgroundenum.s
 *.namsfc
+src/itemenum.s
