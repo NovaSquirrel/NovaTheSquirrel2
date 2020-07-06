@@ -5,12 +5,14 @@
 {FG Ledge 12 0,5}
 {Return}
 
-
-
 --- NovaMaffiTest
 {Call ForestWithFlatGround}
 {Actor 0 Maffi 32,80 R}
 {Actor 1 Nova 64,80 L}
+{PreloadActor 4 Maffi}
+{PreloadActor 5 Maffi}
+{PreloadActor 6 Maffi}
+{PreloadActor 7 Maffi}
 {Say 0 Maffi 0}
 {C2}Hello world{C1}! You're looking at sample
 text. This is a test.
@@ -36,11 +38,36 @@ another!
 {-}
 {End}
 
-
---- RebeccaTest
+--- NovaMaffiTest2
 {Call ForestWithFlatGround}
-{Actor 0 Rebecca 32,80 R}
+{Actor 0 Maffi 32,80 R}
+{Actor 1 Nova 64,80 L}
 {Say 0 Maffi 0}
-Hi I'm a taur!
+This is a second sign.
+{-}
+{End}
+
+--- NovaWhatIsSlope
+{Call ForestWithFlatGround}
+{Actor 0 Maffi 32,80 R}
+{Actor 1 Nova 64,80 L}
+{Say 1 Nova 4}
+W-what's that? The ground's at
+some sort of angle? You can DO
+that?
+{-}
+{Say 0 Maffi 2}
+Yes Nova that's called a "slope."
+I understand Latte didn't have them?
+{-}
+{Say 1 Nova 5}
+There were sloped minecart tracks
+but no sloped ground. I've never
+seen anything like this before.
+{-}
+{Say 0 Maffi 0}
+Well, in this world, ground can be
+sloped too! You can even roll down
+the hill if you press {arrowdown} + {buttonb} on it.
 {-}
 {End}
