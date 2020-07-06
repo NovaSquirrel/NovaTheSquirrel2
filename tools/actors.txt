@@ -273,6 +273,13 @@ run RunFlyingArrow
 draw DrawFlyingArrow
 size 16x16
 
++Boulder
+flag AutoRemove
+gfx SPHannah
+run RunBoulder
+draw DrawBoulder
+size 16x16
+
 # ---------- particles ----------
 +Poof
 particle
