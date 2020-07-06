@@ -39,9 +39,6 @@ imgdir4 := tilesets4
 imgdir2 := tilesets2
 bgdir := backgrounds
 
-lz4_flags    := -f -9
-lz4_compress := tools/lz4
-
 ifndef SNESEMU
 SNESEMU := ./mesen-s
 endif
@@ -51,10 +48,14 @@ endif
 # https://forums.nesdev.com/viewtopic.php?f=6&t=16218
 SPCPLAY := gmeplay
 
+lz4_flags    := -f -9
+
 ifdef COMSPEC
 PY := py.exe -3 
+lz4_compress := tools/lz4
 else
-PY :=
+PY := python3
+lz4_compress := lz4
 endif
 
 # Calculate the current directory as Wine applications would see it.
@@ -143,6 +144,7 @@ $(objdir)/mktables.s: tools/mktables.py
 $(objdir)/spcimage.o: $(brrlisto)
 
 # Files that depend on enums
+$(objdir)/graphics.o: $(srcdir)/graphicsenum.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
@@ -217,7 +219,7 @@ m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py
 	$(PY) tools/m7levelconvert.py $< $@
 $(srcdir)/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py
-
+$(objdir)/m7leveldata.o: $(m7levels_lz4) $(m7levels_bin) $(srcdir)/m7leveldata.s
 
 
 
