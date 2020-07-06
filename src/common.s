@@ -212,7 +212,7 @@ Found:
 @FineUp:
 
   lda ScrollY+1
-  add #16+1
+  add #14+1
   bcs @FineDown
   cmp Temp
   bcs @FineDown
@@ -327,7 +327,7 @@ Exit = ChangeBlock::Exit
 
   lda ScrollY+1
   add FG2OffsetY+1
-  add #16+1
+  add #14+1
   bcs @FineDown
   cmp Temp
   bcs @FineDown
