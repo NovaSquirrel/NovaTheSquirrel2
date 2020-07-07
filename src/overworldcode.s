@@ -90,6 +90,7 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   ; Start reading the overworld
   ldy #0
   seta8
+  stz HDMASTART
 
 
   ; -------------------------
