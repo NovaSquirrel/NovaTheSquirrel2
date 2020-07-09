@@ -110,7 +110,7 @@ chr4_lz4          := $(patsubst %.png,%.chrsfc.lz4,$(wildcard tilesets4/lz4/*.pn
 chr2_lz4          := $(patsubst %.png,%.chrgb.lz4,$(wildcard tilesets2/lz4/*.png))
 palettes := $(wildcard palettes/*.png)
 variable_palettes := $(wildcard palettes/variable/*.png)
-portaits := $(wildcard portraits/*.png)
+portraits := $(wildcard portraits/*.png)
 levels := $(wildcard levels/*.json)
 overworlds := $(wildcard overworlds/*.tmx)
 m7levels_lz4 := $(patsubst %.tmx,%.lz4,$(wildcard m7levels/*.tmx))
@@ -144,7 +144,10 @@ $(objdir)/mktables.s: tools/mktables.py
 $(objdir)/spcimage.o: $(brrlisto)
 
 # Files that depend on enums
-$(objdir)/graphics.o: $(srcdir)/graphicsenum.s
+$(srcdir)/graphics.s: $(srcdir)/graphicsenum.s
+$(srcdir)/backgrounddata.s: $(srcdir)/backgroundenum.s $(srcdir)/graphicsenum.s
+$(srcdir)/portraitdata.s: $(srcdir)/portraitenum.s
+
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
@@ -165,7 +168,7 @@ $(objdir)/itemcode.o: $(srcdir)/itemenum.s
 $(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/vwf.o: $(srcdir)/vwf.inc
 $(objdir)/namefont.o: tilesets2/DialogNameFont.chrgb $(srcdir)/namefontwidth.s
-$(objdir)/dialog_text_data.s.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/dialog_npc_enum.s $(srcdir)/vwf.inc $(srcdir)/blockenum.s $(srcdir)/portraitenum.s
+$(objdir)/dialog_text_data.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/dialog_npc_enum.s $(srcdir)/vwf.inc $(srcdir)/blockenum.s $(srcdir)/portraitenum.s
 $(srcdir)/namefontwidth.s: tilesets2/DialogNameFont.chrgb
 	$(PY) tools/namefontwidthtable.py
 $(srcdir)/vwf_fontdata.s: tools/fonts/BaseSeven.png tools/makefontvwf.py
@@ -184,6 +187,7 @@ $(srcdir)/blockenum.s: tools/blocks.txt
 $(srcdir)/overworldblockdata.s: tools/overworldblocks.txt
 $(srcdir)/overworldblockenum.s: tools/overworldblocks.txt
 	$(PY) tools/makeoverworldblocks.py
+
 
 
 $(objdir)/portraitdata.o: $(portraits) $(srcdir)/portraitenum.s
@@ -251,7 +255,7 @@ tools/M7TilesetRearranged.png: tools/M7Tileset.png
 tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py
-$(objdir)/mode7.o: tools/M7Tileset.chrm7.lz4 $(m7levels)
+$(objdir)/mode7.o: tools/M7Tileset.chrm7.lz4 $(m7levels_lz4)
 tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
