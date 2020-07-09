@@ -2547,7 +2547,65 @@ Falling:
 .i16
 .export RunBoulder
 .proc RunBoulder
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Init
+  bne :+
+    ; Place an invisible wall at the current position
+    ldy ActorPY,x
+    lda ActorPX,x
+    jsl GetLevelPtrXY
+    lda #Block::InvisibleWall
+    sta [LevelBlockPtr]
+  :
+
+  ; Keep falling
+  lda ActorVarA,x
+  bne KeepFalling
+
+  ; Check below
+  lda ActorPY,x
+  add #$0080
+  tay
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+  lda [LevelBlockPtr]
+  cmp #Block::Empty
+  beq StartFalling
+
+Exit:
+; TO DO: actually keep the boulder in the new position somehow?
+; The previous game modified the level's actor list but that's in ROM this time
+; Should I move it to RAM?
   rtl
+
+StartFalling:
+  lda #4
+  sta ActorVarA,x
+  lda #Block::InvisibleWall
+  sta [LevelBlockPtr]
+
+KeepFalling:
+  ; Fall down, decrease timer
+  lda ActorPY,x
+  add #$0040
+  sta ActorPY,x
+
+  ; Decrease fall timer
+  dec ActorVarA,x
+  bne Exit
+
+; Finish falling
+Finish:
+  lda ActorPY,x
+  sub #$0100
+  tay
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+
+  lda #Block::Empty
+  sta [LevelBlockPtr]
+  bra Exit
 .endproc
 
 .a16
