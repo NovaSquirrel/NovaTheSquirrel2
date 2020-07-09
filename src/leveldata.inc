@@ -197,5 +197,6 @@
 LSpecialCmd = $f7
 
 .enum LevelSpecialConfig
-  ALTERNATE_BUFFER
+  AlternateBuffer
+  ActorListInRAM
 .endenum

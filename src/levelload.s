@@ -500,11 +500,44 @@ SpecialConfig:
 
 SpecialConfigTable:
   .addr UseAlternateBuffer
+  .addr ActorListInRAM
 
 .a8
 UseAlternateBuffer:
   stz DecodeColumn
   dec SecondLayer ; Roll around to -1
+  rts
+
+.a8
+ActorListInRAM:
+  jsr NextLevelByte
+  seta16
+  ; Top byte still zero from the earlier TDC
+  asl ; * 4
+  asl
+  ina ; the 255 on the end
+  sta DMALEN
+  lda #.loword(LevelActorBuffer)
+  sta WMADDL
+  lda #(<WMDATA << 8) | DMA_LINEAR | DMA_FORWARD
+  sta DMAMODE
+
+  lda LevelActorPointer
+  sta DMAADDR
+  seta8
+  lda LevelActorPointer+2
+  sta DMAADDRBANK
+  stz WMADDH ; First bank
+
+  lda #1
+  sta COPYSTART
+
+  lda #<LevelActorBuffer
+  sta LevelActorPointer+0
+  lda #>LevelActorBuffer
+  sta LevelActorPointer+1
+  lda #^LevelActorBuffer
+  sta LevelActorPointer+2
   rts
 .endproc
 

@@ -312,12 +312,14 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   NameFontRenderTop:    .res 384 ; Enough for 12 tiles
   NameFontRenderBottom: .res 384 ; Enough for 12 tiles
 
+  LevelActorBuffer: .res 1024 ; Room for 256 actors if the list must be in RAM, not used by default
+
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
   LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
   ColumnWords: .res 512
 
-  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
+;  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in
   HDMA_Buffer2: .res 2048    ; for double buffering the previous
 

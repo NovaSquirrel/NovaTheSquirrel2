@@ -2574,9 +2574,15 @@ Falling:
   beq StartFalling
 
 Exit:
-; TO DO: actually keep the boulder in the new position somehow?
-; The previous game modified the level's actor list but that's in ROM this time
-; Should I move it to RAM?
+  ; Directly modify the list of actors in the level
+  ; to update for the new position.
+  ; Needs the "ActorListInRAM" level option.
+  seta8
+  ldy ActorIndexInLevel,x
+  iny
+  lda ActorPY+1,x
+  sta [LevelActorPointer],y ; Could directly use LevelActorBuffer
+  seta16
   rtl
 
 StartFalling:

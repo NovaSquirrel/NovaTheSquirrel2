@@ -228,6 +228,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global HDMA_Buffer2
 .global Scratchpad
 .global RenderBuffer, NameFontRenderTop, NameFontRenderBottom
+.global LevelActorBuffer
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable

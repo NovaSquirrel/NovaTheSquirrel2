@@ -243,6 +243,7 @@ for f in glob.glob("levels/*.json"):
 		return boundaries | bit
 
 	# Apply some control commands
+	control_commands = []
 	for r in control:
 		if r.type == 'PLAYER_START_R' or r.type == 'PLAYER_START_L':
 			player_x = r.x
@@ -254,6 +255,12 @@ for f in glob.glob("levels/*.json"):
 				boundaries = set_boundary_at(screen+1, boundaries);
 			else:
 				boundaries = set_boundary_at(screen, boundaries);
+		if r.type == 'LEVEL_EFFECT':
+			control_commands.append('.byt LSpecialCmd, LevelSpecialConfig::%s' % r.extra)
+			total_level_size += 2
+			if r.extra == 'ActorListInRAM':
+				control_commands.append('.byt %d' % len(actors))
+				total_level_size += 1
 
     # Write the header
 	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction
@@ -302,10 +309,12 @@ for f in glob.glob("levels/*.json"):
 	fg_data, fg_size = convert_layer(foreground)
 	total_level_size += fg_size
 	outfile.write("level_%s_fg:\n" % plain_name)
+	for c in control_commands:
+		outfile.write("  %s\n" % c)
 	for line in fg_data:
 		outfile.write("  %s\n" % line)
 	if secondary != []:
-		outfile.write("  .byt LSpecialCmd, LevelSpecialConfig::ALTERNATE_BUFFER\n")
+		outfile.write("  .byt LSpecialCmd, LevelSpecialConfig::AlternateBuffer\n")
 		total_level_size += 2
 
 		# Write the secondary foreground data
