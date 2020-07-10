@@ -516,7 +516,6 @@ ReturnFromTwoLayer:
 ; ---------------------------------------------------------
 SetScrollForTwoLayerLevel:
   seta16
-  seta16
   lda ScrollX
   add FG2OffsetX
   lsr

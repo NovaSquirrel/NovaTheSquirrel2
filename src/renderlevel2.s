@@ -174,6 +174,7 @@ YPos = 6
 
   ; Use the Y scroll position in blocks
   lda ScrollY
+  add FG2OffsetY
   xba
   and #LEVEL_HEIGHT-1
   asl
