@@ -170,8 +170,7 @@ class DialogScene(object):
 
 			elif c == 'fg':
 				self.bytes.append(DC+'SceneMetatiles')
-				for i in range(len(chain)):
-					part = chain[i]
+				for i, part in enumerate(chain):
 					metatile = 'Block::'+part[1] # Get the block name
 
 					# Set the required flags

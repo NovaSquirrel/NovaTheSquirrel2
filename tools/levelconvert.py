@@ -44,8 +44,8 @@ def is_available_nybble(id):
 	return False
 
 def which_nybble_list(id):
-	for i in range(len(available_nybble)):
-		if id in available_nybble[i]:
+	for i, v in enumerate(available_nybble):
+		if id in v:
 			return i+1
 
 # -------------------------------------
@@ -119,8 +119,7 @@ def convert_layer(layer):
 	layer = sorted(layer, key=lambda r: r.x)
 
 	# Check if any reordering needs to happen
-	for i in range(len(layer)):
-		r1 = layer[i]
+	for i, r1 in enumerate(layer):
 		for j in range(i):
 			r2 = layer[j]
 			if r1.overlaps(r2) and r1.z < r2.z:
@@ -218,11 +217,11 @@ for f in glob.glob("levels/*.json"):
 
 	foreground = []
 	secondary = []
-	for z in range(len(level_json["Layers"][0]["Data"])):
-		foreground.append(Rect(level_json["Layers"][0]["Data"][z], z))
+	for z, v in enumerate(level_json["Layers"][0]["Data"]):
+		foreground.append(Rect(v, z))
 	if level_json["Layers"][1]["Type"] == "Rectangle":
-		for z in range(len(level_json["Layers"][1]["Data"])):
-			secondary.append(Rect(level_json["Layers"][1]["Data"][z], z))
+		for z, v in enumerate(level_json["Layers"][1]["Data"]):
+			secondary.append(Rect(v, z))
 		actors = [Rect(x) for x in level_json["Layers"][2]["Data"]]
 		control = [Rect(x) for x in level_json["Layers"][3]["Data"]]
 	else:

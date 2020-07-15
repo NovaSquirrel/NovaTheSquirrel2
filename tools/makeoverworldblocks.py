@@ -73,8 +73,8 @@ outfile.write('\n.segment "Overworld"\n\n')
 
 # Block appearance information
 corners = ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]
-for corner in range(len(corners)):
-	outfile.write(".proc OWBlock%s\n" % corners[corner])
+for corner, cornername in enumerate(corners):
+	outfile.write(".proc OWBlock%s\n" % cornername)
 	for b in all_blocks:
 		outfile.write('  .word $%.4x ; %s\n' % (b['tiles'][corner], b['name']))
 	outfile.write(".endproc\n\n")

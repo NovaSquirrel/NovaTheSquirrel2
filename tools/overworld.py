@@ -51,9 +51,9 @@ for f in sorted(glob.glob("overworlds/*.tmx")):
 	# Find what tileset a tile belongs to, and the offset within it
 	def identify_tile(tilenum):
 		if tilenum > 0:
-			for i in range(len(tileset_first)):
-				if tilenum >= tileset_first[i]:
-					within = str(tilenum-tileset_first[i])
+			for i, first in enumerate(tileset_first):
+				if tilenum >= first:
+					within = str(tilenum-first)
 					if within in tileset_data[i]:
 						return tileset_data[i][within]
 					else:
