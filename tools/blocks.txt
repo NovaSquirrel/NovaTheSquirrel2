@@ -7,12 +7,14 @@ alias terrain_rocks $1c00
 alias wood $2000
 alias small_trees $2800
 alias common_pal_flowertops $2e00
+alias colorfulflower $3000
 alias colored_locks $5c00
 alias special_push $5800
 alias global_palette 1
 alias terrain_palette 2
 alias locks_palette 3
 alias glass_palette 4
+alias colorfulflower_palette 3
 
 #######################################
 # Global tile stuff
@@ -1116,3 +1118,34 @@ q 12,2
 +ArrowRevealSolid
 t 0:0 0:0
 t 0:0 0:0
+
+#######################################
+# Colorful flowers
+#######################################
+base colorfulflower
+palette colorfulflower_palette
+tileset FGColorfulFlowers
+
++ColorfulFlower1
+q 0,0
+
++ColorfulFlower2
+q 2,0
+
++ColorfulFlower3
+q 4,0
+
++ColorfulFlower4
+q 6,0
+
++ColorfulFlower5
+q 8,0
+
++ColorfulFlower6
+q 10,0
+
++ColorfulFlower7
+q 12,0
+
++ColorfulFlower8
+q 14,0

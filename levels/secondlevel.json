@@ -16,8 +16,8 @@
 		"Background":	"Forest",
 		"SpriteGFX":	["SPWalker", "SPGeorge", "SPFire", "SPFire2"],
 		"Flags":	["VerticalScrolling"],
-		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGForest"],
-		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops"],
+		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", null, null, null, "BGForest"],
+		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers"],
 		"BGColor":	"RGB(15,23,31)"
 	},
 	"Layers":	[{
