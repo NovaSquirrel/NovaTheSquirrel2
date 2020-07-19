@@ -953,3 +953,16 @@ DoorExit:
   jsr BlockBricks::Create
   rts
 .endproc
+
+.a16
+.i16
+.export BlockAnimateGrass
+.proc BlockAnimateGrass
+  lda #Block::GrassSteppedOn
+  jsl ChangeBlock
+  lda #5
+  sta BlockTemp
+  lda #Block::Grass
+  jsl DelayChangeBlock
+  rts
+.endproc
