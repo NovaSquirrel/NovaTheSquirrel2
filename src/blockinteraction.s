@@ -959,10 +959,42 @@ DoorExit:
 .export BlockAnimateGrass
 .proc BlockAnimateGrass
   lda #Block::GrassSteppedOn
+  cmp [LevelBlockPtr]
+  beq AlreadyDown
+  ; Now write the new block
   jsl ChangeBlock
-  lda #5
+  lda #10
   sta BlockTemp
   lda #Block::Grass
   jsl DelayChangeBlock
+  rts
+
+AlreadyDown:
+  ; Find the delayed edit slot, increase the time
+  jsr FindDelayedEditForBlock
+  bcc :+
+    lda #10
+    sta DelayedBlockEditTime,x
+  :
+  rts
+.endproc
+
+.proc FindDelayedEditForBlock
+  ldx #(MaxDelayedBlockEdits-1)*2
+DelayedBlockLoop:
+  ; Count down the timer, if there is a timer
+  lda DelayedBlockEditTime,x
+  beq :+
+    ; Is it this block?
+    lda DelayedBlockEditAddr,x
+    cmp LevelBlockPtr
+    beq Yes
+: dex
+  dex
+  bpl DelayedBlockLoop
+  clc
+  rts
+Yes:
+  sec
   rts
 .endproc

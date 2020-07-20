@@ -847,6 +847,7 @@ t 0:0 0:0
 t 8,1 9,1
 
 +GrassSteppedOn
+when Touch, BlockAnimateGrass
 t 0:0 0:0
 t 9,2 10,2
 
