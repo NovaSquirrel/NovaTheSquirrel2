@@ -71,6 +71,42 @@ RightPointer      = 13 ; and 14 15
   sub LevelColumnSize ; Subtract one column to account for the middle pointer being offset
   jsr Process
 
+
+  bit TwoLayerLevel-1
+  bmi HasSecondLayer
+  rtl
+
+HasSecondLayer:
+  ; For the first column, do stuff a bit different
+  ; and use LeftPointer and MidPointer
+  ldy #0
+  lda #LEVEL_WIDTH * LEVEL_HEIGHT * LEVEL_TILE_SIZE
+  sta LeftPointer
+  sta MidPointer
+  ora LevelColumnSize
+  sta RightPointer ; Stop at the right column
+  lda LevelColumnSize
+  jsr Process
+
+  ; For the middle part, process it normally
+  ldy #0 ; Reset Y to zero
+  lda RightPointer ; Reuse it from here because it's in zeropage
+  sta MidPointer
+  lda RightPointer
+  add LevelColumnSize
+  sta RightPointer
+  lda #LEVEL_WIDTH * LEVEL_HEIGHT * LEVEL_TILE_SIZE
+  sub LevelColumnSize ; Subtract two columns to account for the middle pointer being offset
+  sub LevelColumnSize
+  jsr Process
+
+  ; For the last column, right pointer = middle pointer
+  ; To avoid going off the end of the level
+  lda MidPointer
+  sta RightPointer
+  lda #LEVEL_WIDTH * LEVEL_HEIGHT * LEVEL_TILE_SIZE
+  sub LevelColumnSize ; Subtract one column to account for the middle pointer being offset
+  jsr Process
   rtl
 
 ; Call something with the RTS trick
@@ -80,6 +116,7 @@ Call:
 
 ; Call the autotile routine registered with each metatile, if there is one
 ; Loop until the end index is reached
+; A = index to stop at
 Process:
   sta ChangeAtIndex
 Loop:
