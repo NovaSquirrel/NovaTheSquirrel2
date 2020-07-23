@@ -537,11 +537,22 @@ JOY4H  = JOY2B1CUR+1
   sep #$20
 .endmacro
 
+.macro seta8_sec
+  sep #$21
+.endmacro
+
 ;;
 ; Sets the accumulator and memory-only data manipulation
 ; instructions to use 16-bit data.
 .macro seta16
   rep #$20
+.endmacro
+
+;;
+; Sets the accumulator and memory-only data manipulation
+; instructions to use 16-bit data. Clears carry too
+.macro seta16_clc
+  rep #$21
 .endmacro
 
 ;;
