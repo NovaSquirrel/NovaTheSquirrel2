@@ -15,6 +15,7 @@ alias terrain_palette 2
 alias locks_palette 3
 alias glass_palette 4
 alias colorfulflower_palette 3
+alias foreststone_palette 4
 
 #######################################
 # Global tile stuff
@@ -378,111 +379,106 @@ tileset FGGrassy
 +Ledge
 autotile AutotileLedge
 solid_top
-t 1,2 1,2
-t 1,3 1,3
+q 0,2
 
 +LedgeLeft
 solid_top
-t 0,2 1,2
-t 0,3 1,3
+t 2,2 1,2
+t 2,3 1,3
 
 +LedgeRight
 solid_top
-t 1,2 2,2
-t 1,3 2,3
+t 0,2 3,2
+t 0,3 3,3
 
 +LedgeSolidLeft
 autotile AutotileLedgeSolidLeft
 solid
-t 4,3 1,2
-t 6,2 7,2
+t 4,2 1,2
+t 8,3 5,3
 
 +LedgeSolidRight
 autotile AutotileLedgeSolidRight
 solid
-t 1,2 5,3
-t 8,2 9,2
+t 0,2 7,2
+t 6,3 11,3
 
 +LedgeLeft_Dirt
 solid_top
 t 3,5 1,2
-t 0,3 1,3
+t 2,3 1,3
 
 +LedgeRight_Dirt
 solid_top
-t 1,2 4,5
-t 1,3 2,3
+t 0,2 4,5
+t 0,3 3,3
 
 +LedgeSolidLeft_Dirt
 autotile AutotileLedgeSolidLeft
 solid
 t 9,5 1,2
-t 6,2 7,2
+t 8,3 5,3
 
 +LedgeSolidRight_Dirt
 autotile AutotileLedgeSolidRight
 solid
-t 1,2 10,5
-t 8,2 9,2
+t 0,2 10,5
+t 6,3 11,3
 
 +LedgeMiddle
 autotile AutotileExpandDirt
-t 3,3 3,3
-t 3,3 3,3
+t 5,2 6,2
+t 5,2 6,2
 
 +LedgeLeftSide
-t 0,3 3,3
-t 0,3 3,3
+t 4,3 6,2
+t 4,3 6,2
 
 +LedgeRightSide
-t 3,3 2,3
-t 3,3 2,3
+t 5,2 7,3
+t 5,2 7,3
 
 +LedgeSolidLeftSide
 solid
-t 6,2 7,3
-t 6,2 7,3
+q 8,2
 
 +LedgeSolidRightSide
 solid
-t 8,3 9,2
-t 8,3 9,2
+q 10,2
 
 +LedgeSolidLeftSideCorner
 solid
-t 6,3 7,3
-t 3,3 3,3
+q 14,2
 
 +LedgeSolidRightSideCorner
 solid
-t 8,3 9,3
-t 3,3 3,3
+q 12,2
 
 +LedgeSolidLeftSideCornerBottom
 solid
-t 3,3 3,3
-t 6,3v 7,3
+t 5,2 6,2
+t 15,1 6,2
 
 +LedgeSolidRightSideCornerBottom
 solid
-t 3,3 3,3
-t 8,3 9,3v
+t 5,2 6,2
+t 5,2 14,0
 
 +LedgeSolidBottom
 autotile AutotileLedgeSolidBottom
 solid
-t 4,2 4,2
-t 11,2 11,2
+t 5,2 6,2
+t 15,0 14,1
 
 +LedgeSolidBottomLeft
 solid
-t 6,2 3,2
-t 10,2 11,2
+t 8,2 9,2
+t 14,4 15,4
 
 +LedgeSolidBottomRight
 solid
-t 5,2 9,2
-t 11,2 12,2
+t 10,2 11,2
+t 14,5 15,5
 
 #######################################
 # Terrain (slopes) - fully solid
@@ -491,42 +487,42 @@ t 11,2 12,2
 autotile AutotileExpandDirt
 solid
 t 2,1 3,1
-t 3,3 3,3
+t 5,2 6,2
 
 +MedSlopeR_DR
 autotile AutotileExpandDirt
 t 4,1 5,1
-t 3,3 3,3
+t 5,2 6,2
 
 +GradualSlopeL_D1
 autotile AutotileExpandDirt
 t 6,1 7,1
-t 3,3 3,3
+t 5,2 6,2
 
 +GradualSlopeL_D2
 autotile AutotileExpandDirt
 t 8,1 9,1
-t 3,3 3,3
+t 5,2 6,2
 
 +GradualSlopeR_D3
 autotile AutotileExpandDirt
 t 10,1 11,1
-t 3,3 3,3
+t 5,2 6,2
 
 +GradualSlopeR_D4
 autotile AutotileExpandDirt
 t 12,1 13,1
-t 3,3 3,3
+t 5,2 6,2
 
 +SteepSlopeL_D
 autotile AutotileExpandDirt
-t 0,1 3,3
-t 3,3 3,3
+t 0,1 6,2
+t 5,2 6,2
 
 +SteepSlopeR_D
 autotile AutotileExpandDirt
-t 3,3 1,1
-t 3,3 3,3
+t 5,2 1,1
+t 5,2 6,2
 
 #######################################
 # Terrain (slopes) - partially solid
@@ -656,7 +652,7 @@ t 12,4 13,4
 # Terrain rocks/sand
 #######################################
 base terrain_rocks
-palette global_palette
+palette foreststone_palette
 tileset FGForestStone
 
 +SandLeft
@@ -710,72 +706,56 @@ t 7,1 8,1
 
 +StoneLeft
 solid
-t 0,1 1,1
-t 0,1 1,1
+t 2,0 1,0
+t 2,1 1,1
 
 +Stone
 autotile AutotileStone
 solid
-t 1,1 1,1
-t 1,1 1,1
+q 0,0
 
 +StoneRight
 solid
-t 1,1 2,1
-t 1,1 2,1
+t 0,0 3,0
+t 1,1 3,1
 
 +StoneTopLeft
 solid
-q 0,0
+t 6,0 5,0
+t 2,1 1,1
 
 +StoneTop
 solid
-t 1,0 1,0
+t 4,0 5,0
 t 1,1 1,1
 
 +StoneTopRight
 solid
-q 1,0
+t 4,0 7,0
+t 1,1 3,1
 
 +StoneBottomLeft
 solid
-t 0,1 1,1
-t 3,0 4,0
+t 2,0 1,0
+t 6,1 5,1
 
 +StoneBottom
 solid
-t 1,1 1,1
-t 4,0 4,0
+t 0,0 1,0
+t 4,1 5,1
 
 +StoneBottomRight
 solid
-t 1,1 2,1
-t 4,0 5,0
+t 0,0 3,0
+t 4,1 7,1
 
-+StoneCornerTopLeft
++StoneMossy
 solid
-t 1,1 1,1
-t 1,1 9,0
-
-+StoneCornerTopRight
-solid
-t 1,1 1,1
-t 10,0 1,1
-
-+StoneCornerBottomLeft
-solid
-t 1,1 9,1
-t 1,1 1,1
-
-+StoneCornerBottomRight
-solid
-t 10,1 1,1
-t 1,1 1,1
+q 8,0
 
 +StoneSingle
 solid
-t 0,0 2,0
-t 3,0 5,0
+q 6,0
 
 #######################################
 # Small trees (and other plants)

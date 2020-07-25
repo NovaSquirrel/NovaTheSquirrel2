@@ -671,8 +671,6 @@ Yes:
 
 .export AutotileStone
 .proc AutotileStone
-  ; Maybe make it generate the corner blocks later,
-  ; though it really doesn't look too bad without them
   stz 0
 
   ; Up
