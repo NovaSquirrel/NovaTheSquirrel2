@@ -2039,7 +2039,7 @@ GoToNotNear:
 
       lda ActorPY,x
       sub #$0080
-      sta ActorPY,y      
+      sta ActorPY,y
 
       ; Calculate angle
       phy
