@@ -358,7 +358,7 @@ InRange:
   asl
   asl
   asl
-  ora #BackgroundBG>>1
+  ora SecondFGTilemapPointer
   sta BlockUpdateAddress,y
   jmp ChangeBlock::CalculateRestOfAddress
 .endproc

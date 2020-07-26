@@ -172,6 +172,8 @@
   FGScrollYPixels: .res 2
   BGScrollXPixels: .res 2
   BGScrollYPixels: .res 2
+  FG2ScrollXPixels: .res 2
+  FG2ScrollYPixels: .res 2
   ; Storage, for effects
   BGEffectRAM:     .res 8
 
@@ -182,6 +184,7 @@
   OldFG2OffsetY: .res 2
   OldScrollX: .res 2
   OldScrollY: .res 2
+  SecondFGTilemapPointer: .res 2 ; Usually BackgroundBG>>1 but can be ExtraBG>>1
 
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:
@@ -192,6 +195,7 @@ LevelZeroWhenLoad_Start:
   GlassForegroundEffect:  .res 1
   TwoLayerLevel:          .res 1 ; Two foreground layer level
   TwoLayerInteraction:    .res 1 ; Interaction with the second layer is enabled
+  ForegroundLayerThree:   .res 1 ; The second foreground layer is on layer 3, not layer 2
 
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4

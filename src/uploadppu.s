@@ -525,14 +525,18 @@ SpriteLoop:
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
 
-  ; Clear layer 3
-  ldx #$e000 >> 1
-  ldy #32*4
-  jsl ppu_clear_nt
+  seta8
+  lda ForegroundLayerThree
+  bne :+
+    ; Clear layer 3
+    ldx #$e000 >> 1
+    ldy #32*4
+    jsl ppu_clear_nt
+  :
   ; Including the graphics?
-  ldx #$e800 >> 1
-  ldy #0
-  jsl ppu_clear_nt
+;  ldx #$e800 >> 1
+;  ldy #0
+;  jsl ppu_clear_nt
 
   ; .------------------------------------.
   ; | Set up PPU registers for level use |
@@ -583,9 +587,19 @@ SpriteLoop:
     sta BLENDSUB
     lda #%00100110  ; add, enable on layers 0, 1 and backdrop
     sta CGADSUB
-
     lda #%00000010
     sta CGWSEL
+  :
+
+  lda ForegroundLayerThree
+  beq :+
+    lda #1 | ($f000 >> 9)
+    sta NTADDR+2    ; plane 2 nametable at $f000, 2 screens wide
+    ; Tiles go on $e000 still
+    lda #BG3_PRIORITY | 1
+    sta BGMODE
+    lda #%00010111  ; enable layer 3 because it's being used now
+    sta BLENDMAIN
   :
 
   setaxy16

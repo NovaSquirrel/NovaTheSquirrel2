@@ -213,10 +213,11 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global LevelBackgroundColor
 .global LevelBackgroundId
 .global FGScrollXPixels, FGScrollYPixels, BGScrollXPixels, BGScrollYPixels, BGEffectRAM
+.global FG2ScrollXPixels, FG2ScrollYPixels
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
-.global GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction
+.global GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, SecondFGTilemapPointer
 
 .globalzp random1
 .globalzp random2

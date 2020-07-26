@@ -108,7 +108,7 @@ YPos = 6
   asl
   asl
   asl
-  ora #BackgroundBG>>1
+  ora SecondFGTilemapPointer
   sta RowUpdateAddress2
 
   ; Get level pointer address
@@ -154,7 +154,7 @@ YPos = 6
 
   ; Calculate address of the column
   and #31
-  ora #BackgroundBG>>1
+  ora SecondFGTilemapPointer
   sta ColumnUpdateAddress2
 
   ; Use the second screen if required
@@ -224,7 +224,7 @@ Loop:
   lda BlockNum
   and #15
   asl
-  ora #BackgroundBG>>1
+  ora SecondFGTilemapPointer
   sta ColumnUpdateAddress2
 
   ; Use the other nametable if necessary

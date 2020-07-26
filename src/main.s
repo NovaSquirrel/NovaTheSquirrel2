@@ -103,6 +103,16 @@
   ldx #$e000 >> 1
   ldy #0
   jsl ppu_clear_nt
+
+
+  ; Clear palette
+  stz CGADDR
+  ldx #256
+: stz CGDATA
+  stz CGDATA
+  dex
+  bne :-
+
   setaxy16
 
   ; Initialize random generator
@@ -250,6 +260,7 @@ DelayedBlockLoop:
   sta FG2OffsetY
 
   ; Update foreground layer 2
+  ; TODO: move this somewhere else
   bit TwoLayerLevel-1
   bpl @NotTwoLayer
     ; Carry the player along if they're riding on foreground layer 2
@@ -452,12 +463,14 @@ padwait:
   bne padwait
 
   ; Update scroll registers
+  ; ---Primary foreground---
   seta16
   lda ScrollX
   lsr
   lsr
   lsr
   lsr
+  adc #0
   sta 0
   sta FGScrollXPixels
 
@@ -466,6 +479,7 @@ padwait:
   lsr
   lsr
   lsr
+  adc #0
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
   sta 2
   sta FGScrollYPixels
@@ -480,12 +494,9 @@ padwait:
   lda 3
   sta BGSCROLLY
 
-  ; If in a two-layer level, don't scroll second layer as if it's a background
-  lda TwoLayerLevel
-  bne SetScrollForTwoLayerLevel
-
-  ; Regular background layer
+  ; ---Parallax background layer---
   seta16
+  ; TODO: allow for different speeds?
   lsr 0
   lsr 2
   lda 0
@@ -496,14 +507,22 @@ padwait:
   sta 2
   sta BGScrollYPixels
   seta8
-  lda 0
-  sta BGSCROLLX+2
-  lda 1
-  sta BGSCROLLX+2
-  lda 2
-  sta BGSCROLLY+2
-  lda 3
-  sta BGSCROLLY+2
+  lda TwoLayerLevel
+  eor ForegroundLayerThree
+  bne :+
+    lda 0
+    sta BGSCROLLX+2
+    lda 1
+    sta BGSCROLLX+2
+    lda 2
+    sta BGSCROLLY+2
+    lda 3
+    sta BGSCROLLY+2
+  :
+
+  ; If in a two-layer level, scroll the second layer differently
+  lda TwoLayerLevel
+  bne SetScrollForTwoLayerLevel
 
 ; Jump back here if the second layer's scrolling was already set
 ReturnFromTwoLayer:
@@ -522,8 +541,9 @@ SetScrollForTwoLayerLevel:
   lsr
   lsr
   lsr
+  adc #0
   sta 0
-  sta BGScrollXPixels
+  sta FG2ScrollXPixels
 
   lda ScrollY
   add FG2OffsetY
@@ -531,18 +551,34 @@ SetScrollForTwoLayerLevel:
   lsr
   lsr
   lsr
+  adc #0
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
   sta 2
-  sta BGScrollYPixels
+  sta FG2ScrollYPixels
   seta8
 
+  lda ForegroundLayerThree
+  bne :+
+    ; Foreground on layer 2
+    lda 0
+    sta BGSCROLLX+2
+    lda 1
+    sta BGSCROLLX+2
+    lda 2
+    sta BGSCROLLY+2
+    lda 3
+    sta BGSCROLLY+2
+    jmp ReturnFromTwoLayer
+  :
+  ; Foreground on layer 3
   lda 0
-  sta BGSCROLLX+2
+  sta BGSCROLLX+4
   lda 1
-  sta BGSCROLLX+2
+  sta BGSCROLLX+4
   lda 2
-  sta BGSCROLLY+2
+  sta BGSCROLLY+4
   lda 3
-  sta BGSCROLLY+2
+  sta BGSCROLLY+4
+
   jmp ReturnFromTwoLayer
 .endproc
