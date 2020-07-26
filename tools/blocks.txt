@@ -10,6 +10,8 @@ alias common_pal_flowertops $2e00
 alias colorfulflower $3000
 alias colored_locks $5c00
 alias special_push $5800
+alias fg_water $3400
+alias common_pal_sand $3800
 alias global_palette 1
 alias terrain_palette 2
 alias locks_palette 3
@@ -649,60 +651,64 @@ t 3,3 3,3
 t 12,4 13,4
 
 #######################################
-# Terrain rocks/sand
+# Sand I guess
 #######################################
-base terrain_rocks
-palette foreststone_palette
-tileset FGForestStone
+base common_pal_sand
+palette global_palette
+tileset FGCommonPalSand
 
 +SandLeft
 solid
-t 6,0 7,0
-t 6,0 7,0
+t 3,0 4,0
+t 3,0 4,0
 
 +Sand
 autotile AutotileSand
 solid
-t 7,0 7,0
-t 7,0 7,0
+t 4,0 4,0
+t 4,0 4,0
 
 +SandRight
 solid
-t 7,0 8,0
-t 7,0 8,0
+t 4,0 5,0
+t 4,0 5,0
 
 +SandTopLeft
 solid
-t 3,1 4,1
-t 6,0 7,0
+t 0,0 1,0
+t 3,0 4,0
 
 +SandTop
 solid
-t 4,1 4,1
-t 7,0 7,0
+t 1,0 1,0
+t 4,0 4,0
 
 +SandTopRight
 solid
-t 4,1 5,1
-t 7,0 8,0
+t 1,0 2,0
+t 4,0 5,0
 
 +SandBottomLeft
 solid
+t 3,0 4,0
 t 6,0 7,0
-t 6,1 7,1
 
 +SandBottom
 solid
+t 4,0 4,0
 t 7,0 7,0
-t 7,1 7,1
 
 +SandBottomRight
 solid
+t 4,0 5,0
 t 7,0 8,0
-t 7,1 8,1
 
-
-
+#######################################
+# Terrain rocks
+#######################################
+base terrain_rocks
+palette foreststone_palette
+tileset FGForestStone
 
 +StoneLeft
 solid
@@ -756,6 +762,112 @@ q 8,0
 +StoneSingle
 solid
 q 6,0
+
+#######################################
+# Water
+#######################################
+base fg_water
+palette foreststone_palette
+tileset FGWater
+
++WaterSingle
+class Water
+t 0,0 1,0
+t 4,0 5,0
+
++WaterVerticalBottom
+class Water
+t 3,1 4,1
+t 0,1 2,1
+
++WaterVerticalTop
+class Water
+t 0,0 1,0
+t 10,0 11,0
+
++WaterVertical
+class Water
+t 3,1 4,1
+t 3,1 4,1
+
++WaterHorizontalLeft
+class Water
+t 0,0 3,0
+t 4,0 7,0
+
++WaterLowerLeft
+class Water
+t 3,1 0:11
+t 0,1 1,1
+
++WaterUpperLeft
+class Water
+t 0,0 3,0
+t 3,1 9,0
+
++WaterLeftSide
+class Water
+t 3,1 0:11
+t 3,1 0:11
+
++WaterHorizontalRight
+class Water
+t 2,0 1,0
+t 6,0 5,0
+
++WaterLowerRight
+class Water
+t 0:11 4,1
+t 1,1 2,1
+
++WaterUpperRight
+class Water
+t 2,0 1,0
+t 8,0 11,0
+
++WaterRightSide
+class Water
+t 0:11 4,1
+t 0:11 4,1
+
++WaterHorizontal
+class Water
+t 2,0 3,0
+t 6,0 7,0
+
++WaterBottomSide
+class Water
+t 0:11 0:11
+t 1,1 1,1
+
++WaterTopside
+class Water
+t 2,0 3,0
+t 8,0 9,0
+
++Water
+class Water
+autotile AutotileWater
+t 0:11 0:11
+t 0:11 0:11
+
++WaterInnerCornerRight
+class Water
+autotile AutotileWater
+t 0:11 6,1
+t 0:11 0:11
+
++WaterInnerCornerLeft
+class Water
+autotile AutotileWater
+t 5,1 0:11
+t 0:11 0:11
+
++WaterInnerCornerBoth
+class Water
+autotile AutotileWater
+t 5,1 6,1
+t 0:11 0:11
 
 #######################################
 # Small trees (and other plants)

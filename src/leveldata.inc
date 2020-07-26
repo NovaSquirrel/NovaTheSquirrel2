@@ -107,6 +107,7 @@
   MetalForkUp
   MetalForkDown
   ArrowRevealSolid
+  Water
 .endenum
 
 .macro LSpr Type, Direction, XPos, YPos, Extra

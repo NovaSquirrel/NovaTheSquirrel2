@@ -854,3 +854,74 @@ Right:
   sta [MidPointer],y
   rts
 .endproc
+
+.a16
+.export AutotileWater
+.proc AutotileWater
+  stz 0
+
+  ; Left
+  lda [LeftPointer],y
+  jsr IsWater
+  rol 0
+
+  ; Right
+  lda [RightPointer],y
+  jsr IsWater
+  rol 0
+
+  ; Down
+  iny
+  iny
+  lda [MidPointer],y
+  jsr IsWater
+  rol 0
+  dey
+  dey
+
+  ; Up
+  dey
+  dey
+  lda [MidPointer],y
+  jsr IsWater
+  rol 0
+  iny
+  iny
+
+  lda 0
+  asl
+  add #Block::WaterSingle
+  sta [MidPointer],y
+  cmp #Block::Water
+  beq :+
+  rts
+:
+  ; Try for inner corners
+  stz 0
+  dey
+  dey
+  lda [LeftPointer],y
+  jsr IsWater
+  rol 0
+  lda [RightPointer],y
+  jsr IsWater
+  lda 0
+  rol
+  iny
+  iny
+  eor #3
+  asl 
+  adc #Block::Water
+  sta [MidPointer],y
+  rts
+
+IsWater:
+  cmp #Block::WaterInnerCornerBoth+1
+  bcs No
+  cmp #Block::WaterSingle
+  bcs Yes
+No:
+  clc
+Yes:
+  rts
+.endproc

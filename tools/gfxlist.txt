@@ -43,3 +43,5 @@ D000 MapBGLake
 5000 FGHannah
 A000 SPHannah
 3000 FGColorfulFlowers
+3400 FGWater
+3800 FGCommonPalSand
