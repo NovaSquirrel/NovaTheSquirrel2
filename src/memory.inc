@@ -218,10 +218,11 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
 .global GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, SecondFGTilemapPointer
+.global LevelFadeIn, RunGameLogic
 
 .globalzp random1
 .globalzp random2
-
+.globalzp HDMASTART_Mirror
 
 .global NMIHandler ; For keeping effects stable
 .global IRQHandler ; For changing what IRQ does for different effects
@@ -281,3 +282,4 @@ DialogCharacterLen = 5
 
 .global SmallRenderBuffer
 .global DecompressBuffer
+.global IrisEffectBuffer1, IrisEffectBuffer2

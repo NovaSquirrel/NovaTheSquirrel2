@@ -38,6 +38,8 @@
   random1:  .res 2
   random2:  .res 2
 
+  HDMASTART_Mirror: .res 1
+
   LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks. 00xxxxxxxxyyyyy0
   BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
   BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr (Unused)
@@ -196,6 +198,8 @@ LevelZeroWhenLoad_Start:
   TwoLayerLevel:          .res 1 ; Two foreground layer level
   TwoLayerInteraction:    .res 1 ; Interaction with the second layer is enabled
   ForegroundLayerThree:   .res 1 ; The second foreground layer is on layer 3, not layer 2
+  LevelFadeIn:            .res 1 ; Timer for fading the level in
+  RunGameLogic:           .res 1 ; If nonzero, run all of the game logic
 
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4
@@ -317,6 +321,8 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   NameFontRenderBottom: .res 384 ; Enough for 12 tiles
 
   LevelActorBuffer: .res 1024 ; Room for 256 actors if the list must be in RAM, not used by default
+  IrisEffectBuffer1: .res 224*3+5
+  IrisEffectBuffer2: .res 224*3+5
 
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
