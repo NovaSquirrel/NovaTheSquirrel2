@@ -24,7 +24,7 @@ objlist = \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
-  backgrounddata bgeffectcode playerdraw playerability
+  backgrounddata bgeffectcode playerdraw playerability iris
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

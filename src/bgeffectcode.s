@@ -78,7 +78,9 @@ No:
   stx DMAADDR+$50
 
   lda #%111100
+  ora HDMASTART_Mirror
   sta HDMASTART
+  sta HDMASTART_Mirror
   lda #%00100000 ; On backgrounds
   sta CGADSUB
   stz CGADDR

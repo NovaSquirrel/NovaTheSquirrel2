@@ -454,6 +454,8 @@ DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
 .export UploadLevelGraphics
 .proc UploadLevelGraphics
   seta8
+  stz HDMASTART_Mirror
+  stz HDMASTART
 
   ; Fix the background color
   stz CGADDR

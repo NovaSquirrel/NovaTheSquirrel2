@@ -87,6 +87,7 @@ StringExitLevel:
   stz CGADSUB
   stz BLENDSUB
   stz HDMASTART
+  stz HDMASTART_Mirror
 
   lda #255
   sta InventorySwapRow

@@ -91,7 +91,7 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   ldy #0
   seta8
   stz HDMASTART
-
+  stz HDMASTART_Mirror
 
   ; -------------------------
 
@@ -499,10 +499,6 @@ PathRenderLoop:
   sta BLENDMAIN
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
-
-
-
-
 
 
   ; -----------------------------------
