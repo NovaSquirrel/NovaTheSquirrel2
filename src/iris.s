@@ -127,6 +127,7 @@ BottomLength = 7
   ; Empty space at the top, if needed
   lda OriginY
   sub Length
+  beq NoEmptySpaceAtTop
   bcc NoEmptySpaceAtTop
     ; Do it with one entry
     cmp #128
@@ -166,6 +167,7 @@ BottomLength = 7
   lda Length
   cmp OriginY
   bcc :+
+LimitTop:
     lda OriginY
   :
   sta TopLength
@@ -174,9 +176,10 @@ BottomLength = 7
   ; Bottom of the circle
   lda OriginY
   add Length
-  bcc :+ ; < 256
+  bcs LimitBottom ; < 256
   cmp #224
   bcc :+ ; < 224
+LimitBottom:
     lda #224
   :
   sub OriginY
