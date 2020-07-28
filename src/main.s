@@ -134,12 +134,19 @@
 
 .export GameMainLoop
 .proc GameMainLoop
+.import IrisInitTable, IrisUpdate, IrisInitHDMA
+;  jsl IrisInitTable
+
   phk
   plb
 forever:
   ; Draw the player to a display list in main memory
   setaxy16
   inc framecount
+  lda #1
+;  jsl IrisUpdate
+;  jsl IrisInitHDMA
+  seta16
 
   ; Update keys
   lda keydown
@@ -226,7 +233,11 @@ DelayedBlockLoop:
 
   ; Run stuff for this frame
   stz OamPtr
-  jsl RunPlayer
+;  lda RunGameLogic
+;  lsr
+;  bcc :+
+    jsl RunPlayer
+;  :
   jsl AdjustCamera
 
   lda FG2OffsetX
@@ -234,22 +245,6 @@ DelayedBlockLoop:
   lda FG2OffsetY
   sta OldFG2OffsetY
 
-.if 0
-  lda keydown
-  and #KEY_L
-  beq :+
-    lda FG2OffsetX
-    sub #$10
-    sta FG2OffsetX
-  :
-  lda keydown
-  and #KEY_R
-  beq :+
-    lda FG2OffsetX
-    add #$10
-    sta FG2OffsetX
-  :
-.endif
   .import MathSinTable
   lda framecount
   and #$ff
@@ -289,6 +284,9 @@ DelayedBlockLoop:
 
   jsl DrawPlayerStatus
 
+;  lda RunGameLogic
+;  lsr
+;  bcc SkipActors
   ; Move all of the actors that are standing on 
   bit TwoLayerInteraction-1
   bpl @NotTwoLayerForActors
@@ -316,7 +314,8 @@ DelayedBlockLoop:
     bne @TwoLayerActorLoop
   @NotTwoLayerForActors:
 
-  jsl RunAllActors
+    jsl RunAllActors
+;  SkipActors:
   jsl DrawPlayer
   .a16
   .i16
@@ -453,8 +452,14 @@ SkipGeneric:
   jsl PlayerFrameUpload
 
   seta8
-  lda #$0F
-  sta PPUBRIGHT  ; turn on rendering
+  ; Turn on rendering
+  lda LevelFadeIn
+  sta PPUBRIGHT
+  cmp #$0f
+  beq :+
+    ina
+  :
+  sta LevelFadeIn
 
   ; wait for control reading to finish
   lda #$01
@@ -530,6 +535,8 @@ ReturnFromTwoLayer:
   .import BGEffectRun
   jsl BGEffectRun
 
+  lda HDMASTART_Mirror
+  sta HDMASTART
   jmp forever
 
 ; ---------------------------------------------------------

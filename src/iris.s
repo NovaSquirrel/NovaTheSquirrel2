@@ -64,10 +64,8 @@
   lda #%01010000
   sta CGWSEL
 
-  lda HDMASTART_Mirror
-  ora #$80
-  sta HDMASTART_Mirror
-  sta HDMASTART ; TODO: have the mirror copy itself over instead
+  lda #$80
+  tsb HDMASTART_Mirror
   plp
   rtl
 .endproc
