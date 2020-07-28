@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, glob, os
+import json, glob, os, sys
 
 # -------------------------------------
 # Parse the level data definition file
@@ -15,6 +15,7 @@ available_nybble = [set(), set(), set(), set()]
 available_state = None
 available_special = {} # Uses a Python function to handle it
 has_metadata = {} # Uses a Python function to insert metadata
+teleport_destinations = {}
 
 for line in define_lines:
 	if not len(line): # Skip empty lines
@@ -111,8 +112,23 @@ def encode_sign(r, extra):
 	add_import(symbol)
 	return ("LWriteCol <%s, >%s, ^%s" % (symbol, symbol, symbol)), 4
 
+def encode_door(r, extra):
+	dashes = extra.split('-')
+	if len(dashes) == 2: # A-B two-way door
+		if dashes[1] in teleport_destinations:
+			d = teleport_destinations[dashes[1]]
+			return ("LWriteCol %d, %d" % (d[1], d[0])), 3 # Y and then X
+		else:
+			sys.exit("Teleport destination "+dashes[1]+" not found")
+	elif len(dashes) == 1: # Level door
+		return ("LWriteCol $20, Level::%s" % extra), 3 # level number
+	sys.exit("Invalid door: "+extra)
+	return (""), 0
+
 has_metadata['Sign'] = encode_sign
 has_metadata['DialogPoint'] = encode_sign
+has_metadata['DoorTwoWay'] = encode_door
+has_metadata['DoorTop'] = encode_door
 
 def convert_layer(layer):
 	# Sort by X coordinate
@@ -200,6 +216,7 @@ outfile.write('.include "paletteenum.s"\n')
 outfile.write('.include "backgroundenum.s"\n')
 outfile.write('.include "blockenum.s"\n')
 outfile.write('.include "leveldata.inc"\n\n')
+outfile.write('.include "levelenum.s"\n\n')
 outfile.write('.segment "LevelBank1"\n\n')
 
 for f in glob.glob("levels/*.json"):
@@ -227,6 +244,16 @@ for f in glob.glob("levels/*.json"):
 	else:
 		actors = [Rect(x) for x in level_json["Layers"][1]["Data"]]
 		control = [Rect(x) for x in level_json["Layers"][2]["Data"]]
+
+	# Find teleport destinations
+	for r in foreground:
+		if r.type in ['DoorTop', 'DoorTwoWay']:
+			dashes = r.extra.split("-")
+			if len(dashes) == 2 and len(dashes[0]):
+				teleport_destinations[dashes[0]] = (r.x, r.y+2)
+	for r in control:
+		if r.type == 'TELEPORT_DESTINATION':
+			teleport_destinations[r.extra] = (r.x, r.y)
 
 	# ---------------------------------
 	player_x, player_y, player_dir = 5, 5, False

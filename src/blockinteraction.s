@@ -803,10 +803,53 @@ Up:
   cmp #Block::DoorExit
   beq DoorExit
 DoorNormal:
-  rts
+  jsl GetBlockX
+  bra TeleportAtColumn
 DoorExit:
   .import ExitToOverworld
   jml ExitToOverworld
+.endproc
+
+.a16
+.i16
+.proc TeleportAtColumn
+  asl
+  tax
+  seta8
+  lda f:ColumnWords+0,x
+  cmp #$20
+  beq LevelDoor
+    sta PlayerPY+1
+    lda f:ColumnWords+1,x
+    sta PlayerPX+1
+    lda #$80        ; Horizontally centered
+    sta PlayerPX
+    stz PlayerPY
+    stz LevelFadeIn ; Start fading in
+
+    ; Fade the screen out and then disable rendering once it's black
+    lda #$0e
+    sta 0
+  FadeOut:
+    jsl WaitVblank
+
+    lda 0
+    sta PPUBRIGHT
+    dec
+    sta 0
+    bne FadeOut
+    lda #FORCEBLANK
+    sta PPUBRIGHT
+
+    lda #1
+    sta RerenderInitEntities
+    seta16
+
+    jsl RenderLevelScreens
+    rts
+LevelDoor:
+  ; Load a new level I guess
+  rts
 .endproc
 
 .a16
