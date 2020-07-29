@@ -807,6 +807,8 @@ DoorNormal:
   bra TeleportAtColumn
 DoorExit:
   .import ExitToOverworld
+  jsr DoorFade
+  jsl WaitVblank
   jml ExitToOverworld
 .endproc
 
@@ -825,37 +827,9 @@ DoorExit:
     lda #$80        ; Horizontally centered
     sta PlayerPX
     stz PlayerPY
-    stz LevelFadeIn ; Start fading in
+    stz LevelFadeIn ; Start fading in after the transition
 
-    .import IrisInitTable, IrisUpdate, IrisInitHDMA, IrisDisable
-    jsl IrisInitTable
-    ; Fade the screen out and then disable rendering once it's black
-    lda #$0e
-    sta 15
-  FadeOut:
-    inc framecount
-    lda PlayerDrawX
-    sta 0
-    lda PlayerDrawY
-    sub #16
-    sta 1
-    lda 15
-    jsl IrisUpdate    
-    jsl WaitVblank
-    jsl IrisInitHDMA
-    seta8
-    lda HDMASTART_Mirror
-    sta HDMASTART
-
-    lda 15
-    sta PPUBRIGHT
-    dec
-    sta 15
-    bne FadeOut
-
-    jsl IrisDisable
-    lda #FORCEBLANK
-    sta PPUBRIGHT
+    jsr DoorFade
 
     lda #1
     sta RerenderInitEntities
@@ -867,6 +841,40 @@ DoorExit:
     rts
 LevelDoor:
   ; Load a new level I guess
+  rts
+.endproc
+
+.proc DoorFade
+  seta8
+  .import IrisInitTable, IrisUpdate, IrisInitHDMA, IrisDisable
+  jsl IrisInitTable
+  ; Fade the screen out and then disable rendering once it's black
+  lda #$0e
+  sta 15
+FadeOut:
+  inc framecount
+  lda PlayerDrawX
+  sta 0
+  lda PlayerDrawY
+  sub #16
+  sta 1
+  lda 15
+  jsl IrisUpdate    
+  jsl WaitVblank
+  jsl IrisInitHDMA
+  seta8
+  lda HDMASTART_Mirror
+  sta HDMASTART
+
+  lda 15
+  sta PPUBRIGHT
+  dec
+  sta 15
+  bne FadeOut
+
+  jsl IrisDisable
+  lda #FORCEBLANK
+  sta PPUBRIGHT
   rts
 .endproc
 
