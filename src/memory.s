@@ -201,6 +201,7 @@ LevelZeroWhenLoad_Start:
   LevelFadeIn:            .res 1 ; Timer for fading the level in
   LevelIrisIn:            .res 1 ; Timer for doing the "iris in" effect
   RunGameLogic:           .res 1 ; If nonzero, run all of the game logic
+  FG2MovementRoutine:     .res 3 ; Pointer for a routine to call every frame
 
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4

@@ -218,7 +218,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
 .global GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, SecondFGTilemapPointer
-.global LevelFadeIn, LevelIrisIn, RunGameLogic
+.global LevelFadeIn, LevelIrisIn, RunGameLogic, FG2MovementRoutine
 
 .globalzp random1
 .globalzp random2

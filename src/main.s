@@ -241,17 +241,13 @@ DelayedBlockLoop:
   lda FG2OffsetY
   sta OldFG2OffsetY
 
-  .import MathSinTable
-  lda framecount
-  and #$ff
-  asl
-  tax
-  lda f:MathSinTable,x
-  asr_n 5
-  sta FG2OffsetY
+  .a16
+  lda FG2MovementRoutine
+  beq :+
+    jsl CallFG2MovementRoutine
+  :
 
   ; Update foreground layer 2
-  ; TODO: move this somewhere else
   bit TwoLayerLevel-1
   bpl @NotTwoLayer
     ; Carry the player along if they're riding on foreground layer 2
@@ -616,4 +612,9 @@ SetScrollForTwoLayerLevel:
   sta BGSCROLLY+4
 
   jmp ReturnFromTwoLayer
+.endproc
+
+.a16
+.proc CallFG2MovementRoutine
+  jml [FG2MovementRoutine]
 .endproc
