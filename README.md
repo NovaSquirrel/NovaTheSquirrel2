@@ -17,7 +17,6 @@ You'll need the following:
 * Python 3 (and Pillow)
 * GNU Make
 * [ca65](https://cc65.github.io/)
-* [Huffmunch](https://github.com/bbbradsmith/huffmunch) compressor (Windows build included)
 * [lz4](https://github.com/lz4/lz4/releases) compressor (Windows build included)
 
 With that in place, just enter `make`.

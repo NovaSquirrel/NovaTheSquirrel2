@@ -194,6 +194,7 @@ CheckerLoop:
   ; Decompress a level of some sort
   seta8
   .import M7Level_sample2
+  hm_node = 0
   lda #<M7Level_sample2
   sta hm_node+0
   lda #>M7Level_sample2

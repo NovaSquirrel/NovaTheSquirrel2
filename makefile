@@ -20,7 +20,7 @@ objlist = \
   uploadppu blarggapu spcimage musicseq graphics blockdata \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
-  mode7 perspective_data sincos_data huffmunch inventory vwf \
+  mode7 perspective_data sincos_data inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
