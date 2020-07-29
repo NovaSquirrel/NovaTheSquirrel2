@@ -827,22 +827,40 @@ DoorExit:
     stz PlayerPY
     stz LevelFadeIn ; Start fading in
 
+    .import IrisInitTable, IrisUpdate, IrisInitHDMA, IrisDisable
+    jsl IrisInitTable
     ; Fade the screen out and then disable rendering once it's black
     lda #$0e
-    sta 0
+    sta 15
   FadeOut:
+    inc framecount
+    lda PlayerDrawX
+    sta 0
+    lda PlayerDrawY
+    sub #16
+    sta 1
+    lda 15
+    jsl IrisUpdate    
     jsl WaitVblank
+    jsl IrisInitHDMA
+    seta8
+    lda HDMASTART_Mirror
+    sta HDMASTART
 
-    lda 0
+    lda 15
     sta PPUBRIGHT
     dec
-    sta 0
+    sta 15
     bne FadeOut
+
+    jsl IrisDisable
     lda #FORCEBLANK
     sta PPUBRIGHT
 
     lda #1
     sta RerenderInitEntities
+
+    stz LevelIrisIn ; Start the iris effect again
     seta16
 
     jsl RenderLevelScreens

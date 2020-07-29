@@ -86,6 +86,8 @@ lowoamloop:
   ldx OamPtr
   ldy #3
   seta8
+  stz 1 ; Because of the 16-bit "dec 0" later
+
 : cpx #512 ; Don't go past the end of OAM
   bcs Exit
   lda #1   ; High X bit set

@@ -47,11 +47,11 @@
   lda framecount
   lsr
   bcc :+
-    lda #.loword(IrisEffectBuffer2)
+    lda #.loword(IrisEffectBuffer1)
     sta DMAADDR+$70
     bra :++
   :
-    lda #.loword(IrisEffectBuffer1)
+    lda #.loword(IrisEffectBuffer2)
     sta DMAADDR+$70
   :
 
@@ -72,33 +72,44 @@
 
 .a16
 .i16
+.export IrisDisable
+.proc IrisDisable
+  php
+  seta8
+  ; Disable the windows now
+  lda HDMASTART_Mirror
+  and #$7F
+  sta HDMASTART_Mirror
+  sta HDMASTART
+
+  lda #%00000000
+  sta CGWSEL
+  plp
+  rtl
+.endproc
+
+.a16
+.i16
+; Updates the iris effect's tables
+; A = Frame number
+; 0 = Center X coordinate
+; 1 = Center Y coordinate
 .export IrisUpdate
 .proc IrisUpdate
-Frame = 0
-RowsLeft = 1
-OriginX = 2
-OriginY = 3
+OriginX = 0
+OriginY = 1
+Frame = 2
+RowsLeft = 3
 Length = 4
 TopLength = 5
 BottomLength = 7
+  php
   seta8
   sta Frame
 
   tdc ; Clear all of accumulator for TAX/TAY
 
-  lda PlayerDrawX
-  sta OriginX
-  lda PlayerDrawY
-  sta OriginY
-
-  ; Calculate frame base
-  lda framecount
-  lsr
-  lsr
-  lsr
-  lsr
-  and #15
-  sta Frame
+  lda Frame
   sta CPUMCAND
   lda #224
   sta CPUMUL
@@ -213,6 +224,7 @@ LimitBottom:
   sta f:IrisEffectBuffer1+3,x
 
   plb
+  plp
   rtl
 
 BuildLoopTop:

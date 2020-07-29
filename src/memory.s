@@ -199,6 +199,7 @@ LevelZeroWhenLoad_Start:
   TwoLayerInteraction:    .res 1 ; Interaction with the second layer is enabled
   ForegroundLayerThree:   .res 1 ; The second foreground layer is on layer 3, not layer 2
   LevelFadeIn:            .res 1 ; Timer for fading the level in
+  LevelIrisIn:            .res 1 ; Timer for doing the "iris in" effect
   RunGameLogic:           .res 1 ; If nonzero, run all of the game logic
 
   ; How many Actors use each of the four palette slots, for detecting when one is free

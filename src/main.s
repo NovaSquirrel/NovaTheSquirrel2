@@ -22,6 +22,8 @@
 .import RunAllActors, DrawPlayer, DrawPlayerStatus
 .import StartLevel, ResumeLevelFromCheckpoint
 
+IRIS_EFFECT_END = 30
+
 .segment "CODE"
 ;;
 ; Minimalist NMI handler that only acknowledges NMI and signals
@@ -134,18 +136,12 @@
 
 .export GameMainLoop
 .proc GameMainLoop
-.import IrisInitTable, IrisUpdate, IrisInitHDMA
-;  jsl IrisInitTable
-
   phk
   plb
 forever:
   ; Draw the player to a display list in main memory
   setaxy16
   inc framecount
-  lda #1
-;  jsl IrisUpdate
-;  jsl IrisInitHDMA
   seta16
 
   ; Update keys
@@ -319,6 +315,30 @@ DelayedBlockLoop:
   jsl DrawPlayer
   .a16
   .i16
+
+  ; Update iris stuff
+  seta8
+  .import IrisInitTable, IrisUpdate, IrisInitHDMA, IrisDisable
+  lda LevelIrisIn
+  cmp #IRIS_EFFECT_END
+  beq NoIris
+
+  lda PlayerDrawX
+  sta 0
+  lda PlayerDrawY
+  sub #16
+  sta 1
+  lda LevelIrisIn
+  jsl IrisUpdate
+
+  lda LevelIrisIn
+  ina
+  sta LevelIrisIn
+  cmp #IRIS_EFFECT_END
+  bne NoIris
+  jsl IrisDisable
+NoIris:
+  setaxy16
 
   ; Going past the bottom of the screen results in dying
   lda PlayerPY
@@ -534,6 +554,14 @@ ReturnFromTwoLayer:
   seta16
   .import BGEffectRun
   jsl BGEffectRun
+
+  ; Add iris effect
+  seta8
+  lda LevelIrisIn
+  cmp #IRIS_EFFECT_END
+  bcs :+
+  jsl IrisInitHDMA
+:
 
   lda HDMASTART_Mirror
   sta HDMASTART
