@@ -2547,6 +2547,18 @@ Falling:
 .i16
 .export RunBoulder
 .proc RunBoulder
+  ; Instead of relying on the AutoRemove flag, only allow removing while not falling
+  lda ActorVarA,x
+  bne :+
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #$2000 ; How about two screens of distance does it?
+  bcc :+
+    stz ActorType,x ; Zero the type
+    rtl
+  :
+
   lda ActorState,x
   and #255
   cmp #ActorStateValue::Init

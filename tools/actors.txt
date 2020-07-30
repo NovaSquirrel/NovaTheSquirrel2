@@ -274,7 +274,6 @@ draw DrawFlyingArrow
 size 16x16
 
 +Boulder
-flag AutoRemove
 gfx SPHannah
 run RunBoulder
 draw DrawBoulder
