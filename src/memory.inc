@@ -200,7 +200,10 @@ SpriteXYOffset = GraphicUploadOffset ; in the order X, Y
 .globalzp StartedLevelNumber
 .global NeedLevelReload
 .global NeedLevelRerender
+
+RERENDER_INIT_ENTITIES_TELEPORT = $80
 .global RerenderInitEntities
+
 
 ; ScreenFlags stores flags for each screen in the level; so far there's just one flag:
 SCREEN_BOUNDARY = 1 ; boundary on left side of screen

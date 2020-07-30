@@ -147,6 +147,7 @@ $(objdir)/spcimage.o: $(brrlisto)
 $(srcdir)/graphics.s: $(srcdir)/graphicsenum.s
 $(srcdir)/backgrounddata.s: $(srcdir)/backgroundenum.s $(srcdir)/graphicsenum.s
 $(srcdir)/portraitdata.s: $(srcdir)/portraitenum.s
+$(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s

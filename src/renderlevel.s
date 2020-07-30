@@ -17,6 +17,7 @@
 
 .include "snes.inc"
 .include "global.inc"
+.include "actorenum.s"
 .smart
 .global LevelBuf
 .import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
@@ -57,14 +58,39 @@
   and #255
   beq NoInitEntities
 
-  seta8
-  stz RerenderInitEntities
-  seta16
+  ; Teleports will not erase certain actor types
+  ; in order to avoid letting teleports break things.
+  cmp #RERENDER_INIT_ENTITIES_TELEPORT
+  bne DontPreserveEntities
+    ldx #ActorStart
+  @Loop:
+    lda ActorType,x
+    cmp #Actor::FlyingArrow*2
+    beq @Preserve
+    cmp #Actor::Boulder*2
+    beq @Preserve
+    cmp #Actor::ActivePushBlock*2
+    beq @Preserve
+    stz ActorType,x
+  @Preserve:
+    txa
+    add #ActorSize
+    tax
+    cmp #ProjectileEnd
+    bne @Loop
+    ; Done here, skip over the other clear code
+    bra DidPreserveEntities
+  DontPreserveEntities:
 
   ; Init actors
   ldx #ActorStart
   ldy #ProjectileEnd-ActorStart
   jsl MemClear
+DidPreserveEntities:
+
+  seta8
+  stz RerenderInitEntities
+  seta16
 
   ; Init particles
   ldx #ParticleStart

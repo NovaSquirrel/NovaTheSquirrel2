@@ -831,7 +831,7 @@ DoorExit:
 
     jsr DoorFade
 
-    lda #1
+    lda #RERENDER_INIT_ENTITIES_TELEPORT
     sta RerenderInitEntities
 
     stz LevelIrisIn ; Start the iris effect again
