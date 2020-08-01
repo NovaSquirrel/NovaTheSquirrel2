@@ -488,8 +488,11 @@ PlayerIsntOnLadder:
     seta8
     stz PlayerJumping
     seta16
-    lda #$4000
-    sta BottomCmp
+    lda PlayerPY
+    and #$80
+    bne :+
+      lda #$4000
+      sta BottomCmp
   :
 
   ; Slope interaction
