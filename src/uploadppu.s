@@ -585,7 +585,7 @@ SpriteLoop:
 
   lda GlassForegroundEffect
   beq :+
-    lda #%00010010  ; enable sprites, plane 1
+    lda #%00010011  ; enable sprites, plane 1
     sta BLENDMAIN
     lda #%00000001
     sta BLENDSUB
@@ -593,6 +593,11 @@ SpriteLoop:
     sta CGADSUB
     lda #%00000010
     sta CGWSEL
+
+    lda #%00010010  ; enable sprites, plane 1
+    sta BLENDMAIN
+    lda #%00010011
+    sta BLENDSUB
   :
 
   lda ForegroundLayerThree
@@ -606,11 +611,48 @@ SpriteLoop:
     sta BLENDMAIN
   :
 
+  lda ToggleSwitch1
+  beq :+
+    ldx #$4a00>>1
+    ldy #.loword(File_FGToggleBlocksSwapped+256*0)
+    jsr ToggleSwitchDMA
+  :
+  lda ToggleSwitch2
+  beq :+
+    ldx #$4b00>>1
+    ldy #.loword(File_FGToggleBlocksSwapped+256*1)
+    jsr ToggleSwitchDMA
+  :
+  lda ToggleSwitch3
+  beq :+
+    ldx #$4c00>>1
+    ldy #.loword(File_FGToggleBlocksSwapped+256*2)
+    jsr ToggleSwitchDMA
+  :
+
   setaxy16
   .import BGEffectInit
   jsl BGEffectInit
   setaxy16
   jml RenderLevelScreens
+
+.a8
+ToggleSwitchDMA:
+  .import File_FGToggleBlocksSwapped
+  lda #^File_FGToggleBlocksSwapped
+  sta DMAADDRBANK
+
+  stx PPUADDR
+  sty DMAADDR
+
+  ldx #256
+  stx DMALEN
+  ldx #DMAMODE_PPUDATA
+  stx DMAMODE
+
+  lda #1
+  sta COPYSTART
+  rts
 .endproc
 
 

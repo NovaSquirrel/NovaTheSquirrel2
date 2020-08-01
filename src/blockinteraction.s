@@ -1067,3 +1067,103 @@ Yes:
   sec
   rts
 .endproc
+
+.a16
+.i16
+.export BlockToggleSwitch
+.proc BlockToggleSwitch
+Color = BlockTemp
+Value = BlockTemp+2
+  .import File_FGToggleBlocks, File_FGToggleBlocksSwapped
+  lda [LevelBlockPtr]
+  sub #Block::Toggle1Switch
+  lsr
+  sta Color
+  tay
+  seta8
+  lda ToggleSwitch1,y
+  eor #1
+  sta ToggleSwitch1,y
+  sta Value
+  seta16
+
+  ; Make the graphical change
+  phx
+  tya
+  xba ; * 256
+  lsr
+  add #$4A00>>1
+  tax ; X = VRAM destination
+  ldy #256 ; Copy 256 bytes
+
+  ; Calculate source address
+  seta8
+  lda #^File_FGToggleBlocks
+  sta 0
+  seta16
+  lda Color
+  xba
+  add #.loword(File_FGToggleBlocks)
+  lsr Value
+  bcc :+
+    seta8
+    lda #^File_FGToggleBlocksSwapped
+    sta 0
+    seta16
+    lda Color
+    xba
+    add #.loword(File_FGToggleBlocksSwapped)
+  :
+  jsl QueueGenericUpdate
+  plx
+
+  ; -------------------------
+  ; Animate the switch itself
+  lda #60
+  sta BlockTemp
+  lda [LevelBlockPtr]
+  jsl DelayChangeBlock
+  lda [LevelBlockPtr]
+  add #3*2
+  jsl ChangeBlock
+  rts
+.endproc
+
+.a16
+.i16
+.export BlockToggleNonsolid
+.proc BlockToggleNonsolid
+  ; Determine which flag should be checked
+  lda [LevelBlockPtr]
+  sub #Block::Toggle1BlockNonsolid
+  lsr
+  tay
+
+  ; Become solid if the flag is set
+  lda ToggleSwitch1,y
+  lsr
+  bcc :+
+     lda #$c000
+     sta BlockFlag
+  :
+  rts
+.endproc
+
+.a16
+.i16
+.export BlockToggleSolid
+.proc BlockToggleSolid
+  ; Determine which flag should be checked
+  lda [LevelBlockPtr]
+  sub #Block::Toggle1BlockSolid
+  lsr
+  tay
+
+  ; Become nonsolid if the flag is set
+  lda ToggleSwitch1,y
+  lsr
+  bcc :+
+     stz BlockFlag
+  :
+  rts
+.endproc

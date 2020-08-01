@@ -17,6 +17,11 @@ for line in text:
 	address = int(split[0], 16)
 	name = split[1]
 
+	do_define = False
+	for option in split[2:]:
+		if option == "define":
+			do_define = True
+
 	# Look to see if the resource exists as a 2bpp or 4bpp image
 	filename = ""
 	for tryfile in ["tilesets4/%s.chrsfc", "tilesets2/%s.chrgb", "tilesets4/lz4/%s.chrsfc.lz4",
@@ -37,6 +42,7 @@ for line in text:
 	graphic['filename'] = "../%s" % filename
 	graphic['size'] = os.path.getsize(filename)
 	graphic['lz4'] = filename.endswith('lz4')
+	graphic['define'] = do_define
 	all_graphics.append(graphic)
 all_graphics = sorted(all_graphics, key=lambda g: g['size'], reverse=True) 
 
@@ -88,6 +94,8 @@ outfile.write('.endproc\n')
 for key, value in banks_files.items():
 	outfile.write('\n.segment "%s"\n' % key)
 	for f in value:
+		if f['define']:
+			outfile.write('.export File_%s\n' % f['name'])
 		outfile.write('File_%s:\n  .incbin "%s"\n' % (f['name'], f['filename']))
 
 outfile.close()

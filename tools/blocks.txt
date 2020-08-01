@@ -12,6 +12,7 @@ alias colored_locks $5c00
 alias special_push $5800
 alias fg_water $3400
 alias common_pal_sand $3800
+alias toggleblocks $4A00
 alias global_palette 1
 alias terrain_palette 2
 alias locks_palette 3
@@ -1247,3 +1248,94 @@ q 12,0
 
 +ColorfulFlower8
 q 14,0
+
+#######################################
+# Toggle blocks
+#######################################
+base toggleblocks
+palette colorfulflower_palette
+tileset FGColorfulFlowers
+
++Toggle1Switch
+when Touch, BlockToggleSwitch
+t 8,1 9,1
+t 10,1 11,1
+
++Toggle2Switch
+when Touch, BlockToggleSwitch
+t 4,2 5,2
+t 6,2 7,2
+
++Toggle3Switch
+when Touch, BlockToggleSwitch
+t 14,1 15,1
+t 0,2 1,2
+
++Toggle1SwitchPressed
+t 8,1 9,1
+t 12,1 13,1
+
++Toggle2SwitchPressed
+t 4,2 5,2
+t 8,2 9,2
+
++Toggle3SwitchPressed
+t 14,1 15,1
+t 2,2 3,2
+
++Toggle1BlockNonsolid
+when Above, BlockToggleNonsolid
+when Side, BlockToggleNonsolid
+when Below, BlockToggleNonsolid
+when ActorTopBottom, BlockToggleNonsolid
+when ActorSide, BlockToggleNonsolid
+t 0,0 1,0
+t 2,0 3,0
+
++Toggle2BlockNonsolid
+when Above, BlockToggleNonsolid
+when Side, BlockToggleNonsolid
+when Below, BlockToggleNonsolid
+when ActorTopBottom, BlockToggleNonsolid
+when ActorSide, BlockToggleNonsolid
+t 8,0 9,0
+t 10,0 11,0
+
++Toggle3BlockNonsolid
+when Above, BlockToggleNonsolid
+when Side, BlockToggleNonsolid
+when Below, BlockToggleNonsolid
+when ActorTopBottom, BlockToggleNonsolid
+when ActorSide, BlockToggleNonsolid
+t 0,1 1,1
+t 2,1 3,1
+
++Toggle1BlockSolid
+solid
+when Above, BlockToggleSolid
+when Side, BlockToggleSolid
+when Below, BlockToggleSolid
+when ActorTopBottom, BlockToggleSolid
+when ActorSide, BlockToggleSolid
+t 4,0 5,0
+t 6,0 7,0
+
++Toggle2BlockSolid
+solid
+when Above, BlockToggleSolid
+when Side, BlockToggleSolid
+when Below, BlockToggleSolid
+when ActorTopBottom, BlockToggleSolid
+when ActorSide, BlockToggleSolid
+t 12,0 13,0
+t 14,0 15,0
+
++Toggle3BlockSolid
+solid
+when Above, BlockToggleSolid
+when Side, BlockToggleSolid
+when Below, BlockToggleSolid
+when ActorTopBottom, BlockToggleSolid
+when ActorSide, BlockToggleSolid
+t 4,1 5,1
+t 6,1 7,1

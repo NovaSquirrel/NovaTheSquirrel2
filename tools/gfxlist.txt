@@ -45,3 +45,6 @@ A000 SPHannah
 3000 FGColorfulFlowers
 3400 FGWater
 3800 FGCommonPalSand
+E000 layer3test
+4A00 FGToggleBlocks define
+4A00 FGToggleBlocksSwapped define
