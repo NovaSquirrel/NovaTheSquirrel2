@@ -226,7 +226,8 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 
 .globalzp random1
 .globalzp random2
-.globalzp HDMASTART_Mirror
+.globalzp HDMASTART_Mirror, CGWSEL_Mirror, CGADSUB_Mirror
+
 
 .global NMIHandler ; For keeping effects stable
 .global IRQHandler ; For changing what IRQ does for different effects

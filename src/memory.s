@@ -38,7 +38,9 @@
   random1:  .res 2
   random2:  .res 2
 
-  HDMASTART_Mirror: .res 1
+  HDMASTART_Mirror: .res 1 ; Maintained everywhere HDMA is used
+  CGWSEL_Mirror: .res 1    ; Currently only maintained during gameplay
+  CGADSUB_Mirror: .res 1   ; Currently only maintained during gameplay
 
   LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks. 00xxxxxxxxyyyyy0
   BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set

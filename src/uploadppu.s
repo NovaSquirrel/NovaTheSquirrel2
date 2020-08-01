@@ -581,7 +581,9 @@ SpriteLoop:
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
   stz CGWSEL
+  stz CGWSEL_Mirror
   stz CGADSUB
+  stz CGADSUB_Mirror
 
   lda GlassForegroundEffect
   beq :+
@@ -591,8 +593,10 @@ SpriteLoop:
     sta BLENDSUB
     lda #%00100110  ; add, enable on layers 0, 1 and backdrop
     sta CGADSUB
+    sta CGADSUB_Mirror
     lda #%00000010
     sta CGWSEL
+    sta CGWSEL_Mirror
 
     lda #%00010010  ; enable sprites, plane 1
     sta BLENDMAIN

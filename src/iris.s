@@ -61,8 +61,15 @@
 
   lda #%00100000
   sta WOBJSEL
-  lda #%01010000
+
+  lda CGWSEL_Mirror
+  ; Color math always --> becomes color math inside window
+  ; Color math never  --> stays color math never
+  ; Black outside of the window
+  and #%00101111
+  ora #%01010000
   sta CGWSEL
+  sta CGWSEL_Mirror
 
   lda #$80
   tsb HDMASTART_Mirror
@@ -82,8 +89,16 @@
   sta HDMASTART_Mirror
   sta HDMASTART
 
-  lda #%00000000
+  ; Color math in window -> becomes color math always
+  ; Color math never     -> stays color math never
+  lda CGWSEL_Mirror
+  and #%00111111
+  bit #%00100000 ; Will be set if Never (or "outside window" which isn't used)
+  bne :+
+    and #%00001111
+  :
   sta CGWSEL
+  sta CGWSEL_Mirror
   plp
   rtl
 .endproc
