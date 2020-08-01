@@ -64,6 +64,12 @@ for line in text:
 		# Aliases for selecting multiple interaction types at once
 		if arg[0] == "Touch":
 			arg[0] = ("InsideBody", "InsideHead", "Above", "Below", "Side")
+		elif arg[0] == "SolidCheck":
+			arg[0] = ("InsideHead", "Above", "Below", "Side", "ActorTopBottom", "ActorSide")
+		elif arg[0] == "PlayerSolidCheck":
+			arg[0] = ("InsideHead", "Above", "Below", "Side")
+		elif arg[0] == "ActorSolidCheck":
+			arg[0] = ("ActorTopBottom", "ActorSide")
 		elif arg[0] == "Inside":
 			arg[0] = ("InsideBody", "InsideHead")
 		else:
