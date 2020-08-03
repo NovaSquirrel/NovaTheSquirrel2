@@ -34,6 +34,7 @@ D800 DialogForest
 5800 FGSpecialPush
 8400 InventoryItem
 2800 FGGlassBlocks
+2C00 FGGlassBlocksGray
 6000 BGGlass
 D000 MapBGGlass
 D000 MapBGHillsMountains
