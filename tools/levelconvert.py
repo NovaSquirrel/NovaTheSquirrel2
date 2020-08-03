@@ -159,7 +159,7 @@ def convert_layer(layer):
 			offset -= 16
 			byte_count += 1
 		else: # Just directly set the right column then
-			output.append('LSetX')
+			output.append('LSetX %d' % r.x)
 			offset = 0
 			column = r.x
 			byte_count += 2
