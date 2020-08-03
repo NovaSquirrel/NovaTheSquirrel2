@@ -585,25 +585,6 @@ SpriteLoop:
   stz CGADSUB
   stz CGADSUB_Mirror
 
-  lda GlassForegroundEffect
-  beq :+
-    lda #%00010011  ; enable sprites, plane 1
-    sta BLENDMAIN
-    lda #%00000001
-    sta BLENDSUB
-    lda #%00100110  ; add, enable on layers 0, 1 and backdrop
-    sta CGADSUB
-    sta CGADSUB_Mirror
-    lda #%00000010
-    sta CGWSEL
-    sta CGWSEL_Mirror
-
-    lda #%00010010  ; enable sprites, plane 1
-    sta BLENDMAIN
-    lda #%00010011
-    sta BLENDSUB
-  :
-
   lda ForegroundLayerThree
   beq :+
     lda #1 | ($f000 >> 9)
@@ -613,6 +594,21 @@ SpriteLoop:
     sta BGMODE
     lda #%00010111  ; enable layer 3 because it's being used now
     sta BLENDMAIN
+  :
+
+  lda GlassForegroundEffect
+  beq :+
+    lda #%00100110  ; add, enable on layers 0, 1 and backdrop
+    sta CGADSUB
+    sta CGADSUB_Mirror
+    lda #%00000010
+    sta CGWSEL
+    sta CGWSEL_Mirror
+
+    lda #%00010010
+    sta BLENDMAIN
+    lda #%00010011
+    sta BLENDSUB
   :
 
   lda ToggleSwitch1

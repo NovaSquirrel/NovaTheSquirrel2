@@ -13,10 +13,12 @@ alias special_push $5800
 alias fg_water $3400
 alias common_pal_sand $3800
 alias toggleblocks $4A00
+
 alias global_palette 1
 alias terrain_palette 2
-alias locks_palette 3
-alias glass_palette 4
+alias locks_palette 4
+alias glass_palette 5
+alias glass_palette_gray 6
 alias colorfulflower_palette 3
 alias foreststone_palette 4
 
@@ -1133,26 +1135,30 @@ q 0,0
 solid
 q 2,0
 
-+GlassWhiteSolid
-solid
++GlassNonsolidRed
 q 4,0
 
-+GlassPillarTop
++GlassNonsolidBlue
 q 6,0
 
+base $2C00
+palette glass_palette_gray
+tileset FGGlassBlocksGray
+
++GlassWhiteSolid
+solid
+q 0,0
+
++GlassPillarTop
+q 2,0
+
 +GlassPillarMiddle
-t 6,1 7,1
-t 6,1 7,1
+t 2,1 3,1
+t 2,1 3,1
 
 +GlassPillarBottom
-t 6,1 7,1
-t 8,0 9,0
-
-+GlassNonsolidRed
-q 10,0
-
-+GlassNonsolidBlue
-q 12,0
+t 2,1 3,1
+t 4,0 5,0
 
 #######################################
 # Arrow blocks
