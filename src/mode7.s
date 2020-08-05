@@ -337,6 +337,7 @@ DontIncreaseChipCounter:
   seta8
   lda #^Mode7IRQ
   sta IRQHandler+2
+  sta NMIHandler+2
   ; -----------------------
 
   lda #$8000 >> 14
@@ -348,6 +349,8 @@ DontIncreaseChipCounter:
   setaxy16
   lda #.loword(Mode7IRQ)
   sta IRQHandler+0
+  lda #.loword(Mode7NMI)
+  sta NMIHandler+0
 
   jsr MakeCheckpoint
 Loop:
@@ -498,8 +501,6 @@ SkipBlock:
 
   lda #$0F
   sta PPUBRIGHT ; Turn on rendering
-  lda #1
-  sta BGMODE
   lda #%11100000 ; Reset COLDATA
   sta COLDATA
 
@@ -524,9 +525,6 @@ SkipBlock:
   sta BGSCROLLY
   lda Mode7ScrollY+1
   sta BGSCROLLY
-
-  lda #%00010010  ; enable sprites, plane 1
-  sta BLENDMAIN
 
   ; Calculate the centers
   seta16
@@ -967,6 +965,19 @@ Mode7Tiles:
 .incbin "../tools/M7Tileset.chrm7.lz4"
 
 .include "m7palettedata.s"
+
+
+.proc Mode7NMI
+  seta8
+  pha
+  lda #1
+  sta BGMODE
+  lda #%00010010  ; enable sprites, plane 1
+  sta BLENDMAIN
+  pla
+  plb
+  rti
+.endproc
 
 
 .proc Mode7IRQ

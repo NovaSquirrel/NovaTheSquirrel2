@@ -54,6 +54,15 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   seta8
   lda #FORCEBLANK
   sta PPUBRIGHT
+
+  ; Remove an NMI handler if one was set
+  .import NoNMIHandler
+  lda #<NoNMIHandler
+  sta NMIHandler+0
+  lda #>NoNMIHandler
+  sta NMIHandler+1
+  lda #^NoNMIHandler
+  sta NMIHandler+2
 .endproc
 
 ; Input: A = overworld number
