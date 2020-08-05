@@ -34,10 +34,10 @@ Mode7CheckpointY     = CheckpointState + 2
 Mode7CheckpointDir   = CheckpointState + 4
 Mode7CheckpointChips = CheckpointState = 6
 
-M7A_M7B_Buffer1 = HDMA_Buffer1
-M7C_M7D_Buffer1 = HDMA_Buffer1+1024
-M7A_M7B_Buffer2 = HDMA_Buffer2
-M7C_M7D_Buffer2 = HDMA_Buffer2+1024
+M7A_M7B_Buffer1Data  = HDMA_Buffer1
+M7C_M7D_Buffer1Data  = HDMA_Buffer1+1024
+M7A_M7B_Buffer2Data  = HDMA_Buffer2
+M7C_M7D_Buffer2Data  = HDMA_Buffer2+1024
 
 .import m7a_m7b_0
 .import m7a_m7b_list
@@ -271,33 +271,6 @@ RestoredFromCheckpoint:
   jsl ppu_clear_nt
   .a8
 
-  ; Prepare the HDMA tables
-  lda #49
-  sta f:M7A_M7B_Buffer1
-  sta f:M7C_M7D_Buffer1
-  sta f:M7A_M7B_Buffer2
-  sta f:M7C_M7D_Buffer2
-  ; "1 scanline"
-  lda #1
-  ldx #5
-: sta f:M7A_M7B_Buffer1,x
-  sta f:M7C_M7D_Buffer1,x
-  sta f:M7A_M7B_Buffer2,x
-  sta f:M7C_M7D_Buffer2,x
-  inx
-  inx
-  inx
-  inx
-  inx
-  cpx #5*(224-48)
-  bne :-
-  ; Zero scanlines, terminate the list
-  dea
-  sta f:M7A_M7B_Buffer1,x
-  sta f:M7C_M7D_Buffer1,x
-  sta f:M7A_M7B_Buffer2,x
-  sta f:M7C_M7D_Buffer2,x
-
   ; .----------------------------------
   ; | Render Mode7LevelMap
   ; '----------------------------------
@@ -483,26 +456,26 @@ SkipBlock:
   tax
 
   ; Double buffering
-  lda #.loword(M7A_M7B_Buffer1)
+  lda #.loword(M7A_M7B_Table1)
   sta DMAADDR+$20
-  lda #.loword(M7C_M7D_Buffer1)
+  lda #.loword(M7C_M7D_Table1)
   sta DMAADDR+$30
   lda framecount
   lsr
   bcc :+
-    lda #.loword(M7A_M7B_Buffer2)
+    lda #.loword(M7A_M7B_Table2)
     sta DMAADDR+$20
-    lda #.loword(M7C_M7D_Buffer2)
+    lda #.loword(M7C_M7D_Table2)
     sta DMAADDR+$30
   :
 
   lda #.loword(GradientTable)
   sta DMAADDR+$40
-  lda #$1b03 ; m7a and m7b
+  lda #(<M7A << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7a and m7b
   sta DMAMODE+$20
-  lda #$1d03 ; m7c and m7d
+  lda #(<M7C << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7c and m7d
   sta DMAMODE+$30
-  lda #$3200 ; one byte to COLDATA
+  lda #(<COLDATA <<8) ; one byte to COLDATA
   sta DMAMODE+$40
 
   lda #220
@@ -510,9 +483,13 @@ SkipBlock:
   lda #48
   sta VTIME
   seta8
-  lda #^HDMA_Buffer1
+  lda #^M7A_M7B_Table1
   sta DMAADDRBANK+$20
   sta DMAADDRBANK+$30
+  lda #^HDMA_Buffer1
+  sta HDMAINDBANK+$20
+  sta HDMAINDBANK+$30
+
   lda #^GradientTable
   sta DMAADDRBANK+$40
 
@@ -927,24 +904,23 @@ WasRotation:
   plb
 
   ; Write index
-  ldx #1
+  ldx #0
   lda framecount
   lsr
   bcs :+
-    ldx #1+2048
+    ldx #0+2048
   :
 BuildHDMALoop:
   lda 2*176*8,y ; M7A
-  sta f:M7A_M7B_Buffer1+0,x
-  sta f:M7C_M7D_Buffer1+2,x
+  sta f:M7A_M7B_Buffer1Data+0,x
+  sta f:M7C_M7D_Buffer1Data+2,x
   lda 0,y ; M7B
-  sta f:M7A_M7B_Buffer1+2,x
+  sta f:M7A_M7B_Buffer1Data+2,x
   eor #$ffff
   ina
-  sta f:M7C_M7D_Buffer1+0,x
+  sta f:M7C_M7D_Buffer1Data+0,x
 
   inx ; Next HDMA table entry
-  inx
   inx
   inx
   inx
@@ -1311,3 +1287,37 @@ GradientTable:     ;
    .byt $07, $81   ; 
    .byt $05, $80   ; 
    .byt $00        ; 
+
+M7A_M7B_Table1:
+  ; was 49 originally, but it looks like it has an incorrect scanline when I use 49 with indirect hdma?
+  .byt 48
+  .addr .loword(0)
+  .byt 128 | 127
+  .addr .loword(M7A_M7B_Buffer1Data)
+  .byt 128 | 49
+  .addr .loword(M7A_M7B_Buffer1Data+127*4)
+  .byt 0
+M7C_M7D_Table1:
+  .byt 48
+  .addr .loword(0)
+  .byt 128 | 127
+  .addr .loword(M7C_M7D_Buffer1Data)
+  .byt 128 | 49
+  .addr .loword(M7C_M7D_Buffer1Data+127*4)
+  .byt 0
+M7A_M7B_Table2:
+  .byt 48
+  .addr .loword(0)
+  .byt 128 | 127
+  .addr .loword(M7A_M7B_Buffer2Data)
+  .byt 128 | 49
+  .addr .loword(M7A_M7B_Buffer2Data+127*4)
+  .byt 0
+M7C_M7D_Table2:
+  .byt 48
+  .addr .loword(0)
+  .byt 128 | 127
+  .addr .loword(M7C_M7D_Buffer2Data)
+  .byt 128 | 49
+  .addr .loword(M7C_M7D_Buffer2Data+127*4)
+  .byt 0
