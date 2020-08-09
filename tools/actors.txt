@@ -246,6 +246,8 @@ run RunAnyCannonH
 draw DrawCannonV
 size 16x16
 
+# --------------------
+
 +BounceGuy
 flag AutoRemove GetShot AutoReset
 gfx SPCannon
@@ -278,6 +280,60 @@ gfx SPHannah
 run RunBoulder
 draw DrawBoulder
 size 16x16
+
++BurgerRider
+flag AutoRemove GetShot AutoReset
+gfx SPBurgerRider
+pal SPCannon
+size 16x40
+
++ExplodingFries
+flag AutoRemove GetShot AutoReset
+gfx SPBurgerRider
+pal SPCannon
+size 16x16
+
++FrenchFry
+flag AutoRemove
+gfx SPBurgerRider
+pal SPCannon
+size 8x16
+
++BubbleWizard
+flag AutoRemove GetShot AutoReset
+gfx SPBubble
+pal SPWalker
+size 8x18
+
++BubbleBuddy
+flag AutoRemove GetShot AutoReset
+gfx SPBubble
+pal SPWalker
+size 16x16
+
++BubbleBullet
+flag AutoRemove GetShot AutoReset
+gfx SPBubble
+pal SPWalker
+size 8x8
+
++BubbleCat
+flag AutoRemove GetShot AutoReset
+gfx SPBubble
+pal SPWalker
+size 16x14
+
++BubbleMoai
+flag AutoRemove GetShot AutoReset
+gfx SPMoai
+pal SPFire
+size 16x22
+
++SkateboardMoai
+flag AutoRemove GetShot AutoReset
+gfx SPMoai
+pal SPFire
+size 16x28
 
 # ---------- particles ----------
 +Poof

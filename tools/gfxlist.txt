@@ -49,3 +49,6 @@ A000 SPHannah
 E000 layer3test
 4A00 FGToggleBlocks define
 4A00 FGToggleBlocksSwapped define
+A000 SPMoai
+A000 SPBubble
+A000 SPBurgerRider
