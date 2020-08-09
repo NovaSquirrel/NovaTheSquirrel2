@@ -54,6 +54,7 @@ MaxSpeedRight = 12
   countdown PlayerWantsToAttack
   countdown PlayerJumpCancelLock
   countdown PlayerOnLadder
+  countdown PlayerInWater
   countdown PlayerInvincible
   countdown PlayerWalkLock
   stz PlayerOnSlope
@@ -292,7 +293,7 @@ DecelerateAnyway:
 
     sub Temp ; Deceleration speed
     bpl :+
-      lda #0
+      tdc ; Clear accumulator
     :
 
     ; If negative, make negative again
@@ -408,6 +409,9 @@ SkipLeft:
   lda PlayerOnLadder
   and #255
   bne HandleLadder
+  lda PlayerInWater
+  and #255
+  bne PlayerHandleWater
 
   ; Vertical movement
   lda PlayerVY
@@ -421,6 +425,26 @@ SkipGravity:
   add PlayerPY ; Apply the vertical speed
   sta PlayerPY
 SkipApplyGravity:
+  jmp PlayerIsntOnLadder
+
+PlayerHandleWater:
+  seta8
+  stz PlayerNeedsGround
+  seta16
+  jsr OfferJump
+  lda PlayerVY
+  bmi @GravityAddOK
+  cmp #$60
+  bcs @SkipGravity
+@GravityAddOK:
+  add #2
+  sta PlayerVY
+@SkipGravity:
+  cmp #$8000
+  ror
+  add PlayerPY ; Apply the vertical speed/2
+  sta PlayerPY
+@SkipApplyGravity:
   jmp PlayerIsntOnLadder
 
 HandleLadder:

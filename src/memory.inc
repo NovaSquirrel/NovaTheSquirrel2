@@ -25,7 +25,7 @@
 .globalzp PlayerFrameYFlip
 .globalzp PlayerDir
 .globalzp PlayerWasRunning
-.global PlayerOnLadder
+.global PlayerOnLadder, PlayerInWater
 .global PlayerOnSlope
 .global PlayerSlopeType
 .global PlayerRolling

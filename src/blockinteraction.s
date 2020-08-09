@@ -761,6 +761,23 @@ Exit:
 .endproc
 
 .a16
+.export BlockWater
+.proc BlockWater
+  seta8
+  lda PlayerInWater
+  bne :+
+    lda PlayerVY+1
+    bmi :+
+      stz PlayerVY
+      stz PlayerVY+1
+  :
+  lda #2
+  sta PlayerInWater
+  seta16
+  rts
+.endproc
+
+.a16
 .proc BlockFallthrough
   seta8
   lda PlayerDownTimer

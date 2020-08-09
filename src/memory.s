@@ -215,6 +215,7 @@ LevelZeroWhenLoad_Start:
   PaletteRequestIndex: .res 1
   PaletteRequestValue: .res 1
   PlayerOnLadder:      .res 1
+  PlayerInWater:       .res 1
 
   PlayerOnSlope:       .res 1 ; Nonzero if the player is on a slope
   PlayerSlopeType:     .res 2 ; Type of slope the player is on, if they are on one

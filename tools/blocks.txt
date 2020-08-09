@@ -775,100 +775,119 @@ tileset FGWater
 
 +WaterSingle
 class Water
+when InsideBody, BlockWater
 t 0,0 1,0
 t 4,0 5,0
 
 +WaterVerticalBottom
 class Water
+when InsideBody, BlockWater
 t 3,1 4,1
 t 0,1 2,1
 
 +WaterVerticalTop
 class Water
+when InsideBody, BlockWater
 t 0,0 1,0
 t 10,0 11,0
 
 +WaterVertical
 class Water
+when InsideBody, BlockWater
 t 3,1 4,1
 t 3,1 4,1
 
 +WaterHorizontalLeft
 class Water
+when InsideBody, BlockWater
 t 0,0 3,0
 t 4,0 7,0
 
 +WaterLowerLeft
 class Water
+when InsideBody, BlockWater
 t 3,1 0:11
 t 0,1 1,1
 
 +WaterUpperLeft
 class Water
+when InsideBody, BlockWater
 t 0,0 3,0
 t 3,1 9,0
 
 +WaterLeftSide
 class Water
+when InsideBody, BlockWater
 t 3,1 0:11
 t 3,1 0:11
 
 +WaterHorizontalRight
 class Water
+when InsideBody, BlockWater
 t 2,0 1,0
 t 6,0 5,0
 
 +WaterLowerRight
 class Water
+when InsideBody, BlockWater
 t 0:11 4,1
 t 1,1 2,1
 
 +WaterUpperRight
 class Water
+when InsideBody, BlockWater
 t 2,0 1,0
 t 8,0 11,0
 
 +WaterRightSide
 class Water
+when InsideBody, BlockWater
 t 0:11 4,1
 t 0:11 4,1
 
 +WaterHorizontal
 class Water
+when InsideBody, BlockWater
 t 2,0 3,0
 t 6,0 7,0
 
 +WaterBottomSide
 class Water
+when InsideBody, BlockWater
 t 0:11 0:11
 t 1,1 1,1
 
 +WaterTopside
 class Water
+when InsideBody, BlockWater
 t 2,0 3,0
 t 8,0 9,0
 
 +Water
 class Water
 autotile AutotileWater
+when InsideBody, BlockWater
 t 0:11 0:11
 t 0:11 0:11
 
 +WaterInnerCornerRight
 class Water
 autotile AutotileWater
+when InsideBody, BlockWater
 t 0:11 6,1
 t 0:11 0:11
 
 +WaterInnerCornerLeft
 class Water
 autotile AutotileWater
+when InsideBody, BlockWater
 t 5,1 0:11
 t 0:11 0:11
 
 +WaterInnerCornerBoth
 class Water
 autotile AutotileWater
+when InsideBody, BlockWater
 t 5,1 6,1
 t 0:11 0:11
 
