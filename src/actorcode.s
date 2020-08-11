@@ -2098,7 +2098,7 @@ ThwaiteCosineTable:
 
 ; Calculates a horizontal and vertical speed from a speed and an angle
 ; input: A (speed) Y (angle, 0-255 times 2)
-; output: 0,1,2 (X position), 2,3,4 (Y position)
+; output: 0,1,2 (X position), 3,4,5 (Y position)
 .import MathSinTable, MathCosTable
 .export SpeedAngle2Offset256
 .proc SpeedAngle2Offset256
