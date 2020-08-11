@@ -61,7 +61,7 @@ romname:
   .byte MEMSIZE_1MB  ; ROM size (08-0C typical)
   .byte MEMSIZE_NONE   ; backup RAM size (01,03,05 typical; Dezaemon has 07)
   .byte REGION_AMERICA
-  .byte $33   ; publisher id, or $33 for see 16 bytes before header
+  .byte $00   ; publisher id, or $33 for see 16 bytes before header
   .byte $00   ; ROM revision number
   .word $0000 ; sum of all bytes will be poked here after linking
   .word $0000 ; $FFFF minus above sum will also be poked here
