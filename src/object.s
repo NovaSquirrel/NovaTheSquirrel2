@@ -22,7 +22,7 @@
 .import ParticleRun, ParticleDraw, ActorGetShot
 .smart
 
-.segment "ActorData"
+.segment "ActorCommon"
 
 ; Two comparisons to make to determine if something is a slope
 SlopeBCC = Block::MedSlopeL_DL
