@@ -24,7 +24,8 @@ objlist = \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
-  backgrounddata bgeffectcode playerdraw playerability iris
+  backgrounddata bgeffectcode playerdraw playerability iris \
+  playerprojectile
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -164,6 +165,7 @@ $(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/po
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(objdir)/playerprojectile.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(srcdir)/itemdata.s: $(srcdir)/itemenum.s $(srcdir)/vwf.inc
 $(objdir)/itemcode.o: $(srcdir)/itemenum.s
 $(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
