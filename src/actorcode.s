@@ -1443,6 +1443,7 @@ Normal:
 .i16
 .export RunExplodingFries
 .proc RunExplodingFries
+  stz ActorState,x ; Can't stun fries
   jsl ActorFall
   bcc InAir
   inc ActorVarA,x
