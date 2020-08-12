@@ -285,54 +285,72 @@ size 16x16
 flag AutoRemove GetShot AutoReset
 gfx SPBurgerRider
 pal SPCannon
+run RunBurgerRider
+draw DrawBurgerRider
 size 16x40
 
 +ExplodingFries
 flag AutoRemove GetShot AutoReset
 gfx SPBurgerRider
 pal SPCannon
+run RunExplodingFries
+draw DrawExplodingFries
 size 16x16
 
 +FrenchFry
 flag AutoRemove
 gfx SPBurgerRider
 pal SPCannon
+run RunFrenchFry
+draw DrawFrenchFry
 size 8x16
 
 +BubbleWizard
 flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
+run RunBubbleWizard
+draw DrawBubbleWizard
 size 8x18
 
 +BubbleBuddy
 flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
+run RunBubbleBuddy
+draw DrawBubbleBuddy
 size 16x16
 
 +BubbleBullet
 flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
+run RunBubbleBullet
+draw DrawBubbleBullet
 size 8x8
 
 +BubbleCat
 flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
+run RunBubbleCat
+draw DrawBubbleCat
 size 16x14
 
 +BubbleMoai
 flag AutoRemove GetShot AutoReset
 gfx SPMoai
 pal SPFire
+run RunBubbleMoai
+draw DrawBubbleMoai
 size 16x22
 
 +SkateboardMoai
 flag AutoRemove GetShot AutoReset
 gfx SPMoai
 pal SPFire
+run RunSkateboardMoai
+draw DrawSkateboardMoai
 size 16x28
 
 # ---------- particles ----------

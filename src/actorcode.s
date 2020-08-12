@@ -19,6 +19,7 @@
 .include "global.inc"
 .include "actorenum.s"
 .include "blockenum.s"
+.include "actorframedefine.s"
 .smart
 
 .segment "ActorData"
@@ -304,10 +305,8 @@ DistanceToTrigger:
   jml DispActorMetaRight
 
 Platform:
-  .byt 4        ; 4 across
-  .word .loword(-16), 0  ; X and Y
-  .byt $00, $10, $10, $01
-  .byt 255
+  Row8x8   -16,0,  $00, $10, $10, $01
+  EndMetasprite
 .endproc
 
 .a16
@@ -1236,13 +1235,9 @@ TilesB:
   lda #.loword(Tree)
   jml DispActorMetaPriority2
 Tree:
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(-16)     ; X and Y
-  .byt $00
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(0)     ; X and Y
-  .byt $02
-  .byt 255
+  Row16x16  0,-16,  $00
+  Row16x16  0,  0,  $02
+  EndMetasprite
 .endproc
 
 .a16
@@ -1283,10 +1278,8 @@ DrawSprout:
   lda #.loword(Sprout)
   jml DispActorMetaPriority2
 Sprout:
-  .byt 2        ; 2 across
-  .word .loword(-4), .loword(0)  ; X and Y
-  .byt $14, $15
-  .byt 255
+  Row8x8   -4,0,  $14,$15
+  EndMetasprite
 .endproc
 
 .a16
@@ -1349,21 +1342,13 @@ NotInGround:
   jml DispActorMetaPriority2
 
 Turnip:
-  .byt 2        ; 2 across
-  .word .loword(-4), .loword(-16)  ; X and Y
-  .byt $14, $15
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(0)     ; X and Y
-  .byt $06
-  .byt 255
+  Row8x8   -4,-16,  $14, $15
+  Row16x16  0,  0,  $06
+  EndMetasprite
 Turnip2:
-  .byt 2        ; 2 across
-  .word .loword(-4), .loword(-16)  ; X and Y
-  .byt $14, $15
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(0)     ; X and Y
-  .byt $08
-  .byt 255
+  Row8x8   -4,-16,  $14, $15
+  Row16x16  0,  0,  $08
+  EndMetasprite
 .endproc
 
 .a16
@@ -1396,25 +1381,14 @@ Turnip2:
   jml DispActorMetaPriority2
 
 Rabbit2:
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(-16)     ; X and Y
-  .byt $00
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(0)     ; X and Y
-  .byt $02
-  .byt 255
-
+  Row16x16  0,-16,  $00
+  Row16x16  0,  0,  $02
+  EndMetasprite
 Rabbit:
-  .byt 2        ; 2 across
-  .word .loword(-4), .loword(-24)  ; X and Y
-  .byt $00, $01
-  .byt 2        ; 2 across
-  .word .loword(-4), .loword(-16)  ; X and Y
-  .byt $0a, $1a
-  .byt 1|128    ; 16x16
-  .word .loword(0), .loword(0)     ; X and Y
-  .byt $0b
-  .byt 255
+  Row8x8   -4,-24,  $00, $01
+  Row8x8   -4,-16,  $0a, $1a
+  Row16x16  0,  0,  $0b
+  EndMetasprite
 .endproc
 
 .a16
@@ -1430,6 +1404,150 @@ Rabbit:
 .proc DrawMirrorRabbitInHat
   rtl
 .endproc
+
+
+.a16
+.i16
+.export RunBurgerRider
+.proc RunBurgerRider
+  rtl
+.endproc
+.a16
+.i16
+.export DrawBurgerRider
+.proc DrawBurgerRider
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunExplodingFries
+.proc RunExplodingFries
+  rtl
+.endproc
+.a16
+.i16
+.export DrawExplodingFries
+.proc DrawExplodingFries
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunFrenchFry
+.proc RunFrenchFry
+  rtl
+.endproc
+.a16
+.i16
+.export DrawFrenchFry
+.proc DrawFrenchFry
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunBubbleWizard
+.proc RunBubbleWizard
+  rtl
+.endproc
+.a16
+.i16
+.export DrawBubbleWizard
+.proc DrawBubbleWizard
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunBubbleBuddy
+.proc RunBubbleBuddy
+  rtl
+.endproc
+.a16
+.i16
+.export DrawBubbleBuddy
+.proc DrawBubbleBuddy
+  lda #0|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+
+.a16
+.i16
+.export RunBubbleBullet
+.proc RunBubbleBullet
+  rtl
+.endproc
+.a16
+.i16
+.export DrawBubbleBullet
+.proc DrawBubbleBullet
+  rtl
+.endproc
+
+
+.a16
+.i16
+.export RunBubbleCat
+.proc RunBubbleCat
+  lda #$10
+  jsl ActorWalkOnPlatform
+  jsl ActorFall
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawBubbleCat
+.proc DrawBubbleCat
+  lda framecount
+  lsr
+  lsr
+  and #2
+  add #(2*2)|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+
+.a16
+.i16
+.export RunBubbleMoai
+.proc RunBubbleMoai
+  rtl
+.endproc
+.a16
+.i16
+.export DrawBubbleMoai
+.proc DrawBubbleMoai
+  lda #.loword(Normal)
+  jml DispActorMetaPriority2
+
+Normal:
+  Row8x8   -4,-16,  $00,$01
+  Row16x16  0,  0,  $02
+  EndMetasprite
+MouthOpen:
+  Row8x8 -4,-16,   0,1
+  Row8x8 -4, -8,   $02,$04
+  Row8x8 -4,  0,   $12,$14
+  EndMetasprite
+.endproc
+
+.a16
+.i16
+.export RunSkateboardMoai
+.proc RunSkateboardMoai
+  rtl
+.endproc
+.a16
+.i16
+.export DrawSkateboardMoai
+.proc DrawSkateboardMoai
+  rtl
+.endproc
+
+
 
 
 

@@ -1232,6 +1232,12 @@ CopyEnemy:
   .word Actor::George*2
   .word Actor::Burger*2
   .word Actor::MirrorRabbit*2
+  .word Actor::BubbleCat*2
+  .word Actor::BubbleBuddy*2
+  .word Actor::BubbleMoai*2
+  .word Actor::SkateboardMoai*2
+  .word Actor::ExplodingFries*2
+  .word Actor::BurgerRider*2
   .word 0
 
 CopyAbility:
@@ -1243,6 +1249,12 @@ CopyAbility:
   .byt Ability::Water
   .byt Ability::Burger
   .byt Ability::Mirror
+  .byt Ability::Bubble
+  .byt Ability::Bubble
+  .byt Ability::Bubble
+  .byt Ability::Bubble
+  .byt Ability::Burger
+  .byt Ability::Burger
 .endproc
 
 .a16
