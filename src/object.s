@@ -61,7 +61,8 @@ Loop:
     txy ; All override routines will have to TYX
     lda ActorTimer,x ; Reuse the timer to determine which override to use
     tax
-    .assert ^RunAllActors = ^ActorRunOverrideList, error, "ActorRunOverrideList must be in the same bank as RunAllActors"
+
+    assert_same_banks RunAllActors, ActorRunOverrideList
     .import ActorRunOverrideList
     jsr (.loword(ActorRunOverrideList),x)
 

@@ -145,7 +145,7 @@ CantAttack:
     tax
     php
     .import AbilityRoutineForId
-    .assert ^RunPlayer = ^AbilityRoutineForId, error, "AbilityRoutineForId not in player bank"
+    assert_same_banks RunPlayer, AbilityRoutineForId
     jsr (.loword(AbilityRoutineForId),x)
     plp
   :

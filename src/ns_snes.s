@@ -387,3 +387,7 @@ DJ_Label:
     adc param
   .endif
 .endmacro
+
+.macro assert_same_banks symbol1, symbol2
+  .assert ^symbol1 = ^symbol2, error, .sprintf("%s must be in the same bank as %s", .string(symbol1), .string(symbol2))
+.endmacro
