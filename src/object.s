@@ -1520,6 +1520,11 @@ SixteenStripStart:
 
   ; X
   lda (Pointer)
+  ; Negate if WidthUnit goes left
+  bit WidthUnit
+  bpl :+
+    neg
+  :
   add BasePixelX
   sub #8
   sta CurrentX

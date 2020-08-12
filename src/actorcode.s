@@ -1435,7 +1435,7 @@ Rabbit:
 Normal:
   Row8x8   -4,-32,    $16, $17
   Row16x16  0,-16,    $04
-  Row16x16  8,  0,    $00,$02
+  Row16x16 -8,  0,    $00,$02
   EndMetasprite
 .endproc
 
