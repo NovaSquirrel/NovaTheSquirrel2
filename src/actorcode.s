@@ -1410,39 +1410,152 @@ Rabbit:
 .i16
 .export RunBurgerRider
 .proc RunBurgerRider
+  .import LakituMovement
+  jsl LakituMovement
+
+  lda framecount
+  and #255
+  bne NoShoot
+    jsl FindFreeActorY
+    bcc NoShoot
+      jsl ActorClearY ; Includes clearing VarA and velocity and such
+      jsl ActorCopyPosXY
+      lda #Actor::ExplodingFries*2
+      sta ActorType,y
+  NoShoot:
   rtl
 .endproc
 .a16
 .i16
 .export DrawBurgerRider
 .proc DrawBurgerRider
-  rtl
+  lda #.loword(Normal)
+  jml DispActorMetaPriority2
+
+Normal:
+  Row8x8   -4,-32,    $16, $17
+  Row16x16  0,-16,    $04
+  Row16x16  8,  0,    $00,$02
+  EndMetasprite
 .endproc
 
 .a16
 .i16
 .export RunExplodingFries
 .proc RunExplodingFries
+  jsl ActorFall
+  bcc InAir
+  inc ActorVarA,x
+
+  ; Remove the fries a little bit after they explode
+  lda ActorVarA,x
+  cmp #100
+  bcc :+
+  stz ActorType,x
+: ; Explode fries after a bit
+  cmp #50
+  bne NotExplode
+    jsr LaunchFry
+    jsr LaunchFry
+    jsr LaunchFry
+    jsr LaunchFry
+  NotExplode:
+InAir:
   rtl
+
+LaunchFry:
+  jsl FindFreeActorY
+  bcc :+
+    jsl ActorClearY ; Includes clearing VarA and velocity and such
+    lda #Actor::FrenchFry*2
+    sta ActorType,y
+
+    lda ActorPX,x
+    sta ActorPX,y
+    lda ActorPY,x
+    sta ActorPY,y
+
+    lda #.loword(-$60)
+    sta ActorVY,y
+
+    jsl RandomByte
+    sta ActorVarA,y
+    and #$001f
+    jsl VelocityLeftOrRight
+    sta ActorVX,y
+  :
+  rts
 .endproc
 .a16
 .i16
 .export DrawExplodingFries
 .proc DrawExplodingFries
-  rtl
+  lda ActorVarA,x
+  cmp #50
+  bcs Exploded
+  lda #10|OAM_PRIORITY_2
+  jml DispActor16x16
+
+Exploded:
+  lda #.loword(ExplodedFrame)
+  jml DispActorMetaPriority2
+ExplodedFrame:
+  Row8x8 -4,0,  $1a,$1b
+  EndMetasprite
 .endproc
 
 .a16
 .i16
 .export RunFrenchFry
 .proc RunFrenchFry
-  rtl
+  jsl ActorApplyXVelocity
+  jsl ActorGravity
+  jml PlayerActorCollisionHurt
 .endproc
 .a16
 .i16
 .export DrawFrenchFry
 .proc DrawFrenchFry
-  rtl
+  lda ActorVarA,x
+  and #%1110
+  tay
+  lda Table,y
+  jml DispActorMetaPriority2
+
+Table:
+  .addr .loword(FryPic1)
+  .addr .loword(FryPic1)
+  .addr .loword(FryPic2)
+  .addr .loword(FryPic3)
+  .addr .loword(FryPic3)
+  .addr .loword(FryPic4)
+  .addr .loword(FryPic5)
+  .addr .loword(FryPic6)
+
+FryPic1:
+  Row8x8 -4,-8,  $0c
+  Row8x8 -4, 0,  $1c
+  EndMetasprite
+FryPic2:
+  Row8x8 -4,-8,  $1c|FRAME_YFLIP
+  Row8x8 -4, 0,  $0c|FRAME_YFLIP
+  EndMetasprite
+FryPic3:
+  Row8x8 -4,-8,  $0d
+  Row8x8 -4, 0,  $1d
+  EndMetasprite
+FryPic4:
+  Row8x8 -4,-8,  $1d|FRAME_YFLIP
+  Row8x8 -4, 0,  $0d|FRAME_YFLIP
+  EndMetasprite
+FryPic5:
+  Row8x8 -4,-8,  $0e
+  Row8x8 -4, 0,  $1e
+  EndMetasprite
+FryPic6:
+  Row8x8 -4,-8,  $1e|FRAME_YFLIP
+  Row8x8 -4, 0,  $0e|FRAME_YFLIP
+  EndMetasprite
 .endproc
 
 .a16
@@ -2305,6 +2418,7 @@ Exit:
   rtl
 .endproc
 
+.segment "ActorCommon" ; Must be in the same bank as RunAllActors
 .export ActorRunOverrideList
 .proc ActorRunOverrideList
   .addr .loword(Nothing)

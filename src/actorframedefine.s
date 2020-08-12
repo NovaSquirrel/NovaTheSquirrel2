@@ -72,3 +72,5 @@
 .macro EndMetasprite
   .byt 255
 .endmacro
+FRAME_XFLIP = OAM_XFLIP >> 8
+FRAME_YFLIP = OAM_YFLIP >> 8
