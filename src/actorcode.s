@@ -1612,7 +1612,7 @@ PositiveVelocity:
     and #3
     bne WasOnGround
 
-    lda #.loword(-$28)
+    lda #.loword(-$2a)
     sta ActorVY,x
     bra WasOnGround
 InAir:
