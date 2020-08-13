@@ -810,6 +810,14 @@ ChargeUp:
     rts
   :
 
+  ; Force a bubble out immediately if there's none
+  seta16
+  .import CountProjectileAmount
+  lda #Actor::PlayerProjectile*2
+  jsl CountProjectileAmount
+  beq ForceBubble
+  seta8
+
   ; Use the amount of time the ability has been out instead of the frame counter
   lda TailAttackTimer
   ina
@@ -817,6 +825,7 @@ ChargeUp:
   sta TailAttackTimer
   cmp #$f8
   bne NoBubble
+ForceBubble:
     seta16
     jsl FindFreeProjectileX
     bcc NoBubble

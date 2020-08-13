@@ -2154,6 +2154,39 @@ Loop:
   rtl
 .endproc
 
+; Counts the amount of a certain projectile actor that currently exists
+; TODO: maybe measure the projectile type, instead of the actor type?
+; inputs: A (actor type * 2)
+; outputs: Y (count)
+; locals: 0
+.export CountProjectileAmount
+.a16
+.i16
+.proc CountProjectileAmount
+  phx
+  sta 0  ; 0 = object num
+  ldy #0 ; Y = counter for number of matching objects
+
+  ldx #ProjectileStart
+Loop:
+  lda ActorType,x
+  cmp 0
+  bne :+
+    iny
+  :
+  txa
+  add #ActorSize
+  tax
+  cpx #ProjectileEnd
+  bne Loop
+
+  plx
+  tya
+  rtl
+.endproc
+
+
+
 .export ActorCopyPosXY
 .a16
 .i16
