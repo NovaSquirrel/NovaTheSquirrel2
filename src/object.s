@@ -19,7 +19,7 @@
 .include "global.inc"
 .include "blockenum.s"
 .import ActorRun, ActorDraw, ActorFlags, ActorWidth, ActorHeight, ActorBank, ActorGraphic, ActorPalette
-.import ParticleRun, ParticleDraw, ActorGetShot
+.import ActorGetShot
 .smart
 
 .segment "ActorCommon"
@@ -157,7 +157,7 @@ SkipEntity:
   cpx #ProjectileEnd ; NOT ActorEnd, go and run the projectiles too
   jne Loop
 
-  jmp RunAllParticles
+  jml RunAllParticles
 
 ; Call the Actor run code
 .a16
@@ -334,8 +334,13 @@ FoundPalette:
   jml [0]
 .endproc
 
+.pushseg
+.segment "ParticleCode"
 .a16
 .i16
+.import ParticleRun, ParticleDraw
+assert_same_banks RunAllParticles, ParticleRun
+assert_same_banks RunAllParticles, ParticleDraw
 .proc RunAllParticles
   phk
   plb
@@ -372,7 +377,7 @@ CallDraw:
   pha
   rts
 .endproc
-
+.popseg
 
 .a16
 .i16
@@ -879,6 +884,29 @@ Skip:
   jmp ActorCheckStandingOnSolid
 .endproc
 
+.a16
+.export ActorBumpAgainstCeiling
+.proc ActorBumpAgainstCeiling
+  phx
+  lda ActorType,x
+  tax
+  lda f:ActorHeight,x
+  plx
+  ; Reverse subtraction
+  eor #$ffff
+  sec
+  adc ActorPY,x
+  tay
+  lda ActorPX,x
+  jsl ActorTryUpInteraction
+  asl
+  bcc :+
+    lda #$20
+    sta ActorVY,x
+    clc
+  :
+  rtl
+.endproc
 
 ; Checks if an Actor is on top of a solid block
 ; input: X (Actor slot)
@@ -894,27 +922,7 @@ Skip:
   ; If going upwards, bounce against ceilings
   stz 0
   lda ActorVY,x
-  bpl NotUp
-    phx
-    lda ActorType,x
-    tax
-    lda f:ActorHeight,x
-    plx
-    ; Reverse subtraction
-    eor #$ffff
-    sec
-    adc ActorPY,x
-    tay
-    lda ActorPX,x
-    jsl ActorTryUpInteraction
-    asl
-    bcc :+
-      lda #$20
-      sta ActorVY,x
-      clc
-    :
-    rtl
-  NotUp:
+  bmi ActorBumpAgainstCeiling
 
   ; Check for slope interaction
   jsr ActorGetSlopeYPos

@@ -137,6 +137,7 @@ for b in all_actors:
 outfile.write('.endproc\n\n')
 
 # Particles
+outfile.write('.segment "ParticleCode"\n')
 outfile.write('.proc ParticleDraw\n  .addr .loword(ParticleNothing-1)\n')
 for b in all_particles:
 	outfile.write('  .addr .loword(%s-1)\n' % b["draw"])

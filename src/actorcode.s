@@ -37,7 +37,7 @@ CommonTileBase = $40
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
 .import ActorNegIfLeft
 .import GetAngle512
-.import ActorTryUpInteraction, ActorTryDownInteraction
+.import ActorTryUpInteraction, ActorTryDownInteraction, ActorBumpAgainstCeiling
 
 .a16
 .i16
@@ -1576,13 +1576,72 @@ FryPic6:
 .i16
 .export RunBubbleBuddy
 .proc RunBubbleBuddy
-  rtl
+  seta8
+  stz ActorOnGround,x
+  seta16
+
+  lda ActorVY,x
+  bpl PositiveVelocity
+;  jsl ActorBumpAgainstCeiling
+  bra InAir
+PositiveVelocity:
+  lda ActorPY,x ; Only interact with ground on the top half of it
+  and #$80
+  bne InAir
+  ldy ActorPY,x ; Test for ground
+  lda ActorPX,x
+  jsl ActorTryDownInteraction
+  cmp #$4000
+  bcc InAir
+    jsl ActorLookAtPlayer
+    stz ActorVY,x
+
+    seta8
+    inc ActorOnGround,x
+    stz ActorPY,x ; Clear the low byte
+    seta16
+
+    ; Jump sometimes
+    lda ActorState
+    and #255
+    bne WasOnGround
+    lda framecount
+    and #15
+    bne WasOnGround
+    jsl RandomByte
+    and #3
+    bne WasOnGround
+
+    lda #.loword(-$28)
+    sta ActorVY,x
+    bra WasOnGround
+InAir:
+  lda #20
+  jsl ActorWalk
+
+WasOnGround:
+  lda #10
+  jsl ActorWalk
+WasInAir:
+
+  ; Apply and add small amount of gravity
+  lda ActorVY,x
+  add #1
+  sta ActorVY,x
+  add ActorPY,x
+  sta ActorPY,x
+  jml PlayerActorCollisionHurt
 .endproc
 .a16
 .i16
 .export DrawBubbleBuddy
 .proc DrawBubbleBuddy
+  lda ActorOnGround,x
+  and #255
+  beq :+
   lda #0|OAM_PRIORITY_2
+  jml DispActor16x16
+: lda #2|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
 
@@ -1591,13 +1650,22 @@ FryPic6:
 .i16
 .export RunBubbleBullet
 .proc RunBubbleBullet
-  rtl
+  jml PlayerActorCollisionHurt
 .endproc
 .a16
 .i16
 .export DrawBubbleBullet
 .proc DrawBubbleBullet
-  rtl
+  lda ActorVarA,x
+  and #%1110
+  tay
+  lda Images,y
+  jml DispActor8x8
+Images:
+  .word 14|$00|OAM_PRIORITY_2
+  .word 14|$00|OAM_PRIORITY_2
+  .word 15|$10|OAM_PRIORITY_2
+  .word 15|$10|OAM_PRIORITY_2
 .endproc
 
 
@@ -2045,6 +2113,9 @@ MakeForkedArrow:
 
 
 ; -------------------------------------
+; Maybe move particles to a separate file, though we don't have many yet
+.pushseg
+.segment "ParticleCode"
 .a16
 .i16
 .export DrawPoofParticle
@@ -2235,6 +2306,7 @@ Flipped:
 
   rts
 .endproc
+.popseg
 
 
 ; Check for collision with a rideable 16x16 thing
