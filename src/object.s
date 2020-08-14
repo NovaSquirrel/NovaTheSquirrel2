@@ -869,7 +869,7 @@ Skip:
 .export ActorFall
 .proc ActorFall
   jsl ActorGravity
-
+OnlyGroundCheck:
   ; Remove if too far off the bottom
   lda ActorPY,x
   bmi :+
@@ -883,6 +883,8 @@ Skip:
 
   jmp ActorCheckStandingOnSolid
 .endproc
+ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
+.export ActorFallOnlyGroundCheck
 
 .a16
 .export ActorBumpAgainstCeiling

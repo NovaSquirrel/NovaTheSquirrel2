@@ -328,68 +328,44 @@ Platform:
 .export RunMovingPlatformPush
 .proc RunMovingPlatformPush
   jsl CollideRide
-  php
-
-  seta8
-  lda ActorState,x
-  cmp #ActorStateValue::Init
-  bne :+ ; change it to paused
-    seta16
-    lda ActorPX,x
-    sta ActorVarA,x
-    lda ActorPY,x
-    sta ActorVarB,x
-  :
-  seta16
-
-  lda framecount
-  asl
-  and #255
-  asl
-  tay
-  lda #11
-  jsr SpeedAngle2Offset256
-
-  OldX = 6
-  OldY = 8
-  lda ActorPX,x
-  sta OldX
-  lda ActorPY,x
-  sta OldY
-
-  lda ActorVarA,x
-  add 1
-  sta ActorPX,x
-
-  lda ActorVarB,x
-  add 4
-  sta ActorPY,x
-
-  ; ---------------
-
-  plp
   bcc NoRide
-    seta8
-    lda #2
-    sta PlayerRidingSomething
-    seta16
-    stz PlayerVY
+    lda ActorVarA,x
+    asl
+    tay
+
+    lda ActorPX,x
+    add DXList,y
+    sta ActorPX,x
+
+    lda PlayerPX
+    add DXList,y
+    sta PlayerPX
+
+    lda ActorPY,x
+    add DYList,y
+    sta ActorPY,x
+
     lda ActorPY,x
     sub #$70
     sta PlayerPY
 
-    lda ActorPX,x
-    sub OldX
-    add PlayerPX
-    sta PlayerPX
+    stz PlayerVY
 
-;    lda ActorPY,x
-;    sub OldY
-;    add PlayerPY
-;    sta PlayerPY
+    seta8
+    lda #2
+    sta PlayerRidingSomething
+    stz PlayerNeedsGround
+    seta16
   NoRide:
-
   rtl
+
+DXList:
+  .word .loword($10), .loword($00), .loword(-$10), .loword($00)
+  .word .loword($20), .loword($00), .loword(-$20), .loword($00)
+
+DYList:
+  .word .loword($00), .loword($10), .loword($00), .loword(-$10)
+  .word .loword($00), .loword($20), .loword($00), .loword(-$20)
 .endproc
 
 .a16
@@ -1580,18 +1556,18 @@ FryPic6:
   stz ActorOnGround,x
   seta16
 
+  ; Apply and add small amount of gravity
   lda ActorVY,x
-  bpl PositiveVelocity
-;  jsl ActorBumpAgainstCeiling
-  bra InAir
-PositiveVelocity:
+  add #1
+  sta ActorVY,x
+  add ActorPY,x
+  sta ActorPY,x
+
   lda ActorPY,x ; Only interact with ground on the top half of it
   and #$80
   bne InAir
-  ldy ActorPY,x ; Test for ground
-  lda ActorPX,x
-  jsl ActorTryDownInteraction
-  cmp #$4000
+  .import ActorFallOnlyGroundCheck
+  jsl ActorFallOnlyGroundCheck
   bcc InAir
     jsl ActorLookAtPlayer
     stz ActorVY,x
@@ -1623,13 +1599,6 @@ WasOnGround:
   lda #10
   jsl ActorWalk
 WasInAir:
-
-  ; Apply and add small amount of gravity
-  lda ActorVY,x
-  add #1
-  sta ActorVY,x
-  add ActorPY,x
-  sta ActorPY,x
   jml PlayerActorCollisionHurt
 .endproc
 .a16
