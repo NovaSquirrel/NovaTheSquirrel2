@@ -327,6 +327,9 @@ Platform:
 .i16
 .export RunMovingPlatformPush
 .proc RunMovingPlatformPush
+  lda PlayerPY
+  cmp ActorPY,x
+  bcs NoRide
   jsl CollideRide
   bcc NoRide
     lda ActorVarA,x
