@@ -108,6 +108,7 @@
   MetalForkDown
   ArrowRevealSolid
   Water
+  WoodPlanks
 .endenum
 
 .macro LSpr Type, Direction, XPos, YPos, Extra

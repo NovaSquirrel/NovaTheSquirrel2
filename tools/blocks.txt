@@ -12,6 +12,7 @@ alias colored_locks $5c00
 alias special_push $5800
 alias fg_water $3400
 alias common_pal_sand $3800
+alias treehouse $3800
 alias toggleblocks $4A00
 
 alias global_palette 1
@@ -705,6 +706,34 @@ t 7,0 7,0
 solid
 t 4,0 5,0
 t 7,0 8,0
+
+#######################################
+# Treehouse, currently wooden planks
+#######################################
+base treehouse
+palette terrain_palette
+tileset FGTreehouse
+
++WoodPlanks
+autotile AutotileWoodPlanks
+solid
+t 0,0 1,0
+t 2,0 3,0
+
++WoodPlanksLeft
+solid
+t 0,0 5,0
+t 2,0 7,0
+
++WoodPlanksRight
+solid
+t 4,0 1,0
+t 6,0 3,0
+
++WoodPlanksMiddle
+solid
+t 4,0 5,0
+t 6,0 7,0
 
 #######################################
 # Terrain rocks

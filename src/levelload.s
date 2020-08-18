@@ -669,7 +669,7 @@ ActorListInRAM:
   .word Block::MetalForkDown
   .word Block::ArrowRevealSolid
   .word Block::Water
-  .word Block::Empty
+  .word Block::WoodPlanks
   .word Block::Empty
   .word Block::Empty
   .word Block::Empty

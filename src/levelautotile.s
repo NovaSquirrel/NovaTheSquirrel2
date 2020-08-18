@@ -925,3 +925,32 @@ No:
 Yes:
   rts
 .endproc
+
+.export AutotileWoodPlanks
+.proc AutotileWoodPlanks
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsWood
+  rol 0
+  lda [RightPointer],y
+  jsr IsWood
+  rol 0
+  asl 0 ; Multiply by 2 for the 16-bit table below
+
+  lda #Block::WoodPlanks
+  add 0
+  sta [MidPointer],y
+  rts
+
+IsWood:
+  cmp #Block::WoodPlanksMiddle+1
+  bcs No
+  cmp #Block::WoodPlanks
+  bcc No
+  ; Carry set
+  rts
+No:
+  clc
+  rts
+.endproc
