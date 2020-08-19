@@ -657,6 +657,8 @@ Create:
 .endproc
 
 .proc BlockSpikes
+  .import HurtPlayer
+  jsl HurtPlayer
   rts
 .endproc
 
