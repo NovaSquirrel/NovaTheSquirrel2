@@ -193,13 +193,12 @@ CheckerLoop:
 
   ; Decompress a level of some sort
   seta8
-  .import M7Level_sample2
   hm_node = 0
-  lda #<M7Level_sample2
+  lda LevelHeaderPointer+0
   sta hm_node+0
-  lda #>M7Level_sample2
+  lda LevelHeaderPointer+1
   sta hm_node+1
-  lda #^M7Level_sample2
+  lda LevelHeaderPointer+2
   sta hm_node+2
 
   ; Starting X pos
@@ -233,7 +232,9 @@ CheckerLoop:
   seta16
   ldx hm_node
   ldy #.loword(Mode7LevelMap)
-  lda #(^Mode7LevelMap <<8) | ^M7Level_sample2
+  lda LevelHeaderPointer+2
+  and #255
+  ora #(^Mode7LevelMap <<8)
   jsl SFX_LZ4_decompress
   .a16
 
