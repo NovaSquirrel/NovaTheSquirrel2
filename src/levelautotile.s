@@ -280,6 +280,7 @@ AutotileExpandOther = AutotileExpandDirt::ExpandOther
   iny
   iny
 
+; Adjust every block in the column
 Loop:
   iny
   iny
@@ -290,6 +291,7 @@ Loop:
   sta [MidPointer],y
   bra Loop
 
+; Hit the bottom
 Nope:
   dey
   dey
@@ -323,6 +325,7 @@ Yup:
   iny
   iny
 
+; Adjust every block in the column
 Loop:
   iny
   iny
@@ -333,14 +336,15 @@ Loop:
   sta [MidPointer],y
   bra Loop
 
+; Hit the bottom
 Nope:
   dey
   dey
+  lda [RightPointer],y
   cmp #Block::LedgeRight
   beq Yup
   cmp #Block::LedgeSolidRight
   beq Yup
-  lda [RightPointer],y
   cmp #Block::Ledge
   bne :+
 Yup:
