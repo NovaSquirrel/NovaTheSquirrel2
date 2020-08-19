@@ -253,6 +253,7 @@ for world in all_levelmarkers:
 		else:
 			x, y, color, directions = level
 			outfile.write('$%.2x, $%.2x' % ((y<<4)|x, (color<<4)|directions))
+	outfile.write('\n')
 outfile.write('\n\n')
 
 # Import all of the level pointers
@@ -272,6 +273,7 @@ for world in all_levelpointers:
 			outfile.write('0')
 		else:
 			outfile.write(level)
+	outfile.write('\n')
 outfile.write('\n\n')
 
 
