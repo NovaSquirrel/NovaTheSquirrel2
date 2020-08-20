@@ -128,7 +128,7 @@ OAM_YPOS = OAM+1
 OAM_TILE = OAM+2
 OAM_ATTR = OAM+3
 
-ActorLen = 20
+ActorLen = 24
 ProjectileLen = 8
 .global ActorStart
 .globalzp ActorSize

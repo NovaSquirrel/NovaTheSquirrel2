@@ -268,8 +268,15 @@ DistanceToTrigger:
   lda #11|OAM_PRIORITY_2
   jsr DrawCannonIndicator
 
+  lda ActorVarA,x
+  bne UpsideDown
+
   lda #$6|OAM_PRIORITY_2
   jml DispActor16x16
+
+UpsideDown:
+  lda #$6|OAM_PRIORITY_2|OAM_YFLIP
+  jml DispActor16x16FlippedAbsolute
 .endproc
 
 .a16
@@ -549,10 +556,50 @@ NoShoot:
 .endproc
 
 .a16
+.proc ActorNegIfVarA
+  pha
+  lda ActorVarA,x
+  bne Left
+Right:
+  pla ; No change
+  rts
+Left:
+  pla ; Negate
+  neg
+  rts
+.endproc
+
+
+.a16
 .i16
 .export RunBurgerCannonV
 .proc RunBurgerCannonV
-  jsl ActorHover
+  jsr ActorCannonCommon1
+  bcc NoShoot
+    jsl FindFreeActorY
+    bcc NoShoot
+      jsl ActorClearY
+      jsl ActorCopyPosXY
+
+      lda #Actor::Burger*2
+      sta ActorType,y
+      lda #0
+      sta ActorTimer,y
+      sta ActorVY,y
+      lda #25*4
+      sta ActorVarB,y ; Expiration timer
+      lda #.loword(-$38)
+      jsr ActorNegIfVarA
+      sta ActorVY,y
+
+      lda #.loword(-4*16)
+      sta 0
+      lda #.loword(-16*16)
+      jsr ActorNegIfVarA
+      add #.loword(-8*16)
+      sta 2
+      jsl ActorMakePoofAtOffset
+NoShoot:
   rtl
 .endproc
 
@@ -669,6 +716,9 @@ ActorCannonCommon1NoHover = ActorCannonCommon1::NoHover
 NormalWalk:
 
   ; Make flames sometimes
+  lda ActorOnScreen,x ; Require them to be onscreen, to hopefully cut down on actor slot use
+  and #255
+  beq :+
   lda ActorState,x
   and #255
   bne :+
@@ -1582,15 +1632,17 @@ FryPic6:
 
     ; Jump sometimes
     lda ActorState
-    and #255
-    bne WasOnGround
-    lda framecount
+    ora framecount
     and #15
     bne WasOnGround
     jsl RandomByte
     and #3
     bne WasOnGround
+    lda ActorOnScreen,x
+    and #255
+    beq :+
 
+    ; Do the jump
     lda #.loword(-$2a)
     sta ActorVY,x
     bra WasOnGround
@@ -1622,14 +1674,54 @@ WasInAir:
 .i16
 .export RunBubbleBullet
 .proc RunBubbleBullet
+  jsr ActorExpire
+
+  lda ActorTimer,x
+  cmp #40
+  beq Aim
+  bcc Fly
+
+  ; Smoothly slide to the right position
+
+  lda ActorVarB,x
+  sub ActorPX,x
+  jsr Divide
+  add ActorPX,x
+  sta ActorPX,x
+
+  ; -------
+
+  lda ActorVarC,x
+  sub ActorPY,x
+  jsr Divide
+  add ActorPY,x
+  sta ActorPY,x
+
+Done:
   jml PlayerActorCollisionHurt
+
+Divide:
+  asr_n 3
+  rts
+
+Aim:
+  jsl ActorLookAtPlayer
+  lda #$18
+  jsl ActorNegIfLeft
+  sta ActorVX,x
+  seta8
+  stz ActorDirection,x
+  seta16
+Fly:
+  jsl ActorApplyXVelocity  
+  bra Done
 .endproc
 .a16
 .i16
 .export DrawBubbleBullet
 .proc DrawBubbleBullet
   lda ActorVarA,x
-  and #%1110
+  and #%110
   tay
   lda Images,y
   jml DispActor8x8
@@ -1645,9 +1737,101 @@ Images:
 .i16
 .export RunBubbleCat
 .proc RunBubbleCat
-  lda #$10
-  jsl ActorWalkOnPlatform
   jsl ActorFall
+
+  seta8
+  ; Don't move or shoot when stunned
+  lda ActorState,x
+  beq Normal
+  cmp #ActorStateValue::Active
+  bne :+
+  lda ActorTimer,x
+  cmp #4
+  beq DoShoot
+:
+  seta16
+  rtl
+Normal:
+
+  .a8
+  tdc
+  lda PlayerPX+1
+  sub ActorPX+1,x
+  abs
+  seta16
+  ina
+  asl
+  jsl ActorWalkOnPlatform
+
+  seta8
+  ; Sometimes move into a shooting state
+  lda PlayerPY+1
+  sub ActorPY+1,x
+  abs
+  cmp #$03
+  bcs TooFar
+
+  lda PlayerPX+1
+  sub ActorPX+1,x
+  abs
+  cmp #$06
+  bcs TooFar
+
+  lda framecount
+  and #63
+  bne :+
+    lda #ActorStateValue::Active
+    sta ActorState,x
+    lda #20
+    sta ActorTimer,x
+  :
+TooFar:
+DontMove:
+  seta16
+  jml PlayerActorCollisionHurt
+
+; Shoot one bubble
+DoShoot:
+  seta16
+  jsl FindFreeActorY
+  bcc :+
+    jsl ActorClearY
+    lda ActorPX,x
+    sta ActorPX,y
+    lda ActorPY,x
+    sub #$58
+    sta ActorPY,y
+
+    ; Shoot bubble bullets
+    lda #0
+    sta ActorVY,y
+
+    lda #$30
+    jsl ActorNegIfLeft
+    sta ActorVX,y
+
+    lda #Actor::BubbleBullet*2
+    sta ActorType,y
+    lda #80
+    sta ActorTimer,y
+
+    ; Randomly position the bubble
+    jsl RandomByte
+    lsr
+    jsl VelocityLeftOrRight
+    add ActorPX,x
+    sta ActorVarB,y
+    jsl RandomByte
+    lsr
+    neg
+    sub #$0100
+    add ActorPY,x
+    sta ActorVarC,y
+
+    ; Random appearance of bubble
+    jsl RandomByte
+    sta ActorVarA,y
+  :
   jml PlayerActorCollisionHurt
 .endproc
 
@@ -1655,11 +1839,20 @@ Images:
 .i16
 .export DrawBubbleCat
 .proc DrawBubbleCat
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Active
+  beq Active
+
   lda framecount
   lsr
   lsr
   and #2
   add #(2*2)|OAM_PRIORITY_2
+
+  jml DispActor16x16
+Active:
+  lda #(4*2)|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
 

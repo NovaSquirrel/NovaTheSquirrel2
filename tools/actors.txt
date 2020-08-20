@@ -322,7 +322,7 @@ draw DrawBubbleBuddy
 size 16x16
 
 +BubbleBullet
-flag AutoRemove GetShot AutoReset
+flag AutoRemove
 gfx SPBubble
 pal SPWalker
 run RunBubbleBullet
