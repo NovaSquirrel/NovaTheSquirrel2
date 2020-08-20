@@ -1003,8 +1003,20 @@ Divide:
   add 2
   sta ActorPY,x
 
+  ; Explode certain types
+  ldy ActorPY,x
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+  cmp #Block::Bricks
+  beq ExplodeBlock
+  cmp #Block::Ice
+  beq ExplodeBlock
+
   jsr ActorExpire
   rtl
+ExplodeBlock:
+  tdc
+  jml ChangeBlock
 .endproc
 
 .a16
