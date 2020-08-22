@@ -59,3 +59,5 @@ src/backgrounddata.s
 src/backgroundenum.s
 *.namsfc
 src/itemenum.s
+src/m7blockenum.s
+src/m7blockdata.s

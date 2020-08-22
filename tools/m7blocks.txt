@@ -1,0 +1,434 @@
++Void
+solid
+t 0,0 0,0
+t 0,0 0,0
+
++Checker1
+t 1,0 1,0
+t 1,0 1,0
+
++Checker2
+t 2,0 2,0
+t 2,0 2,0
+
++Gravel
+t 2,1 2,1
+t 2,1 2,1
+
++BecomeWall
+when Exit, M7BlockBecomeWall
+t 0,1 1,1
+t 1,1 0,1
+
++Cancel
+solid
+t 3,1 3,1
+t 3,1 3,1
+
++CountFour
+when Enter, M7BlockCountFour
+q 4,0
+
++CountThree
+when Enter, M7BlockCountThree
+q 6,0
+
++CountTwo
+when Enter, M7BlockCountTwo
+q 8,0
+
++Collect
+when Enter, M7BlockCollect
+q 10,0
+
++Hurt
+when Enter, M7BlockHurt
+q 12,0
+
++Spring
+when Enter, M7BlockSpring
+q 14,0
+
++ForceDown
+when Enter, M7BlockForceDown
+q 0,2
+
++ForceUp
+when Enter, M7BlockForceUp
+q 2,2
+
++ForceLeft
+when Enter, M7BlockForceLeft
+q 4,2
+
++ForceRight
+when Enter, M7BlockForceRight
+q 6,2
+
++Empty
+q 8,2
+
++Checkpoint
+q 10,2
+
++Bomb
+q 12,0
+
++Teleport
+when Enter, M7BlockTeleport
+q 14,0
+
++ToggleFloor1
+t 0,4 1,4
+t 2,4 3,4
+
++ToggleWall1
+solid
+t 4,4 5,4
+t 6,4 7,4
+
++ToggleButton1
+when Enter, M7BlockToggleButton1
+t 0,5 1,5
+t 2,5 3,5
+
++ToggleFloor2
+t 8,4 9,4
+t 10,4 11,4
+
++ToggleWall2
+solid
+t 12,4 13,4
+t 14,4 15,4
+
++ToggleButton2
+when Enter, M7BlockToggleButton2
+t 4,5 5,5
+t 6,5 7,5
+
++PushableBlock
+when Bump, M7BlockPushableBlock
+solid
+t 8,5 9,5
+t 10,5 11,5
+
++Exit
+when Enter, M7BlockExit
+t 12,5 13,5
+t 14,5 15,5
+
++Dirt
+when Enter, M7BlockDirt
+q 0,6
+
++WoodArrowRight
+when Bump, M7BlockWoodArrow
+solid
+t 6,6 3,6 
+t 6,7 5,7
+
++WoodArrowDown
+when Bump, M7BlockWoodArrow
+solid
+q 4,6
+
++WoodArrowLeft
+when Bump, M7BlockWoodArrow
+solid
+t 2,6 7,6
+t 4,7 7,7
+
++WoodArrowUp
+when Bump, M7BlockWoodArrow
+solid
+q 2,6
+
++MetalArrowRight
+solid
+t 6,8 3,8
+t 6,9 5,9
+
++MetalArrowDown
+solid
+q 4,8
+
++MetalArrowLeft
+solid
+t 2,8 7,8
+t 4,9 7,9
+
++MetalArrowUp
+solid
+q 2,8
+
++MetalCrate
+solid
+q 0,8
+
++MetalArrowForkRight
+solid
+t 10,8 3,8
+t 10,9 5,9
+
++MetalArrowForkDown
+solid
+t 8,8 9,8
+t 4,9 5,9
+
++MetalArrowForkLeft
+solid
+t 2,8 11,8
+t 4,9 11,9
+
++MetalArrowForkUp
+solid
+t 2,8 3,8
+t 8,9 9,9
+
++Ice
+when Enter, M7BlockIce
+q 10,6
+
++IceCornerUL
+when Enter, M7BlockIceCorner
+solid_u
+solid_l
+t 12,6 11,6
+t 10,7 11,7
+
++IceCornerUR
+when Enter, M7BlockIceCorner
+solid_u
+solid_r
+t 10,6 13,6
+t 10,7 11,7
+
++IceCornerDL
+when Enter, M7BlockIceCorner
+solid_d
+solid_l
+t 10,6 11,6
+t 12,7 11,7
+
++IceCornerDR
+when Enter, M7BlockIceCorner
+solid_d
+solid_r
+t 10,6 11,6
+t 10,7 13,7
+
++IceAllCorners
+solid
+q 12,6
+
++Thief
+when Enter, M7BlockThief
+q 8,6
+
++BorderL
+solid_l
+t 14,6 3,0
+t 14,6 3,0
+
++BorderR
+solid_r
+t 3,0 15,6
+t 3,0 15,6
+
++BorderU
+solid_u
+t 14,7 14,7
+t 3,0 3,0
+
++BorderD
+solid_d
+t 3,0 3,0
+t 15,7 15,7
+
++BorderLR
+solid_l
+solid_r
+t 14,6 15,6
+t 14,6 15,6
+
++BorderUD
+solid_u
+solid_d
+t 14,7 14,7
+t 15,7 15,7
+
++RotateBorderLR
+when Exit, M7BlockRotateBorderLR
+solid_l
+solid_r
+t 14,8 15,8
+t 14,8 15,8
+
++RotateBorderUD
+when Exit, M7BlockRotateBorderUD
+solid_u
+solid_d
+t 14,9 14,9
+t 15,9 15,9
+
++RotateCornerUL
+when Exit, M7BlockRotateCorner
+solid_u
+solid_l
+t 12,8 14,9
+t 14,8 3,0
+
++RotateCornerUR
+when Exit, M7BlockRotateCorner
+solid_u
+solid_r
+t 14,9 13,8
+t 3,0 15,8
+
++RotateCornerDR
+when Exit, M7BlockRotateCorner
+solid_d
+solid_r
+t 3,0 15,8
+t 15,9 13,9
+
++RotateCornerDL
+when Exit, M7BlockRotateCorner
+solid_d
+solid_l
+t 14,8 3,0
+t 12,9 15,9
+
++Key1
+when Enter, M7BlockKey
+t 0,10 0,10
+t 0,10 0,10
+
++Key2
+when Enter, M7BlockKey
+t 1,10 1,10
+t 1,10 1,10
+
++Key3
+when Enter, M7BlockKey
+t 0,11 0,11
+t 0,11 0,11
+
++Key4
+when Enter, M7BlockKey
+t 1,11 1,11
+t 1,11 1,11
+
++Lock1
+when Bump, M7BlockLock
+solid
+t 4,10 0,10
+t 4,11 5,11
+
++Lock2
+when Bump, M7BlockLock
+solid
+t 4,10 1,10
+t 4,11 5,11
+
++Lock3
+when Bump, M7BlockLock
+solid
+t 4,10 0,11
+t 4,11 5,11
+
++Lock4
+when Bump, M7BlockLock
+solid
+t 4,10 1,11
+t 4,11 5,11
+
++CloneBlock
+solid
+t 4,10 9,5
+t 4,11 5,11
+
++CloneArrowUp
+solid
+t 4,10 0,12
+t 4,11 5,11
+
++CloneArrowDown
+solid
+t 4,10 1,12
+t 4,11 5,11
+
++CloneArrowLeft
+solid
+t 4,10 0,13
+t 4,11 5,11
+
++CloneArrowRight
+solid
+t 4,10 1,13
+t 4,11 5,11
+
++Message
+when Enter, M7BlockMessage
+q 6,10
+
++CloneButton
+when Enter, M7BlockCloneButton
+q 8,10
+
++Water
+when Enter, M7BlockWater
+q 10,10
+
++Turtle
+when Exit, M7BlockTurtle
+q 12,10
+
++Fire
+when Enter, M7BlockFire
+q 14,10
+
++PointUp
+solid
+t 0,12 0,12
+t 0,12 0,12
+
++PointDown
+solid
+t 1,12 1,12
+t 1,12 1,12
+
++PointLeft
+solid
+t 0,13 0,13
+t 0,13 0,13
+
++PointRight
+solid
+t 1,13 1,13
+t 1,13 1,13
+
++BlueAllCorners
+solid
+q 12,8
+
++FireBoots
+when Enter, M7BlockFireBoots
+t 2,10 2,10
+t 2,10 2,10
+
++SuctionBoots
+when Enter, M7BlockSuctionBoots
+t 3,10 3,10
+t 3,10 3,10
+
++Flippers
+when Enter, M7BlockFlippers
+t 2,11 2,11
+t 2,11 2,11
+
++IceSkates
+when Enter, M7BlockIceSkates
+t 3,11 3,11
+t 3,11 3,11
+

@@ -25,7 +25,7 @@ objlist = \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile
+  playerprojectile m7blockdata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -151,6 +151,7 @@ $(srcdir)/portraitdata.s: $(srcdir)/portraitenum.s
 $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
+$(objdir)/m7blockdata.o: $(srcdir)/m7blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
@@ -161,7 +162,7 @@ $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(sr
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/vwf.inc
-$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s
+$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s $(srcdir)/m7blockenum.s
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
@@ -182,9 +183,14 @@ $(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) $(chr4_lz4)
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
-$(srcdir)/blockdata.s: tools/blocks.txt
-$(srcdir)/blockenum.s: tools/blocks.txt
+$(srcdir)/blockdata.s: tools/blocks.txt tools/makeblocks.py
+$(srcdir)/blockenum.s: tools/blocks.txt tools/makeblocks.py
 	$(PY) tools/makeblocks.py
+
+# For Mode 7 levels too
+$(srcdir)/m7blockdata.s: tools/m7blocks.txt tools/m7makeblocks.py
+$(srcdir)/m7blockenum.s: tools/m7blocks.txt tools/m7makeblocks.py
+	$(PY) tools/m7makeblocks.py
 
 # Automatically create the list of overworld blocks from a description
 $(srcdir)/overworldblockdata.s: tools/overworldblocks.txt
@@ -252,10 +258,8 @@ $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png
-	$(PY) tools/makebackgroundmap.py $<
-tools/M7TilesetRearranged.png: tools/M7Tileset.png
-	$(PY) tools/rearrangem7.py
-tools/M7Tileset.chrm7: tools/M7TilesetRearranged.png
+	$(PY) tools/makebackgroundmap.py $<e
+tools/M7Tileset.chrm7: tools/M7Tileset.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py
 $(objdir)/mode7.o: tools/M7Tileset.chrm7.lz4 $(m7levels_lz4)

@@ -10,8 +10,8 @@ outfile.write('.proc Mode7Palette\n')
 
 im = Image.open("tools/M7Tileset.png")
 pal = im.getpalette()[3:]
-# Read out 64 colors
-for i in range(64):
+# Read out 90 colors
+for i in range(90):
 	r = pal.pop(0)
 	g = pal.pop(0)
 	b = pal.pop(0)

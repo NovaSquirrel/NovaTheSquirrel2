@@ -20,10 +20,10 @@
 .include "graphicsenum.s"
 .include "paletteenum.s"
 .include "portraitenum.s"
-.include "m7leveldata.inc"
+.include "m7blockenum.s"
 .smart
 .importzp hm_node
-.import huffmunch_load_snes, huffmunch_read_snes
+.import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 
 Mode7LevelMap = LevelBuf
 Mode7LevelMapCheckpoint = LevelBuf + (64*64) ; 4096
@@ -119,7 +119,7 @@ PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
   ; ---
   lda #DMAMODE_CGDATA
   ldx #$ffff & Mode7Palette
-  ldy #64*2
+  ldy #90*2
   jsl ppu_copy
 
   ; Common sprites
@@ -271,6 +271,7 @@ RestoredFromCheckpoint:
   ldy #64
   jsl ppu_clear_nt
   .a8
+  tdc ; Clear all of accumulator
 
   ; .----------------------------------
   ; | Render Mode7LevelMap
@@ -298,11 +299,14 @@ RenderMapLoop:
     cld
     pla
 DontIncreaseChipCounter:
-  asl
-  asl
+
+  phx
+  tax
+  lda M7BlockTopLeft,x
   sta PPUDATA
-  ina
+  lda M7BlockTopRight,x
   sta PPUDATA
+  plx
   inx
   dey
   bne :-
@@ -311,20 +315,24 @@ DontIncreaseChipCounter:
   txa
   sub #64
   tax
+  tdc
   seta8
 
   ; Bottom row
   ldy #64
 : lda f:Mode7LevelMap,x
-  asl
-  asl
-  ora #2
+  phx
+  tax
+  lda M7BlockBottomLeft,x
   sta PPUDATA
-  ina
+  lda M7BlockBottomRight,x
   sta PPUDATA
+  plx
   inx
   dey
   bne :-
+
+
 
   dec 0
   bne RenderMapLoop
@@ -375,7 +383,7 @@ BlockUpdateLoop:
   seta8
   lda BlockUpdateDataTL,x
   sta PPUDATA
-  ina
+  lda BlockUpdateDataTR,x
   sta PPUDATA
 
   seta16
@@ -383,10 +391,9 @@ BlockUpdateLoop:
   add #128
   sta PPUADDR
   seta8
-  lda BlockUpdateDataTL,x
-  add #2
+  lda BlockUpdateDataBL,x
   sta PPUDATA
-  ina
+  lda BlockUpdateDataBR,x
   sta PPUDATA
   seta16
 
@@ -703,9 +710,9 @@ NoRotation:
   bcs WasRotation
   jsr Mode7BlockAddress
   tay
-  lda BlockInfo,y
-  lsr
-  bcc NotWall
+  lda M7BlockFlags,y
+  and #15
+  beq NotWall
 IsWall:
     bra WasRotation
   NotWall:
@@ -868,7 +875,7 @@ WasRotation:
     lda Mode7PlayerX
     ldy Mode7PlayerY
     jsr Mode7BlockAddress
-    jsr CallBlockAction
+;    jsr CallBlockEnter
   :
 
   setaxy16
@@ -943,6 +950,7 @@ ForwardYTile:
   .word .loword(-16), 0, .loword(16), 0
 
 .proc CheckWallAhead
+; Not used?
   lda Mode7PlayerY
   add ForwardYTile,x
   cmp #64*16 ; Don't allow if this would make the player go out of bounds
@@ -954,8 +962,9 @@ ForwardYTile:
   bcs Block
   jsr Mode7BlockAddress
   tay
-  lda BlockInfo,y
-  lsr
+  lda M7BlockFlags,y
+  and #15
+  cmp #1
   rts
 Block:
   sec
@@ -1020,9 +1029,15 @@ Found:
   ; From this point on in the routine, Y = free update queue index
 
   ; Store the tile number
-  asl
-  asl
+  tax
+  lda M7BlockTopLeft,x
   sta BlockUpdateDataTL,y
+  lda M7BlockTopRight,x
+  sta BlockUpdateDataTR,y
+  lda M7BlockBottomLeft,x
+  sta BlockUpdateDataBL,y
+  lda M7BlockBottomRight,x
+  sta BlockUpdateDataBR,y
 
   ; Now calculate the PPU address
   ; LevelBlockPtr is 0000yyyyyyxxxxxx
@@ -1115,59 +1130,90 @@ Exit:
   .byt Floor ;RedButton
 .endproc
 
-CallBlockAction:
+.import M7BlockInteractionSet, M7BlockInteractionEnter
+CallBlockEnter:
+  wdm 0
+  tay
+  lda M7BlockInteractionSet,y
+  and #255
   asl
   tay
-  lda BlockAction,y
+  lda M7BlockInteractionEnter,y
   pha
   rts
 
-.proc BlockAction
-  .raddr .loword(DoNothing) ;Void
-  .raddr .loword(DoNothing) ;Checker1
-  .raddr .loword(DoNothing) ;Checker2
-  .raddr .loword(DoNothing) ;ToggleFloor
-  .raddr .loword(DoNothing) ;ToggleWall
-  .raddr .loword(DoCollect) ;Collect
-  .raddr .loword(DoHurt)    ;Hurt
-  .raddr .loword(DoNothing) ;Spring
-  .raddr .loword(DoNothing) ;ForceDown
-  .raddr .loword(DoNothing) ;ForceUp
-  .raddr .loword(DoNothing) ;ForceLeft
-  .raddr .loword(DoNothing) ;ForceRight
-  .raddr .loword(DoNothing) ;Unused
-  .raddr .loword(DoCheckpoint) ;Checkpoint
-  .raddr .loword(DoNothing) ;ToggleButton
-  .raddr .loword(DoNothing) ;Button
-  .raddr .loword(DoNothing) ;BlueLock
-  .raddr .loword(DoNothing) ;RedLock
-  .raddr .loword(DoNothing) ;GreenLock
-  .raddr .loword(DoNothing) ;YellowLock
-  .raddr .loword(DoNothing) ;BlueKey
-  .raddr .loword(DoNothing) ;RedKey
-  .raddr .loword(DoNothing) ;GreenKey
-  .raddr .loword(DoNothing) ;YellowKey
-  .raddr .loword(DoCountFive) ;CountFive
-  .raddr .loword(DoCountFour) ;CountFour
-  .raddr .loword(DoCountThree) ;CountThree
-  .raddr .loword(DoCountTwo) ;CountTwo
-  .raddr .loword(DoNothing) ;GetBlock
-  .raddr .loword(DoNothing) ;AcceptBlock
-  .raddr .loword(DoNothing) ;Bridge
-  .raddr .loword(DoNothing) ;FlyingBlock
-  .raddr .loword(DoNothing) ;Exit
-  .raddr .loword(DoNothing) ;Ice
-  .raddr .loword(DoNothing) ;Bomb
-  .raddr .loword(DoNothing) ;RedButton
-DoNothing:
+.export M7BlockFire
+M7BlockFire:
+.export M7BlockNothing
+M7BlockNothing:
+.export M7BlockBecomeWall
+M7BlockBecomeWall:
+.export M7BlockCloneButton
+M7BlockCloneButton:
+.export M7BlockDirt
+M7BlockDirt:
+.export M7BlockExit
+M7BlockExit:
+.export M7BlockFireBoots
+M7BlockFireBoots:
+.export M7BlockFlippers
+M7BlockFlippers:
+.export M7BlockSuctionBoots
+M7BlockSuctionBoots:
+.export M7BlockIceSkates
+M7BlockIceSkates:
+.export M7BlockForceLeft
+M7BlockForceLeft:
+.export M7BlockForceDown
+M7BlockForceDown:
+.export M7BlockForceUp
+M7BlockForceUp:
+.export M7BlockForceRight
+M7BlockForceRight:
+.export M7BlockIce
+M7BlockIce:
+.export M7BlockIceCorner
+M7BlockIceCorner:
+.export M7BlockKey
+M7BlockKey:
+.export M7BlockLock
+M7BlockLock:
+.export M7BlockMessage
+M7BlockMessage:
+.export M7BlockPushableBlock
+M7BlockPushableBlock:
+.export M7BlockRotateBorderLR
+M7BlockRotateBorderLR:
+.export M7BlockRotateBorderUD
+M7BlockRotateBorderUD:
+.export M7BlockRotateCorner
+M7BlockRotateCorner:
+.export M7BlockSpring
+M7BlockSpring:
+.export M7BlockTeleport
+M7BlockTeleport:
+.export M7BlockThief
+M7BlockThief:
+.export M7BlockToggleButton1
+M7BlockToggleButton1:
+.export M7BlockToggleButton2
+M7BlockToggleButton2:
+.export M7BlockTurtle
+M7BlockTurtle:
+.export M7BlockWater
+M7BlockWater:
+.export M7BlockWoodArrow
+M7BlockWoodArrow:
   rts
-
-DoHurt:
+.export M7BlockHurt
+.proc M7BlockHurt
   lda #30
   sta Mode7Oops
   rts
+.endproc
 
-DoCollect:
+.export M7BlockCollect
+.proc M7BlockCollect
   lda #15
   sta Mode7HappyTimer
 
@@ -1178,26 +1224,28 @@ DoCollect:
   cld
   lda #Mode7Block::Hurt
   jmp Mode7ChangeBlock
-DoCountFive:
-  lda #Mode7Block::CountFour
-  jmp Mode7ChangeBlock
-DoCountFour:
+.endproc
+.export M7BlockCountFour
+.proc M7BlockCountFour
   lda #Mode7Block::CountThree
   jmp Mode7ChangeBlock
-DoCountThree:
+.endproc
+.export M7BlockCountThree
+.proc M7BlockCountThree
   lda #Mode7Block::CountTwo
   jmp Mode7ChangeBlock
-DoCountTwo:
+.endproc
+.export M7BlockCountTwo
+.proc M7BlockCountTwo
   lda #Mode7Block::Collect
   jmp Mode7ChangeBlock
-
-DoCheckpoint:
+.endproc
+.export M7BlockCheckpoint
+.proc M7BlockCheckpoint
   lda #Mode7Block::Empty
   jsr Mode7ChangeBlock
   jmp MakeCheckpoint
 .endproc
-
-
 
 
 .a16
