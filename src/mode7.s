@@ -61,6 +61,8 @@ Mode7Portrait = TouchTemp
 Mode7HappyTimer:  .res 2
 Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
+Mode7LastPositionPtr: .res 2
+Mode7ForceMove: .res 2
 
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
 PORTRAIT_OOPS   = $88 | OAM_PRIORITY_3
@@ -68,6 +70,15 @@ PORTRAIT_HAPPY  = $A0 | OAM_PRIORITY_3
 PORTRAIT_BLINK  = $A8 | OAM_PRIORITY_3
 PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
 
+M7_BLOCK_SOLID_L      = 1
+M7_BLOCK_SOLID_R      = 2
+M7_BLOCK_SOLID_U      = 4
+M7_BLOCK_SOLID_D      = 8
+
+DIRECTION_UP    = 0
+DIRECTION_LEFT  = 1
+DIRECTION_DOWN  = 2
+DIRECTION_RIGHT = 3
 
 .segment "Mode7Game"
 
@@ -87,6 +98,8 @@ PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
   stz Mode7PlayerX
   stz Mode7PlayerY
   stz Mode7ChipsLeft
+  stz Mode7LastPositionPtr
+  stz Mode7ForceMove
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -558,7 +571,7 @@ SkipBlock:
   ; Save player X ORed with player Y so we can know if the player was moving last frame
   lda Mode7PlayerX
   ora Mode7PlayerY
-  pha
+  pha ; Hold onto this for a long while
 
   ; ---------------
 
@@ -684,11 +697,21 @@ NoRotation:
       bra @StartMoving
     :
 
+    lda Mode7ForceMove
+    bpl :+
+    @DoForceMoveAnyway:
+      lda Mode7ForceMove
+      and #3
+      sta Mode7MoveDirection
+      stz Mode7ForceMove
+      bra @StartMoving
+    :
+
     bra WasRotation
 @NotAligned:
 @StartMoving:
 
-  ; If not rotating, move forward
+  ; If moving and not rotating, move forward
   lda Mode7MoveDirection
   asl
   tax
@@ -697,26 +720,50 @@ NoRotation:
   lda Mode7PlayerX
   ora Mode7PlayerY
   and #15
-  bne NotWall
-  ; Is there a wall one block ahead?
-  lda Mode7PlayerY
-  add ForwardYTile,x
-  cmp #64*16 ; Don't allow if this would make the player go out of bounds
-  bcs WasRotation
-  tay
+  bne @NotWall
+
   lda Mode7PlayerX
-  add ForwardXTile,x
-  cmp #64*16 ; Don't allow if this would make the player go out of bounds
-  bcs WasRotation
+  ldy Mode7PlayerY
   jsr Mode7BlockAddress
   tay
   lda M7BlockFlags,y
   and #15
-  beq NotWall
-IsWall:
-    bra WasRotation
-  NotWall:
+  cmp #15
+  beq @DontCheckSolidInside
+    and ForwardWallBitInside,x
+    bne DontMoveForward
+  @DontCheckSolidInside:
 
+  ; Is there a wall one block ahead?
+  lda Mode7PlayerY
+  add ForwardYTile,x
+  cmp #64*16 ; Don't allow if this would make the player go out of bounds
+  bcs DontMoveForward
+  tay
+  lda Mode7PlayerX
+  add ForwardXTile,x
+  cmp #64*16 ; Don't allow if this would make the player go out of bounds
+  bcs DontMoveForward
+  jsr Mode7BlockAddress
+  tay
+  lda M7BlockFlags,y
+  and ForwardWallBitOutside,x
+  beq @NotWall
+@IsWall:
+    bra DontMoveForward
+  @NotWall:
+
+  ; Fighting against a force move?
+  ; Check at this point because a blocked move against a wall shouldn't cancel it
+  lda Mode7ForceMove
+  bpl @NoForceMove
+    eor Mode7MoveDirection
+    lsr
+    bcc @DoForceMoveAnyway
+    stz Mode7ForceMove
+  @NoForceMove:
+
+  ; Move forward after all
   lda Mode7PlayerX
   add ForwardX,x
   sta Mode7PlayerX
@@ -724,6 +771,7 @@ IsWall:
   lda Mode7PlayerY
   add ForwardY,x
   sta Mode7PlayerY
+DontMoveForward:
 WasRotation:
 
   ; Make it so that 0,0 places the player on the top left corner of the map
@@ -865,18 +913,30 @@ WasRotation:
   ; Don't respond to special floors when you weren't moving last frame
   pla ; Mode7PlayerX|Mode7PlayerY
   and #15
-  beq :+
+  beq DontRunSpecialFloor
 
   ; Respond to special floors when you're in the middle of a block
   lda Mode7PlayerX
   ora Mode7PlayerY
   and #15
-  bne :+
+  bne DontRunSpecialFloor
+    lda Mode7LastPositionPtr
+    beq :+
+      sta LevelBlockPtr
+      lda [LevelBlockPtr]
+      and #255
+      jsr CallBlockExit
+    :
+
     lda Mode7PlayerX
     ldy Mode7PlayerY
     jsr Mode7BlockAddress
-;    jsr CallBlockEnter
-  :
+    pha
+    lda LevelBlockPtr
+    sta Mode7LastPositionPtr
+    pla
+    jsr CallBlockEnter
+  DontRunSpecialFloor:
 
   setaxy16
   ldx OamPtr
@@ -940,6 +1000,7 @@ BuildHDMALoop:
   rts
 .endproc
 
+; Up, Right, Down, Left?
 ForwardX:
   .word 0, .loword(-2), 0, .loword(2)
 ForwardY:
@@ -948,6 +1009,10 @@ ForwardXTile:
   .word 0, .loword(-16), 0, .loword(16)
 ForwardYTile:
   .word .loword(-16), 0, .loword(16), 0
+ForwardWallBitOutside:
+  .word M7_BLOCK_SOLID_U, M7_BLOCK_SOLID_R, M7_BLOCK_SOLID_D, M7_BLOCK_SOLID_L
+ForwardWallBitInside:
+  .word M7_BLOCK_SOLID_D, M7_BLOCK_SOLID_L, M7_BLOCK_SOLID_U, M7_BLOCK_SOLID_R
 
 .proc CheckWallAhead
 ; Not used?
@@ -970,9 +1035,6 @@ Block:
   sec
   rts
 .endproc
-
-Mode7Tiles:
-.incbin "../tools/M7Tileset.chrm7.lz4"
 
 .include "m7palettedata.s"
 
@@ -1089,65 +1151,37 @@ Exit:
   rts
 .endproc
 
-.proc BlockInfo
-  Solid = 1
-  Floor = 0
-  .byt Solid ;Void
-  .byt Floor ;Checker1
-  .byt Floor ;Checker2
-  .byt Floor ;ToggleFloor
-  .byt Floor ;ToggleWall
-  .byt Floor ;Collect
-  .byt Floor ;Hurt
-  .byt Floor ;Spring
-  .byt Floor ;ForceDown
-  .byt Floor ;ForceUp
-  .byt Floor ;ForceLeft
-  .byt Floor ;ForceRight
-  .byt Floor ;Unused1
-  .byt Floor ;Checkpoint
-  .byt Floor ;ToggleButton
-  .byt Floor ;Button
-  .byt Solid ;BlueLock
-  .byt Solid ;RedLock
-  .byt Solid ;GreenLock
-  .byt Solid ;YellowLock
-  .byt Floor ;BlueKey
-  .byt Floor ;RedKey
-  .byt Floor ;GreenKey
-  .byt Floor ;YellowKey
-  .byt Floor ;CountFive
-  .byt Floor ;CountFour
-  .byt Floor ;CountThree
-  .byt Floor ;CountTwo
-  .byt Floor ;GetBlock
-  .byt Solid ;AcceptBlock
-  .byt Floor ;Bridge
-  .byt Solid ;FlyingBlock
-  .byt Floor ;Exit
-  .byt Floor ;Ice
-  .byt Floor ;Bomb
-  .byt Floor ;RedButton
-.endproc
 
-.import M7BlockInteractionSet, M7BlockInteractionEnter
-CallBlockEnter:
-  wdm 0
+.a16
+.import M7BlockInteractionSet, M7BlockInteractionEnter, M7BlockInteractionExit, M7BlockInteractionBump
+GetInteractionSet:
   tay
   lda M7BlockInteractionSet,y
   and #255
   asl
   tay
+  rts
+CallBlockEnter:
+  jsr GetInteractionSet
   lda M7BlockInteractionEnter,y
   pha
   rts
+CallBlockExit:
+  jsr GetInteractionSet
+  lda M7BlockInteractionExit,y
+  pha
+  rts
+CallBlockBump:
+  jsr GetInteractionSet
+  lda M7BlockInteractionBump,y
+  pha
+  rts
 
+.a16
 .export M7BlockFire
 M7BlockFire:
 .export M7BlockNothing
 M7BlockNothing:
-.export M7BlockBecomeWall
-M7BlockBecomeWall:
 .export M7BlockCloneButton
 M7BlockCloneButton:
 .export M7BlockDirt
@@ -1162,14 +1196,6 @@ M7BlockFlippers:
 M7BlockSuctionBoots:
 .export M7BlockIceSkates
 M7BlockIceSkates:
-.export M7BlockForceLeft
-M7BlockForceLeft:
-.export M7BlockForceDown
-M7BlockForceDown:
-.export M7BlockForceUp
-M7BlockForceUp:
-.export M7BlockForceRight
-M7BlockForceRight:
 .export M7BlockIce
 M7BlockIce:
 .export M7BlockIceCorner
@@ -1182,12 +1208,6 @@ M7BlockLock:
 M7BlockMessage:
 .export M7BlockPushableBlock
 M7BlockPushableBlock:
-.export M7BlockRotateBorderLR
-M7BlockRotateBorderLR:
-.export M7BlockRotateBorderUD
-M7BlockRotateBorderUD:
-.export M7BlockRotateCorner
-M7BlockRotateCorner:
 .export M7BlockSpring
 M7BlockSpring:
 .export M7BlockTeleport
@@ -1198,8 +1218,6 @@ M7BlockThief:
 M7BlockToggleButton1:
 .export M7BlockToggleButton2
 M7BlockToggleButton2:
-.export M7BlockTurtle
-M7BlockTurtle:
 .export M7BlockWater
 M7BlockWater:
 .export M7BlockWoodArrow
@@ -1210,6 +1228,76 @@ M7BlockWoodArrow:
   lda #30
   sta Mode7Oops
   rts
+.endproc
+
+
+.export M7BlockForceLeft
+.proc M7BlockForceLeft
+  lda #$8000 | DIRECTION_LEFT
+  sta Mode7ForceMove
+  rts
+.endproc
+.export M7BlockForceDown
+.proc M7BlockForceDown
+  lda #$8000 | DIRECTION_DOWN
+  sta Mode7ForceMove
+  rts
+.endproc
+.export M7BlockForceUp
+.proc M7BlockForceUp
+  lda #$8000 | DIRECTION_UP
+  sta Mode7ForceMove
+  rts
+.endproc
+.export M7BlockForceRight
+.proc M7BlockForceRight
+  lda #$8000 | DIRECTION_RIGHT
+  sta Mode7ForceMove
+  rts
+.endproc
+
+
+.export M7BlockTurtle
+.proc M7BlockTurtle
+  lda #Mode7Block::Water
+  jmp Mode7ChangeBlock
+.endproc
+.export M7BlockBecomeWall
+.proc M7BlockBecomeWall
+  lda #Mode7Block::Void
+  jmp Mode7ChangeBlock
+.endproc
+
+.export M7BlockRotateBorderLR
+.proc M7BlockRotateBorderLR
+  lda #Mode7Block::RotateBorderUD
+  jmp Mode7ChangeBlock
+.endproc
+.export M7BlockRotateBorderUD
+.proc M7BlockRotateBorderUD
+  lda #Mode7Block::RotateBorderLR
+  jmp Mode7ChangeBlock
+.endproc
+
+.export M7BlockRotateCornerUL
+.proc M7BlockRotateCornerUL
+  lda #Mode7Block::RotateCornerUR
+  jmp Mode7ChangeBlock
+.endproc
+.export M7BlockRotateCornerUR
+.proc M7BlockRotateCornerUR
+  lda #Mode7Block::RotateCornerDR
+  jmp Mode7ChangeBlock
+.endproc
+.export M7BlockRotateCornerDR
+.proc M7BlockRotateCornerDR
+  lda #Mode7Block::RotateCornerDL
+  jmp Mode7ChangeBlock
+.endproc
+.export M7BlockRotateCornerDL
+.proc M7BlockRotateCornerDL
+  lda #Mode7Block::RotateCornerUL
+  jmp Mode7ChangeBlock
 .endproc
 
 .export M7BlockCollect
@@ -1381,3 +1469,8 @@ M7C_M7D_Table2:
   .byt 128 | 49
   .addr .loword(M7C_M7D_Buffer2Data+127*4)
   .byt 0
+
+
+.segment "Mode7Tiles"
+Mode7Tiles:
+.incbin "../tools/M7Tileset.chrm7.lz4"

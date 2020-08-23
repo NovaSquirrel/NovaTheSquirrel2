@@ -34,7 +34,7 @@ for line in text:
 		# Reset to prepare for the new block
 		priority = False
 		block = {"name": line[1:], "solid_u": False, "solid_d": False, "solid_l": False, "solid_r": False, \
-		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
+		  "solid_inside": False, "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -61,14 +61,8 @@ for line in text:
 		block["solid_d"] = True
 		block["solid_u"] = True
 		block["solid_r"] = True
-	elif word == "solid_l":
-		block["solid_l"] = True
-	elif word == "solid_d":
-		block["solid_d"] = True
-	elif word == "solid_u":
-		block["solid_u"] = True
-	elif word == "solid_r":
-		block["solid_r"] = True
+	elif word in ["solid_l", "solid_r", "solid_u", "solid_d", "solid_inside"]:
+		block[word] = True
 	elif word == "t": # add tiles
 		split = arg.split(" ")
 		for tile in split:
@@ -127,12 +121,12 @@ interaction_types = ["Enter", "Exit", "Bump"]
 for interaction in interaction_types:
 	outfile.write(".export M7BlockInteraction%s\n" % interaction)
 	outfile.write(".proc M7BlockInteraction%s\n" % interaction)
-	outfile.write('  .addr .loword(M7BlockNothing)\n') # Empty interaction set
+	outfile.write('  .addr .loword(M7BlockNothing-1)\n') # Empty interaction set
 	for b in all_interaction_sets:
 		if interaction in b:
-			outfile.write('  .addr .loword(%s)\n' % b[interaction])
+			outfile.write('  .addr .loword(%s-1)\n' % b[interaction])
 		else:
-			outfile.write('  .addr .loword(M7BlockNothing)\n')
+			outfile.write('  .addr .loword(M7BlockNothing-1)\n')
 	outfile.write(".endproc\n\n")
 
 outfile.close()

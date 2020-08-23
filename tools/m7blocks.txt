@@ -272,28 +272,28 @@ t 14,9 14,9
 t 15,9 15,9
 
 +RotateCornerUL
-when Exit, M7BlockRotateCorner
+when Exit, M7BlockRotateCornerUL
 solid_u
 solid_l
 t 12,8 14,9
 t 14,8 3,0
 
 +RotateCornerUR
-when Exit, M7BlockRotateCorner
+when Exit, M7BlockRotateCornerUR
 solid_u
 solid_r
 t 14,9 13,8
 t 3,0 15,8
 
 +RotateCornerDR
-when Exit, M7BlockRotateCorner
+when Exit, M7BlockRotateCornerDR
 solid_d
 solid_r
 t 3,0 15,8
 t 15,9 13,9
 
 +RotateCornerDL
-when Exit, M7BlockRotateCorner
+when Exit, M7BlockRotateCornerDL
 solid_d
 solid_l
 t 14,8 3,0
