@@ -63,6 +63,7 @@ Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
 Mode7LastPositionPtr: .res 2
 Mode7ForceMove: .res 2
+Mode7IceDirection: .res 2 ; Last direction used
 
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
 PORTRAIT_OOPS   = $88 | OAM_PRIORITY_3
@@ -100,6 +101,7 @@ DIRECTION_RIGHT = 3
   stz Mode7ChipsLeft
   stz Mode7LastPositionPtr
   stz Mode7ForceMove
+  stz Mode7IceDirection ; Probably don't need to init this one but whatever
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -753,15 +755,21 @@ NoRotation:
     bra DontMoveForward
   @NotWall:
 
-  ; Fighting against a force move?
+  ; Countering a force move by sidestepping?
   ; Check at this point because a blocked move against a wall shouldn't cancel it
   lda Mode7ForceMove
   bpl @NoForceMove
+    bit #$4000 ; If it's ice, you can't 
+    bne @DoForceMoveAnyway
     eor Mode7MoveDirection
     lsr
     bcc @DoForceMoveAnyway
     stz Mode7ForceMove
   @NoForceMove:
+
+  ; Save the direction for ice purposes
+  lda Mode7MoveDirection
+  sta Mode7IceDirection
 
   ; Move forward after all
   lda Mode7PlayerX
@@ -1196,10 +1204,6 @@ M7BlockFlippers:
 M7BlockSuctionBoots:
 .export M7BlockIceSkates
 M7BlockIceSkates:
-.export M7BlockIce
-M7BlockIce:
-.export M7BlockIceCorner
-M7BlockIceCorner:
 .export M7BlockKey
 M7BlockKey:
 .export M7BlockLock
@@ -1230,6 +1234,59 @@ M7BlockWoodArrow:
   rts
 .endproc
 
+.export M7BlockIce
+.proc M7BlockIce
+  lda Mode7IceDirection
+  ora #$8000 | $4000
+  sta Mode7ForceMove
+  rts
+.endproc
+
+
+IceGoUp:
+  lda #$8000 | $4000 | DIRECTION_UP
+  sta Mode7ForceMove
+  rts
+IceGoLeft:
+  lda #$8000 | $4000 | DIRECTION_LEFT
+  sta Mode7ForceMove
+  rts
+IceGoDown:
+  lda #$8000 | $4000 | DIRECTION_DOWN
+  sta Mode7ForceMove
+  rts
+IceGoRight:
+  lda #$8000 | $4000 | DIRECTION_RIGHT
+  sta Mode7ForceMove
+  rts
+.export M7BlockIceCornerUL
+.proc M7BlockIceCornerUL
+  lda Mode7IceDirection
+  cmp #DIRECTION_LEFT
+  beq IceGoDown
+  bra IceGoRight
+.endproc
+.export M7BlockIceCornerUR
+.proc M7BlockIceCornerUR
+  lda Mode7IceDirection
+  cmp #DIRECTION_RIGHT
+  beq IceGoDown
+  bra IceGoLeft
+.endproc
+.export M7BlockIceCornerDL
+.proc M7BlockIceCornerDL
+  lda Mode7IceDirection
+  cmp #DIRECTION_LEFT
+  beq IceGoUp
+  bra IceGoRight
+.endproc
+.export M7BlockIceCornerDR
+.proc M7BlockIceCornerDR
+  lda Mode7IceDirection
+  cmp #DIRECTION_RIGHT
+  beq IceGoUp
+  bra IceGoLeft
+.endproc
 
 .export M7BlockForceLeft
 .proc M7BlockForceLeft

@@ -13,7 +13,6 @@ for t in tileset_root:
 			assert p.tag == 'property'
 			if p.attrib['name'] == 'Name':
 				name_for_tiled_id[int(t.attrib['id'])] = p.attrib['value']
-print(name_for_tiled_id)
 
 # Get the block enum
 define_file = open("src/m7blockenum.s")
@@ -30,7 +29,6 @@ for i in define_lines:
 	elif in_enum:
 		id_for_block[i.strip()] = block_count
 		block_count += 1
-print(id_for_block)
 
 if len(sys.argv) != 3:
 	print("m7levelconvert.py input.tmx output.bin")

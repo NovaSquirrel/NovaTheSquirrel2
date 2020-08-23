@@ -190,28 +190,28 @@ when Enter, M7BlockIce
 q 10,6
 
 +IceCornerUL
-when Enter, M7BlockIceCorner
+when Enter, M7BlockIceCornerUL
 solid_u
 solid_l
 t 12,6 11,6
 t 10,7 11,7
 
 +IceCornerUR
-when Enter, M7BlockIceCorner
+when Enter, M7BlockIceCornerUR
 solid_u
 solid_r
 t 10,6 13,6
 t 10,7 11,7
 
 +IceCornerDL
-when Enter, M7BlockIceCorner
+when Enter, M7BlockIceCornerDL
 solid_d
 solid_l
 t 10,6 11,6
 t 12,7 11,7
 
 +IceCornerDR
-when Enter, M7BlockIceCorner
+when Enter, M7BlockIceCornerDR
 solid_d
 solid_r
 t 10,6 11,6
