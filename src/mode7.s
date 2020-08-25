@@ -16,7 +16,6 @@
 ;
 .include "snes.inc"
 .include "global.inc"
-.include "blockenum.s"
 .include "graphicsenum.s"
 .include "paletteenum.s"
 .include "portraitenum.s"
@@ -25,8 +24,15 @@
 .importzp hm_node
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 
-Mode7LevelMap = LevelBuf
-Mode7LevelMapCheckpoint = LevelBuf + (64*64) ; 4096
+.export Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
+Mode7LevelMap                = LevelBuf + (64*64*0) ;\
+Mode7LevelMapCheckpoint      = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
+Mode7LevelMapBelow           = LevelBuf + (64*64*2) ; /
+Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
+Mode7DynamicTileBuffer       = LevelBufAlt          ; 8 tiles long, 64*8 = 2048 = 2KB?
+Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 8 bytes long?
+
+CommonTilesetLength = (12*16+4)*64
 
 ; Reusing this may be a little risky but it should be big enough
 Mode7CheckpointX     = CheckpointState + 0
@@ -99,9 +105,6 @@ DIRECTION_RIGHT = 3
   stz Mode7PlayerX
   stz Mode7PlayerY
   stz Mode7ChipsLeft
-  stz Mode7LastPositionPtr
-  stz Mode7ForceMove
-  stz Mode7IceDirection ; Probably don't need to init this one but whatever
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -185,10 +188,21 @@ DIRECTION_RIGHT = 3
 
   ; Upload graphics
   .import LZ4_DecompressToMode7Tiles, SFX_LZ4_decompress
-  ldx #.loword(Mode7Tiles)
+  ldy #DMAMODE_PPUHIDATA
+  sty DMAMODE
+  seta8
   lda #^Mode7Tiles
-  stz PPUADDR
-  jsl LZ4_DecompressToMode7Tiles
+  sta DMAADDRBANK
+  ldy #.loword(Mode7Tiles)
+  sty DMAADDR
+  ldy #CommonTilesetLength
+  sty DMALEN
+
+  stz PPUADDR+0
+  stz PPUADDR+1
+  lda #1
+  sta COPYSTART
+  seta16
 
   ; -----------------------------------
 
@@ -206,7 +220,7 @@ CheckerLoop:
   cpx #4096
   bne CheckerLoop
 
-  ; Decompress a level of some sort
+  ; Read the level pointer that was passed in from the overworld map
   seta8
   hm_node = 0
   lda LevelHeaderPointer+0
@@ -273,6 +287,19 @@ RestoredFromCheckpoint:
   stz Mode7SidestepWanted
   stz Mode7HappyTimer
   stz Mode7Oops
+
+  stz Mode7LastPositionPtr
+  stz Mode7ForceMove
+  stz Mode7IceDirection ; Probably don't need to init this one but whatever
+
+  stz Mode7DynamicTileUsed+0 ; 8 bytes long
+  stz Mode7DynamicTileUsed+2
+  stz Mode7DynamicTileUsed+4
+  stz Mode7DynamicTileUsed+6
+
+  ldx #ActorStart
+  ldy #ActorEnd-ActorStart
+  jsl MemClear
 
   ; Initialize the HDMA table and mode 7 scroll
   jsr BuildHDMATable
@@ -347,8 +374,6 @@ DontIncreaseChipCounter:
   dey
   bne :-
 
-
-
   dec 0
   bne RenderMapLoop
 
@@ -377,6 +402,9 @@ DontIncreaseChipCounter:
   sta NMIHandler+0
 
   jsr MakeCheckpoint
+.endproc
+
+.proc Mode7MainLoop
 Loop:
   setaxy16
   inc framecount
@@ -384,6 +412,23 @@ Loop:
   jsl WaitVblank
   jsl ppu_copy_oam
 
+  ; Upload the dynamic tile area
+  seta8
+  ldy #DMAMODE_PPUHIDATA
+  sty DMAMODE
+  lda #INC_DATAHI
+  sta PPUCTRL
+  lda #^Mode7DynamicTileBuffer
+  sta DMAADDRBANK
+  ldy #.loword(Mode7DynamicTileBuffer)
+  sty DMAADDR
+  ldy #32*64
+  sty DMALEN
+  ldy #(14*16)*64
+  sty PPUADDR
+  lda #1
+  sta COPYSTART
+  seta16
 
   ; -----------------------------------
   seta8
@@ -953,6 +998,21 @@ WasRotation:
 
   jsr BuildHDMATable
 
+
+
+  lda keynew
+  and #KEY_B
+  beq :+
+    lda #1*2
+    ldx Mode7PlayerX
+    ldy Mode7PlayerY
+    .import Mode7CreateActor
+    jsr Mode7CreateActor
+  :
+
+  .import Mode7RunActors
+  jsr Mode7RunActors
+
   jmp Loop
 
   rtl
@@ -1022,8 +1082,8 @@ ForwardWallBitOutside:
 ForwardWallBitInside:
   .word M7_BLOCK_SOLID_D, M7_BLOCK_SOLID_L, M7_BLOCK_SOLID_U, M7_BLOCK_SOLID_R
 
-.proc CheckWallAhead
 ; Not used?
+.proc CheckWallAhead
   lda Mode7PlayerY
   add ForwardYTile,x
   cmp #64*16 ; Don't allow if this would make the player go out of bounds
@@ -1134,12 +1194,12 @@ Exit:
   rts
 .endproc
 
-
 ; A = X coordinate
 ; Y = Y coordinate
 ; Output: LevelBlockPtr
 .a16
 .i16
+.export Mode7BlockAddress
 .proc Mode7BlockAddress
   and #%1111110000
       ; ......xx xxxx....
@@ -1529,5 +1589,6 @@ M7C_M7D_Table2:
 
 
 .segment "Mode7Tiles"
+.export Mode7Tiles
 Mode7Tiles:
-.incbin "../tools/M7Tileset.chrm7.lz4"
+.incbin "../tools/M7Tileset.chrm7", 0, CommonTilesetLength

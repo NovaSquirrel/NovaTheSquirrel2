@@ -329,16 +329,16 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   NameFontRenderBottom: .res 384 ; Enough for 12 tiles
 
   LevelActorBuffer: .res 1024 ; Room for 256 actors if the list must be in RAM, not used by default
-  IrisEffectBuffer1: .res 224*3+5
-  IrisEffectBuffer2: .res 224*3+5
+  IrisEffectBuffer1: .res 224*3+5 ; HDMA table
+  IrisEffectBuffer2: .res 224*3+5 ; HDMA table
 
 .segment "BSS7F"
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
   LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
-  ColumnWords: .res 512
+  ColumnWords: .res 512      ; Two byte per column of the level
 
 ;  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in
   HDMA_Buffer2: .res 2048    ; for double buffering the previous
 
-  DecompressBuffer: .res 8192
+  DecompressBuffer: .res 8192 ; Not used by LZ4_DecompressToMode7Tiles, though that's also currently unused

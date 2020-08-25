@@ -9,7 +9,7 @@
 .export SFX_LZ4_decompress, SFX_LZ4_decompress_block
 
 ; Added by Nova
-.export LZ4_DecompressToVRAM, LZ4_DecompressToPPU, LZ4_DecompressToMode7Tiles
+.export LZ4_DecompressToVRAM, LZ4_DecompressToPPU ;, LZ4_DecompressToMode7Tiles
 
 ; X = source address
 ; A = source bank
@@ -35,13 +35,14 @@ LZ4_DecompressToPPU:
   seta16
   rtl
 
+.if 0
 ; Separate routine, because it needs >8KB files and needs to only write the high bytes
 .a16
 LZ4_DecompressToMode7Tiles:
   ldy #DMAMODE_PPUHIDATA
   sty DMAMODE
   seta8
-  xba ; Set B to the destination bank
+  xba ; Set B to the decompression destination bank
   lda #^LevelBuf
   sta DMAADDRBANK
   xba
@@ -55,6 +56,7 @@ LZ4_DecompressToMode7Tiles:
   sta COPYSTART
   seta16
   rtl
+.endif
 
 ;-------------------------------------------------------------------------------
 ;  SFX_LZ4_decompress

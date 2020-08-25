@@ -25,7 +25,7 @@ objlist = \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile m7blockdata
+  playerprojectile m7blockdata mode7actors
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -152,6 +152,7 @@ $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/m7blockdata.o: $(srcdir)/m7blockenum.s
+$(objdir)/mode7actors.o: $(srcdir)/m7blockenum.s
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
@@ -262,10 +263,10 @@ $(bgdir)/%.chrsfc: $(bgdir)/%.png
 tools/M7Tileset.chrm7: tools/M7Tileset.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py
-$(objdir)/mode7.o: tools/M7Tileset.chrm7.lz4 $(m7levels_lz4)
-tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
-	$(lz4_compress) $(lz4_flags) $< $@
-	@touch $@
+$(objdir)/mode7.o: tools/M7Tileset.chrm7 $(m7levels_lz4)
+#tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
+#	$(lz4_compress) $(lz4_flags) $< $@
+#	@touch $@
 
 tilesets4/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc
 	$(lz4_compress) $(lz4_flags) $< $@
