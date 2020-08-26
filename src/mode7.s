@@ -1277,8 +1277,8 @@ Exit:
   rts
 .endproc
 
-; A = X coordinate
-; Y = Y coordinate
+; A = X coordinate (in pixels)
+; Y = Y coordinate (in pixels)
 ; Output: LevelBlockPtr
 .a16
 .i16

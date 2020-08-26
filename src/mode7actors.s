@@ -85,8 +85,8 @@ Fail:
 .a16
 .i16
 ; A = Actor to create
-; X = X coordinate, 12.4 format
-; Y = Y coordinate, 12.4 format
+; X = X coordinate, pixels
+; Y = Y coordinate, pixels
 .export Mode7CreateActor
 .proc Mode7CreateActor
   sta 0
@@ -255,11 +255,17 @@ WIDE = 3
 
 .a16
 AlignedToGrid:
-  jsr RenderAligned
-
+  phy
   lda ActorPX,x
   ldy ActorPY,x
   jsr Mode7BlockAddress
+
+  lda LevelBlockPtr ; Preserve LevelBlockPtr because RenderAligned can overwrite it
+  pha
+  jsr RenderAligned
+  pla
+  sta LevelBlockPtr
+  ply 
 
   lda ActorPX,x
   cmp ActorOldXPos
@@ -290,19 +296,43 @@ AlignedToGrid:
   ; F##
   ; F##
   seta8
-  wdm 0
+  tdc ; For TAX/TAY
+  lda BlockUpdateAddress,y
+  dea
+  sta BlockUpdateAddress,y
+
   jsr Mode7GetDynamicTileNumber
   sta BlockUpdateDataTR,y
   ina
-  sta BlockUpdateDataBR,y
-  ina
   sta BlockUpdateDataBL+1,y
+  ina
+  sta BlockUpdateDataBR,y
   ina
   sta BlockUpdateDataBR+1,y
 
-  lda #10
+  phx
+  lda ActorPX,x
+  and #8
+  bne @MoveRightFixRight
+@MoveRightFixLeft:
+  dec LevelBlockPtr
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockTopRight,x
   sta BlockUpdateDataTL,y
+  lda M7BlockBottomRight,x
   sta BlockUpdateDataBL,y
+  bra @MoveRightFixedLeft
+@MoveRightFixRight:
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockTopLeft,x
+  sta BlockUpdateDataTL,y
+  lda M7BlockBottomLeft,x
+  sta BlockUpdateDataBL,y
+@MoveRightFixedLeft:
+  plx
+
 
   lda #WIDE
   sta BlockUpdateDataTL+1,y
@@ -369,12 +399,36 @@ UnderTileBR = 10
   jsr LoadUpTileNumbersUnderActor
   jsr CopyOverFourTileGfx
   ; Edit the tiles a bit
-  tay
+  phx
+  tax
   lda #255
-  sta Mode7DynamicTileBuffer,y
-  sta Mode7DynamicTileBuffer+2,y
-  sta Mode7DynamicTileBuffer+4,y
-  sta Mode7DynamicTileBuffer+6,y
+  sta f:Mode7DynamicTileBuffer,x
+  sta f:Mode7DynamicTileBuffer+2,x
+  sta f:Mode7DynamicTileBuffer+4,x
+  sta f:Mode7DynamicTileBuffer+6,x
+  sta f:Mode7DynamicTileBuffer+8,x
+  sta f:Mode7DynamicTileBuffer+10,x
+  sta f:Mode7DynamicTileBuffer+12,x
+  sta f:Mode7DynamicTileBuffer+14,x
+
+  sta f:Mode7DynamicTileBuffer+128,x
+  sta f:Mode7DynamicTileBuffer+2+128,x
+  sta f:Mode7DynamicTileBuffer+4+128,x
+  sta f:Mode7DynamicTileBuffer+6+128,x
+  sta f:Mode7DynamicTileBuffer+8+128,x
+  sta f:Mode7DynamicTileBuffer+10+128,x
+  sta f:Mode7DynamicTileBuffer+12+128,x
+  sta f:Mode7DynamicTileBuffer+14+128,x
+
+  sta f:Mode7DynamicTileBuffer+64,x
+  sta f:Mode7DynamicTileBuffer+2+64,x
+  sta f:Mode7DynamicTileBuffer+4+64,x
+  sta f:Mode7DynamicTileBuffer+6+64,x
+  sta f:Mode7DynamicTileBuffer+8+64,x
+  sta f:Mode7DynamicTileBuffer+10+64,x
+  sta f:Mode7DynamicTileBuffer+12+64,x
+  sta f:Mode7DynamicTileBuffer+14+64,x
+  plx
   rts
 
   .macro PointerForM7TileNumber
@@ -385,19 +439,20 @@ UnderTileBR = 10
     add #.loword(Mode7Tiles)
   .endmacro
 
+.a16
 LoadUpTileNumbersUnderActor:
   lda ActorPX,x
-  and #$0080
-  beq @Right
+  and #$0008
+  bne @Right
 @Left:
   lda ActorPY,x
-  and #$0080
+  and #$0008
   beq LoadUpTileNumbersAligned
-  bra LoadUpTileNumbersRight
+  bra LoadUpTileNumbersDown
 @Right:
   lda ActorPY,x
-  and #$0080
-  jeq LoadUpTileNumbersDown
+  and #$0008
+  jeq LoadUpTileNumbersRight
   jmp LoadUpTileNumbersBoth
 
 LoadUpTileNumbersAligned:
@@ -414,31 +469,6 @@ LoadUpTileNumbersAligned:
   lda M7BlockBottomLeft,y
   PointerForM7TileNumber
   sta UnderTileBL
-  lda M7BlockBottomRight,y
-  PointerForM7TileNumber
-  sta UnderTileBR
-  rts
-
-LoadUpTileNumbersRight:
-  lda [LevelBlockPtr]
-  and #255
-  tay
-  ;---
-  lda M7BlockTopRight,y
-  PointerForM7TileNumber
-  sta UnderTileUL
-  lda M7BlockBottomRight,y
-  PointerForM7TileNumber
-  sta UnderTileBL
-
-  inc LevelBlockPtr
-  lda [LevelBlockPtr]
-  and #255
-  tay
-  ;---
-  lda M7BlockTopRight,y
-  PointerForM7TileNumber
-  sta UnderTileUR
   lda M7BlockBottomRight,y
   PointerForM7TileNumber
   sta UnderTileBR
@@ -467,6 +497,31 @@ LoadUpTileNumbersDown:
   PointerForM7TileNumber
   sta UnderTileBL
   lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileBR
+  rts
+
+LoadUpTileNumbersRight:
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileUL
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileBL
+
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopLeft,y
+  PointerForM7TileNumber
+  sta UnderTileUR
+  lda M7BlockBottomLeft,y
   PointerForM7TileNumber
   sta UnderTileBR
   rts
