@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2019-2020 NovaSquirrel
+; Copyright (C) 2020 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as
@@ -18,7 +18,13 @@
 .include "global.inc"
 .include "m7blockenum.s"
 .smart
+.import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 .import Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
+.import Mode7BlockAddress, Mode7Tiles
+
+; Reuse these
+ActorOldXPos = FG2OffsetX
+ActorOldYPos = FG2OffsetY
 
 .segment "Mode7Game"
 ActorM7DynamicSlot = ActorIndexInLevel ; Reuse this
@@ -33,7 +39,7 @@ NUM_M7_ACTORS = 8
   phx
   seta8
   ; Look for a slot
-  ldx #7
+  ldx #4
 : lda Mode7DynamicTileUsed,x
   beq Found
   dex
@@ -45,14 +51,36 @@ NUM_M7_ACTORS = 8
 Found:
   inc Mode7DynamicTileUsed,x
   seta16
-  ; A = X * 256 (four tiles)
   txa
-  xba
   plx
   sec
   rts
 .endproc
 
+; Find a free block update slot
+; Y = The slot it found
+; Carry = Success
+.proc Mode7FindFreeTilemapUpdateSlot
+  php
+  seta8
+  ; Find a free index in the block update queue
+  ldy #(BLOCK_UPDATE_COUNT-1)*2 ; Currently BLOCK_UPDATE_COUNT = 8
+FindIndex:
+  lda BlockUpdateDataTL+1,y ; Test for zero
+  beq Found
+  dey                      ; Next index
+  dey
+  bpl FindIndex
+  bra Fail                 ; Give up if all slots full
+Found:
+  plp
+  sec
+  rts
+Fail:
+  plp
+  clc
+  rts
+.endproc
 
 .a16
 .i16
@@ -97,7 +125,6 @@ Fail:
 .a16
 .i16
 .proc Mode7FreeDynamicSlot
-  xba
   and #255
   tax
   seta8
@@ -124,6 +151,12 @@ Loop:
   rts
 Call:
   tay
+  ; Save the original position of the actor
+  lda ActorPX,x
+  sta ActorOldXPos
+  lda ActorPY,x
+  sta ActorOldYPos
+  ; Call the routine now
   lda Mode7ActorTable,y
   pha
   rts
@@ -133,9 +166,39 @@ Mode7ActorTable:
   .raddr 0
   .raddr M7FlyingArrow
 
-.proc M7FlyingArrow
-  phx
+; Get the index into the dynamic tile buffer
+.a16
+.proc Mode7GetDynamicBuffer
+  ; Multiply by 256+128
   lda ActorM7DynamicSlot,x
+  xba
+  lsr
+  sta 0
+  lda ActorM7DynamicSlot,x
+  xba
+  add 0
+  rts
+.endproc
+
+.a8
+.i16
+.proc Mode7GetDynamicTileNumber
+  ; Multiply by 6
+  lda ActorM7DynamicSlot,x
+  ; Add number*4 + number*2
+  asl
+  sta 0
+  asl
+  add 0
+  add #$e2
+  rts
+.endproc
+
+.a16
+.proc M7FlyingArrow
+.if 0
+  phx
+  jsr Mode7GetDynamicBuffer
   tax
   lda #255
   sta f:Mode7DynamicTileBuffer,x
@@ -148,5 +211,328 @@ Mode7ActorTable:
   sta f:Mode7DynamicTileBuffer+14,x
   sta f:Mode7DynamicTileBuffer+16,x
   plx
+.endif
+
+  inc ActorPX,x
+  
+  jsr Mode7UpdateActorPicture
+
+  rts
+.endproc
+
+.a16
+.i16
+.proc Mode7UpdateActorPicture
+TALL = 2
+WIDE = 3
+
+  jsr Mode7FindFreeTilemapUpdateSlot
+  bcs :+ ; Return early if failed to find a slot
+    rts
+  :
+  ; Y = tilemap update slot
+
+  lda ActorPX,x
+  and #$3f8 ; %000000xx xxxxx000
+  lsr       ; %0000000x xxxxxx00
+  lsr       ; %00000000 xxxxxxx0
+  lsr       ; %00000000 0xxxxxxx
+  sta 0
+  lda ActorPY,x
+  and #$3f8 ; %000000yy yyyyy000
+  asl       ; %00000yyy yyyy0000
+  asl       ; %0000yyyy yyy00000
+  asl       ; %000yyyyy yy000000
+  asl       ; %00yyyyyy y0000000
+  ora 0     ; %00yyyyyy yxxxxxxx
+  sta BlockUpdateAddress,y
+
+  lda ActorPX,x
+  ora ActorPY,x
+  and #$0007
+  jeq AlignedToGrid
+  rts
+
+.a16
+AlignedToGrid:
+  jsr RenderAligned
+
+  lda ActorPX,x
+  ldy ActorPY,x
+  jsr Mode7BlockAddress
+
+  lda ActorPX,x
+  cmp ActorOldXPos
+  beq @MovedVertically
+  bcs @MovedRight
+@MovedLeft:
+  ; ##F
+  ; ##F
+  seta8
+  jsr Mode7GetDynamicTileNumber
+  sta BlockUpdateDataTL,y 
+  ina
+  sta BlockUpdateDataTR,y
+  ina
+  sta BlockUpdateDataBL,y
+  ina
+  sta BlockUpdateDataBR,y
+
+  lda #10
+  sta BlockUpdateDataBL+1,y
+  sta BlockUpdateDataBR+1,y
+
+  lda #WIDE
+  sta BlockUpdateDataTL+1,y
+  seta16
+  rts
+@MovedRight:
+  ; F##
+  ; F##
+  seta8
+  wdm 0
+  jsr Mode7GetDynamicTileNumber
+  sta BlockUpdateDataTR,y
+  ina
+  sta BlockUpdateDataBR,y
+  ina
+  sta BlockUpdateDataBL+1,y
+  ina
+  sta BlockUpdateDataBR+1,y
+
+  lda #10
+  sta BlockUpdateDataTL,y
+  sta BlockUpdateDataBL,y
+
+  lda #WIDE
+  sta BlockUpdateDataTL+1,y
+  seta16
+  rts
+
+@MovedVertically:
+  lda ActorPY,x
+  cmp ActorOldYPos
+  bcs @MovedDown
+@MovedUp:
+  ; FF
+  ; ##
+  ; ##
+  seta8
+  jsr Mode7GetDynamicTileNumber
+  sta BlockUpdateDataBL,y
+  ina
+  sta BlockUpdateDataBR,y
+  ina
+  sta BlockUpdateDataBL+1,y
+  ina
+  sta BlockUpdateDataBR+1,y
+
+  lda #10
+  sta BlockUpdateDataTL,y
+  sta BlockUpdateDataTR,y
+
+  lda #TALL
+  sta BlockUpdateDataTL+1,y
+  seta16
+  rts
+@MovedDown:
+  ; ##
+  ; ##
+  ; FF
+  seta8
+  jsr Mode7GetDynamicTileNumber
+  sta BlockUpdateDataTL,y
+  ina
+  sta BlockUpdateDataTR,y
+  ina
+  sta BlockUpdateDataBL,y
+  ina
+  sta BlockUpdateDataBR,y
+
+  lda #10
+  sta BlockUpdateDataBL+1,y
+  sta BlockUpdateDataBR+1,y
+
+  lda #TALL
+  sta BlockUpdateDataTL+1,y
+  seta16
+  rts
+
+; -------------------------------------
+; Render the actor on top of the tile it's on top of
+.a16
+RenderAligned:
+UnderTileUL = 4
+UnderTileUR = 6
+UnderTileBL = 8
+UnderTileBR = 10
+  jsr LoadUpTileNumbersUnderActor
+  jsr CopyOverFourTileGfx
+  ; Edit the tiles a bit
+  tay
+  lda #255
+  sta Mode7DynamicTileBuffer,y
+  sta Mode7DynamicTileBuffer+2,y
+  sta Mode7DynamicTileBuffer+4,y
+  sta Mode7DynamicTileBuffer+6,y
+  rts
+
+  .macro PointerForM7TileNumber
+    and #255
+    xba
+    lsr
+    lsr
+    add #.loword(Mode7Tiles)
+  .endmacro
+
+LoadUpTileNumbersUnderActor:
+  lda ActorPX,x
+  and #$0080
+  beq @Right
+@Left:
+  lda ActorPY,x
+  and #$0080
+  beq LoadUpTileNumbersAligned
+  bra LoadUpTileNumbersRight
+@Right:
+  lda ActorPY,x
+  and #$0080
+  jeq LoadUpTileNumbersDown
+  jmp LoadUpTileNumbersBoth
+
+LoadUpTileNumbersAligned:
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopLeft,y
+  PointerForM7TileNumber
+  sta UnderTileUL
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileUR
+  lda M7BlockBottomLeft,y
+  PointerForM7TileNumber
+  sta UnderTileBL
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileBR
+  rts
+
+LoadUpTileNumbersRight:
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileUL
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileBL
+
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileUR
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileBR
+  rts
+
+LoadUpTileNumbersDown:
+  lda [LevelBlockPtr]
+  and #255
+  tay
+
+  lda M7BlockBottomLeft,y
+  PointerForM7TileNumber
+  sta UnderTileUL
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileUR
+
+  lda LevelBlockPtr
+  add #64
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+
+  lda M7BlockTopLeft,y
+  PointerForM7TileNumber
+  sta UnderTileBL
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileBR
+  rts
+
+LoadUpTileNumbersBoth:
+  ; The worst case, needs to change the block pointer four times
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopLeft,y
+  PointerForM7TileNumber
+  sta UnderTileUL
+
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileUR
+
+  lda LevelBlockPtr
+  add #64-1
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockBottomLeft,y
+  PointerForM7TileNumber
+  sta UnderTileBL
+
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileBR
+  rts
+
+; Copies the tiles at UnderTileUL, UnderTileUR, UnderTileBL and UnderTileBR in order
+CopyOverFourTileGfx:
+  jsr Mode7GetDynamicBuffer
+  pha
+  phx
+  phb ; MVN overwrites the data bank
+  add #.loword(Mode7DynamicTileBuffer)
+  tay
+  ldx UnderTileUL
+  lda #64-1
+  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles ;<--- this is MVN
+  ldx UnderTileUR
+  lda #64-1
+  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
+  ldx UnderTileBL
+  lda #64-1
+  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
+  ldx UnderTileBR
+  lda #64-1
+  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
+  plb
+  plx
+  pla
   rts
 .endproc

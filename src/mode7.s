@@ -29,8 +29,8 @@ Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapCheckpoint      = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapBelow           = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
-Mode7DynamicTileBuffer       = LevelBufAlt          ; 8 tiles long, 64*8 = 2048 = 2KB?
-Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 8 bytes long?
+Mode7DynamicTileBuffer       = LevelBufAlt          ; 5 tiles long, 64*6*5 = 1920
+Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 5 bytes long?
 
 CommonTilesetLength = (12*16+4)*64
 
@@ -300,6 +300,9 @@ RestoredFromCheckpoint:
   ldx #ActorStart
   ldy #ActorEnd-ActorStart
   jsl MemClear
+  ldx #BlockUpdateAddress
+  ldy #BlockUpdateDataEnd-BlockUpdateAddress
+  jsl MemClear
 
   ; Initialize the HDMA table and mode 7 scroll
   jsr BuildHDMATable
@@ -422,9 +425,9 @@ Loop:
   sta DMAADDRBANK
   ldy #.loword(Mode7DynamicTileBuffer)
   sty DMAADDR
-  ldy #32*64
+  ldy #30*64
   sty DMALEN
-  ldy #(14*16)*64
+  ldy #(14*16+2)*64
   sty PPUADDR
   lda #1
   sta COPYSTART
@@ -434,18 +437,33 @@ Loop:
   seta8
   stz PPUCTRL
   seta16
-  ; Do block updates
+  ; Do block updates.
+  ; The second bytes of the tile numbers aren't normally used, because Mode 7 has 8-bit tile numbers,
+  ; so they're repurposed here.
   ldx #(BLOCK_UPDATE_COUNT-1)*2
 BlockUpdateLoop:
+  lda BlockUpdateDataTL+1,x ; Repurposed to be an update size/shape
+  and #255
+  jeq SkipBlock
+  dea
+  beq @Square
+  dea
+  beq @Tall
+@Wide:
+  jsr Mode7DoBlockUpdateWide
+  bra SkipBlock
+@Tall:
+  jsr Mode7DoBlockUpdateTall
+  bra SkipBlock
+@Square: ; 2x2
+  .a16
   lda BlockUpdateAddress,x
-  beq SkipBlock
   sta PPUADDR
   seta8
   lda BlockUpdateDataTL,x
   sta PPUDATA
   lda BlockUpdateDataTR,x
   sta PPUDATA
-
   seta16
   lda BlockUpdateAddress,x ; Move down a row
   add #128
@@ -455,13 +473,12 @@ BlockUpdateLoop:
   sta PPUDATA
   lda BlockUpdateDataBR,x
   sta PPUDATA
-  seta16
-
-  stz BlockUpdateAddress,x ; Cancel out the block now that it's been written
+  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
 SkipBlock:
+  seta16
   dex
   dex
-  bpl BlockUpdateLoop
+  jpl BlockUpdateLoop
   seta8
   lda #INC_DATAHI
   sta PPUCTRL
@@ -1018,6 +1035,65 @@ WasRotation:
   rtl
 .endproc
 
+.proc Mode7DoBlockUpdateWide
+  ; 3x2, BL+1 and BR+1 go to the right
+  .a16
+  lda BlockUpdateAddress,x
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  lda BlockUpdateDataTR,x
+  sta PPUDATA
+  lda BlockUpdateDataBL+1,x
+  sta PPUDATA
+  seta16
+  lda BlockUpdateAddress,x ; Move down a row
+  add #128
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataBL,x
+  sta PPUDATA
+  lda BlockUpdateDataBR,x
+  sta PPUDATA
+  lda BlockUpdateDataBR+1,x
+  sta PPUDATA
+  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
+  rts
+.endproc
+
+.proc Mode7DoBlockUpdateTall
+  ; 2x3, BL+1 and BR+1 go below
+  .a16
+  lda BlockUpdateAddress,x
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  lda BlockUpdateDataTR,x
+  sta PPUDATA
+  seta16
+  lda BlockUpdateAddress,x ; Move down a row
+  add #128
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataBL,x
+  sta PPUDATA
+  lda BlockUpdateDataBR,x
+  sta PPUDATA
+  seta16
+  lda BlockUpdateAddress,x ; Move down two rows
+  add #256
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataBL+1,x
+  sta PPUDATA
+  lda BlockUpdateDataBR+1,x
+  sta PPUDATA
+  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
+  rts
+.endproc
+
 .a16
 .i16
 .proc BuildHDMATable
@@ -1145,21 +1221,24 @@ Temp = BlockTemp
   php
   seta8
   sta [LevelBlockPtr] ; Make the change in the level buffer itself
+  tax                 ; assert((a>>8) == 0)
   setaxy16
   ; Find a free index in the block update queue
   ldy #(BLOCK_UPDATE_COUNT-1)*2
 FindIndex:
-  ldx BlockUpdateAddress,y ; Test for zero (exact value not used)
+  lda BlockUpdateDataTL+1,y ; Test for empty slot
+  and #255
   beq Found
   dey                      ; Next index
   dey
   bpl FindIndex            ; Give up if all slots full
-  jmp Exit
+  bra Exit
 Found:
   ; From this point on in the routine, Y = free update queue index
 
-  ; Store the tile number
-  tax
+  seta8
+  ; Mode 7 has 8-bit tile numbers, unlike the main game which has 16-bit tile numbers
+  ; so the second byte is mostly unused and can be repurposed. Here TL+1 is used to specify the shape/size of update.
   lda M7BlockTopLeft,x
   sta BlockUpdateDataTL,y
   lda M7BlockTopRight,x
@@ -1168,6 +1247,10 @@ Found:
   sta BlockUpdateDataBL,y
   lda M7BlockBottomRight,x
   sta BlockUpdateDataBR,y
+  ; Enable, and mark it as a 16x16 update
+  lda #1
+  sta BlockUpdateDataTL+1,y
+  seta16
 
   ; Now calculate the PPU address
   ; LevelBlockPtr is 0000yyyyyyxxxxxx
