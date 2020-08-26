@@ -94,6 +94,7 @@ BLOCK_UPDATE_COUNT = 8
 .global BlockUpdateDataTR
 .global BlockUpdateDataBL
 .global BlockUpdateDataBR
+.global BlockUpdateDataEnd
 
 MaxDelayedBlockEdits = 15
 .global DelayedBlockEditType

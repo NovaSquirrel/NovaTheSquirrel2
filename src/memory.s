@@ -239,6 +239,7 @@ LevelZeroWhenLoad_Start:
   BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataEnd:
 
   ; VRAM/CGRAM updates, for tiles and palette updates
   GenericUpdateDestination: .res GENERIC_UPDATE_COUNT*2
