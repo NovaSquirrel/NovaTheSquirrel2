@@ -269,24 +269,44 @@ AlignedToGrid:
 
   lda ActorPX,x
   cmp ActorOldXPos
-  beq @MovedVertically
+  jeq @MovedVertically
   bcs @MovedRight
 @MovedLeft:
   ; ##F
   ; ##F
   seta8
+  tdc ; For TAX/TAY
   jsr Mode7GetDynamicTileNumber
   sta BlockUpdateDataTL,y 
   ina
-  sta BlockUpdateDataTR,y
-  ina
   sta BlockUpdateDataBL,y
+  ina
+  sta BlockUpdateDataTR,y
   ina
   sta BlockUpdateDataBR,y
 
-  lda #10
+  phx
+  inc LevelBlockPtr
+  lda ActorPX,x
+  and #8
+  beq @MoveLeftFixRight
+@MoveLeftFixLeft:
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockTopRight,x
   sta BlockUpdateDataBL+1,y
+  lda M7BlockBottomRight,x
   sta BlockUpdateDataBR+1,y
+  bra @MoveLeftFixedLeft
+@MoveLeftFixRight:
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockTopLeft,x
+  sta BlockUpdateDataBL+1,y
+  lda M7BlockBottomLeft,x
+  sta BlockUpdateDataBR+1,y
+@MoveLeftFixedLeft:
+  plx
 
   lda #WIDE
   sta BlockUpdateDataTL+1,y
@@ -304,9 +324,9 @@ AlignedToGrid:
   jsr Mode7GetDynamicTileNumber
   sta BlockUpdateDataTR,y
   ina
-  sta BlockUpdateDataBL+1,y
-  ina
   sta BlockUpdateDataBR,y
+  ina
+  sta BlockUpdateDataBL+1,y
   ina
   sta BlockUpdateDataBR+1,y
 
@@ -333,7 +353,6 @@ AlignedToGrid:
 @MoveRightFixedLeft:
   plx
 
-
   lda #WIDE
   sta BlockUpdateDataTL+1,y
   seta16
@@ -351,9 +370,9 @@ AlignedToGrid:
   jsr Mode7GetDynamicTileNumber
   sta BlockUpdateDataBL,y
   ina
-  sta BlockUpdateDataBR,y
-  ina
   sta BlockUpdateDataBL+1,y
+  ina
+  sta BlockUpdateDataBR,y
   ina
   sta BlockUpdateDataBR+1,y
 
@@ -373,9 +392,9 @@ AlignedToGrid:
   jsr Mode7GetDynamicTileNumber
   sta BlockUpdateDataTL,y
   ina
-  sta BlockUpdateDataTR,y
-  ina
   sta BlockUpdateDataBL,y
+  ina
+  sta BlockUpdateDataTR,y
   ina
   sta BlockUpdateDataBR,y
 
@@ -398,40 +417,63 @@ UnderTileBL = 8
 UnderTileBR = 10
   jsr LoadUpTileNumbersUnderActor
   jsr CopyOverFourTileGfx
-  ; Edit the tiles a bit
+
   phx
+  phy
   tax
-  lda #255
-  sta f:Mode7DynamicTileBuffer,x
-  sta f:Mode7DynamicTileBuffer+2,x
-  sta f:Mode7DynamicTileBuffer+4,x
-  sta f:Mode7DynamicTileBuffer+6,x
-  sta f:Mode7DynamicTileBuffer+8,x
-  sta f:Mode7DynamicTileBuffer+10,x
-  sta f:Mode7DynamicTileBuffer+12,x
-  sta f:Mode7DynamicTileBuffer+14,x
+  .scope
+    SpritePointer = 0
+    Columns = 2
+    Rows = 3
 
-  sta f:Mode7DynamicTileBuffer+128,x
-  sta f:Mode7DynamicTileBuffer+2+128,x
-  sta f:Mode7DynamicTileBuffer+4+128,x
-  sta f:Mode7DynamicTileBuffer+6+128,x
-  sta f:Mode7DynamicTileBuffer+8+128,x
-  sta f:Mode7DynamicTileBuffer+10+128,x
-  sta f:Mode7DynamicTileBuffer+12+128,x
-  sta f:Mode7DynamicTileBuffer+14+128,x
+    lda #.loword(DemoSoftwareSprite)
+    sta SpritePointer
+    ldy #0 ; Index for the above
+    seta8
+    lda #16
+    sta Columns
+  @ColumnLoop:
+    lda #16
+    sta Rows
+  @RowLoop:
+    lda (SpritePointer),y
+    beq :+
+      sta f:Mode7DynamicTileBuffer,x
+    :
+    iny
+    ; Next row
+    seta16
+    txa
+    add #8
+    tax
+    seta8
+    dec Rows
+    bne @RowLoop
 
-  sta f:Mode7DynamicTileBuffer+64,x
-  sta f:Mode7DynamicTileBuffer+2+64,x
-  sta f:Mode7DynamicTileBuffer+4+64,x
-  sta f:Mode7DynamicTileBuffer+6+64,x
-  sta f:Mode7DynamicTileBuffer+8+64,x
-  sta f:Mode7DynamicTileBuffer+10+64,x
-  sta f:Mode7DynamicTileBuffer+12+64,x
-  sta f:Mode7DynamicTileBuffer+14+64,x
+    ; Go back up to the top of the column
+    seta16
+    txa
+    sub #128-1
+    tax
+    lda Columns
+    and #255
+    cmp #9
+    bne :+
+      txa
+      add #128-8
+      tax
+    :
+    seta8
+    dec Columns
+    bne @ColumnLoop
+  .endscope
+
+  seta16
+  ply
   plx
   rts
 
-  .macro PointerForM7TileNumber
+.macro PointerForM7TileNumber
     and #255
     xba
     lsr
@@ -443,17 +485,13 @@ UnderTileBR = 10
 LoadUpTileNumbersUnderActor:
   lda ActorPX,x
   and #$0008
-  bne @Right
+  jne LoadUpTileNumbersRight ; Software sprites are aligned to at least one axis right now
 @Left:
   lda ActorPY,x
   and #$0008
   beq LoadUpTileNumbersAligned
   bra LoadUpTileNumbersDown
 @Right:
-  lda ActorPY,x
-  and #$0008
-  jeq LoadUpTileNumbersRight
-  jmp LoadUpTileNumbersBoth
 
 LoadUpTileNumbersAligned:
   lda [LevelBlockPtr]
@@ -526,47 +564,8 @@ LoadUpTileNumbersRight:
   sta UnderTileBR
   rts
 
-LoadUpTileNumbersBoth:
-  ; The worst case, needs to change the block pointer four times
-  lda [LevelBlockPtr]
-  and #255
-  tay
-  ;---
-  lda M7BlockTopLeft,y
-  PointerForM7TileNumber
-  sta UnderTileUL
-
-  inc LevelBlockPtr
-  lda [LevelBlockPtr]
-  and #255
-  tay
-  ;---
-  lda M7BlockTopRight,y
-  PointerForM7TileNumber
-  sta UnderTileUR
-
-  lda LevelBlockPtr
-  add #64-1
-  sta LevelBlockPtr
-  lda [LevelBlockPtr]
-  and #255
-  tay
-  ;---
-  lda M7BlockBottomLeft,y
-  PointerForM7TileNumber
-  sta UnderTileBL
-
-  inc LevelBlockPtr
-  lda [LevelBlockPtr]
-  and #255
-  tay
-  ;---
-  lda M7BlockBottomRight,y
-  PointerForM7TileNumber
-  sta UnderTileBR
-  rts
-
 ; Copies the tiles at UnderTileUL, UnderTileUR, UnderTileBL and UnderTileBR in order
+.a16
 CopyOverFourTileGfx:
   jsr Mode7GetDynamicBuffer
   pha
@@ -577,10 +576,10 @@ CopyOverFourTileGfx:
   ldx UnderTileUL
   lda #64-1
   .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles ;<--- this is MVN
-  ldx UnderTileUR
+  ldx UnderTileBL
   lda #64-1
   .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
-  ldx UnderTileBL
+  ldx UnderTileUR
   lda #64-1
   .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
   ldx UnderTileBR
@@ -588,6 +587,28 @@ CopyOverFourTileGfx:
   .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
   plb
   plx
-  pla
+  pla ; A = Mode7GetDynamicBuffer's result still
   rts
 .endproc
+
+
+DemoSoftwareSprite:
+; 1 white
+; 2 black
+  .byt 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0
+  .byt 0, 0, 0, 0, 2, 2, 1, 1, 1, 1, 2, 2, 0, 0, 0, 0
+  .byt 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0
+  .byt 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0
+  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
+
+  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0
+  .byt 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0
+  .byt 0, 0, 0, 0, 2, 2, 1, 1, 1, 1, 2, 2, 0, 0, 0, 0
+  .byt 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0
