@@ -425,9 +425,9 @@ Loop:
   sta DMAADDRBANK
   ldy #.loword(Mode7DynamicTileBuffer)
   sty DMAADDR
-  ldy #30*64
+  ldy #28*64
   sty DMALEN
-  ldy #(14*16+2)*64
+  ldy #(14*16+4)*64
   sty PPUADDR
   lda #1
   sta COPYSTART
@@ -589,12 +589,10 @@ SkipBlock:
   lda #%11100000 ; Reset COLDATA
   sta COLDATA
 
-
   lda #0          ; Color math is always enabled
   sta CGWSEL
   lda #%00100000  ; Color math when the background color is used
   sta CGADSUB
-
 
   lda #VBLANK_NMI|AUTOREAD|HVTIME_IRQ ; enable HV IRQ
   sta PPUNMI

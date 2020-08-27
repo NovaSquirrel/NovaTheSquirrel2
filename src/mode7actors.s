@@ -22,12 +22,11 @@
 .import Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
 .import Mode7BlockAddress, Mode7Tiles
 
-; Reuse these
-ActorOldXPos = FG2OffsetX
-ActorOldYPos = FG2OffsetY
-
 .segment "Mode7Game"
 ActorM7DynamicSlot = ActorIndexInLevel ; Reuse this
+ActorM7LastDrawX = ActorState    ; and ActorOnGround
+ActorM7LastDrawY = ActorOnScreen ; and ActorDamage
+
 NUM_M7_ACTORS = 8
 
 ; Finds a dynamic sprite slot and allocates it
@@ -39,7 +38,7 @@ NUM_M7_ACTORS = 8
   phx
   seta8
   ; Look for a slot
-  ldx #4
+  ldx #6
 : lda Mode7DynamicTileUsed,x
   beq Found
   dex
@@ -104,9 +103,38 @@ Success:
   lda 2
   and #$fff0
   sta ActorPX,x
+  sta ActorM7LastDrawX,x
   lda 4
   and #$fff0
   sta ActorPY,x
+  sta ActorM7LastDrawY,x
+
+  ; Update the tilemap under the sprite
+  lda ActorPX,x
+  ldy ActorPY,x
+  jsr Mode7BlockAddress
+
+  jsr Mode7FindFreeTilemapUpdateSlot
+  bcc NoTilemapUpdate
+    jsr Mode7TilemapAddressForPosition
+    phy
+    jsr DoRenderAligned
+    ply
+    seta8
+    jsr Mode7GetDynamicTileNumber
+    sta BlockUpdateDataTL,y 
+    ina
+    sta BlockUpdateDataBL,y
+    ina
+    sta BlockUpdateDataTR,y
+    ina
+    sta BlockUpdateDataBR,y
+
+    lda #1 ; Square
+    sta BlockUpdateDataTL+1,y
+    seta16
+  NoTilemapUpdate:
+  ; Report success even if the tilemap update didn't work
   sec
   rts
 Fail:
@@ -117,6 +145,86 @@ Fail:
 .i16
 .proc Mode7RemoveActor
   stz ActorType,x
+
+  ; Erase the last place the sprite was drawn at
+  lda ActorM7LastDrawY,x
+  sta ActorPY,x
+  tay
+  lda ActorM7LastDrawX,x
+  sta ActorPX,x
+  jsr Mode7BlockAddress
+
+  jsr Mode7FindFreeTilemapUpdateSlot
+  jcc NoTilemapUpdate
+    jsr Mode7TilemapAddressForPosition
+    ; Determine the alignment to level tiles
+    lda ActorPX,x
+    and #$0008
+    bne Horizontal
+    lda ActorPY,x
+    and #$0008
+    beq Aligned
+  Vertical:
+    tdc
+    seta8
+    phx
+    lda [LevelBlockPtr]
+    tax
+    lda M7BlockBottomLeft,x
+    sta BlockUpdateDataTL,y
+    lda M7BlockBottomRight,x
+    sta BlockUpdateDataTR,y
+    lda LevelBlockPtr
+    add #64
+    sta LevelBlockPtr
+    addcarry LevelBlockPtr+1
+    lda [LevelBlockPtr]
+    tax
+    lda M7BlockTopLeft,x
+    sta BlockUpdateDataBL,y
+    lda M7BlockTopRight,x
+    sta BlockUpdateDataBR,y
+    bra Finish
+  Horizontal:
+    tdc
+    seta8
+    phx
+    lda [LevelBlockPtr]
+    tax
+    lda M7BlockTopRight,x
+    sta BlockUpdateDataTL,y
+    lda M7BlockBottomRight,x
+    sta BlockUpdateDataBL,y
+    inc LevelBlockPtr
+    lda [LevelBlockPtr]
+    tax
+    lda M7BlockTopLeft,x
+    sta BlockUpdateDataTR,y
+    lda M7BlockBottomLeft,x
+    sta BlockUpdateDataBR,y
+    bra Finish
+  Aligned:
+    tdc
+    seta8
+    phx
+    lda [LevelBlockPtr]
+    tax
+    lda M7BlockTopLeft,x
+    sta BlockUpdateDataTL,y
+    lda M7BlockTopRight,x
+    sta BlockUpdateDataTR,y
+    lda M7BlockBottomLeft,x
+    sta BlockUpdateDataBL,y
+    lda M7BlockBottomRight,x
+    sta BlockUpdateDataBR,y
+  Finish:
+    .a8
+    lda #1 ; Square
+    sta BlockUpdateDataTL+1,y
+    plx
+    seta16
+  NoTilemapUpdate:
+
   lda ActorM7DynamicSlot,x
 .endproc
 ; Inline tail call to Mode7FreeDynamicSlot
@@ -125,11 +233,13 @@ Fail:
 .a16
 .i16
 .proc Mode7FreeDynamicSlot
+  phx
   and #255
   tax
   seta8
   stz Mode7DynamicTileUsed,x
   seta16
+  plx
   rts
 .endproc
 
@@ -151,11 +261,6 @@ Loop:
   rts
 Call:
   tay
-  ; Save the original position of the actor
-  lda ActorPX,x
-  sta ActorOldXPos
-  lda ActorPY,x
-  sta ActorOldYPos
   ; Call the routine now
   lda Mode7ActorTable,y
   pha
@@ -169,69 +274,40 @@ Mode7ActorTable:
 ; Get the index into the dynamic tile buffer
 .a16
 .proc Mode7GetDynamicBuffer
-  ; Multiply by 256+128
+  ; Multiply by 256
   lda ActorM7DynamicSlot,x
   xba
-  lsr
-  sta 0
-  lda ActorM7DynamicSlot,x
-  xba
-  add 0
   rts
 .endproc
 
 .a8
 .i16
 .proc Mode7GetDynamicTileNumber
-  ; Multiply by 6
   lda ActorM7DynamicSlot,x
-  ; Add number*4 + number*2
+  ; Add number*4
   asl
-  sta 0
   asl
-  add 0
-  add #$e2
+  ; assert((PS & 1) == 0) Carry will be clear
+  adc #$e4
   rts
 .endproc
 
 .a16
 .proc M7FlyingArrow
-.if 0
-  phx
-  jsr Mode7GetDynamicBuffer
-  tax
-  lda #255
-  sta f:Mode7DynamicTileBuffer,x
-  sta f:Mode7DynamicTileBuffer+2,x
-  sta f:Mode7DynamicTileBuffer+4,x
-  sta f:Mode7DynamicTileBuffer+6,x
-  sta f:Mode7DynamicTileBuffer+8,x
-  sta f:Mode7DynamicTileBuffer+10,x
-  sta f:Mode7DynamicTileBuffer+12,x
-  sta f:Mode7DynamicTileBuffer+14,x
-  sta f:Mode7DynamicTileBuffer+16,x
-  plx
-.endif
-
   inc ActorPX,x
-  
-  jsr Mode7UpdateActorPicture
 
+  lda ActorPX,x
+  cmp #7*16
+  bne DontDie
+    jmp Mode7RemoveActor
+  DontDie:
+
+  jsr Mode7UpdateActorPicture
   rts
 .endproc
 
 .a16
-.i16
-.proc Mode7UpdateActorPicture
-TALL = 2
-WIDE = 3
-
-  jsr Mode7FindFreeTilemapUpdateSlot
-  bcs :+ ; Return early if failed to find a slot
-    rts
-  :
-  ; Y = tilemap update slot
-
+.proc Mode7TilemapAddressForPosition
   lda ActorPX,x
   and #$3f8 ; %000000xx xxxxx000
   lsr       ; %0000000x xxxxxx00
@@ -246,11 +322,32 @@ WIDE = 3
   asl       ; %00yyyyyy y0000000
   ora 0     ; %00yyyyyy yxxxxxxx
   sta BlockUpdateAddress,y
+  rts
+.endproc
+
+.a16
+.i16
+.proc Mode7UpdateActorPicture
+TALL = 2
+WIDE = 3
+
+  jsr Mode7FindFreeTilemapUpdateSlot
+  bcs :+ ; Return early if failed to find a slot
+    rts
+  :
+  ; Y = tilemap update slot
+  jsr Mode7TilemapAddressForPosition
 
   lda ActorPX,x
   ora ActorPY,x
   and #$0007
-  jeq AlignedToGrid
+  bne :+
+    jsr AlignedToGrid
+    lda ActorPX,x
+    sta ActorM7LastDrawX,x
+    lda ActorPY,x
+    sta ActorM7LastDrawY,x
+  :
   rts
 
 .a16
@@ -268,7 +365,7 @@ AlignedToGrid:
   ply 
 
   lda ActorPX,x
-  cmp ActorOldXPos
+  cmp ActorM7LastDrawX,x
   jeq @MovedVertically
   bcs @MovedRight
 @MovedLeft:
@@ -360,7 +457,7 @@ AlignedToGrid:
 
 @MovedVertically:
   lda ActorPY,x
-  cmp ActorOldYPos
+  cmp ActorM7LastDrawY,x
   bcs @MovedDown
 @MovedUp:
   ; ##
@@ -475,49 +572,22 @@ UnderTileBR = 10
   tax
   .scope
     SpritePointer = 0
-    Columns = 2
-    Rows = 3
+    Bytes = 2
 
     lda #.loword(DemoSoftwareSprite)
     sta SpritePointer
     ldy #0 ; Index for the above
     seta8
-    lda #16
-    sta Columns
-  @ColumnLoop:
-    lda #16
-    sta Rows
-  @RowLoop:
+    stz Bytes
+  @Loop:
     lda (SpritePointer),y
     beq :+
       sta f:Mode7DynamicTileBuffer,x
     :
     iny
-    ; Next row
-    seta16
-    txa
-    add #8
-    tax
-    seta8
-    dec Rows
-    bne @RowLoop
-
-    ; Go back up to the top of the column
-    seta16
-    txa
-    sub #128-1
-    tax
-    lda Columns
-    and #255
-    cmp #9
-    bne :+
-      txa
-      add #128-8
-      tax
-    :
-    seta8
-    dec Columns
-    bne @ColumnLoop
+    inx
+    inc Bytes
+    bne @Loop
   .endscope
 
   seta16
@@ -525,7 +595,7 @@ UnderTileBR = 10
   plx
   rts
 
-.macro PointerForM7TileNumber
+  .macro PointerForM7TileNumber
     and #255
     xba
     lsr
@@ -543,7 +613,11 @@ LoadUpTileNumbersUnderActor:
   and #$0008
   beq LoadUpTileNumbersAligned
   bra LoadUpTileNumbersDown
-@Right:
+;@Right:
+;  lda ActorPY,x
+;  and #$0008
+;  jeq LoadUpTileNumbersRight
+;  jmp LoadUpTileNumbersBoth
 
 LoadUpTileNumbersAligned:
   lda [LevelBlockPtr]
@@ -616,6 +690,49 @@ LoadUpTileNumbersRight:
   sta UnderTileBR
   rts
 
+.if 0
+LoadUpTileNumbersBoth:
+  ; The worst case, needs to change the block pointer four times
+  ; This isn't ready for use yet though since I'd need to clean up diagonally in addition to the four directions
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopLeft,y
+  PointerForM7TileNumber
+  sta UnderTileUL
+
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockTopRight,y
+  PointerForM7TileNumber
+  sta UnderTileUR
+
+  lda LevelBlockPtr
+  add #64-1
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockBottomLeft,y
+  PointerForM7TileNumber
+  sta UnderTileBL
+
+  inc LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tay
+  ;---
+  lda M7BlockBottomRight,y
+  PointerForM7TileNumber
+  sta UnderTileBR
+  rts
+.endif
+
 ; Copies the tiles at UnderTileUL, UnderTileUR, UnderTileBL and UnderTileBR in order
 .a16
 CopyOverFourTileGfx:
@@ -642,25 +759,43 @@ CopyOverFourTileGfx:
   pla ; A = Mode7GetDynamicBuffer's result still
   rts
 .endproc
-
+DoRenderAligned = Mode7UpdateActorPicture::RenderAligned
 
 DemoSoftwareSprite:
 ; 1 white
 ; 2 black
-  .byt 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0
-  .byt 0, 0, 0, 0, 2, 2, 1, 1, 1, 1, 2, 2, 0, 0, 0, 0
-  .byt 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0
-  .byt 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0
-  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
-  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 0, 0, 0, 0, 0, 0, 2, 2
+  .byt 0, 0, 0, 0, 2, 2, 1, 1
+  .byt 0, 0, 0, 2, 1, 1, 1, 1
+  .byt 0, 0, 2, 1, 1, 1, 1, 1
+  .byt 0, 2, 1, 1, 1, 1, 1, 1
+  .byt 0, 2, 1, 1, 1, 1, 1, 1
+  .byt 2, 1, 1, 1, 1, 1, 1, 1
+  .byt 2, 1, 1, 1, 1, 1, 1, 1
 
-  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
-  .byt 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2
-  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0
-  .byt 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 0, 0
-  .byt 0, 0, 0, 0, 2, 2, 1, 1, 1, 1, 2, 2, 0, 0, 0, 0
-  .byt 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0
+  .byt 2, 1, 1, 1, 1, 1, 1, 1
+  .byt 2, 1, 1, 1, 1, 1, 1, 1
+  .byt 0, 2, 1, 1, 1, 1, 1, 1
+  .byt 0, 2, 1, 1, 1, 1, 1, 1
+  .byt 0, 0, 2, 1, 1, 1, 1, 1
+  .byt 0, 0, 0, 2, 1, 1, 1, 1
+  .byt 0, 0, 0, 0, 2, 2, 1, 1
+  .byt 0, 0, 0, 0, 0, 0, 2, 2
+
+  .byt 2, 2, 0, 0, 0, 0, 0, 0
+  .byt 1, 1, 2, 2, 0, 0, 0, 0
+  .byt 1, 1, 1, 1, 2, 0, 0, 0
+  .byt 1, 1, 1, 1, 1, 2, 0, 0
+  .byt 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 1, 1, 1, 1, 1, 1, 1, 2
+
+  .byt 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 1, 1, 1, 1, 1, 1, 1, 2
+  .byt 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 1, 1, 1, 1, 1, 1, 2, 0
+  .byt 1, 1, 1, 1, 1, 2, 0, 0
+  .byt 1, 1, 1, 1, 2, 0, 0, 0
+  .byt 1, 1, 2, 2, 0, 0, 0, 0
+  .byt 2, 2, 0, 0, 0, 0, 0, 0
