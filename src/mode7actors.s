@@ -363,44 +363,96 @@ AlignedToGrid:
   cmp ActorOldYPos
   bcs @MovedDown
 @MovedUp:
+  ; ##
+  ; ##
   ; FF
-  ; ##
-  ; ##
   seta8
+  tdc ; For TAX/TAY
   jsr Mode7GetDynamicTileNumber
+  sta BlockUpdateDataTL,y
+  ina
   sta BlockUpdateDataBL,y
   ina
-  sta BlockUpdateDataBL+1,y
+  sta BlockUpdateDataTR,y
   ina
   sta BlockUpdateDataBR,y
-  ina
-  sta BlockUpdateDataBR+1,y
 
-  lda #10
-  sta BlockUpdateDataTL,y
-  sta BlockUpdateDataTR,y
+  phx
+  lda LevelBlockPtr
+  add #64
+  sta LevelBlockPtr
+  addcarry LevelBlockPtr+1
+  lda ActorPY,x
+  and #8
+  beq @MoveUpFixBottom
+@MoveUpFixTop:
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockBottomLeft,x
+  sta BlockUpdateDataBL+1,y
+  lda M7BlockBottomRight,x
+  sta BlockUpdateDataBR+1,y
+  bra @MoveUpFixedTop
+@MoveUpFixBottom:
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockTopLeft,x
+  sta BlockUpdateDataBL+1,y
+  lda M7BlockTopRight,x
+  sta BlockUpdateDataBR+1,y
+@MoveUpFixedTop:
+  plx
 
   lda #TALL
   sta BlockUpdateDataTL+1,y
   seta16
   rts
 @MovedDown:
-  ; ##
-  ; ##
   ; FF
+  ; ##
+  ; ##
+  .a16
+  lda BlockUpdateAddress,y
+  sub #128
+  sta BlockUpdateAddress,y
   seta8
+  tdc ; For TAX/TAY
+
   jsr Mode7GetDynamicTileNumber
-  sta BlockUpdateDataTL,y
-  ina
   sta BlockUpdateDataBL,y
   ina
-  sta BlockUpdateDataTR,y
+  sta BlockUpdateDataBL+1,y
   ina
   sta BlockUpdateDataBR,y
-
-  lda #10
-  sta BlockUpdateDataBL+1,y
+  ina
   sta BlockUpdateDataBR+1,y
+
+  phx
+  lda ActorPY,x
+  and #8
+  bne @MoveDownFixBottom
+@MoveDownFixTop:
+  lda LevelBlockPtr
+  sub #64
+  sta LevelBlockPtr
+  subcarry LevelBlockPtr+1
+
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockBottomLeft,x
+  sta BlockUpdateDataTL,y
+  lda M7BlockBottomRight,x
+  sta BlockUpdateDataTR,y
+  bra @MoveDownFixedTop
+@MoveDownFixBottom:
+  lda [LevelBlockPtr]
+  tax
+  lda M7BlockTopLeft,x
+  sta BlockUpdateDataTL,y
+  lda M7BlockTopRight,x
+  sta BlockUpdateDataTR,y
+@MoveDownFixedTop:
+  plx
 
   lda #TALL
   sta BlockUpdateDataTL+1,y
