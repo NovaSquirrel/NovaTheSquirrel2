@@ -69,9 +69,11 @@ q 6,2
 q 8,2
 
 +Checkpoint
+when Enter, M7BlockCheckpoint
 q 10,2
 
 +Bomb
+when Enter, M7BlockHurt
 q 12,0
 
 +Teleport

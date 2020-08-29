@@ -30,7 +30,14 @@ Mode7LevelMapCheckpoint      = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapBelow           = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
 Mode7DynamicTileBuffer       = LevelBufAlt          ; 7 tiles long, 64*4*7 = 1792
-Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long?
+Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long? padded to 8 though
+Mode7Keys                    = Mode7DynamicTileUsed+8 ; 4 bytes
+Mode7Tools                   = Mode7Keys+4          ; 2 bytes? Could be 1
+
+TOOL_FLIPPERS     = 1
+TOOL_FIREBOOTS    = 2
+TOOL_ICESKATES    = 4
+TOOL_SUCTIONBOOTS = 8
 
 CommonTilesetLength = (12*16+4)*64
 
@@ -38,7 +45,9 @@ CommonTilesetLength = (12*16+4)*64
 Mode7CheckpointX     = CheckpointState + 0
 Mode7CheckpointY     = CheckpointState + 2
 Mode7CheckpointDir   = CheckpointState + 4
-Mode7CheckpointChips = CheckpointState = 6
+Mode7CheckpointChips = CheckpointState + 6
+Mode7CheckpointKeys  = CheckpointState + 8 ; Four bytes
+Mode7CheckpointTools = CheckpointState + 10
 
 M7A_M7B_Buffer1Data  = HDMA_Buffer1
 M7C_M7D_Buffer1Data  = HDMA_Buffer1+1024
@@ -862,7 +871,7 @@ NoRotation:
       bra @StartMoving
     :
 
-    bra WasRotation
+    jmp WasRotation
 @NotAligned:
 @StartMoving:
 
@@ -905,6 +914,9 @@ NoRotation:
   and ForwardWallBitOutside,x
   beq @NotWall
 @IsWall:
+    lda [LevelBlockPtr]
+    and #255
+    jsr CallBlockBump
     bra DontMoveForward
   @NotWall:
 
@@ -1145,7 +1157,7 @@ DontDrawPlayer:
   jsr BuildHDMATable
 
 
-
+.if 0
   lda keynew
   and #KEY_B
   beq :+
@@ -1155,6 +1167,7 @@ DontDrawPlayer:
     .import Mode7CreateActor
     jsr Mode7CreateActor
   :
+.endif
 
   .import Mode7RunActors
   jsr Mode7RunActors
@@ -1473,28 +1486,12 @@ CallBlockBump:
   rts
 
 .a16
-.export M7BlockFire
-M7BlockFire:
 .export M7BlockNothing
 M7BlockNothing:
 .export M7BlockCloneButton
 M7BlockCloneButton:
-.export M7BlockDirt
-M7BlockDirt:
 .export M7BlockExit
 M7BlockExit:
-.export M7BlockFireBoots
-M7BlockFireBoots:
-.export M7BlockFlippers
-M7BlockFlippers:
-.export M7BlockSuctionBoots
-M7BlockSuctionBoots:
-.export M7BlockIceSkates
-M7BlockIceSkates:
-.export M7BlockKey
-M7BlockKey:
-.export M7BlockLock
-M7BlockLock:
 .export M7BlockMessage
 M7BlockMessage:
 .export M7BlockPushableBlock
@@ -1503,17 +1500,118 @@ M7BlockPushableBlock:
 M7BlockSpring:
 .export M7BlockTeleport
 M7BlockTeleport:
-.export M7BlockThief
-M7BlockThief:
 .export M7BlockToggleButton1
 M7BlockToggleButton1:
 .export M7BlockToggleButton2
 M7BlockToggleButton2:
-.export M7BlockWater
-M7BlockWater:
 .export M7BlockWoodArrow
 M7BlockWoodArrow:
   rts
+
+; Change a block to what its checkerboard block would be, based on the address
+EraseBlock:
+  lda LevelBlockPtr
+  sta 0
+  lsr
+  lsr
+  lsr
+  lsr
+  lsr
+  lsr
+  eor 0
+  lsr
+  tdc ; A = zero
+  adc #Mode7Block::Checker1
+  jmp Mode7ChangeBlock
+
+.export M7BlockDirt
+.proc M7BlockDirt
+  bra EraseBlock
+.endproc
+
+.export M7BlockWater
+.proc M7BlockWater
+  lda Mode7Tools
+  and TOOL_FLIPPERS
+  beq :+
+    rts
+  :
+  jmp M7BlockHurt
+.endproc
+
+.export M7BlockFire
+.proc M7BlockFire
+  lda Mode7Tools
+  and TOOL_FIREBOOTS
+  beq :+
+    rts
+  :
+  jmp M7BlockHurt
+.endproc
+
+.export M7BlockThief
+.proc M7BlockThief
+  stz Mode7Tools
+  rts
+.endproc
+
+.export M7BlockFireBoots
+.proc M7BlockFireBoots
+  lda #TOOL_FIREBOOTS
+  tsb Mode7Tools
+  bra EraseBlock
+.endproc
+
+.export M7BlockFlippers
+.proc M7BlockFlippers
+  lda #TOOL_FLIPPERS
+  tsb Mode7Tools
+  bra EraseBlock
+.endproc
+
+.export M7BlockSuctionBoots
+.proc M7BlockSuctionBoots
+  lda #TOOL_SUCTIONBOOTS
+  tsb Mode7Tools
+  bra EraseBlock
+.endproc
+
+.export M7BlockIceSkates
+.proc M7BlockIceSkates
+  lda #TOOL_ICESKATES
+  tsb Mode7Tools
+  bra EraseBlock
+.endproc
+
+.export M7BlockKey
+.proc M7BlockKey
+  tdc
+  seta8
+  lda [LevelBlockPtr]
+  sub #Mode7Block::Key1
+  tax
+  inc Mode7Keys,x  
+  seta16
+  bra EraseBlock
+.endproc
+
+.export M7BlockLock
+.proc M7BlockLock
+  tdc
+  seta8
+  lda [LevelBlockPtr]
+  sub #Mode7Block::Lock1
+  tax
+  lda Mode7Keys,x
+  bne Unlock
+  seta16
+  rts
+Unlock:
+  dec Mode7Keys,x
+  seta16
+  bra EraseBlock
+.endproc
+
 .export M7BlockHurt
 .proc M7BlockHurt
   lda #30
@@ -1523,6 +1621,7 @@ M7BlockWoodArrow:
 
 .export M7BlockIce
 .proc M7BlockIce
+  jsr CancelIfHaveSkates
   lda Mode7IceDirection
   ora #$8000 | $4000
   sta Mode7ForceMove
@@ -1546,8 +1645,19 @@ IceGoRight:
   lda #$8000 | $4000 | DIRECTION_RIGHT
   sta Mode7ForceMove
   rts
+
+.proc CancelIfHaveSkates
+  lda Mode7Tools
+  and #TOOL_ICESKATES
+  beq :+
+    pla ; Pop the return address off
+    rts
+  :
+  rts
+.endproc
 .export M7BlockIceCornerUL
 .proc M7BlockIceCornerUL
+  jsr CancelIfHaveSkates
   lda Mode7IceDirection
   cmp #DIRECTION_LEFT
   beq IceGoDown
@@ -1555,6 +1665,7 @@ IceGoRight:
 .endproc
 .export M7BlockIceCornerUR
 .proc M7BlockIceCornerUR
+  jsr CancelIfHaveSkates
   lda Mode7IceDirection
   cmp #DIRECTION_RIGHT
   beq IceGoDown
@@ -1562,6 +1673,7 @@ IceGoRight:
 .endproc
 .export M7BlockIceCornerDL
 .proc M7BlockIceCornerDL
+  jsr CancelIfHaveSkates
   lda Mode7IceDirection
   cmp #DIRECTION_LEFT
   beq IceGoUp
@@ -1569,32 +1681,46 @@ IceGoRight:
 .endproc
 .export M7BlockIceCornerDR
 .proc M7BlockIceCornerDR
+  jsr CancelIfHaveSkates
   lda Mode7IceDirection
   cmp #DIRECTION_RIGHT
   beq IceGoUp
   bra IceGoLeft
 .endproc
 
+.proc CancelIfHaveSuctionBoots
+  lda Mode7Tools
+  and #TOOL_SUCTIONBOOTS
+  beq :+
+    pla ; Pop the return address off
+    rts
+  :
+  rts
+.endproc
 .export M7BlockForceLeft
 .proc M7BlockForceLeft
+  jsr CancelIfHaveSuctionBoots
   lda #$8000 | DIRECTION_LEFT
   sta Mode7ForceMove
   rts
 .endproc
 .export M7BlockForceDown
 .proc M7BlockForceDown
+  jsr CancelIfHaveSuctionBoots
   lda #$8000 | DIRECTION_DOWN
   sta Mode7ForceMove
   rts
 .endproc
 .export M7BlockForceUp
 .proc M7BlockForceUp
+  jsr CancelIfHaveSuctionBoots
   lda #$8000 | DIRECTION_UP
   sta Mode7ForceMove
   rts
 .endproc
 .export M7BlockForceRight
 .proc M7BlockForceRight
+  jsr CancelIfHaveSuctionBoots
   lda #$8000 | DIRECTION_RIGHT
   sta Mode7ForceMove
   rts
@@ -1691,6 +1817,12 @@ IceGoRight:
   sta Mode7CheckpointDir
   lda Mode7ChipsLeft
   sta Mode7CheckpointChips
+  lda Mode7Keys+0
+  sta Mode7CheckpointKeys+0
+  lda Mode7Keys+2
+  sta Mode7CheckpointKeys+2
+  lda Mode7Tools
+  sta Mode7CheckpointTools
 
   ldx #4096-2
 : lda f:Mode7LevelMap,x
@@ -1725,6 +1857,12 @@ IceGoRight:
   sta Mode7RealAngle
   lda Mode7CheckpointChips
   sta Mode7ChipsLeft
+  lda Mode7CheckpointKeys+0
+  sta Mode7Keys+0
+  lda Mode7CheckpointKeys+2
+  sta Mode7Keys+2
+  lda Mode7CheckpointTools
+  sta Mode7Tools
 
   ldx #4096-2
 : lda f:Mode7LevelMapCheckpoint,x
