@@ -29,8 +29,8 @@ Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapCheckpoint      = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapBelow           = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
-Mode7DynamicTileBuffer       = LevelBufAlt          ; 5 tiles long, 64*6*5 = 1920
-Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 5 bytes long?
+Mode7DynamicTileBuffer       = LevelBufAlt          ; 7 tiles long, 64*4*7 = 1792
+Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long?
 
 CommonTilesetLength = (12*16+4)*64
 
@@ -71,11 +71,16 @@ Mode7LastPositionPtr: .res 2
 Mode7ForceMove: .res 2
 Mode7IceDirection: .res 2 ; Last direction used
 
+Mode7DoLookAround: .res 2
+Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
+Mode7LookAroundOffsetY = FG2OffsetY
+; Maybe I can reuse more of the above?? Have some sort of overlay system
+
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
 PORTRAIT_OOPS   = $88 | OAM_PRIORITY_3
 PORTRAIT_HAPPY  = $A0 | OAM_PRIORITY_3
 PORTRAIT_BLINK  = $A8 | OAM_PRIORITY_3
-PORTRAIT_LEFT   = $C0 | OAM_PRIORITY_3
+PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
 
 M7_BLOCK_SOLID_L      = 1
 M7_BLOCK_SOLID_R      = 2
@@ -173,6 +178,8 @@ DIRECTION_RIGHT = 3
   ina
   ldy #$9500 >> 1
   jsl DoPortraitUpload
+  ; Binoculars
+  ina
   ina
   ldy #$9800 >> 1
   jsl DoPortraitUpload
@@ -296,6 +303,10 @@ RestoredFromCheckpoint:
   stz Mode7DynamicTileUsed+2
   stz Mode7DynamicTileUsed+4
   stz Mode7DynamicTileUsed+6
+
+  stz Mode7DoLookAround
+  stz Mode7LookAroundOffsetX
+  stz Mode7LookAroundOffsetY
 
   ldx #ActorStart
   ldy #ActorEnd-ActorStart
@@ -637,8 +648,90 @@ SkipBlock:
 
   ; ---------------
 
-  lda Mode7Oops
-  jne WasRotation
+  lda Mode7Turning
+  bne :+
+  lda keynew
+  and #KEY_X
+  beq :+
+    lda Mode7DoLookAround
+    ina
+    sta Mode7DoLookAround
+  :
+
+  ; If you're currently looking around, allow using the d-pad to move the camera offset
+  lda Mode7DoLookAround
+  jeq DontLookAround
+    ; If snapping back, move back to the player
+    lda Mode7DoLookAround
+    cmp #1
+    beq AllowLookAround
+      ina
+      sta Mode7DoLookAround
+      cmp #20
+      bcc :+
+        stz Mode7DoLookAround
+        stz Mode7LookAroundOffsetX
+        stz Mode7LookAroundOffsetY
+      :
+
+      lda Mode7LookAroundOffsetX
+      pha
+      asr_n 2
+      rsb Mode7LookAroundOffsetX
+      sta Mode7LookAroundOffsetX
+      pla
+      cmp Mode7LookAroundOffsetX
+      bne :+
+        stz Mode7LookAroundOffsetX
+      :
+
+      lda Mode7LookAroundOffsetY
+      pha
+      asr_n 2
+      rsb Mode7LookAroundOffsetY
+      sta Mode7LookAroundOffsetY
+      pla
+      cmp Mode7LookAroundOffsetY
+      bne :+
+        stz Mode7LookAroundOffsetY
+      :
+
+      bra DontLookAround
+  AllowLookAround:
+    ; If not snapping back to the player, move around in response to the keys
+    lda keydown
+    and #KEY_LEFT
+    beq :+
+      lda Mode7Direction
+      ina
+      jsr AddLookAroundDirection
+    :
+    lda keydown
+    and #KEY_DOWN
+    beq :+
+      lda Mode7Direction
+      ina
+      ina
+      jsr AddLookAroundDirection
+    :
+    lda keydown
+    and #KEY_UP
+    beq :+
+      lda Mode7Direction
+      jsr AddLookAroundDirection
+    :
+    lda keydown
+    and #KEY_RIGHT
+    beq :+
+      lda Mode7Direction
+      dea
+      jsr AddLookAroundDirection
+    :
+  DontLookAround:
+
+  lda Mode7DoLookAround
+  ora Mode7Oops
+  jne DontMoveForward
   lda Mode7Turning
   jne AlreadyTurning
     lda keydown
@@ -896,6 +989,44 @@ WasRotation:
     jeq Mode7Die
   :
 
+  lda Mode7DoLookAround
+  beq DoDrawPlayer
+    ldy OamPtr
+    lda #PORTRAIT_LOOK
+    sta OAM_TILE+(4*0),y
+    ora #$02
+    sta OAM_TILE+(4*1),y
+    lda #PORTRAIT_LOOK
+    ora #$04
+    sta OAM_TILE+(4*2),y
+    ora #$02
+    sta OAM_TILE+(4*3),y
+
+    seta8
+    lda #10
+    sta OAM_XPOS+(4*0),y
+    sta OAM_XPOS+(4*2),y
+    sta OAM_YPOS+(4*0),y
+    sta OAM_YPOS+(4*1),y
+    lda #10+16
+    sta OAM_XPOS+(4*1),y
+    sta OAM_XPOS+(4*3),y
+    sta OAM_YPOS+(4*2),y
+    sta OAM_YPOS+(4*3),y
+
+    ; Portrait
+    lda #$02
+    sta OAMHI+1+(4*0),y
+    sta OAMHI+1+(4*1),y
+    sta OAMHI+1+(4*2),y
+    sta OAMHI+1+(4*3),y
+    seta16
+    tya
+    add #4*4
+    sta OamPtr
+
+    jmp DontDrawPlayer
+  DoDrawPlayer:
 
   ; Draw a crappy temporary walk animation
   ldy OamPtr
@@ -975,7 +1106,7 @@ WasRotation:
   tya
   add #8*4
   sta OamPtr
-
+DontDrawPlayer:
 
 
   ; Don't respond to special floors when you weren't moving last frame
@@ -1175,6 +1306,21 @@ ForwardWallBitInside:
   rts
 Block:
   sec
+  rts
+.endproc
+
+; For the lookaround code above in the main loop
+.a16
+.proc AddLookAroundDirection
+  and #3
+  asl
+  tax
+  lda ForwardX,x
+  add Mode7LookAroundOffsetX
+  sta Mode7LookAroundOffsetX
+  lda ForwardY,x
+  add Mode7LookAroundOffsetY
+  sta Mode7LookAroundOffsetY
   rts
 .endproc
 
@@ -1591,9 +1737,11 @@ IceGoRight:
 
 .proc CalculateScroll
   lda Mode7PlayerX
+  add Mode7LookAroundOffsetX
   sub #7*16+8
   sta Mode7ScrollX
   lda Mode7PlayerY
+  add Mode7LookAroundOffsetY
   sub #11*16+8
   sta Mode7ScrollY
   rts
