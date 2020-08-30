@@ -120,6 +120,9 @@ DIRECTION_RIGHT = 3
   stz Mode7PlayerY
   stz Mode7ChipsLeft
   stz Mode7CheckpointChips
+  stz Mode7Tools
+  stz Mode7Keys
+  stz Mode7Keys+2
 
   seta8
   ; Transparency outside the mode 7 plane
