@@ -34,7 +34,7 @@ for line in text:
 		# Reset to prepare for the new block
 		priority = False
 		block = {"name": line[1:], "solid_u": False, "solid_d": False, "solid_l": False, "solid_r": False, \
-		  "solid_inside": False, "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
+		  "solid_block": False, "solid_creature": False, "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -104,6 +104,10 @@ for b in all_blocks:
 		flags |= 4
 	if b['solid_u']:
 		flags |= 8
+	if b['solid_block']:
+		flags |= 16
+	if b['solid_creature']:
+		flags |= 32
 	outfile.write('  .byt %d ; %s\n' % (flags, b['name']))
 outfile.write('.endproc\n\n')
 

@@ -12,6 +12,7 @@ t 2,0 2,0
 t 2,0 2,0
 
 +Gravel
+solid_creature
 t 2,1 2,1
 t 2,1 2,1
 
@@ -116,10 +117,13 @@ t 10,5 11,5
 
 +Exit
 when Enter, M7BlockExit
+solid_creature
 t 12,5 13,5
 t 14,5 15,5
 
 +Dirt
+solid_creature
+solid_block
 when Enter, M7BlockDirt
 q 0,6
 
@@ -224,6 +228,7 @@ solid
 q 12,6
 
 +Thief
+solid_creature
 when Enter, M7BlockThief
 q 8,6
 
@@ -415,21 +420,25 @@ solid
 q 12,8
 
 +FireBoots
+solid_creature
 when Enter, M7BlockFireBoots
 t 2,10 2,10
 t 2,10 2,10
 
 +SuctionBoots
+solid_creature
 when Enter, M7BlockSuctionBoots
 t 3,10 3,10
 t 3,10 3,10
 
 +Flippers
+solid_creature
 when Enter, M7BlockFlippers
 t 2,11 2,11
 t 2,11 2,11
 
 +IceSkates
+solid_creature
 when Enter, M7BlockIceSkates
 t 3,11 3,11
 t 3,11 3,11
