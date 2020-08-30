@@ -34,10 +34,10 @@ Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long? 
 Mode7Keys                    = Mode7DynamicTileUsed+8 ; 4 bytes
 Mode7Tools                   = Mode7Keys+4          ; 2 bytes? Could be 1
 
-TOOL_FLIPPERS     = 1
-TOOL_FIREBOOTS    = 2
-TOOL_ICESKATES    = 4
-TOOL_SUCTIONBOOTS = 8
+TOOL_FIREBOOTS    = 1
+TOOL_FLIPPERS     = 2
+TOOL_SUCTIONBOOTS = 4
+TOOL_ICESKATES    = 8
 
 CommonTilesetLength = (12*16+4)*64
 
@@ -119,6 +119,7 @@ DIRECTION_RIGHT = 3
   stz Mode7PlayerX
   stz Mode7PlayerY
   stz Mode7ChipsLeft
+  stz Mode7CheckpointChips
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -155,7 +156,7 @@ DIRECTION_RIGHT = 3
   jsl ppu_copy
 
   ; Common sprites
-  lda #Palette::FGCommon
+  lda #Palette::Mode7HUDSprites
   pha
   ldy #9
   jsl DoPaletteUpload
@@ -163,7 +164,7 @@ DIRECTION_RIGHT = 3
   ; And upload the common palette to the last background palette
   ldy #7
   jsl DoPaletteUpload
-  lda #GraphicsUpload::SPCommon
+  lda #GraphicsUpload::Mode7HUDSprites
   jsl DoGraphicUpload
   lda #GraphicsUpload::MaffiM7TempWalk
   jsl DoGraphicUpload
@@ -353,15 +354,20 @@ RestoredFromCheckpoint:
 RenderMapLoop:
   ; Top row
   ldy #64
-: lda f:Mode7LevelMap,x
+RenderTopLoop:
+  lda f:Mode7LevelMap,x
+  ; Could chips while this is going on
   cmp #Mode7Block::Collect
   bne DontIncreaseChipCounter
     pha
-    sed
-    lda Mode7ChipsLeft
-    adc #0 ; assert((PS & 1) == 1) Carry will be set
-    sta Mode7ChipsLeft
-    cld
+    lda Mode7CheckpointChips ; Don't add if coming in from a checkpoint and it's already been calculated
+    bne :+
+      sed
+      lda Mode7ChipsLeft
+      adc #0 ; assert((PS & 1) == 1) Carry will be set
+      sta Mode7ChipsLeft
+      cld
+    :
     pla
 DontIncreaseChipCounter:
 
@@ -374,7 +380,7 @@ DontIncreaseChipCounter:
   plx
   inx
   dey
-  bne :-
+  bne RenderTopLoop
 
   seta16
   txa
@@ -506,7 +512,7 @@ SkipBlock:
   seta16
   ; -----------------------------------
   ; Update the HUD
-  lda #($c000 >> 1) + NTXY(14, 2)
+  lda #($c000 >> 1) + NTXY(6, 2)
   sta PPUADDR
   HUD_Base = 64 + (7 << 10)
   lda #12 | HUD_Base
@@ -532,7 +538,7 @@ SkipBlock:
   sta PPUDATA
 @TopWasZero:
   ;--- (Bottom)
-  lda #($c000 >> 1) + NTXY(14, 3)
+  lda #($c000 >> 1) + NTXY(6, 3)
   sta PPUADDR
   lda #$10+12 | HUD_Base
   sta PPUDATA
@@ -1043,7 +1049,7 @@ WasRotation:
   ; Draw a crappy temporary walk animation
   ldy OamPtr
   lda keydown
-  and #KEY_UP
+  and #KEY_UP|KEY_DOWN|KEY_L|KEY_R
   bne :+
     lda #4
     bra :++
@@ -1150,13 +1156,16 @@ DontDrawPlayer:
   DontRunSpecialFloor:
 
   setaxy16
+
+  jsr Mode7DrawInventory
+
   ldx OamPtr
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
   jsr BuildHDMATable
 
-
+  ; Test for the moving sprite system
 .if 0
   lda keynew
   and #KEY_B
@@ -1233,6 +1242,77 @@ DontDrawPlayer:
   lda BlockUpdateDataBR+1,x
   sta PPUDATA
   stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
+  rts
+.endproc
+
+.a16
+.i16
+.proc Mode7DrawInventory
+CurrentXY = 2
+Tools = 4
+KeyCount = 6
+Attr = OAM_PRIORITY_2 | OAM_COLOR_1
+  lda #(11*8) | ((2*8)<<8) ; Y is second byte
+  sta CurrentXY
+  lda Mode7Tools
+  sta Tools
+
+  ldx OamPtr
+
+  ; Draw footwear
+  lsr Tools ; Fire boots
+  bcc :+
+    lda #Attr|$40
+    jsr AddOneSprite
+  :
+  lsr Tools ; Flippers
+  bcc :+
+    lda #Attr|$42
+    jsr AddOneSprite
+  :
+  lsr Tools ; Suction boots
+  bcc :+
+    lda #Attr|$44
+    jsr AddOneSprite
+  :
+  lsr Tools ; Iceskates
+  bcc :+
+    lda #Attr|$46
+    jsr AddOneSprite
+  :
+
+  ; Draw keys
+  ldy #0
+KeyLoop:
+  lda Mode7Keys,y
+  and #255
+  beq NoKeys
+  tya
+  asl
+  adc #Attr|$48
+  jsr AddOneSprite
+NoKeys:
+  iny
+  cpy #4
+  bne KeyLoop
+
+  stx OamPtr
+  rts
+
+AddOneSprite:
+  sta OAM_TILE,x ; Gets attribute too
+  lda CurrentXY
+  sta OAM_XPOS,x ; Gets Y too
+  lda #$0200     ; 16x16
+  sta OAMHI,x
+  inx
+  inx
+  inx
+  inx
+
+  lda CurrentXY
+  add #16
+  sta CurrentXY
   rts
 .endproc
 
@@ -1490,8 +1570,6 @@ CallBlockBump:
 M7BlockNothing:
 .export M7BlockCloneButton
 M7BlockCloneButton:
-.export M7BlockExit
-M7BlockExit:
 .export M7BlockMessage
 M7BlockMessage:
 .export M7BlockPushableBlock
@@ -1507,6 +1585,18 @@ M7BlockToggleButton2:
 .export M7BlockWoodArrow
 M7BlockWoodArrow:
   rts
+
+.export M7BlockExit
+.proc M7BlockExit
+  lda Mode7ChipsLeft
+  beq :+
+    rts
+  :
+  .import ExitToOverworld
+  jsl WaitVblank
+  jml ExitToOverworld
+.endproc
+
 
 ; Change a block to what its checkerboard block would be, based on the address
 EraseBlock:
@@ -1532,7 +1622,7 @@ EraseBlock:
 .export M7BlockWater
 .proc M7BlockWater
   lda Mode7Tools
-  and TOOL_FLIPPERS
+  and #TOOL_FLIPPERS
   beq :+
     rts
   :
@@ -1542,7 +1632,7 @@ EraseBlock:
 .export M7BlockFire
 .proc M7BlockFire
   lda Mode7Tools
-  and TOOL_FIREBOOTS
+  and #TOOL_FIREBOOTS
   beq :+
     rts
   :

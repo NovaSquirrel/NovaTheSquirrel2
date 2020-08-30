@@ -296,11 +296,11 @@ Mode7ActorTable:
 .proc M7FlyingArrow
   inc ActorPX,x
 
-  lda ActorPX,x
-  cmp #7*16
-  bne DontDie
-    jmp Mode7RemoveActor
-  DontDie:
+;  lda ActorPX,x
+;  cmp #7*16
+;  bne DontDie
+;    jmp Mode7RemoveActor
+;  DontDie:
 
   jsr Mode7UpdateActorPicture
   rts
