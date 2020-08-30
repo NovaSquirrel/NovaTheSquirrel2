@@ -705,34 +705,16 @@ Yes:
   jsr IsStone
   rol 0
 
-  asl 0
-  ldx 0
-  lda StoneTable,x
+  lda 0
+  asl
+  add #Block::StoneSingle
   sta [MidPointer],y
   rts
 
-StoneTable:
-  .word Block::StoneSingle      ; ....
-  .word Block::Stone            ; ...L
-  .word Block::Stone            ; ..R.
-  .word Block::Stone            ; ..RL
-  .word Block::Stone            ; .D..
-  .word Block::StoneTopRight    ; .D.L
-  .word Block::StoneTopLeft     ; .DR.
-  .word Block::StoneTop         ; .DRL
-  .word Block::Stone            ; U...
-  .word Block::StoneBottomRight ; U..L
-  .word Block::StoneBottomLeft  ; U.R.
-  .word Block::StoneBottom      ; U.RL
-  .word Block::Stone            ; UD..
-  .word Block::StoneRight       ; UD.L
-  .word Block::StoneLeft        ; UDR.
-  .word Block::Stone            ; UDRL
-
 IsStone:
-  cmp #Block::StoneSingle+1
+  cmp #Block::StoneMossy+1
   bcs No
-  cmp #Block::StoneLeft
+  cmp #Block::StoneSingle
   bcs Yes
 No:
   clc

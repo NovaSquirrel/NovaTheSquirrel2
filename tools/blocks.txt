@@ -742,19 +742,32 @@ base terrain_rocks
 palette foreststone_palette
 tileset FGForestStone
 
-+StoneLeft
++StoneSingle
 solid
-t 2,0 1,0
-t 2,1 1,1
+q 6,0
 
-+Stone
-autotile AutotileStone
++StoneHorizontalRight
 solid
-q 0,0
+t 4,0 7,0
+t 4,1 7,1
 
-+StoneRight
++StoneHorizontalLeft
 solid
-t 0,0 3,0
+t 6,0 5,0
+t 6,1 5,1
+
++StoneHorizontal
+solid
+q 4,0
+
++StoneVerticalTop
+solid
+t 6,0 7,0
+t 2,1 3,1
+
++StoneTopRight
+solid
+t 4,0 7,0
 t 1,1 3,1
 
 +StoneTopLeft
@@ -767,10 +780,15 @@ solid
 t 4,0 5,0
 t 1,1 1,1
 
-+StoneTopRight
++StoneVerticalBottom
 solid
-t 4,0 7,0
-t 1,1 3,1
+t 2,0 3,0
+t 6,1 7,1
+
++StoneBottomRight
+solid
+t 0,0 3,0
+t 4,1 7,1
 
 +StoneBottomLeft
 solid
@@ -782,18 +800,29 @@ solid
 t 0,0 1,0
 t 4,1 5,1
 
-+StoneBottomRight
++StoneVertical
+solid
+q 2,0
+
++StoneRight
 solid
 t 0,0 3,0
-t 4,1 7,1
+t 1,1 3,1
+
++StoneLeft
+solid
+t 2,0 1,0
+t 2,1 1,1
+
++Stone
+autotile AutotileStone
+solid
+q 0,0
 
 +StoneMossy
 solid
 q 8,0
 
-+StoneSingle
-solid
-q 6,0
 
 #######################################
 # Water
