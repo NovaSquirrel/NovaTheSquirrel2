@@ -1197,10 +1197,14 @@ tileset FGGlassBlocksGray
 solid
 q 0,0
 
++GlassNonsolidWhite
+q 6,0
+
 +GlassPillarTop
 q 2,0
 
 +GlassPillarMiddle
+autotile AutotileGlassPillar
 t 2,1 3,1
 t 2,1 3,1
 

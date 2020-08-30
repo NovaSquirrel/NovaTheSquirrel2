@@ -958,3 +958,21 @@ No:
   clc
   rts
 .endproc
+
+.export AutotileGlassPillar
+.proc AutotileGlassPillar
+  lda #Block::GlassPillarTop
+  sta [MidPointer],y
+Loop:
+  iny
+  iny
+  lda [MidPointer],y
+  cmp #Block::GlassPillarMiddle
+  beq Loop
+Stop:
+  dey
+  dey
+  lda #Block::GlassPillarBottom
+  sta [MidPointer],y
+  rts
+.endproc

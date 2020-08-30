@@ -506,6 +506,7 @@ PathRenderLoop:
   stz PPURES
   lda #%00010011  ; enable sprites, plane 0 and 1
   sta BLENDMAIN
+  stz BLENDSUB
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
 
