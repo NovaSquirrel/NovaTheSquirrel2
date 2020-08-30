@@ -34,12 +34,16 @@
   setaxy16
   ; Taken from the overworld and used for level-specific flags
   sta StartedLevelNumber
-
+FromDoor:
+  ldx #$1ff
+  txs ; Reset the stack pointer so no cleanup is needed
   jsr StartLevelCommon
   jsl UploadLevelGraphics
   jsl MakeCheckpoint
   jml GameMainLoop
 .endproc
+StartLevelFromDoor = StartLevel::FromDoor
+.export StartLevelFromDoor
 
 ; Called both when starting a level normally and when making a checkpoint through other means
 .export MakeCheckpoint
@@ -100,13 +104,11 @@
 ; .----------------------------------------------------------------------------
 ; | Header parsing
 ; '----------------------------------------------------------------------------
-; Accumulator = level number
+; Loads the level whose header is pointed to by LevelHeaderPointer
 .a16
 .i16
 .export DecompressLevel
 .proc DecompressLevel
-  sta LevelNumber
-
   ; Clear out some buffers before the level loads stuff into them
 
   ; Don't clear any entities, that'll be done when rendering

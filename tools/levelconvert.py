@@ -15,7 +15,10 @@ available_nybble = [set(), set(), set(), set()]
 available_state = None
 available_special = {} # Uses a Python function to handle it
 has_metadata = {} # Uses a Python function to insert metadata
+
+# Per-level global state
 teleport_destinations = {}
+door_level_teleport_list = [] # List of levels, for doors that lead to other levels
 
 for line in define_lines:
 	if not len(line): # Skip empty lines
@@ -121,7 +124,9 @@ def encode_door(r, extra):
 		else:
 			sys.exit("Teleport destination "+dashes[1]+" not found")
 	elif len(dashes) == 1: # Level door
-		return ("LWriteCol $20, Level::%s" % extra), 3 # level number
+		if extra not in door_level_teleport_list:
+			door_level_teleport_list.append(extra)
+		return ("LWriteCol $20, %d ;%s" % (door_level_teleport_list.index(extra), extra)), 3 # level number
 	sys.exit("Invalid door: "+extra)
 	return (""), 0
 
@@ -220,6 +225,8 @@ outfile.write('.include "levelenum.s"\n\n')
 outfile.write('.segment "LevelBank1"\n\n')
 
 for f in glob.glob("levels/*.json"):
+	teleport_destinations.clear()
+
 	plain_name = os.path.splitext(os.path.basename(f))[0]
 	all_levels.append(plain_name)
 	outfile.write(".export level_%s\n" % plain_name)
@@ -365,12 +372,18 @@ for f in glob.glob("levels/*.json"):
 
 	outfile.write("\n")
 	print("Total size: %d" % total_level_size)
+
+outfile.write('.segment "BlockInteraction"\n')
+outfile.write('.export DoorLevelTeleportList\nDoorLevelTeleportList:\n')
+for level in door_level_teleport_list:
+	outfile.write('.faraddr level_%s\n' % level)
 outfile.close()
 
-# Generate the enum in a separate file
-outfile = open("src/levelenum.s", "w")
-outfile.write('; This is automatically generated. Edit level JSON files instead\n')
-outfile.write('.enum Level\n')
-for b in all_levels:
-	outfile.write('  %s\n' % b)
-outfile.write('.endenum\n\n')
+# Nothing seems to use the below enum, so don't generate it
+## Generate the enum in a separate file
+#outfile = open("src/levelenum.s", "w")
+#outfile.write('; This is automatically generated. Edit level JSON files instead\n')
+#outfile.write('.enum Level\n')
+#for b in all_levels:
+#	outfile.write('  %s\n' % b)
+#outfile.write('.endenum\n\n')

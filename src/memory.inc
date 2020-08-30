@@ -197,7 +197,6 @@ ParticleLen = 32
 .global GraphicUploadOffset
 SpriteXYOffset = GraphicUploadOffset ; in the order X, Y
 
-.globalzp LevelNumber
 .globalzp StartedLevelNumber
 .global NeedLevelReload
 .global NeedLevelRerender

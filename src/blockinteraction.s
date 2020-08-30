@@ -859,8 +859,31 @@ DoorExit:
     jsl RenderLevelScreens
     rts
 LevelDoor:
-  ; Load a new level I guess
-  rts
+  lda f:ColumnWords+1,x
+  pha
+  jsr DoorFade
+  pla
+
+  ; Find the level header pointer
+  setaxy16
+  and #255 ; Multiply by 3
+  sta 0
+  asl
+  adc 0 ; assert((PS & 1) == 0) Carry will be clear
+  tax
+  seta8
+  .import DoorLevelTeleportList
+  ; Use DoorLevelTeleportList to find the header
+  lda DoorLevelTeleportList+0,x
+  sta LevelHeaderPointer+0
+  lda DoorLevelTeleportList+1,x
+  sta LevelHeaderPointer+1
+  lda DoorLevelTeleportList+2,x
+  sta LevelHeaderPointer+2
+  setaxy16
+
+  .import StartLevelFromDoor
+  jml StartLevelFromDoor
 .endproc
 
 .proc DoorFade

@@ -73,7 +73,6 @@
   PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
   PlayerHealth:     .res 1     ; current health, measured in half hearts
 
-  LevelNumber:           .res 2 ; Current level number (actual map number from the game)
   StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
 
   SpriteTileBase:   .res 2 ; Detected tile base for the current entity (includes palette index)
