@@ -72,6 +72,10 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   phk
   plb
 
+  seta8
+  lda #1
+  sta OverworldMap
+
   setaxy16
   lda OverworldMap
   and #255
