@@ -95,6 +95,24 @@ AbilityRoutineForId:
     stz TailAttackTimer
   :
 
+  ; Tail swish can interact with blocks
+  ; Maybe add an interaction later specifically for tail collision?
+  lda TailAttackTimer
+  cmp #6*2
+  bne :+
+    seta16
+    lda PlayerPY
+    sub #10*16
+    tay
+    lda #13*16
+    jsl PlayerNegIfLeft
+    add PlayerPX
+    jsl GetLevelPtrXY
+    jsl GetBlockFlag
+    jsl BlockRunInteractionBelow
+    seta8
+  :
+
   pla
   cmp #4*2
   rts
