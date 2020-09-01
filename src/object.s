@@ -1320,7 +1320,7 @@ Finish:
   ; with a 16-bit push/pull
   lda ActorDirection,x
   pha
-  stz ActorDirection,x ; Start as zero
+  ; Don't clear ActorDirection,x
 
   ; Temporarily write new values
   seta8

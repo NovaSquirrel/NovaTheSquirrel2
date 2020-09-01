@@ -2276,6 +2276,173 @@ MakeForkedArrow:
   bra JustDestroyCrate
 .endproc
 
+.a16
+.i16
+.export RunEnemyGlider
+.proc RunEnemyGlider
+Direction = 0
+  lda ActorState,x
+  and #255
+  bne NoMove
+
+  ; Increase the counter
+  inc ActorVarB,x
+
+; -----------------------------
+  lda ActorVarB,x
+  lsr
+  bcs NoMove
+  ; Get the "frame" out of the four glider frames
+  and #3
+  asl ; 16-bit table
+  tay
+
+  lda GliderPushX,y ; get X push value from table
+  jsl ActorNegIfLeft
+  add ActorPX,x
+  sta ActorPX,x
+  
+  lda GliderPushY,y ; get Y push value from table
+  ldy ActorVarA,x   ; read value not used, but test for zero
+  beq :+
+    neg
+  :
+  add ActorPY,x
+  sta ActorPY,x
+NoMove:
+; -----------------------------
+  ; Wrap diagonally off the top and bottom of the bottom screen
+
+  seta8
+  lda ActorPY+1,x
+  cmp #15
+  bne :+
+  lda #15+16
+  jsr VerticalWrap
+:
+
+  lda ActorPY+1,x
+  cmp #16+16
+  bne :+
+  lda #0+16
+  jsr VerticalWrap
+:
+  seta16
+  jml PlayerActorCollisionHurt
+
+.a8
+VerticalWrap:
+  pha
+  lda ActorDirection,x
+  lsr
+  bcs @Left
+  lda ActorPX+1,x
+  sub #$10
+  sta ActorPX+1,x
+  pla
+  sta ActorPY+1,x
+  rts
+@Left:
+  lda ActorPX+1,x
+  add #$10
+  sta ActorPX+1,x
+  pla
+  sta ActorPY+1,x
+  rts
+
+GliderPushX:
+  .word $00, $00, $00, $50
+GliderPushY:
+  .word $00, $50, $00, $00
+.endproc
+
+.a16
+.i16
+.export DrawEnemyGlider
+.proc DrawEnemyGlider
+  jsr FlipIfUp
+ 
+  lda ActorVarB,x
+  and #%110
+  ora 0
+  jml DispActor16x16Flipped
+
+; So LWSS can use it too
+FlipIfUp:
+  lda ActorVarA,x
+  beq Down
+Up:
+  lda #OAM_PRIORITY_2|OAM_YFLIP
+  bra WasUp
+Down:
+   lda #OAM_PRIORITY_2
+WasUp:
+  sta 0
+  rts
+.endproc
+
+.a16
+.i16
+.export RunEnemyLWSS
+.proc RunEnemyLWSS
+  lda ActorState,x
+  and #255
+  bne NoMove
+
+  ; Increase the counter
+  inc ActorVarB,x
+
+  lda ActorVarB,x
+  and #3
+  cmp #2
+  bne Skip
+
+  ; Go up or down as needed at the right time
+  lda ActorVarA,x
+  bne Up
+Down:
+  lda ActorPY,x
+  add #$30
+  sta ActorPY,x
+  bra Skip
+Up:
+  lda ActorPY,x
+  sub #$30
+  sta ActorPY,x
+Skip:
+
+  ; Flip sometimes
+  lda ActorVarB,x
+  and #3
+  cmp #0
+  bne :+
+    jsl ActorTurnAround
+  :
+NoMove:
+
+  ; Wrap vertically
+  ; (fix later?)
+  lda ActorPY,x
+  sub #$100
+  and #$0ff0
+  ora #$1000
+  add #$100
+  sta ActorPY,x
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawEnemyLWSS
+.proc DrawEnemyLWSS
+  jsr DrawEnemyGlider::FlipIfUp
+
+  lda ActorVarB,x
+  and #2
+  ora #12
+  ora 0
+  jml DispActor16x16
+.endproc
 
 ; -------------------------------------
 ; Maybe move particles to a separate file, though we don't have many yet

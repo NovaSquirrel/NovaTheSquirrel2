@@ -353,6 +353,22 @@ run RunSkateboardMoai
 draw DrawSkateboardMoai
 size 16x28
 
++EnemyGlider
+flag AutoRemove GetShot AutoReset
+gfx SPLife
+pal SPWalker
+run RunEnemyGlider
+draw DrawEnemyGlider
+size 16x15
+
++EnemyLWSS
+flag AutoRemove GetShot AutoReset
+gfx SPLife
+pal SPWalker
+run RunEnemyLWSS
+draw DrawEnemyLWSS
+size 16x15
+
 # ---------- particles ----------
 +Poof
 particle

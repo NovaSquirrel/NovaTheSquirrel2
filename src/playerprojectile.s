@@ -1250,6 +1250,8 @@ CopyEnemy:
   .word Actor::SkateboardMoai*2
   .word Actor::ExplodingFries*2
   .word Actor::BurgerRider*2
+  .word Actor::EnemyGlider*2
+  .word Actor::EnemyLWSS*2
   .word 0
 
 CopyAbility:
@@ -1267,6 +1269,8 @@ CopyAbility:
   .byt Ability::Bubble
   .byt Ability::Burger
   .byt Ability::Burger
+  .byt Ability::Glider
+  .byt Ability::Glider
 .endproc
 
 .a16

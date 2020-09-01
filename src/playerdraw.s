@@ -28,7 +28,7 @@
   php
   seta16
 
-  ; Set DMA parameters  
+  ; Set DMA parameters
   lda #DMAMODE_PPUDATA
   sta DMAMODE+$00
   sta DMAMODE+$10

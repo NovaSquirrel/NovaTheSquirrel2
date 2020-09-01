@@ -55,3 +55,4 @@ A000 SPBubble
 A000 SPBurgerRider
 3800 FGTreehouse
 8800 Mode7HUDSprites
+A000 SPLife
