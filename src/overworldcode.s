@@ -76,6 +76,26 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   lda #1
   sta OverworldMap
 
+  .include "itemenum.s"
+  lda #InventoryItem::AbilityBurger
+  sta YourInventory+(2*0)
+  lda #InventoryItem::AbilityGlider
+  sta YourInventory+(2*1)
+  lda #InventoryItem::AbilityIce
+  sta YourInventory+(2*2)
+  lda #InventoryItem::AbilityFire
+  sta YourInventory+(2*3)
+  lda #InventoryItem::AbilityWater
+  sta YourInventory+(2*4)
+  lda #InventoryItem::AbilityFishing
+  sta YourInventory+(2*5)
+  lda #InventoryItem::AbilityRocket
+  sta YourInventory+(2*6)
+  lda #InventoryItem::AbilityBubble
+  sta YourInventory+(2*7)
+
+
+
   setaxy16
   lda OverworldMap
   and #255

@@ -367,6 +367,36 @@ CursorNotTopRow:
   :
 
   lda keynew+1
+  and #>KEY_B
+  bne @UseItem
+  lda keynew
+  and #KEY_A
+  beq NotA
+@UseItem:
+    tdc ; Clear all of accumulator
+    lda CursorX
+    sta 0
+    cmp #5
+    bcc :+
+      ; Carry always set
+      adc #InventoryLen-5-1 ; -1 for the carry
+      sta 0
+    :
+    lda CursorY
+    asl ; * 5
+    asl
+    adc CursorY
+    adc 0
+    sub #5 ; Compensate for the inventory row starting at 1
+    asl ; Every item is two bytes
+    tay
+    lda YourInventory,y
+    .import RunItemRoutine
+    jsl RunItemRoutine
+    jmp Exit
+  NotA:
+
+  lda keynew+1
   and #>KEY_SELECT
   jeq @NoSelect
   lda CursorY

@@ -90,3 +90,68 @@ i Block
 name Pizza
 pic 1,2
 i Pizza
+
++AbilityBurger
+name Dinner Blaster
+pic 2,2
+run ItemAbilityBurger
+i Dinner Blaster
+i Demo item that gives you the
+i Burger ability.
+
++AbilityGlider
+name Glider Gun
+pic 2,2
+run ItemAbilityGlider
+i Glider Gun
+i Demo item that gives you the
+i Glider ability.
+
++AbilityIce
+name Ice blocks
+pic 2,2
+run ItemAbilityIce
+i Ice Blocks
+i Demo item that gives you the
+i Ice Block ability.
+
++AbilityFire
+name Fireballs
+pic 2,2
+run ItemAbilityFire
+i Fireballs
+i Demo item that gives you the
+i Fire ability.
+
++AbilityWater
+name Water bottles
+pic 2,2
+run ItemAbilityWater
+i Water Bottles
+i Demo item that gives you the
+i Water Bottle ability.
+
++AbilityFishing
+name Fishing rod
+pic 2,2
+run ItemAbilityFishing
+i Fishing Rod
+i Demo item that gives you the
+i Fishing Rod ability.
+
++AbilityRocket
+name Rocket launcher
+pic 2,2
+run ItemAbilityRocket
+i Rocket Launcher
+i Demo item that gives you the
+i Rocket ability.
+
++AbilityBubble
+name Bubble wand
+pic 2,2
+run ItemAbilityBubble
+i Bubble Wand
+i Demo item that gives you the
+i Bubble ability.
+

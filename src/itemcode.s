@@ -203,3 +203,91 @@ NoRoutine:
 .proc ItemStrawberry
   rts
 .endproc
+
+.a8
+.i16
+.export ItemAbilityBurger
+.proc ItemAbilityBurger
+  lda #Ability::Burger
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityGlider
+.proc ItemAbilityGlider
+  lda #Ability::Glider
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityFishing
+.proc ItemAbilityFishing
+  lda #Ability::Fishing
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityRocket
+.proc ItemAbilityRocket
+  lda #Ability::Rocket
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityBubble
+.proc ItemAbilityBubble
+  lda #Ability::Bubble
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityIce
+.proc ItemAbilityIce
+  lda #Ability::Ice
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityFire
+.proc ItemAbilityFire
+  lda #Ability::Fire
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityWater
+.proc ItemAbilityWater
+  lda #Ability::Water
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc

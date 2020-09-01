@@ -78,7 +78,7 @@ outfile.write('.endproc\n\n')
 
 outfile.write('.proc ItemRun\n  .addr 0\n')
 for b in all_items:
-	outfile.write('  .addr .loword(%s)\n' % b["run"])
+	outfile.write('  .addr .loword(%s-1)\n' % b["run"])
 outfile.write('.endproc\n\n')
 
 outfile.write('.proc ItemName\n  .addr 0\n')
