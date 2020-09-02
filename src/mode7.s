@@ -26,8 +26,8 @@
 
 .export Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
 Mode7LevelMap                = LevelBuf + (64*64*0) ;\
-Mode7LevelMapCheckpoint      = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
-Mode7LevelMapBelow           = LevelBuf + (64*64*2) ; /
+Mode7LevelMapBelow           = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
+Mode7LevelMapCheckpoint      = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
 Mode7DynamicTileBuffer       = LevelBufAlt          ; 7 tiles long, 64*4*7 = 1792
 Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long? padded to 8 though
@@ -123,6 +123,10 @@ DIRECTION_RIGHT = 3
   stz Mode7Tools
   stz Mode7Keys
   stz Mode7Keys+2
+
+  ldx #.loword(Mode7LevelMapBelow)
+  ldy #64*64
+  jsl MemClear7F
 
   seta8
   ; Transparency outside the mode 7 plane
@@ -1169,17 +1173,24 @@ DontDrawPlayer:
   jsr BuildHDMATable
 
   ; Test for the moving sprite system
-.if 0
+.if 1
   lda keynew
   and #KEY_B
   beq :+
-    lda #1*2
     ldx Mode7PlayerX
     ldy Mode7PlayerY
+    lda #2*2
     .import Mode7CreateActor
     jsr Mode7CreateActor
   :
 .endif
+
+  ; Leave select as a way to reset to the checkpoint
+  lda keynew
+  and #KEY_SELECT
+  beq :+
+    jsr M7BlockHurt
+  :
 
   .import Mode7RunActors
   jsr Mode7RunActors
@@ -1427,9 +1438,9 @@ Block:
   seta8
   pha
   lda #1
-  sta BGMODE
+  sta f:BGMODE
   lda #%00010010  ; enable sprites, plane 1
-  sta BLENDMAIN
+  sta f:BLENDMAIN
   pla
   plb
   rti
@@ -1440,18 +1451,55 @@ Block:
   pha
   php
   seta8
-  bit TIMESTATUS ; Acknowledge interrupt
+  ; f: is used because if MVN gets interrupted then the data bank will be $7F
+  lda f:TIMESTATUS ; Acknowledge interrupt
   lda #7
-  sta BGMODE
+  sta f:BGMODE
   lda #%00010001  ; enable sprites, plane 0
-  sta BLENDMAIN
+  sta f:BLENDMAIN
   plp
   pla
   rti
 .endproc
 
+; LevelBlockPtr = block address
+.proc Mode7UncoverBlock
+  php
+
+  phy
+  ldy #64*64
+  seta8
+  lda [LevelBlockPtr],y
+  sta [LevelBlockPtr]
+  bne NotEmpty ; If the uncovered tile isn't empty, make it floor
+    seta16
+    jsr EraseBlock
+  NotEmpty:
+  ply
+
+  plp
+  rts
+.endproc
+
 ; A = block to set
-; X = block address
+; LevelBlockPtr = block address
+.proc Mode7PutBlockAbove
+  pha
+  php
+  seta8
+  phy
+  ldy #64*64
+  lda [LevelBlockPtr]
+  sta [LevelBlockPtr],y
+  ply
+
+  plp
+  pla
+  ; Inline tail call into Mode7ChangeBlock
+.endproc
+
+; A = block to set
+; LevelBlockPtr = block address
 .a16
 .i16
 .proc Mode7ChangeBlock
@@ -1917,12 +1965,12 @@ IceGoRight:
   lda Mode7Tools
   sta Mode7CheckpointTools
 
-  ldx #4096-2
-: lda f:Mode7LevelMap,x
-  sta f:Mode7LevelMapCheckpoint,x
-  dex
-  dex
-  bne :-
+  phb
+  ldx #.loword(Mode7LevelMap)
+  ldy #.loword(Mode7LevelMapCheckpoint)
+  lda #(64*64*2)-1
+  .byt $54, ^Mode7LevelMap,      ^Mode7LevelMapCheckpoint ;<--- this is MVN
+  plb
   rts
 .endproc
 
@@ -1957,12 +2005,13 @@ IceGoRight:
   lda Mode7CheckpointTools
   sta Mode7Tools
 
-  ldx #4096-2
-: lda f:Mode7LevelMapCheckpoint,x
-  sta f:Mode7LevelMap,x
-  dex
-  dex
-  bne :-
+  phb
+  ldx #.loword(Mode7LevelMapCheckpoint)
+  ldy #.loword(Mode7LevelMap)
+  lda #(64*64*2)-1
+  .byt $54, ^Mode7LevelMap,      ^Mode7LevelMapCheckpoint ;<--- this is MVN
+  plb
+
   jmp StartMode7Level::RestoredFromCheckpoint
 .endproc
 

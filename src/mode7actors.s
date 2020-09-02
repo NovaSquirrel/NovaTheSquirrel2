@@ -270,6 +270,9 @@ Call:
 Mode7ActorTable:
   .raddr 0
   .raddr M7FlyingArrow
+  .raddr M7FlyingArrow
+  .raddr M7FlyingArrow
+  .raddr M7FlyingArrow
 
 ; Get the index into the dynamic tile buffer
 .a16
@@ -564,19 +567,25 @@ UnderTileUL = 4
 UnderTileUR = 6
 UnderTileBL = 8
 UnderTileBR = 10
+SpritePointer = 12
   jsr LoadUpTileNumbersUnderActor
-  jsr CopyOverFourTileGfx
 
+  ; Do this before X gets reused for other stuff: 
+  lda ActorType,x ; Multiply by 256 for four 64-byte tiles
+  xba
+  add #.loword(SoftwareSprites-64*4) ; So the first non-empty type uses the first sprite
+  sta SpritePointer
+
+  jsr CopyOverFourTileGfx
   phx
   phy
   tax
   .scope
-    SpritePointer = 0
     Bytes = 2
 
-    lda #.loword(DemoSoftwareSprite)
-    sta SpritePointer
-    ldy #0 ; Index for the above
+    ph2banks SoftwareSprites, RenderAligned
+    plb
+    ldy #0 ; Index for SpritePointer
     seta8
     stz Bytes
   @Loop:
@@ -588,6 +597,7 @@ UnderTileBR = 10
     inx
     inc Bytes
     bne @Loop
+    plb
   .endscope
 
   seta16
@@ -761,41 +771,8 @@ CopyOverFourTileGfx:
 .endproc
 DoRenderAligned = Mode7UpdateActorPicture::RenderAligned
 
-DemoSoftwareSprite:
-; 1 white
-; 2 black
-  .byt 0, 0, 0, 0, 0, 0, 2, 2
-  .byt 0, 0, 0, 0, 2, 2, 1, 1
-  .byt 0, 0, 0, 2, 1, 1, 1, 1
-  .byt 0, 0, 2, 1, 1, 1, 1, 1
-  .byt 0, 2, 1, 1, 1, 1, 1, 1
-  .byt 0, 2, 1, 1, 1, 1, 1, 1
-  .byt 2, 1, 1, 1, 1, 1, 1, 1
-  .byt 2, 1, 1, 1, 1, 1, 1, 1
-
-  .byt 2, 1, 1, 1, 1, 1, 1, 1
-  .byt 2, 1, 1, 1, 1, 1, 1, 1
-  .byt 0, 2, 1, 1, 1, 1, 1, 1
-  .byt 0, 2, 1, 1, 1, 1, 1, 1
-  .byt 0, 0, 2, 1, 1, 1, 1, 1
-  .byt 0, 0, 0, 2, 1, 1, 1, 1
-  .byt 0, 0, 0, 0, 2, 2, 1, 1
-  .byt 0, 0, 0, 0, 0, 0, 2, 2
-
-  .byt 2, 2, 0, 0, 0, 0, 0, 0
-  .byt 1, 1, 2, 2, 0, 0, 0, 0
-  .byt 1, 1, 1, 1, 2, 0, 0, 0
-  .byt 1, 1, 1, 1, 1, 2, 0, 0
-  .byt 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 1, 1, 1, 1, 1, 1, 1, 2
-  .byt 1, 1, 1, 1, 1, 1, 1, 2
-
-  .byt 1, 1, 1, 1, 1, 1, 1, 2
-  .byt 1, 1, 1, 1, 1, 1, 1, 2
-  .byt 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 1, 1, 1, 1, 1, 1, 2, 0
-  .byt 1, 1, 1, 1, 1, 2, 0, 0
-  .byt 1, 1, 1, 1, 2, 0, 0, 0
-  .byt 1, 1, 2, 2, 0, 0, 0, 0
-  .byt 2, 2, 0, 0, 0, 0, 0, 0
+.pushseg
+.segment "Mode7SoftwareSprites"
+SoftwareSprites:
+  .incbin "tools/M7SoftSprites.chrm7"
+.popseg
