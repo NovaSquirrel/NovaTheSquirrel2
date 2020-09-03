@@ -127,16 +127,10 @@ solid_block
 when Enter, M7BlockDirt
 q 0,6
 
-+WoodArrowRight
++WoodArrowUp
 when Bump, M7BlockWoodArrow
 solid
-t 6,6 3,6 
-t 6,7 5,7
-
-+WoodArrowDown
-when Bump, M7BlockWoodArrow
-solid
-q 4,6
+q 2,6
 
 +WoodArrowLeft
 when Bump, M7BlockWoodArrow
@@ -144,52 +138,59 @@ solid
 t 2,6 7,6
 t 4,7 7,7
 
-+WoodArrowUp
++WoodArrowDown
 when Bump, M7BlockWoodArrow
 solid
-q 2,6
+q 4,6
 
-+MetalArrowRight
++WoodArrowRight
+when Bump, M7BlockWoodArrow
 solid
-t 6,8 3,8
-t 6,9 5,9
+t 6,6 3,6 
+t 6,7 5,7
 
-+MetalArrowDown
++MetalArrowUp
 solid
-q 4,8
+q 2,8
 
 +MetalArrowLeft
 solid
 t 2,8 7,8
 t 4,9 7,9
 
-+MetalArrowUp
++MetalArrowDown
 solid
-q 2,8
+q 4,8
 
-+MetalCrate
++MetalArrowRight
 solid
-q 0,8
+t 6,8 3,8
+t 6,9 5,9
 
-+MetalArrowForkRight
++MetalArrowForkUp
 solid
-t 10,8 3,8
-t 10,9 5,9
-
-+MetalArrowForkDown
-solid
-t 8,8 9,8
-t 4,9 5,9
+t 2,8 3,8
+t 8,9 9,9
 
 +MetalArrowForkLeft
 solid
 t 2,8 11,8
 t 4,9 11,9
 
-+MetalArrowForkUp
++MetalArrowForkDown
 solid
-t 2,8 3,8
-t 8,9 9,9
+t 8,8 9,8
+t 4,9 5,9
+
++MetalArrowForkRight
+solid
+t 10,8 3,8
+t 10,9 5,9
+
++MetalCrate
+solid
+q 0,8
+
 
 +Ice
 when Enter, M7BlockIce

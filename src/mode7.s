@@ -1652,8 +1652,6 @@ M7BlockTeleport:
 M7BlockToggleButton1:
 .export M7BlockToggleButton2
 M7BlockToggleButton2:
-.export M7BlockWoodArrow
-M7BlockWoodArrow:
   rts
 
 ; Creates actor A at the block corresponding to LevelBlockPtr
@@ -1662,6 +1660,7 @@ M7BlockWoodArrow:
 .proc Mode7CreateActorFromBlock
   pha
 
+  ; Maybe change the order of things, so it'll fail early if there's no actor slots
   jsr Mode7UncoverBlock
 
   lda LevelBlockPtr ; X
@@ -1741,6 +1740,7 @@ Fail:
 ; Change a block to what its checkerboard block would be, based on the address
 .a16
 ; Probably could work at .a8 too
+.export CheckerForPtr
 CheckerForPtr:
   lda LevelBlockPtr
   sta 0
@@ -1755,13 +1755,14 @@ CheckerForPtr:
   tdc ; A = zero
   adc #Mode7Block::Checker1
   rts
-EraseBlock:
+.export Mode7EraseBlock
+Mode7EraseBlock:
   jsr CheckerForPtr
   jmp Mode7ChangeBlock
 
 .export M7BlockDirt
 .proc M7BlockDirt
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
 
 .export M7BlockWater
@@ -1794,28 +1795,28 @@ EraseBlock:
 .proc M7BlockFireBoots
   lda #TOOL_FIREBOOTS
   tsb Mode7Tools
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
 
 .export M7BlockFlippers
 .proc M7BlockFlippers
   lda #TOOL_FLIPPERS
   tsb Mode7Tools
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
 
 .export M7BlockSuctionBoots
 .proc M7BlockSuctionBoots
   lda #TOOL_SUCTIONBOOTS
   tsb Mode7Tools
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
 
 .export M7BlockIceSkates
 .proc M7BlockIceSkates
   lda #TOOL_ICESKATES
   tsb Mode7Tools
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
 
 .export M7BlockKey
@@ -1827,7 +1828,7 @@ EraseBlock:
   tax
   inc Mode7Keys,x  
   seta16
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
 
 .export M7BlockLock
@@ -1844,8 +1845,25 @@ EraseBlock:
 Unlock:
   dec Mode7Keys,x
   seta16
-  bra EraseBlock
+  bra Mode7EraseBlock
 .endproc
+
+.export M7BlockWoodArrow
+.proc M7BlockWoodArrow
+  lda [LevelBlockPtr]
+  and #255
+  sub #Mode7Block::WoodArrowUp
+  asl
+  add #Mode7ActorType::ArrowUp
+  jsr Mode7CreateActorFromBlock
+  bcc :+
+    lda #90
+    sta ActorTimer,x
+  :
+  rts
+.endproc
+
+
 
 .export M7BlockHurt
 .proc M7BlockHurt

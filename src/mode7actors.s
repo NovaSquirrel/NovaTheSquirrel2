@@ -295,10 +295,10 @@ Call:
 
 Mode7ActorTable:
   .raddr 0
-  .raddr M7FlyingArrow
-  .raddr M7FlyingArrow
-  .raddr M7FlyingArrow
-  .raddr M7FlyingArrow
+  .raddr M7FlyingArrowUp
+  .raddr M7FlyingArrowLeft
+  .raddr M7FlyingArrowDown
+  .raddr M7FlyingArrowRight
   .raddr M7PinkBall
   .raddr M7PushBlock
   .raddr M7Burger
@@ -324,18 +324,74 @@ Mode7ActorTable:
   rts
 .endproc
 
-.a16
-.proc M7FlyingArrow
+.proc M7FlyingArrowUp
+  dec ActorPY,x
+  dec ActorPY,x
+  bra M7FlyingArrowCommon
+.endproc
+.proc M7FlyingArrowLeft
+  dec ActorPX,x
+  dec ActorPX,x
+  bra M7FlyingArrowCommon
+.endproc
+.proc M7FlyingArrowDown
+  inc ActorPY,x
+  inc ActorPY,x
+  bra M7FlyingArrowCommon
+.endproc
+.proc M7FlyingArrowRight
   inc ActorPX,x
+  inc ActorPX,x
+.endproc
+.a16
+.proc M7FlyingArrowCommon
+  ; Be removed by running out of time
+  dec ActorTimer,x
+  bne :+
+    jmp Mode7RemoveActor    
+  :
 
-;  lda ActorPX,x
-;  cmp #7*16
-;  bne DontDie
-;    jmp Mode7RemoveActor
-;  DontDie:
+  lda ActorPX,x
+  ora ActorPY,x
+  and #15
+  bne NotAligned
 
-  jsr Mode7UpdateActorPicture
-  rts
+  lda ActorPX,x
+  ldy ActorPY,x
+  jsr Mode7BlockAddress
+  cmp #Mode7Block::Dirt
+  beq RemoveCrate
+  cmp #Mode7Block::MetalCrate
+  beq RemoveCrate
+  cmp #Mode7Block::WoodArrowUp
+  bcc NotCrate
+  cmp #Mode7Block::MetalArrowForkRight+1
+  bcs NotCrate
+    ; Doesn't support fork arrows yet but that's fine
+    sub #Mode7Block::WoodArrowUp
+    and #3
+    asl
+    add #1*2 ; Mode7ActorType::ArrowUp
+    sta ActorType,x
+
+    .import CheckerForPtr
+    jsr CheckerForPtr
+    seta8
+    sta [LevelBlockPtr]
+    seta16
+    ; Refresh the actor timer
+    lda #90
+    sta ActorTimer,x
+  NotCrate:
+NotAligned:
+  jmp Mode7UpdateActorPicture
+
+RemoveCrate:
+  phx
+  .import Mode7EraseBlock
+  jsr Mode7EraseBlock
+  plx
+  jmp Mode7RemoveActor    
 .endproc
 
 .a16
