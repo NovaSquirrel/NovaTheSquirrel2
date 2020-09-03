@@ -86,6 +86,8 @@ Fail:
 ; A = Actor to create
 ; X = X coordinate, pixels
 ; Y = Y coordinate, pixels
+; Output: X is the slot used
+; Output: Carry, if creation was successful
 .export Mode7CreateActor
 .proc Mode7CreateActor
   sta 0
@@ -138,7 +140,31 @@ Success:
   sec
   rts
 Fail:
+  ; Carry is clear
   rts
+.endproc
+
+; Removes an actor and becomes a block instead
+; A = block type to become
+.a16
+.i16
+.proc Mode7ActorBecomeBlock
+  pha
+
+  ; Get block address
+  lda ActorPX,x
+  ldy ActorPY,x
+  jsr Mode7BlockAddress
+  lda LevelBlockPtr
+  pha
+
+  jsr Mode7RemoveActor
+
+  pla
+  sta LevelBlockPtr
+  pla
+  .import Mode7PutBlockAbove
+  jmp Mode7PutBlockAbove
 .endproc
 
 .a16
@@ -273,6 +299,9 @@ Mode7ActorTable:
   .raddr M7FlyingArrow
   .raddr M7FlyingArrow
   .raddr M7FlyingArrow
+  .raddr M7PinkBall
+  .raddr M7PushBlock
+  .raddr M7Burger
 
 ; Get the index into the dynamic tile buffer
 .a16
@@ -306,6 +335,47 @@ Mode7ActorTable:
 ;  DontDie:
 
   jsr Mode7UpdateActorPicture
+  rts
+.endproc
+
+.a16
+.proc M7PushBlock
+  lda ActorDirection,x
+  and #3
+  asl
+  tay
+
+  lda ActorPX,x
+  add OffsetX,y
+  sta ActorPX,x
+
+  lda ActorPY,x
+  add OffsetY,y
+  sta ActorPY,x
+
+  ; Has it arrived on a grid square?
+  lda ActorPX,x
+  ora ActorPY,x
+  and #15
+  bne :+
+    lda #Mode7Block::PushableBlock
+    jmp Mode7ActorBecomeBlock
+  :
+
+  jmp Mode7UpdateActorPicture
+OffsetX:
+  .word 0, .loword(-4), 0, .loword(4)
+OffsetY:
+  .word .loword(-4), 0, .loword(4), 0
+.endproc
+
+.a16
+.proc M7PinkBall
+  rts
+.endproc
+
+.a16
+.proc M7Burger
   rts
 .endproc
 
@@ -571,9 +641,11 @@ SpritePointer = 12
   jsr LoadUpTileNumbersUnderActor
 
   ; Do this before X gets reused for other stuff: 
-  lda ActorType,x ; Multiply by 256 for four 64-byte tiles
+  lda ActorType,x ; Multiply by 256 for four 64-byte tiles (but it's already pre-multiplied by 2, so fix that)
   xba
-  add #.loword(SoftwareSprites-64*4) ; So the first non-empty type uses the first sprite
+  lsr
+  ; assert((PS & 1) == 0) Carry will be clear
+  adc #.loword(SoftwareSprites-64*4) ; So the first non-empty type uses the first sprite
   sta SpritePointer
 
   jsr CopyOverFourTileGfx

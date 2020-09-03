@@ -24,6 +24,18 @@
 .importzp hm_node
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 
+; Synchronize with the list on mode7actors.s
+.enum Mode7ActorType
+  None       = 0*2
+  ArrowUp    = 1*2
+  ArrowLeft  = 2*2
+  ArrowDown  = 3*2
+  ArrowRight = 4*2
+  PinkBall   = 5*2
+  PushBlock  = 6*2
+  Burger     = 7*2
+.endenum
+
 .export Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
 Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapBelow           = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
@@ -1173,7 +1185,7 @@ DontDrawPlayer:
   jsr BuildHDMATable
 
   ; Test for the moving sprite system
-.if 1
+.if 0
   lda keynew
   and #KEY_B
   beq :+
@@ -1394,6 +1406,9 @@ ForwardWallBitOutside:
 ForwardWallBitInside:
   .word M7_BLOCK_SOLID_D, M7_BLOCK_SOLID_L, M7_BLOCK_SOLID_U, M7_BLOCK_SOLID_R
 
+ForwardPtrTile:
+  .word .loword(-64), .loword(-1), .loword(64), .loword(1)
+
 ; Not used?
 .proc CheckWallAhead
   lda Mode7PlayerY
@@ -1463,6 +1478,7 @@ Block:
 .endproc
 
 ; LevelBlockPtr = block address
+; Replaces a tile with the tile "underneath" or a regular floor if there was nothing
 .proc Mode7UncoverBlock
   php
 
@@ -1473,8 +1489,12 @@ Block:
   sta [LevelBlockPtr]
   bne NotEmpty ; If the uncovered tile isn't empty, make it floor
     seta16
-    jsr EraseBlock
+    jsr CheckerForPtr
+    seta8
+    sta [LevelBlockPtr]
   NotEmpty:
+  tdc ; Clear A
+  sta [LevelBlockPtr],y ; Erase block underneath
   ply
 
   plp
@@ -1483,6 +1503,7 @@ Block:
 
 ; A = block to set
 ; LevelBlockPtr = block address
+.export Mode7PutBlockAbove
 .proc Mode7PutBlockAbove
   pha
   php
@@ -1623,8 +1644,6 @@ M7BlockNothing:
 M7BlockCloneButton:
 .export M7BlockMessage
 M7BlockMessage:
-.export M7BlockPushableBlock
-M7BlockPushableBlock:
 .export M7BlockSpring
 M7BlockSpring:
 .export M7BlockTeleport
@@ -1636,6 +1655,74 @@ M7BlockToggleButton2:
 .export M7BlockWoodArrow
 M7BlockWoodArrow:
   rts
+
+; Creates actor A at the block corresponding to LevelBlockPtr
+.a16
+.i16
+.proc Mode7CreateActorFromBlock
+  pha
+
+  jsr Mode7UncoverBlock
+
+  lda LevelBlockPtr ; X
+  and #63
+  asl
+  asl
+  asl
+  asl
+  tax
+
+  lda LevelBlockPtr ; Y
+  and #63*64
+  lsr
+  lsr
+  tay
+
+  pla
+  .import Mode7CreateActor
+  jmp Mode7CreateActor
+  ; Carry = success
+  ; X = actor slot
+.endproc
+
+.export M7BlockPushableBlock
+.proc M7BlockPushableBlock
+  lda LevelBlockPtr
+  sta 0
+
+  lda Mode7MoveDirection
+  and #3
+  asl
+  tay
+  lda ForwardPtrTile,y
+  add LevelBlockPtr
+  sta LevelBlockPtr
+  lda [LevelBlockPtr]
+  and #255
+  tax
+  lda M7BlockFlags,x
+  bit #16 ; Check if the block is specifically solid to blocks
+  bne Fail
+  and ForwardWallBitOutside,y
+  beq :+
+Fail:
+    rts
+  :
+  lda 0
+  sta LevelBlockPtr
+
+  ; Create the block
+  lda #Mode7ActorType::PushBlock
+  jsr Mode7CreateActorFromBlock
+  bcc :+
+    seta8
+    lda Mode7MoveDirection
+    sta ActorDirection,x
+    seta16
+  :
+  rts
+.endproc
+
 
 .export M7BlockExit
 .proc M7BlockExit
@@ -1650,7 +1737,9 @@ M7BlockWoodArrow:
 
 
 ; Change a block to what its checkerboard block would be, based on the address
-EraseBlock:
+.a16
+; Probably could work at .a8 too
+CheckerForPtr:
   lda LevelBlockPtr
   sta 0
   lsr
@@ -1663,6 +1752,9 @@ EraseBlock:
   lsr
   tdc ; A = zero
   adc #Mode7Block::Checker1
+  rts
+EraseBlock:
+  jsr CheckerForPtr
   jmp Mode7ChangeBlock
 
 .export M7BlockDirt
