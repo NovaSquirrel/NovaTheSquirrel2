@@ -357,10 +357,19 @@ Mode7ActorTable:
   lda ActorPX,x
   ora ActorPY,x
   and #15
-  bne :+
+  bne NotOnGrid
+    ; Calculates it again in BecomeBlock, probably fine though
+    lda ActorPX,x
+    ldy ActorPY,x
+    jsr Mode7BlockAddress
+    cmp #Mode7Block::Water
+    bne :+
+      lda #Mode7Block::Dirt
+      jmp Mode7ActorBecomeBlock
+    :
     lda #Mode7Block::PushableBlock
     jmp Mode7ActorBecomeBlock
-  :
+  NotOnGrid:
 
   jmp Mode7UpdateActorPicture
 OffsetX:

@@ -1699,6 +1699,8 @@ M7BlockWoodArrow:
   sta LevelBlockPtr
   lda [LevelBlockPtr]
   and #255
+  cmp #Mode7Block::Dirt ; Special-case dirt specifically until the 16 below works
+  beq Fail
   tax
   lda M7BlockFlags,x
   bit #16 ; Check if the block is specifically solid to blocks
