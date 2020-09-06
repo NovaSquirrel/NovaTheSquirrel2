@@ -24,7 +24,7 @@
 .import ActorBecomePoof, ActorTurnAround, TwoActorCollision, DispActor8x8, DispActor8x8WithOffset, DispActor16x16, ActorExpire
 .import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorWalk, ActorFall, ActorAutoBump
 .import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
-.import DispActor16x16Flipped, SpeedAngle2Offset256
+.import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256
 
 .assert ^ChangeToExplosion = ^RunPlayerProjectile, error, "Player projectiles and other actors should share a bank"
 
@@ -888,7 +888,7 @@ TargetAngleTable:
   and  #%00001110
   tay
   lda Frames,y
-  jml DispActor16x16Flipped
+  jml DispActor16x16FlippedAbsolute
 
 Frames:
 Up    = $2a
