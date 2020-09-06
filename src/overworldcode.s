@@ -78,7 +78,7 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
 
   .include "itemenum.s"
   lda #InventoryItem::AbilityBurger
-  sta YourInventory+(2*0)
+  sta YourInventory+(2*8)
   lda #InventoryItem::AbilityGlider
   sta YourInventory+(2*1)
   lda #InventoryItem::AbilityIce

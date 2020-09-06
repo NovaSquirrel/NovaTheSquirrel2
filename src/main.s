@@ -168,18 +168,20 @@ forever:
   and #KEY_SELECT
   beq :++
     seta8
-    lda PlayerAbility
-    ina
-    and #15
-    sta PlayerAbility
+;    lda PlayerAbility
+;    ina
+;    and #15
+;    sta PlayerAbility
 
     lda keydown+1
     and #>KEY_DOWN
     beq :+
       stz PlayerAbility
+      lda #1
+      sta NeedAbilityChange
     :
-    lda #1
-    sta NeedAbilityChange
+;    lda #1
+;    sta NeedAbilityChange
     seta16
   :
 

@@ -2125,7 +2125,7 @@ Finish:
   lda ActorVarA,x
   tay
   lda Table,y
-  jml DispActor16x16Flipped
+  jml DispActor16x16FlippedAbsolute
 Table:
   .word 0|OAM_PRIORITY_2
   .word 2|OAM_PRIORITY_2

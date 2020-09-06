@@ -99,9 +99,12 @@ TargetY = 6
   eor ScrollOldX
   and #%00010000 << 8
   beq NoScreenChangeLeft
+  lda ScrollX
+  and #$ff
   cmp #$80
   bcc NoScreenChangeLeft
   ; See if we're scrolling past a barrier
+  lda ScrollOldX
   xba
   lsr
   lsr

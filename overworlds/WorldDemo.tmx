@@ -76,14 +76,14 @@
   <object id="41" gid="138" x="192" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="LU"/>
-    <property name="Level" value="demo"/>
+    <property name="Level" value="woodtest"/>
     <property name="Slot" type="int" value="6"/>
    </properties>
   </object>
   <object id="42" gid="139" x="96" y="112" width="16" height="16">
    <properties>
     <property name="Directions" value="LRD"/>
-    <property name="Level" value="newsample"/>
+    <property name="Level" value="demolevel2"/>
     <property name="Slot" type="int" value="10"/>
    </properties>
   </object>
@@ -99,20 +99,6 @@
     <property name="Directions" value="LRD"/>
     <property name="Level" value="demolevel"/>
     <property name="Slot" type="int" value="11"/>
-   </properties>
-  </object>
-  <object id="47" gid="137" x="32" y="176" width="16" height="16">
-   <properties>
-    <property name="Directions" value="U"/>
-    <property name="Level" value="woodtest"/>
-    <property name="Slot" type="int" value="0"/>
-   </properties>
-  </object>
-  <object id="48" gid="137" x="96" y="160" width="16" height="16">
-   <properties>
-    <property name="Directions" value="U"/>
-    <property name="Level" value="bombertree"/>
-    <property name="Slot" type="int" value="13"/>
    </properties>
   </object>
   <object id="49" gid="138" x="128" y="112" width="16" height="16">

@@ -359,6 +359,8 @@ Mode7ActorTable:
   lda ActorPX,x
   ldy ActorPY,x
   jsr Mode7BlockAddress
+  cmp #Mode7Block::Bomb
+  beq RemoveCrate
   cmp #Mode7Block::Dirt
   beq RemoveCrate
   cmp #Mode7Block::MetalCrate

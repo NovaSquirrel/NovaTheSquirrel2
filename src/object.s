@@ -234,6 +234,7 @@ CallDraw:
   cmp SpriteTileSlots+2*7
   bne :+
     lda #$1E0
+    bra FoundTileset
   :
   lda #0
 FoundTileset:
@@ -525,17 +526,16 @@ Wavy:
 .proc LakituMovement
   jsl ActorApplyXVelocity
 
-;  lda ActorPXL,x
-;  add #$80
-;  lda ActorPXH,x
-;  adc #0
-;  ldy ActorPYH,x
-;  jsr GetLevelColumnPtr
-;  cmp #Metatiles::ENEMY_BARRIER
-;  bne :+
-;    neg16x ActorVXL, ActorVXH
-;    rts
-;  :
+  ; Bump into enemy barriers
+  ldy ActorPY,x
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+  cmp #Block::EnemyBarrier
+  bne :+
+    lda ActorVX,x
+    neg
+    sta ActorVX,x
+  :
 
   ; Stop if stunned
   lda ActorState,x ; Ignore high byte
