@@ -61,3 +61,4 @@ src/backgroundenum.s
 src/itemenum.s
 src/m7blockenum.s
 src/m7blockdata.s
+src/perspective_data.s
