@@ -23,6 +23,7 @@
 .smart
 .importzp hm_node
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
+.import MathSinTable, MathCosTable
 
 ; Synchronize with the list on mode7actors.s
 .enum Mode7ActorType
@@ -71,17 +72,16 @@ M7C_M7D_Buffer2Data  = HDMA_Buffer2+1024
 
 .segment "BSS"
 ; Expose these for reuse by other systems
-.export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted
+.export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7MoveDirection
 .export Mode7SidestepWanted, Mode7ChipsLeft, Mode7HappyTimer, Mode7Oops
 Mode7ScrollX:    .res 2
 Mode7ScrollY:    .res 2
 Mode7PlayerX:    .res 2
+Mode7PlayerXSub: .res 2
 Mode7PlayerY:    .res 2
+Mode7PlayerYSub: .res 2
 Mode7RealAngle:  .res 2 ; 0-31
-Mode7Direction:  .res 2 ; 0-3
 Mode7MoveDirection: .res 2 ; 0-3
-Mode7Turning:    .res 2
-Mode7TurnWanted: .res 2
 Mode7SidestepWanted: .res 2
 Mode7ChipsLeft:      .res 2
 Mode7Portrait = TouchTemp
@@ -95,6 +95,9 @@ Mode7IceDirection: .res 2 ; Last direction used
 Mode7DoLookAround: .res 2
 Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
 Mode7LookAroundOffsetY = FG2OffsetY
+Mode7LookAroundOffsetXSub = OldFG2OffsetX ; Reuse
+Mode7LookAroundOffsetYSub = OldFG2OffsetY
+
 ; Maybe I can reuse more of the above?? Have some sort of overlay system
 
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
@@ -127,9 +130,10 @@ DIRECTION_RIGHT = 3
   stz Mode7ScrollX
   stz Mode7ScrollY
   stz Mode7RealAngle
-  stz Mode7Direction
   stz Mode7PlayerX
+  stz Mode7PlayerXSub
   stz Mode7PlayerY
+  stz Mode7PlayerYSub
   stz Mode7ChipsLeft
   stz Mode7CheckpointChips
   stz Mode7Tools
@@ -286,7 +290,7 @@ CheckerLoop:
 
   ; Direction
   lda [hm_node]
-  sta Mode7Direction
+  asl
   asl
   asl
   asl
@@ -318,9 +322,6 @@ CheckerboardAdd:
   seta16
 
 RestoredFromCheckpoint:
-  stz Mode7Turning
-  stz Mode7TurnWanted
-  stz Mode7SidestepWanted
   stz Mode7HappyTimer
   stz Mode7Oops
 
@@ -336,6 +337,8 @@ RestoredFromCheckpoint:
   stz Mode7DoLookAround
   stz Mode7LookAroundOffsetX
   stz Mode7LookAroundOffsetY
+  stz Mode7LookAroundOffsetXSub
+  stz Mode7LookAroundOffsetYSub
 
   ldx #ActorStart
   ldy #ActorEnd-ActorStart
@@ -682,8 +685,6 @@ SkipBlock:
 
   ; ---------------
 
-  lda Mode7Turning
-  bne :+
   lda keynew
   and #KEY_X
   beq :+
@@ -706,6 +707,8 @@ SkipBlock:
         stz Mode7DoLookAround
         stz Mode7LookAroundOffsetX
         stz Mode7LookAroundOffsetY
+        stz Mode7LookAroundOffsetXSub
+        stz Mode7LookAroundOffsetYSub
       :
 
       lda Mode7LookAroundOffsetX
@@ -736,29 +739,25 @@ SkipBlock:
     lda keydown
     and #KEY_LEFT
     beq :+
-      lda Mode7Direction
-      ina
+      lda #.loword(16)
       jsr AddLookAroundDirection
     :
     lda keydown
     and #KEY_DOWN
     beq :+
-      lda Mode7Direction
-      ina
-      ina
+      lda #32
       jsr AddLookAroundDirection
     :
     lda keydown
     and #KEY_UP
     beq :+
-      lda Mode7Direction
+      tdc ; Clear A
       jsr AddLookAroundDirection
     :
     lda keydown
     and #KEY_RIGHT
     beq :+
-      lda Mode7Direction
-      dea
+      lda #.loword(-16)
       jsr AddLookAroundDirection
     :
   DontLookAround:
@@ -766,145 +765,54 @@ SkipBlock:
   lda Mode7DoLookAround
   ora Mode7Oops
   jne DontMoveForward
-  lda Mode7Turning
-  jne AlreadyTurning
-    lda keydown
-    and #KEY_LEFT|KEY_RIGHT
-    tsb Mode7TurnWanted
 
-    ; Can't turn except directly on a tile
-    lda Mode7PlayerX
-    ora Mode7PlayerY
-    and #15
-    php
-
-    beq :+
-      ; But you set SidestepWanted while moving forward/backward and also pressing the sidestep key
-      lda Mode7Direction
-      eor Mode7MoveDirection
-      lsr
-      bcs :+
-
-      lda keydown
-      and #KEY_L|KEY_R
-      tsb Mode7SidestepWanted
-    :
-
-    plp
-    jne AlreadyTurning
-
-.if 0
-    lda keydown
-    and #KEY_B
-    beq NotStop
-      lda keydown
-      and #KEY_UP
-      beq :+
-        stz Mode7TurnWanted
-      :
-      jmp WasRotation
-    NotStop:
-.endif
-
-    lda Mode7TurnWanted
-    and #KEY_RIGHT
-    beq :+
-      dec Mode7Turning
-      lda Mode7Direction
-      dec
-      and #3
-      sta Mode7Direction
-      stz Mode7TurnWanted
-    :
-
-    lda Mode7TurnWanted
-    and #KEY_LEFT
-    beq :+
-      inc Mode7Turning
-      lda Mode7Direction
-      inc
-      and #3
-      sta Mode7Direction
-      stz Mode7TurnWanted
-    :
-  AlreadyTurning:
-
-  lda Mode7Turning
-  beq NoRotation
+  lda keydown
+  and #KEY_RIGHT
+  beq :+
     lda Mode7RealAngle
-    add Mode7Turning
-    and #31
+    dea
+    and #63
     sta Mode7RealAngle
-    and #7
-    bne NoRotation
-      stz Mode7Turning
-NoRotation:
+  :
 
-  ; If not rotating, allow moving forward
-  lda Mode7PlayerX
-  ora Mode7PlayerY
-  and #15
-  bne @NotAligned
-    lda keydown
-    ora Mode7SidestepWanted
-    and #KEY_L
-    beq :+
-      stz Mode7SidestepWanted
-      lda Mode7Direction
-      ina
-      and #3
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
+  lda keydown
+  and #KEY_LEFT
+  beq :+
+    lda Mode7RealAngle
+    ina
+    and #63
+    sta Mode7RealAngle
+  :
 
-    lda keydown
-    ora Mode7SidestepWanted
-    and #KEY_R
-    beq :+
-      stz Mode7SidestepWanted
-      lda Mode7Direction
-      dec
-      and #3
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
+  lda keydown
+  and #KEY_L
+  beq :+
+    lda #.loword(16)
+    jsr AddMoveDirection
+  :
 
-    lda keydown
-    and #KEY_UP
-    beq :+
-      lda Mode7Direction
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
+  lda keydown
+  and #KEY_R
+  beq :+
+    lda #.loword(-16)
+    jsr AddMoveDirection
+  :
 
-    lda keydown
-    and #KEY_DOWN
-    beq :+
-      lda Mode7Direction
-      eor #2
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
+  lda keydown
+  and #KEY_UP
+  beq :+
+    tdc
+    jsr AddMoveDirection
+  :
 
-    lda Mode7ForceMove
-    bpl :+
-    @DoForceMoveAnyway:
-      lda Mode7ForceMove
-      and #3
-      sta Mode7MoveDirection
-      stz Mode7ForceMove
-      bra @StartMoving
-    :
+  lda keydown
+  and #KEY_DOWN
+  beq :+
+    lda #32
+    jsr AddMoveDirection
+  :
 
-    jmp WasRotation
-@NotAligned:
-@StartMoving:
-
-  ; If moving and not rotating, move forward
-  lda Mode7MoveDirection
-  asl
-  tax
-
+  .if 0
   ; Don't check for walls except when moving onto a new block
   lda Mode7PlayerX
   ora Mode7PlayerY
@@ -969,8 +877,8 @@ NoRotation:
   lda Mode7PlayerY
   add ForwardY,x
   sta Mode7PlayerY
+  .endif
 DontMoveForward:
-WasRotation:
 
   ; Make it so that 0,0 places the player on the top left corner of the map
   jsr CalculateScroll
@@ -1197,6 +1105,17 @@ DontDrawPlayer:
   :
 .endif
 
+  lda keydown
+  and #KEY_A
+  beq :+
+    lda Mode7RealAngle
+    sub #4
+    and #<~(7)
+    add #4
+    and #63
+    sta Mode7RealAngle
+  :
+
   ; Leave select as a way to reset to the checkpoint
   lda keynew
   and #KEY_SELECT
@@ -1369,7 +1288,7 @@ AddOneSprite:
     ldx #0+2048
   :
 BuildHDMALoop:
-  lda 2*176*8,y ; M7A
+  lda 2*176*16,y ; M7A
   sta f:M7A_M7B_Buffer1Data+0,x
   sta f:M7C_M7D_Buffer1Data+2,x
   lda 0,y ; M7B
@@ -1434,15 +1353,100 @@ Block:
 ; For the lookaround code above in the main loop
 .a16
 .proc AddLookAroundDirection
-  and #3
-  asl
+  add Mode7RealAngle
+  add #16
+  neg
+  and #63
+  asl ; * 128
+  asl ; * 256
+  asl ; 16-bit
   tax
-  lda ForwardX,x
-  add Mode7LookAroundOffsetX
+  stz 0
+  lda f:MathCosTable,x
+  bpl :+
+    dec 0
+  :
+  add Mode7LookAroundOffsetXSub
+  sta Mode7LookAroundOffsetXSub
+  lda Mode7LookAroundOffsetX
+  adc 0
   sta Mode7LookAroundOffsetX
-  lda ForwardY,x
-  add Mode7LookAroundOffsetY
+
+  stz 0
+  lda f:MathSinTable,x
+  bpl :+
+    dec 0
+  :
+  add Mode7LookAroundOffsetYSub
+  sta Mode7LookAroundOffsetYSub
+  lda Mode7LookAroundOffsetY
+  adc 0
   sta Mode7LookAroundOffsetY
+  rts
+.endproc
+
+.a16
+.proc AddMoveDirection
+  add Mode7RealAngle
+  add #16
+  neg
+  and #63
+  asl ; * 128
+  asl ; * 256
+  asl ; 16-bit
+  tax
+
+  lda f:MathCosTable,x
+  jsr Multiply
+
+  lda 0
+  add Mode7PlayerXSub
+  sta Mode7PlayerXSub
+  lda Mode7PlayerX
+  adc 2
+  sta Mode7PlayerX
+
+  lda f:MathSinTable,x
+  jsr Multiply
+
+  lda 0
+  add Mode7PlayerYSub
+  sta Mode7PlayerYSub
+  lda Mode7PlayerY
+  adc 2
+  sta Mode7PlayerY
+  rts
+
+Multiply:
+  php
+  abs
+  sta 0
+  stz 2
+
+  ldy #6
+  lda keydown
+  and #KEY_B
+  bne :+
+    dey
+    dey
+  :
+
+  lda 0
+: add 0
+  addcarry 2
+  dey
+  bne :-
+  sta 0
+
+  plp
+  bpl :+
+    lda #0
+    sub 0
+    sta 0
+    lda #0
+    sbc 2
+    sta 2
+  :
   rts
 .endproc
 
@@ -2066,7 +2070,7 @@ IceGoRight:
   sta Mode7CheckpointX
   lda Mode7PlayerY
   sta Mode7CheckpointY
-  lda Mode7Direction
+  lda Mode7RealAngle
   sta Mode7CheckpointDir
   lda Mode7ChipsLeft
   sta Mode7CheckpointChips
@@ -2100,13 +2104,11 @@ IceGoRight:
   setaxy16
   lda Mode7CheckpointX
   sta Mode7PlayerX
+  stz Mode7PlayerXSub
   lda Mode7CheckpointY
   sta Mode7PlayerY
+  stz Mode7PlayerYSub
   lda Mode7CheckpointDir
-  sta Mode7Direction
-  asl
-  asl
-  asl
   sta Mode7RealAngle
   lda Mode7CheckpointChips
   sta Mode7ChipsLeft
@@ -2208,6 +2210,14 @@ M7C_M7D_Table2:
   .addr .loword(M7C_M7D_Buffer2Data+127*4)
   .byt 0
 
+; Radius of $4000=16384
+M7MoveSineTable:
+  .word .loword(0), .loword(3196), .loword(6270), .loword(9102), .loword(11585), .loword(13623), .loword(15137), .loword(16069)
+M7MoveCosineTable:
+  .word .loword(16384), .loword(16069), .loword(15137), .loword(13623), .loword(11585), .loword(9102), .loword(6270), .loword(3196)
+  .word .loword(0), .loword(-3196), .loword(-6270), .loword(-9102), .loword(-11585), .loword(-13623), .loword(-15137), .loword(-16069)
+  .word .loword(-16384), .loword(-16069), .loword(-15137), .loword(-13623), .loword(-11585), .loword(-9102), .loword(-6270), .loword(-3196)
+  .word .loword(0), .loword(3196), .loword(6270), .loword(9102), .loword(11585), .loword(13623), .loword(15137), .loword(16069)
 
 .segment "Mode7Tiles"
 .export Mode7Tiles
