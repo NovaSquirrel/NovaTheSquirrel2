@@ -14,7 +14,7 @@
 	"Header":	{
 		"Music":	null,
 		"Background":	"Forest",
-		"SpriteGFX":	["SPWalker", "SPWalker2", "SPCannon", "SPFire", "SPFire2", "SPBubble", "SPHannah"],
+		"SpriteGFX":	["SPWalker", "SPWalker2", "SPCannon", "SPFire", "SPFire2", "SPBubble", "SPHannah", "SPBurgerRider"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", "FGForestStone", null, null, "BGForest"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "FGForestStone", "BGForest", "FGHannah", "FGToggleBlocks", "FGTreehouse", "FGForestStone", "FGWater", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGSmallTrees"],
@@ -1377,12 +1377,6 @@
 					"W":	4,
 					"H":	1
 				}, {
-					"Id":	"DoorExit",
-					"X":	84,
-					"Y":	16,
-					"W":	1,
-					"H":	1
-				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	79,
 					"Y":	27,
@@ -1398,6 +1392,206 @@
 					"Id":	"LedgeSolidLeft",
 					"X":	80,
 					"Y":	26,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"DoorTwoWay",
+					"X":	85,
+					"Y":	16,
+					"W":	1,
+					"H":	1,
+					"Extra":	"C-D"
+				}, {
+					"Id":	"DoorTwoWay",
+					"X":	106,
+					"Y":	26,
+					"W":	1,
+					"H":	1,
+					"Extra":	"D-C"
+				}, {
+					"Id":	"WoodPlanks",
+					"X":	105,
+					"Y":	28,
+					"W":	15,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	105,
+					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	119,
+					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	121,
+					"Y":	28,
+					"W":	7,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	126,
+					"Y":	25,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	124,
+					"Y":	22,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	122,
+					"Y":	19,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	125,
+					"Y":	11,
+					"W":	1,
+					"H":	8
+				}, {
+					"Id":	"WoodPlanks",
+					"X":	115,
+					"Y":	11,
+					"W":	10,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	115,
+					"Y":	12,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	124,
+					"Y":	12,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SmallHeart",
+					"X":	130,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	110,
+					"Y":	25,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	129,
+					"Y":	23,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Money",
+					"X":	127,
+					"Y":	20,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Money",
+					"X":	126,
+					"Y":	17,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Spring",
+					"X":	116,
+					"Y":	10,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SolidBlock",
+					"X":	115,
+					"Y":	1,
+					"W":	1,
+					"H":	10
+				}, {
+					"Id":	"SolidBlock",
+					"X":	116,
+					"Y":	1,
+					"W":	10,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	116,
+					"Y":	6,
+					"W":	8,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	124,
+					"Y":	2,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	125,
+					"Y":	6,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ladder",
+					"X":	121,
+					"Y":	2,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"SolidBlock",
+					"X":	127,
+					"Y":	6,
+					"W":	1,
+					"H":	6
+				}, {
+					"Id":	"SolidBlock",
+					"X":	126,
+					"Y":	11,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"ColorfulFlower1",
+					"X":	122,
+					"Y":	18,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"ColorfulFlower2",
+					"X":	128,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"ColorfulFlower3",
+					"X":	130,
+					"Y":	24,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	128,
+					"Y":	6,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"DoorExit",
+					"X":	128,
+					"Y":	4,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	129,
+					"Y":	4,
 					"W":	1,
 					"H":	2
 				}]
@@ -1569,6 +1763,44 @@
 					"Y":	26,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"BurgerRider",
+					"X":	113,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BurgerRider",
+					"X":	128,
+					"Y":	14,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"BubbleBuddy",
+					"X":	116,
+					"Y":	10,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BubbleBuddy",
+					"X":	118,
+					"Y":	10,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Checkpoint",
+					"X":	117,
+					"Y":	4,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BubbleCat",
+					"X":	125,
+					"Y":	5,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
 				}]
 		}, {
 			"Name":	"Control",

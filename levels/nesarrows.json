@@ -14,7 +14,7 @@
 	"Header":	{
 		"Music":	null,
 		"Background":	"GlassStars",
-		"SpriteGFX":	["SPWalker", "SPCannon", "SPHannah", "SPWalker2"],
+		"SpriteGFX":	["SPWalker", "SPCannon", "SPHannah", "SPWalker2", "SPLife"],
 		"Flags":	["GlassForeground"],
 		"BGPalette":	[null, "FGCommon", "FGGlassTerrain", "FGColorfulFlowers", "FGSuitLocks", "FGGlassBlocks", "FGGlassBlocksGray", "BGGlassRGB"],
 		"GFXUpload":	["FGCommon", "FGGlassTerrain", "FGTropicalWood", "BGGlass", "FGSuitLocks", "FGGlassBlocks", "FGGlassBlocksGray", "FGHannah", "FGToggleBlocks"],
@@ -1576,6 +1576,92 @@
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
+				}, {
+					"Id":	"EnemyLWSS",
+					"X":	10,
+					"Y":	17,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	7,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	9,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	5,
+					"Y":	26,
+					"W":	1,
+					"H":	1,
+					"Extra":	"1"
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	7,
+					"Y":	27,
+					"W":	1,
+					"H":	1,
+					"Extra":	"1"
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	13,
+					"Y":	19,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"EnemyLWSS",
+					"X":	13,
+					"Y":	24,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true,
+					"Extra":	"1"
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	107,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	123,
+					"Y":	19,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"EnemyGlider",
+					"X":	93,
+					"Y":	17,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"EnemyLWSS",
+					"X":	162,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"EnemyLWSS",
+					"X":	185,
+					"Y":	29,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"EnemyLWSS",
+					"X":	68,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"Extra":	"1"
 				}]
 		}, {
 			"Name":	"Control",

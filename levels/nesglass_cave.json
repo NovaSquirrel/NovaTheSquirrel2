@@ -1,0 +1,58 @@
+{
+	"Meta":	{
+		"Name":	"unnamed level",
+		"Comment":	"",
+		"Width":	256,
+		"Height":	32,
+		"TileWidth":	16,
+		"TileHeight":	16,
+		"GridWidth":	16,
+		"GridHeight":	16,
+		"ExportFormat":	"PrincessSNES",
+		"FormatVersion":	1
+	},
+	"Header":	{
+		"Music":	null,
+		"Background":	"Lake",
+		"SpriteGFX":	["SPWalker", "SPCannon"],
+		"Flags":	[],
+		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", null, null, null, "BGLake"],
+		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGLake", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers"],
+		"BGColor":	"RGB(15,23,31)"
+	},
+	"Layers":	[{
+			"Name":	"Foreground",
+			"Type":	"Rectangle",
+			"Tileset":	"nova2fg",
+			"Data":	[{
+					"Id":	"Ledge",
+					"X":	0,
+					"Y":	30,
+					"W":	11,
+					"H":	1
+				}]
+		}, {
+			"Name":	"Sprites",
+			"Type":	"Sprite",
+			"Tileset":	"nova2sp",
+			"Data":	[{
+					"Id":	"Sneaker",
+					"X":	37,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}]
+		}, {
+			"Name":	"Control",
+			"Type":	"Control",
+			"Tileset":	"nova2ct",
+			"Data":	[{
+					"Id":	"PLAYER_START_R",
+					"X":	3,
+					"Y":	29,
+					"W":	1,
+					"H":	1
+				}]
+		}]
+}
