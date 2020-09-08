@@ -290,6 +290,7 @@ CheckerLoop:
   asl
   asl
   asl
+  asl
   sta Mode7RealAngle
   inc16 hm_node
 
@@ -833,9 +834,9 @@ SkipBlock:
   beq NoRotation
     lda Mode7RealAngle
     add Mode7Turning
-    and #31
+    and #63
     sta Mode7RealAngle
-    and #7
+    and #15
     bne NoRotation
       stz Mode7Turning
 NoRotation:
@@ -1369,7 +1370,7 @@ AddOneSprite:
     ldx #0+2048
   :
 BuildHDMALoop:
-  lda 2*176*8,y ; M7A
+  lda 2*176*16,y ; M7A
   sta f:M7A_M7B_Buffer1Data+0,x
   sta f:M7C_M7D_Buffer1Data+2,x
   lda 0,y ; M7B
@@ -2104,6 +2105,7 @@ IceGoRight:
   sta Mode7PlayerY
   lda Mode7CheckpointDir
   sta Mode7Direction
+  asl
   asl
   asl
   asl
