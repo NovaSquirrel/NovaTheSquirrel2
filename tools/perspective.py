@@ -38,7 +38,7 @@ def output_tables():
 
 	sky_lines = 48
 	data_skip = 16
-	angles    = 32
+	angles    = 64
 	denominator = angles
 
 	if sine_only:

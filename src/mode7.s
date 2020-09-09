@@ -24,6 +24,8 @@
 .importzp hm_node
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 
+TURN_ANGLES = 64
+
 ; Synchronize with the list on mode7actors.s
 .enum Mode7ActorType
   None       = 0*2
@@ -287,9 +289,9 @@ CheckerLoop:
   ; Direction
   lda [hm_node]
   sta Mode7Direction
-  asl
-  asl
-  asl
+  .repeat 4
+    asl
+  .endrep
   sta Mode7RealAngle
   inc16 hm_node
 
@@ -833,9 +835,9 @@ SkipBlock:
   beq NoRotation
     lda Mode7RealAngle
     add Mode7Turning
-    and #31
+    and #TURN_ANGLES-1
     sta Mode7RealAngle
-    and #7
+    and #(TURN_ANGLES/4)-1
     bne NoRotation
       stz Mode7Turning
 NoRotation:
@@ -1369,7 +1371,7 @@ AddOneSprite:
     ldx #0+2048
   :
 BuildHDMALoop:
-  lda 2*176*8,y ; M7A
+  lda 2*176*(TURN_ANGLES/4),y ; M7A
   sta f:M7A_M7B_Buffer1Data+0,x
   sta f:M7C_M7D_Buffer1Data+2,x
   lda 0,y ; M7B
@@ -2104,9 +2106,9 @@ IceGoRight:
   sta Mode7PlayerY
   lda Mode7CheckpointDir
   sta Mode7Direction
-  asl
-  asl
-  asl
+  .repeat 4
+    asl
+  .endrep
   sta Mode7RealAngle
   lda Mode7CheckpointChips
   sta Mode7ChipsLeft
