@@ -454,7 +454,7 @@ Found:
 .a16
 .proc ActorTurnAround
   ; No harm in using it as a 16-bit value here, it's just written back
-  lda ActorDirection,x ; a 0 marks an empty slot
+  lda ActorDirection,x
   eor #1
   sta ActorDirection,x
   rtl

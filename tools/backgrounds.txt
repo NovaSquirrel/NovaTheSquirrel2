@@ -8,6 +8,7 @@ size tall
 
 +HillsMountains
 map BGHillsMountains
+init SetupSkyGradient
 size wide
 
 +Lake

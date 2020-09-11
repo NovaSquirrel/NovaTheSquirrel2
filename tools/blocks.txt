@@ -1402,3 +1402,7 @@ solid
 when SolidCheck, BlockToggleSolid
 t 4,1 5,1
 t 6,1 7,1
+
++EnemyBarrier
+t 0:0 0:0
+t 0:0 0:0
