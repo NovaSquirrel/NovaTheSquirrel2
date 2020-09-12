@@ -1288,7 +1288,7 @@ CopyAbility:
       sub #$100
       sta PlayerPY
 
-      stz PlayerVY
+      ; Originally zero'd PlayerVY here, but that made it so you couldn't jump off of burgers?
       sec
       rtl
 : clc
