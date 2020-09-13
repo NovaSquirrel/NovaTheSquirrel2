@@ -155,3 +155,10 @@ i Bubble Wand
 i Demo item that gives you the
 i Bubble ability.
 
++AbilityBombs
+name Bombs
+pic 2,2
+run ItemAbilityBombs
+i Bombs
+i Demo item that gives you the
+i Bomb ability.

@@ -291,3 +291,14 @@ NoRoutine:
   sta NeedAbilityChange
   rts
 .endproc
+
+.a8
+.i16
+.export ItemAbilityBombs
+.proc ItemAbilityBombs
+  lda #Ability::Bomb
+  sta PlayerAbility
+  lda #1
+  sta NeedAbilityChange
+  rts
+.endproc

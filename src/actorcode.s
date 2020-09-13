@@ -1098,7 +1098,7 @@ GoToNotNear:
       and #$fffe
       tay
       lda #1
-      jsr SpeedAngle2Offset256
+      jsl SpeedAngle2Offset256
       ply
       lda 1
       sta ActorVX,y
@@ -2739,6 +2739,10 @@ ThwaiteCosineTable:
 .export SpeedAngle2Offset256
 .proc SpeedAngle2Offset256
   php
+
+  phb
+  phk
+  plb
   seta8
   sta M7MUL ; 8-bit factor
 
@@ -2767,8 +2771,9 @@ ThwaiteCosineTable:
   sta 4
   lda M7PRODBANK
   sta 5
+  plb
   plp
-  rts
+  rtl
 .endproc
 
 .export ActorExpire

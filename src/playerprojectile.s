@@ -298,13 +298,44 @@ GliderPushY:
 .a16
 .i16
 .proc RunProjectileBomb
-  rtl
+  lda ActorVarA,x
+  bne Stationary
+  ; Make sure it does despawn
+  dec ActorTimer,x
+  bne :+
+    stz ActorType,x
+  :
+
+  jsl ActorFall
+  bcc :+
+DoExplode:
+    lda #5*4
+    jmp ChangeToExplosion
+  :
+  ; ActorFall will leave $ffff in 0 if it bumped a ceiling, in which case we need to explode
+  inc 0
+  beq DoExplode
+
+  jml ActorApplyXVelocity
+
+Stationary:
+  dec ActorTimer,x
+  beq DoExplode
+  jsl CollideRide
+  jml RideOnProjectile
+  ; Carry = riding, not currently used though
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileBomb
-  rtl
+;  lda framecount
+;  lsr
+;  lsr
+;  lsr
+;  and #2
+  lda #36|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
@@ -789,7 +820,7 @@ NoTarget:
   asl
   tay
   lda #1
-  jsr SpeedAngle2Offset256
+  jsl SpeedAngle2Offset256
   ; Results in
   ; 0,1,2 X
   ; 3,4,5 Y

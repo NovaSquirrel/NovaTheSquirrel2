@@ -93,6 +93,8 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   sta YourInventory+(2*6)
   lda #InventoryItem::AbilityBubble
   sta YourInventory+(2*7)
+  lda #InventoryItem::AbilityBombs
+  sta YourInventory+(2*9)
 
 
 

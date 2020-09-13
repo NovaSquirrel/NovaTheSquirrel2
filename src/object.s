@@ -903,6 +903,8 @@ ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
   jsl ActorTryUpInteraction
   asl
   bcc :+
+    lda #$ffff
+    sta 0 ; Did hit the ceiling - communicate this a different way?
     lda #$20
     sta ActorVY,x
     clc
@@ -914,6 +916,7 @@ ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
 ; input: X (Actor slot)
 ; output: Zero flag (not zero if on top of a solid block)
 ; locals: 0, 1
+; Currently 0 is set to $ffff if it bumps against the ceiling, but that's sort of flimsy
 .a16
 .export ActorCheckStandingOnSolid
 .proc ActorCheckStandingOnSolid
@@ -999,6 +1002,7 @@ ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
   jsl GetLevelPtrXY
   jsr ActorIsSlope
   bcc NotSlope
+    assert_same_banks ActorGetSlopeYPos, SlopeHeightTable
     phk
     plb
     lda ActorPY,x
@@ -1029,6 +1033,7 @@ NotSlope:
 .proc ActorGetSlopeYPosBelow
   jsr ActorIsSlope
   bcc NotSlope
+    assert_same_banks ActorGetSlopeYPos, SlopeHeightTable
     lda ActorPY,x
     add #$0100
     and #$ff00

@@ -20,7 +20,7 @@
 .include "blockenum.s"
 .include "actorenum.s"
 .smart
-.import ActorClearX, PlayerNegIfLeft
+.import ActorClearX, PlayerNegIfLeft, SpeedAngle2Offset256
 .import BlockRunInteractionBelow
 
 .segment "Player"
@@ -374,14 +374,168 @@ DoBurgerShared:
     sta ActorDirection,x
     lda TailAttackDirection
     sta ActorVarA,x
-    seta16
   :
   rts
 .endproc
 
 .a8
 .proc RunAbilityBomb
+  lda TailAttackDirection
+  and #>KEY_DOWN
+  jne BombBelow
+
+  ; Hold frame 1 of the throw animation
+  lda #PlayerFrame::THROW1
+  sta TailAttackFrame
+
+  ; If throwing, use the throw animation
+  lda TailAttackVariable
+  jne ThrowNow
+  seta16
+  lda keydown
+  and #AttackKeys
+  seta8
+  bne :+
+    inc TailAttackVariable
+    bra NoIncreaseAngle
+  :
+
+  ; Increase the angle
+  lda TailAttackVariable+1
+  cmp #30
+  beq :+
+    ina
+    sta TailAttackVariable+1
+  :
+NoIncreaseAngle:
+
+  .import MathSinTable, MathCosTable
+  seta16
+  jsr GetAimAngle
+  lda f:MathCosTable,x
+  jsr Reduce
+  sta 0
+  lda f:MathSinTable,x
+  jsr Reduce
+  sta 2
+  seta8
+
+  ; Draw the angle
+  tdc ; Clear A
+  lda PlayerDir
+  tay
+  ldx OamPtr
+
+  lda PlayerDrawX
+  add 0
+  sub #4
+  sta OAM_XPOS+(4*0),x
+  lda PlayerDrawY
+  sub #16
+  add 2
+  sta OAM_YPOS+(4*0),x
+
+  seta16
+  lda #$6c|OAM_PRIORITY_2
+  sta OAM_TILE+(4*0),x
+  stz OAMHI+(4*0),x
+  txa
+  add #4
+  sta OamPtr
+  seta8
+  rts
+
+.a16
+Reduce:
+  asr_n 10
+  rts
+
+.a16
+GetAimAngle:
+  lda TailAttackVariable+1
+  asl
+  and #255
+  sta 0
+
+  lda PlayerDir
+  lsr
+  bcs @Left
+@Right:
+  tdc ; Clear accumulator
+  sub 0
+  bra @Shared
+@Left:
+  lda #128
+  add 0
+@Shared:
+  asl
+  and #$1fe
+  tax
+  rts
+
+.a8
+; Do the throw animation and make the bomb
+ThrowNow:
+  jsr StepThrowAnim
+  bne NoThrow
+    seta16
+    jsl FindFreeProjectileX
+    bcc NoThrow
+    lda #Actor::PlayerProjectile16x16*2
+    sta ActorType,x
+
+    lda #PlayerProjectileType::Bomb
+    sta ActorProjectileType,x
+
+    jsr AbilityPositionProjectile16x16
+
+    lda #140
+    sta ActorTimer,x
+
+    ; Set the angle correctly
+    phx
+    jsr GetAimAngle
+    txy
+    plx
+    lda #3
+    jsl SpeedAngle2Offset256
+    lda 1
+    asr_n 2
+    sta ActorVX,x
+    lda 4
+    asr_n 2
+    sub #$20
+    sta ActorVY,x
+
+    seta8
+    lda PlayerDir
+    sta ActorDirection,x
+    stz ActorVarA,x
+  NoThrow:
+  rts
+
+BombBelow:
   jsr StepTailSwish
+  bne NoBombBelow
+    seta16
+    jsl FindFreeProjectileX
+    bcc NoBombBelow
+    stz ActorVX,x
+    stz ActorVY,x
+    lda #Actor::PlayerProjectile16x16*2
+    sta ActorType,x
+    lda #PlayerProjectileType::Bomb
+    sta ActorProjectileType,x
+    lda #200
+    sta ActorTimer,x
+    sta ActorVarA,x ; Needs to be nonzero
+    seta8
+    lda PlayerDir
+    sta ActorDirection,x
+    seta16
+    stz PlayerVY
+    jsr AbilityPositionProjectile16x16
+  NoBombBelow:
   rts
 .endproc
 
