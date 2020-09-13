@@ -329,11 +329,11 @@ Stationary:
 .a16
 .i16
 .proc DrawProjectileBomb
-;  lda framecount
-;  lsr
-;  lsr
-;  lsr
-;  and #2
+  lda ActorVarA,x
+  bne Bigger
+  lda #38|OAM_PRIORITY_2
+  jml DispActor16x16
+Bigger:
   lda #36|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
