@@ -765,6 +765,23 @@ SkipBlock:
     :
   DontLookAround:
 
+  lda keydown
+  and #KEY_LEFT|KEY_A
+  cmp #KEY_LEFT|KEY_A
+  bne :+
+    trb keydown
+    lda #KEY_L
+    tsb keydown
+  :
+  lda keydown
+  and #KEY_RIGHT|KEY_A
+  cmp #KEY_RIGHT|KEY_A
+  bne :+
+    trb keydown
+    lda #KEY_R
+    tsb keydown
+  :
+
   lda Mode7DoLookAround
   ora Mode7Oops
   jne DontMoveForward
