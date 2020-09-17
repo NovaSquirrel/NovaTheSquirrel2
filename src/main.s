@@ -417,14 +417,15 @@ SkipBlock:
   ; Do generic DMA updates
   ldx #(GENERIC_UPDATE_COUNT-1)*2
 GenericUpdateLoop:
-  lda GenericUpdateLength,x
+  ldy GenericUpdateLength,x
   beq SkipGeneric
-  sta DMALEN
+  ; Y used for safe-keeping in case it's needed, since it will get zero'd
+  sty DMALEN
   stz GenericUpdateLength,x ; Mark the update slot as free
   lda GenericUpdateSource,x
   sta DMAADDR
-  lda GenericUpdateDestination,x
-  bmi WasPalette
+  lda GenericUpdateDestination,x ; >=8000 indicates it's a palette upload
+  bmi WasPalette                 ; because only 32K words of VRAM are installed
   ; ---------------
   sta PPUADDR
   lda #DMAMODE_PPUDATA
@@ -434,9 +435,25 @@ GenericUpdateLoop:
   sta DMAADDRBANK
   lda #1
   sta COPYSTART
+  lda GenericUpdateFlags+1,x ; Check metadata
+  bpl @NoSecondRow
+    seta16
+    sty DMALEN ; Length stored from earlier
+    lda GenericUpdateSource2,x
+    sta DMAADDR
+    ; Can probably leave the bank the same;
+    ; I don't think I'll ever have data straddle two banks, due to LoROM
+    ; and I don't think DMA can modify the source bank anyway
+    lda GenericUpdateDestination2,x
+    sta PPUADDR
+    seta8
+    lda #1
+    sta COPYSTART
+  @NoSecondRow:
   seta16
   bra SkipGeneric
   ; ---------------
+
 WasPalette:
   seta8
   sta CGADDR

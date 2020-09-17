@@ -892,3 +892,113 @@ Found:
   bra QueueGenericUpdateWithBank::Already
 .endproc
 .endif
+
+; Returns A = sprite slot, if found
+; Returns success in carry
+.export AllocateDynamicSpriteSlot
+.proc AllocateDynamicSpriteSlot
+  phx
+  seta8
+  ldx #DYNAMIC_SPRITE_SLOTS-1
+: lda DynamicSpriteSlotUsed,x
+  beq Found
+  dex
+  bpl :-
+
+NotFound:
+  seta16
+  plx
+  clc ; Failure
+  rtl
+
+Found:
+  inc DynamicSpriteSlotUsed,x ; Mark it as used
+  seta16
+  txa
+  plx
+  sec ; Success
+  rtl
+.endproc
+
+; A = sprite slot
+.export FreeDynamicSpriteSlot
+.proc FreeDynamicSpriteSlot
+  phx
+  tax
+  seta8
+  stz DynamicSpriteSlotUsed,x
+  seta16
+  plx
+  rtl
+.endproc
+
+; A = tile number to use, for a specific dynamic sprite index
+.export GetDynamicSpriteTileNumber
+.proc GetDynamicSpriteTileNumber
+  phx
+  asl
+  tax
+  lda f:TileNumbers,x
+  plx
+  rtl
+TileNumbers:
+  .word 128+(32*0)
+  .word 128+(32*0)+16
+  .word 128+(32*1)
+  .word 128+(32*1)+16
+  .word 128+(32*2)
+  .word 128+(32*2)+16
+  .word 128+(32*3)
+  .word 128+(32*3)+16
+.endproc
+
+.export GetDynamicSpriteVRAMAddress
+.proc GetDynamicSpriteVRAMAddress
+  phx
+  asl
+  tax
+  lda f:Addresses,x
+  plx
+  rtl
+Addresses:
+  .word $9000>>1
+  .word $9100>>1
+  .word $9400>>1
+  .word $9500>>1
+  .word $9800>>1
+  .word $9900>>1
+  .word $9C00>>1
+  .word $9D00>>1
+.endproc
+
+; Queues a DMA to happen during the next vblank
+; A = Source address (CPU)
+; 0 = Source bank
+; 1 = Should be negative
+; X = Dynamic sprite number
+; Y = Number of bytes to copy
+; Returns success in carry
+.a16
+.export QueueDynamicSpriteUpdate
+.proc QueueDynamicSpriteUpdate
+  pha
+  txa
+  asl
+  tax
+  lda f:GetDynamicSpriteVRAMAddress::Addresses,x
+  tax
+  pla
+  jsl QueueGenericUpdate ; A=source, 0=source bank, X=destination, Y=bytes
+  bcc Fail
+  ; X = the slot, still
+  ; Y is preserved, so it's still the length
+  tya
+  add QueueGenericUpdate::Source
+  sta GenericUpdateSource2,x
+  lda QueueGenericUpdate::Destination
+  ora #$0200 >> 1
+  sta GenericUpdateDestination2,x
+  ; Carry is still set
+Fail:
+  rtl
+.endproc

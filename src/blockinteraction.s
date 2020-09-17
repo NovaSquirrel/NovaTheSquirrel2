@@ -1139,19 +1139,15 @@ Value = BlockTemp+2
   ldy #256 ; Copy 256 bytes
 
   ; Calculate source address
-  seta8
   lda #^File_FGToggleBlocks
   sta 0
-  seta16
   lda Color
   xba
   add #.loword(File_FGToggleBlocks)
   lsr Value
   bcc :+
-    seta8
     lda #^File_FGToggleBlocksSwapped
     sta 0
-    seta16
     lda Color
     xba
     add #.loword(File_FGToggleBlocksSwapped)

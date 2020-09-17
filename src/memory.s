@@ -244,7 +244,14 @@ LevelZeroWhenLoad_Start:
   GenericUpdateDestination: .res GENERIC_UPDATE_COUNT*2
   GenericUpdateLength:      .res GENERIC_UPDATE_COUNT*2
   GenericUpdateSource:      .res GENERIC_UPDATE_COUNT*2
-  GenericUpdateFlags:       .res GENERIC_UPDATE_COUNT*2 ; Bank
+  GenericUpdateDestination2: .res GENERIC_UPDATE_COUNT*2 ;\--- Used for two-row DMAs
+  GenericUpdateSource2:      .res GENERIC_UPDATE_COUNT*2 ;/
+  GenericUpdateFlags:       .res GENERIC_UPDATE_COUNT*2 ; First byte is bank
+  ; Second byte of GenericUpdateFlags has some other metadata:
+  ; For VRAM updates, if bit 7 is set, there is a second DMA to Destination2 from Source2
+
+  DynamicSpriteSlotUsed: .res DYNAMIC_SPRITE_SLOTS
+  ; Every slot is nonzero if used, zero if not
 
   ; Delayed ChangeBlock updates
   DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in
