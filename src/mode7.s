@@ -25,6 +25,8 @@
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 
 TURN_ANGLES = 64
+DrawCenterX = 128
+DrawCenterY = 192
 
 ; Synchronize with the list on mode7actors.s
 .enum Mode7ActorType
@@ -330,7 +332,7 @@ RestoredFromCheckpoint:
   stz Mode7ForceMove
   stz Mode7IceDirection ; Probably don't need to init this one but whatever
 
-  stz Mode7DynamicTileUsed+0 ; 8 bytes long
+  stz Mode7DynamicTileUsed+0 ; 7 bytes long, padded to 8
   stz Mode7DynamicTileUsed+2
   stz Mode7DynamicTileUsed+4
   stz Mode7DynamicTileUsed+6
@@ -659,14 +661,14 @@ SkipBlock:
   ; Calculate the centers
   seta16
   lda Mode7ScrollX
-  add #128
+  add #DrawCenterX
   seta8
   sta M7X
   xba
   sta M7X
   seta16
   lda Mode7ScrollY
-  add #192
+  add #DrawCenterY
   seta8
   sta M7Y
   xba
@@ -1117,9 +1119,6 @@ WasRotation:
   sta OAM_TILE+(4*7),y
 
   seta8
-  DrawCenterX = 128
-  DrawCenterY = 192
-
   lda #DrawCenterX-16
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y

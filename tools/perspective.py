@@ -2,7 +2,7 @@
 import math
 
 raw_tables = True # Don't do premade HDMA tables
-sine_only = True # Don't generate cosine, and repeat the first 8 angles
+sine_only = True # Repeat first 1/4 of the angles; single overlapping sine/cosine table
 
 def perspective(angle, height, scale_x, scale_y):
     """
@@ -16,7 +16,7 @@ def perspective(angle, height, scale_x, scale_y):
    
     m7a, m7b, m7c, m7d = [], [], [], []
     for screen_y in range(224):
-        scale_z = 1/(screen_y+1)
+        scale_z = 1/((screen_y+1)*0.75)
         
         m7a.append(to_fixed( math.cos(angle) * scale_x * scale_z))
         m7b.append(to_fixed( math.sin(angle) * scale_x * scale_z))
@@ -33,6 +33,14 @@ xx Line count
 xx * N Data
 00 Terminate
 """
+
+# Takes a value from 0 to 1
+# Returns a value from 0 to 1 with some smoothing?
+def smoothing(value):
+	value = (2*value-1) * math.pi/2
+	value = (math.sin(value)+1)/2
+	return value
+
 def output_tables():
 	outfile = open("src/perspective_data.s", "w")
 
@@ -41,8 +49,10 @@ def output_tables():
 	angles    = 64
 	denominator = angles
 
+	quarters = 4
 	if sine_only:
 		angles += angles//4
+		quarters += 1
 
 	outfile.write('; This is automatically generated. Edit "perspective.py" instead\n')
 	if raw_tables:
@@ -58,38 +68,47 @@ def output_tables():
 		for a in range(angles):
 			outfile.write('  .addr .loword(m7c_m7d_%d)\n' % a)
 
-	for a in range(angles):
-		m7a, m7b, m7c, m7d = perspective((a/denominator)*2*math.pi, 0, 64, 64)
+	table_id = -1
+	for quarter in range(quarters):
+		quarter_size = denominator//4
+		base_angle = quarter*quarter_size
 
-		if raw_tables:
-			if sine_only:
-				outfile.write('.segment "Mode7TblAB"\n')
-				outfile.write('m7a_m7b_%d:\n' % a)
-				for i in range(224-sky_lines):
-					outfile.write('  .word $%.4x\n' % (m7b[i+data_skip]))
+		for a in range(quarter_size):
+			table_id += 1
+
+			desired_angle = base_angle + quarter_size*smoothing(a/quarter_size)
+			desired_angle = desired_angle/denominator*2*math.pi
+			m7a, m7b, m7c, m7d = perspective(desired_angle, 0, 64, 64)
+
+			if raw_tables:
+				if sine_only:
+					outfile.write('.segment "Mode7TblAB"\n')
+					outfile.write('m7a_m7b_%d:\n' % table_id)
+					for i in range(224-sky_lines):
+						outfile.write('  .word $%.4x\n' % (m7b[i+data_skip]))
+				else:
+					outfile.write('.segment "Mode7TblAB"\n')
+					outfile.write('m7a_m7b_%d:\n' % table_id)
+					for i in range(224-sky_lines):
+						outfile.write('  .word $%.4x, $%.4x\n' % (m7a[i+data_skip], m7b[i+data_skip]))
 			else:
 				outfile.write('.segment "Mode7TblAB"\n')
-				outfile.write('m7a_m7b_%d:\n' % a)
+				outfile.write('m7a_m7b_%d:\n' % table_id)
+				outfile.write('  .byte %d\n' % sky_lines)
+				outfile.write('  .word 0, 0\n')
 				for i in range(224-sky_lines):
+					outfile.write('  .byte 1\n')
 					outfile.write('  .word $%.4x, $%.4x\n' % (m7a[i+data_skip], m7b[i+data_skip]))
-		else:
-			outfile.write('.segment "Mode7TblAB"\n')
-			outfile.write('m7a_m7b_%d:\n' % a)
-			outfile.write('  .byte %d\n' % sky_lines)
-			outfile.write('  .word 0, 0\n')
-			for i in range(224-sky_lines):
-				outfile.write('  .byte 1\n')
-				outfile.write('  .word $%.4x, $%.4x\n' % (m7a[i+data_skip], m7b[i+data_skip]))
-			outfile.write('  .byte 0\n')
+				outfile.write('  .byte 0\n')
 
-			outfile.write('.segment "Mode7TblCD"\n')
-			outfile.write('m7c_m7d_%d:\n' % a)
-			outfile.write('  .byte %d\n' % sky_lines)
-			outfile.write('  .word 0, 0\n')
-			for i in range(224-sky_lines):
-				outfile.write('  .byte 1\n')
-				outfile.write('  .word $%.4x, $%.4x\n' % (m7c[i+data_skip], m7d[i+data_skip]))
-			outfile.write('  .byte 0\n')
+				outfile.write('.segment "Mode7TblCD"\n')
+				outfile.write('m7c_m7d_%d:\n' % table_id)
+				outfile.write('  .byte %d\n' % sky_lines)
+				outfile.write('  .word 0, 0\n')
+				for i in range(224-sky_lines):
+					outfile.write('  .byte 1\n')
+					outfile.write('  .word $%.4x, $%.4x\n' % (m7c[i+data_skip], m7d[i+data_skip]))
+				outfile.write('  .byte 0\n')
 
 	outfile.close()
 output_tables()
