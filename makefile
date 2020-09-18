@@ -150,6 +150,7 @@ $(srcdir)/backgrounddata.s: $(srcdir)/backgroundenum.s $(srcdir)/graphicsenum.s
 $(srcdir)/portraitdata.s: $(srcdir)/portraitenum.s
 $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
+$(objdir)/main.o: $(srcdir)/vblank.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/m7blockdata.o: $(srcdir)/m7blockenum.s
 $(objdir)/mode7actors.o: $(srcdir)/m7blockenum.s tools/M7SoftSprites.chrm7

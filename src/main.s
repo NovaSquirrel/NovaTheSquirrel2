@@ -342,149 +342,23 @@ NoIris:
   lda PlayerPY
   cmp #(512+32)*16
   bcs Die
-  ; So does running out of health
-  lda PlayerHealth
-  and #255
-  bne NotDie
-Die:
-  jsl WaitVblank
-  seta8
-  lda #FORCEBLANK
-  sta PPUBRIGHT
-  seta16
-  jml ResumeLevelFromCheckpoint
+    ; So does running out of health
+    lda PlayerHealth
+    and #255
+    bne NotDie
+  Die:
+    ; Wait and turn off the screen
+    jsl WaitVblank
+    seta8
+    lda #FORCEBLANK
+    sta PPUBRIGHT
+    seta16
+    jml ResumeLevelFromCheckpoint
   NotDie:
 
-
-
-  ; Pack the second OAM table together into the format the PPU expects
-  jsl ppu_pack_oamhi_partial
-  ; And once that's out of the way, wait until vertical blank where
-  ; I can actually copy all of the prepared OAM to the PPU
-  jsl WaitVblank
-  jsl ppu_copy_oam_partial
-  ; And also do background updates:
-  setaxy16
-
-  ; Do row/column updates if required
-  lda ColumnUpdateAddress
-  beq :+
-    jsl RenderLevelColumnUpload
-    stz ColumnUpdateAddress
-  :
-  lda RowUpdateAddress
-  beq :+
-    jsl RenderLevelRowUpload
-    stz RowUpdateAddress
-  :
-  ; Do row/column updates for second layer
-  lda ColumnUpdateAddress2
-  beq :+
-    jsl RenderLevelColumnUpload2
-    stz ColumnUpdateAddress2
-  :
-  lda RowUpdateAddress2
-  beq :+
-    jsl RenderLevelRowUpload2
-    stz RowUpdateAddress2
-  :
-  ; -----------------------------------
-  ; Do block updates
-  ldx #(BLOCK_UPDATE_COUNT-1)*2
-BlockUpdateLoop:
-  lda BlockUpdateAddress,x
-  beq SkipBlock
-  sta PPUADDR
-  lda BlockUpdateDataTL,x
-  sta PPUDATA
-  lda BlockUpdateDataTR,x
-  sta PPUDATA
-
-  lda BlockUpdateAddress,x ; Move down a row
-  add #(32*2)>>1
-  sta PPUADDR
-  lda BlockUpdateDataBL,x
-  sta PPUDATA
-  lda BlockUpdateDataBR,x
-  sta PPUDATA
-
-  stz BlockUpdateAddress,x ; Cancel out the block now that it's been written
-SkipBlock:
-  dex
-  dex
-  bpl BlockUpdateLoop
-
-  ; Do generic DMA updates
-  ldx #(GENERIC_UPDATE_COUNT-1)*2
-GenericUpdateLoop:
-  ldy GenericUpdateLength,x
-  beq SkipGeneric
-  ; Y used for safe-keeping in case it's needed, since it will get zero'd
-  sty DMALEN
-  stz GenericUpdateLength,x ; Mark the update slot as free
-  lda GenericUpdateSource,x
-  sta DMAADDR
-  lda GenericUpdateDestination,x ; >=8000 indicates it's a palette upload
-  bmi WasPalette                 ; because only 32K words of VRAM are installed
-  ; ---------------
-  sta PPUADDR
-  lda #DMAMODE_PPUDATA
-  sta DMAMODE
-  seta8
-  lda GenericUpdateFlags,x
-  sta DMAADDRBANK
-  lda #1
-  sta COPYSTART
-  lda GenericUpdateFlags+1,x ; Check metadata
-  bpl @NoSecondRow
-    seta16
-    sty DMALEN ; Length stored from earlier
-    lda GenericUpdateSource2,x
-    sta DMAADDR
-    ; Can probably leave the bank the same;
-    ; I don't think I'll ever have data straddle two banks, due to LoROM
-    ; and I don't think DMA can modify the source bank anyway
-    lda GenericUpdateDestination2,x
-    sta PPUADDR
-    seta8
-    lda #1
-    sta COPYSTART
-  @NoSecondRow:
-  seta16
-  bra SkipGeneric
-  ; ---------------
-
-WasPalette:
-  seta8
-  sta CGADDR
-  stz DMAMODE   ; Linear, increasing DMA
-  lda #<CGDATA
-  sta DMAPPUREG
-  lda GenericUpdateFlags,x
-  sta DMAADDRBANK
-  lda #1
-  sta COPYSTART
-  seta16
-SkipGeneric:
-  dex
-  dex
-  bpl GenericUpdateLoop
-
-
-  ; Handle palette requests
-  ; (Maybe this should be combined into the generic updates later?)
-  lda PaletteRequestIndex
-  and #255
-  beq :+
-    tay
-    lda PaletteRequestValue ; Do 16-bit read anyway because DoPaletteUpload will mask off the high byte
-    jsl DoPaletteUpload
-    stz PaletteRequestIndex ; Also clears the value since it's the next byte
-  :
-
-
-  ; -----------------------------------
-  jsl PlayerFrameUpload
+  ; Include code for handling the vblank
+  ; and updating PPU memory.
+  .include "vblank.s"
 
   seta8
   ; Turn on rendering
@@ -496,7 +370,7 @@ SkipGeneric:
   :
   sta LevelFadeIn
 
-  ; wait for control reading to finish
+  ; Wait for control reading to finish
   lda #$01
 padwait:
   bit VBLSTATUS
