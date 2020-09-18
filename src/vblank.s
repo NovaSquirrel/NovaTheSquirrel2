@@ -33,7 +33,7 @@ VblankHandler:
 
   ; Do row/column updates if required
   lda ColumnUpdateAddress
-;  beq :+
+  beq :+
     stz ColumnUpdateAddress
     sta PPUADDR
     lda #DMAMODE_PPUDATA
@@ -54,7 +54,7 @@ VblankHandler:
   :
 
   ldx RowUpdateAddress
-;  beq :+
+  beq :+
     stz RowUpdateAddress
     ; --- First screen
     ; Set DMA parameters  
@@ -88,7 +88,7 @@ VblankHandler:
 
   ; Do row/column updates for second layer
   lda ColumnUpdateAddress2
-;  beq :+
+  beq :+
     stz ColumnUpdateAddress2
     sta PPUADDR
     lda #DMAMODE_PPUDATA
@@ -109,7 +109,7 @@ VblankHandler:
   :
 
   lda RowUpdateAddress2
-;  beq :+
+  beq :+
     stz RowUpdateAddress2
     ; --- First screen
     ; Set DMA parameters  
@@ -206,7 +206,7 @@ SkipGeneric:
   ldx #(BLOCK_UPDATE_COUNT-1)*2
 BlockUpdateLoop:
   lda BlockUpdateAddress,x
-;  beq SkipBlock
+  beq SkipBlock
   sta <PPUADDR
   lda BlockUpdateDataTL,x
   sta <PPUDATA

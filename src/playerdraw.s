@@ -64,6 +64,24 @@
   lda #%00000010
   sta COPYSTART
 
+  ; Hold on, is there enough time to upload new ability graphics, if that's needed?
+  ; It's 1KB plus four tiles. We can check to make sure it wouldn't cause vblank to be overrun
+  ; by checking the current Y position.
+  bit PPUSTATUS2 ; Resets the flip flop for GETXY
+  bit GETXY
+  lda YCOORD
+  cmp #261-(8+1) ; The following code takes about 8 scanlines, add 1 for security
+  bcc :+
+@TimeUp:
+    ; There's not enough time to copy the ability graphics, so delay that until next frame
+    plp
+    rtl
+  :
+  ; Read YCOORD a second time - if the high bit of the Y position is set, there is definitely not enough time
+  lda YCOORD
+  lsr
+  bcs @TimeUp
+
   ; -----------------------------------
   ; Is there an ability icon to copy in?
   lda NeedAbilityChange
@@ -102,7 +120,6 @@
     lda #%00000010
     sta COPYSTART
 
-
     ; Ability graphics -------------
     phk
     plb
@@ -127,8 +144,6 @@
     seta8
     lda #%00000001
     sta COPYSTART
-
-
 
     stz NeedAbilityChange
     stz NeedAbilityChangeSilent
