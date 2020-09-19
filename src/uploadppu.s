@@ -943,13 +943,13 @@ Found:
   rtl
 TileNumbers:
   .word 128+(32*0)
-  .word 128+(32*0)+16
+  .word 128+(32*0)+8
   .word 128+(32*1)
-  .word 128+(32*1)+16
+  .word 128+(32*1)+8
   .word 128+(32*2)
-  .word 128+(32*2)+16
+  .word 128+(32*2)+8
   .word 128+(32*3)
-  .word 128+(32*3)+16
+  .word 128+(32*3)+8
 .endproc
 
 .export GetDynamicSpriteVRAMAddress

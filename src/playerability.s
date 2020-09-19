@@ -1059,13 +1059,20 @@ Found:
   ldy #ProjectileStart
 Loop:
   lda ActorType,y
-  beq FindFreeProjectileX::Found
+  beq Found
   tya
   add #ActorSize
   tay
   cpy #ProjectileEnd
   bne Loop
   clc
+  rtl
+Found:
+  seta8
+  lda #255
+  sta ActorDynamicSlot,y
+  seta16
+  sec
   rtl
 .endproc
 

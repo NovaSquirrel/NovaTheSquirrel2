@@ -1018,7 +1018,16 @@ Divide:
 .a16
 .i16
 .proc RunProjectileExplosion
-  jsl RandomByte
+;  jsl RandomByte
+  lda ActorVarB,x
+  asl
+  asl
+  asl
+  asl
+  sta 0
+  lda framecount
+  add ActorVarA,x
+  eor 0
   and #31
   tay
   lda ActorVarA,x
@@ -1051,11 +1060,84 @@ ExplodeBlock:
   jml ChangeBlock
 .endproc
 
+.pushseg
+.segment "DynamicExplosion"
+DSExplosion:
+.incbin "../tilesets4/DSExplosion.chrsfc"
+.popseg
+
+.include "actorframedefine.s"
 .a16
 .i16
 .proc DrawProjectileExplosion
-  lda #(6*16)|OAM_PRIORITY_2
-  jml DispActor16x16
+  ; Don't update the explosion if it's the second actor
+  lda ActorVarB,x
+  beq :+
+    phx
+
+    phx
+    lda ActorVarA,x
+;    and #<~1
+    asl
+    tax
+    lda Frames,x
+    plx
+;    lsr
+;    xba
+;    asl
+;    add #.loword(DSExplosion)
+    pha
+    lda ActorDynamicSlot,x
+    and #7
+    tax
+    ldy #256
+    lda #^DSExplosion | $8000
+    sta 0
+    pla
+    .import QueueDynamicSpriteUpdate
+    jsl QueueDynamicSpriteUpdate
+    plx
+  :
+
+  lda ActorDynamicSlot,x
+  and #7
+  .import GetDynamicSpriteTileNumber
+  jsl GetDynamicSpriteTileNumber
+  ora #OAM_PRIORITY_2
+  sta SpriteTileBase
+
+  lda #.loword(Frame)
+  .import DispActorMetaPriority2
+  jml DispActorMetaPriority2
+;  lda #(6*16)|OAM_PRIORITY_2
+;  jml DispActor16x16
+
+Frame:
+  Row16x16 -8, -8,  $00, $02
+  Row16x16 -8,  8,  $04, $06
+  EndMetasprite
+
+Frames:
+  .word .loword(DSExplosion+(512*0))
+  .word .loword(DSExplosion+(512*1))
+  .word .loword(DSExplosion+(512*1))
+  .word .loword(DSExplosion+(512*1))
+  .word .loword(DSExplosion+(512*2))
+  .word .loword(DSExplosion+(512*2))
+  .word .loword(DSExplosion+(512*2))
+  .word .loword(DSExplosion+(512*3))
+  .word .loword(DSExplosion+(512*3))
+  .word .loword(DSExplosion+(512*4))
+  .word .loword(DSExplosion+(512*4))
+  .word .loword(DSExplosion+(512*5))
+  .word .loword(DSExplosion+(512*5))
+  .word .loword(DSExplosion+(512*6))
+  .word .loword(DSExplosion+(512*6))
+  .word .loword(DSExplosion+(512*7))
+  .word .loword(DSExplosion+(512*7))
+  .word .loword(DSExplosion+(512*8))
+  .word .loword(DSExplosion+(512*8))
+  .word .loword(DSExplosion+(512*9))
 .endproc
 
 ; Check for a collision with a player projectile
@@ -1101,6 +1183,8 @@ NotProjectile:
 .proc ActorGotShot
 ProjectileIndex = ActorGetShotTest::ProjectileIndex
 ProjectileType  = ActorGetShotTest::ProjectileType
+  phk
+  plb
   lda ProjectileType
   asl
   tay
@@ -1142,7 +1226,6 @@ BumpStunOnly:
   lda #90
   sta ActorTimer,x
   rtl
-
 
 ; Instantly kill anything
 Kill:

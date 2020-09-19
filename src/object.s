@@ -2223,7 +2223,7 @@ Loop:
 
   tdc ; Clear all of accumulator
   seta8
-  lda ActorDynamicSlot,x  ; 255 is used to mark an empty slot
+  lda ActorDynamicSlot,x  ; 255 is used to mark an empty slot, so >=128 empty
   bmi NoAllocation
     phx
     tax

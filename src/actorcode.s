@@ -2659,8 +2659,8 @@ Flipped:
 .export ChangeToExplosion
 .proc ChangeToExplosion
   sta ActorTimer,x
-  bit ActorDynamicSlot-1
-  bmi AlreadyDynamic
+  bit ActorDynamicSlot-1,x
+  bpl AlreadyDynamic
     jsl AllocateDynamicSpriteSlot
     bcs :+
       stz ActorType,x
@@ -2671,11 +2671,14 @@ Flipped:
     seta16
   AlreadyDynamic:
 
+  ; Save the position into the velocity
   lda ActorPX,x
   sta ActorVX,x
   lda ActorPY,x
   sta ActorVY,x
-  stz ActorVarA,x
+  stz ActorVarA,x ; Increasing radius
+  lda #1
+  sta ActorVarB,x ; First explosion actor
 
   lda #Actor::PlayerProjectile16x16*2
   sta ActorType,x
@@ -2697,8 +2700,13 @@ Flipped:
     lda ActorPY,x
     sta ActorPY,y
     sta ActorVY,y
-    lda #0
+    seta8
+    lda ActorDynamicSlot,x
+    sta ActorDynamicSlot,y
+    seta16
+    tdc ; Clear accumulator
     sta ActorVarA,y
+    sta ActorVarB,y ; Second explosion actor
   :
   rtl
 .endproc
