@@ -1044,6 +1044,10 @@ Loop:
   clc
   rtl
 Found:
+  seta8
+  lda #255
+  sta ActorDynamicSlot,x
+  seta16
   sec
   rtl
 .endproc

@@ -89,7 +89,7 @@
   LevelActorPointer: .res 3 ; actor pointer for this level
 
 .segment "BSS" ; First 8KB of RAM
-  ActorSize = 10*2+5
+  ActorSize = 10*2+6
   ActorStart: .res ActorLen*ActorSize
   ActorEnd:
   ; Must be contiguous
@@ -111,6 +111,7 @@
   ActorOnGround     = 22 ; Nonzero means on ground
   ActorOnScreen     = 23 ; Nonzero means on screen
   ActorDamage       = 24 ; Amount of damage the actor has
+  ActorDynamicSlot  = 25 ; Dynamic sprite slot (0-7) or 255 if none
   ActorProjectileType = ActorIndexInLevel ; Safe to reuse, since this is only checked on normal actor slots
 
   ; For less important, light entities

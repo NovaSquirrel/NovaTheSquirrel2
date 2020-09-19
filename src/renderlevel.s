@@ -21,6 +21,7 @@
 .smart
 .global LevelBuf
 .import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
+.import ActorSafeRemoveX
 
 .segment "Player"
 
@@ -56,7 +57,7 @@
 
   lda RerenderInitEntities
   and #255
-  beq NoInitEntities
+  jeq NoInitEntities
 
   ; Teleports will not erase certain actor types
   ; in order to avoid letting teleports break things.
@@ -71,7 +72,7 @@
     beq @Preserve
     cmp #Actor::ActivePushBlock*2
     beq @Preserve
-    stz ActorType,x
+    jsl ActorSafeRemoveX
   @Preserve:
     txa
     add #ActorSize
@@ -81,6 +82,12 @@
     ; Done here, skip over the other clear code
     bra DidPreserveEntities
   DontPreserveEntities:
+
+  ; If not preserving anything, clear out the dynamic sprite allocations
+  stz DynamicSpriteSlotUsed+0
+  stz DynamicSpriteSlotUsed+2
+  stz DynamicSpriteSlotUsed+4
+  stz DynamicSpriteSlotUsed+6
 
   ; Init actors
   ldx #ActorStart

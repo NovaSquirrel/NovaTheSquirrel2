@@ -25,6 +25,7 @@
 .import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorWalk, ActorFall, ActorAutoBump
 .import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256
+.import ActorSafeRemoveY
 
 .assert ^ChangeToExplosion = ^RunPlayerProjectile, error, "Player projectiles and other actors should share a bank"
 
@@ -1121,11 +1122,15 @@ StunAndRemove:
   sta ActorTimer,x
 
   ldy ProjectileIndex
-  lda #0
-  sta ActorType,y
-  rtl
+  jml ActorSafeRemoveY
 
 Bump:
+  ; Must be moving in order to bump
+  lda ActorVX,y
+  ora ActorVY,y
+  bne :+
+    rtl
+  :
   lda #.loword(-$30)
   sta ActorVY,x
 BumpStunOnly:
@@ -1144,20 +1149,17 @@ Kill:
   jml ActorBecomePoof
 
 DamageALittle:
-  lda #0
-  sta ActorType,y
+  jsl ActorSafeRemoveY
   lda #$04
   bra AddDamage  
 
 DamageAndRemoveHalf:
-  lda #0
-  sta ActorType,y
+  jsl ActorSafeRemoveY
   lda #$08
   bra AddDamage
 
 DamageAndRemove:
-  lda #0
-  sta ActorType,y
+  jsl ActorSafeRemoveY
 Damage:
   lda #$10
 
@@ -1238,7 +1240,7 @@ Hook:
 
 ; Look up the enemy's type and copy the corresponding ability
 Copy:
-  lda #0
+  lda #0 ; <--- only the copy projectile copies, so don't need ActorSafeRemoveY
   sta ActorType,y
 
   ; Find the enemy's type

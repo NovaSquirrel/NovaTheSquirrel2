@@ -97,8 +97,8 @@ Loop:
     abs
     cmp #$2000 ; How about two screens of distance does it?
     bcc :+
+      jsl ActorSafeRemoveX
       pla
-      stz ActorType,x ; Zero the type
       bra SkipEntity   ; Skip doing anything else with this entity since it no longer exists
     :
     pla
@@ -397,7 +397,10 @@ Loop:
 Found:
   lda #$ffff
   sta ActorIndexInLevel,x
-  stz ActorState,x
+  seta8
+  sta ActorDynamicSlot,x
+  seta16
+  stz ActorState,x ; Also zeros ActorOnGround
   sec
   rtl
 .endproc
@@ -419,8 +422,11 @@ Loop:
 Found:
   lda #$ffff
   sta ActorIndexInLevel,y
+  seta8
+  sta ActorDynamicSlot,y
+  seta16
   tdc ; A = 0
-  sta ActorState,y
+  sta ActorState,y ; Also zeros ActorOnGround
   sec
   rtl
 .endproc
@@ -877,8 +883,7 @@ OnlyGroundCheck:
     bcc :+
     cmp #$ffff - 2*256
     bcs :+
-      stz ActorType,x
-      rtl
+      jml ActorSafeRemoveX
   :
 
   jmp ActorCheckStandingOnSolid
@@ -1109,7 +1114,7 @@ NoBump:
   bcs Good
   cmp #32*256
   bcc Good
-  stz ActorType,x
+  jml ActorSafeRemoveX
 Good:
   rtl
 .endproc
@@ -1125,7 +1130,7 @@ Good:
   bcs Good
   cmp #40*256
   bcc Good
-  stz ActorType,x
+  jml ActorSafeRemoveX
 Good:
   rtl
 .endproc
@@ -2206,5 +2211,39 @@ Loop:
   sta ActorPX,y
   lda ActorPY,x
   sta ActorPY,y
+  rtl
+.endproc
+
+; Removes an actor, but also marks any used dynamic sprite slots as free
+.export ActorSafeRemoveX
+.a16
+.i16
+.proc ActorSafeRemoveX
+  stz ActorType,x
+
+  tdc ; Clear all of accumulator
+  seta8
+  lda ActorDynamicSlot,x  ; 255 is used to mark an empty slot
+  bmi NoAllocation
+    phx
+    tax
+    dec DynamicSpriteSlotUsed,x
+    bpl :+ ; If it rolls over to -1, just reset to zero
+      stz DynamicSpriteSlotUsed,x
+    :
+    plx
+    lda #255 ; Just in case - don't try to free it a second time
+    sta ActorDynamicSlot,x
+  NoAllocation:
+  seta16
+  rtl
+.endproc
+
+.export ActorSafeRemoveY
+.proc ActorSafeRemoveY
+  phx
+  tyx
+  jsl ActorSafeRemoveX
+  plx
   rtl
 .endproc

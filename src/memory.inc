@@ -154,6 +154,7 @@ ProjectileLen = 8
 .globalzp ActorOnScreen
 .globalzp ActorDamage
 .globalzp ActorProjectileType
+.globalzp ActorDynamicSlot
 .global ProjectileStart
 .global ProjectileEnd
 

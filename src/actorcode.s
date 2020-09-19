@@ -30,12 +30,12 @@ CommonTileBase = $40
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
-.import ActorTurnAround
+.import ActorTurnAround, ActorSafeRemoveX
 .import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
 .import PlayerActorCollision, TwoActorCollision
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
-.import ActorNegIfLeft
+.import ActorNegIfLeft, AllocateDynamicSpriteSlot
 .import GetAngle512
 .import ActorTryUpInteraction, ActorTryDownInteraction, ActorBumpAgainstCeiling
 
@@ -2659,6 +2659,18 @@ Flipped:
 .export ChangeToExplosion
 .proc ChangeToExplosion
   sta ActorTimer,x
+  bit ActorDynamicSlot-1
+  bmi AlreadyDynamic
+    jsl AllocateDynamicSpriteSlot
+    bcs :+
+      stz ActorType,x
+      rtl
+    :
+    seta8
+    sta ActorDynamicSlot,x
+    seta16
+  AlreadyDynamic:
+
   lda ActorPX,x
   sta ActorVX,x
   lda ActorPY,x
@@ -2669,6 +2681,8 @@ Flipped:
   sta ActorType,x
   lda #PlayerProjectileType::Explosion
   sta ActorProjectileType,x
+
+  ; Make a second poof
   jsl FindFreeProjectileY
   bcc :+
     lda ActorType,x
@@ -2780,7 +2794,7 @@ ThwaiteCosineTable:
 .proc ActorExpire
   dec ActorTimer,x
   bne :+
-    stz ActorType,x
+    jsl ActorSafeRemoveX
   :
   rts
 .endproc
@@ -2791,7 +2805,9 @@ ThwaiteCosineTable:
 .proc ActorBecomePoof
   phx
   lda ActorType,x
-  stz ActorType,x
+  pha
+  jsl ActorSafeRemoveX
+  pla
   tax
   .import ActorHeight
   lda f:ActorHeight,x
