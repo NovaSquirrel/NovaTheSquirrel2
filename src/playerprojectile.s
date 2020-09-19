@@ -1053,11 +1053,13 @@ Divide:
   cmp #Block::Ice
   beq ExplodeBlock
 
+ExpireThen:
   jsr ActorExpire
   rtl
 ExplodeBlock:
   tdc
-  jml ChangeBlock
+  jsl ChangeBlock
+  bra ExpireThen
 .endproc
 
 .pushseg
