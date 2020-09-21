@@ -25,7 +25,7 @@
 .import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorWalk, ActorFall, ActorAutoBump
 .import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256
-.import ActorSafeRemoveY
+.import ActorSafeRemoveY, BlockRunInteractionBelow
 
 .assert ^ChangeToExplosion = ^RunPlayerProjectile, error, "Player projectiles and other actors should share a bank"
 
@@ -1047,11 +1047,16 @@ Divide:
   ; Explode certain types
   ldy ActorPY,x
   lda ActorPX,x
+  ; Or try running their "below" interactions at least?
+  phx
   jsl GetLevelPtrXY
-  cmp #Block::Bricks
-  beq ExplodeBlock
-  cmp #Block::Ice
-  beq ExplodeBlock
+  jsl GetBlockFlag
+  jsl BlockRunInteractionBelow
+  plx
+;  cmp #Block::Bricks
+;  beq ExplodeBlock
+;  cmp #Block::Ice
+;  beq ExplodeBlock
 
 ExpireThen:
   jsr ActorExpire
