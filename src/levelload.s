@@ -146,10 +146,9 @@ StartLevelFromDoor = StartLevel::FromDoor
 
   seta8
   ; Clear a bunch of stuff in one go that's in contiguous space in memory
-  ldx #LevelZeroWhenLoad_End-LevelZeroWhenLoad_Start-1
-: stz LevelZeroWhenLoad_Start,x
-  dex
-  bpl :-
+  ldx #LevelZeroWhenLoad_Start
+  ldy #LevelZeroWhenLoad_End-LevelZeroWhenLoad_Start
+  jsl MemClear
 
   ; Health
   lda #4

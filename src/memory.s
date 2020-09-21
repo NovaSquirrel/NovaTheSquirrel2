@@ -211,9 +211,20 @@ LevelZeroWhenLoad_Start:
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4
   PaletteInUseLast:    .res 4
+  ; The same, for the eight tileset slots
+  SpriteTilesInUse:     .res 8
+  SpriteTilesInUseLast: .res 8
+  SpriteTilesUseTime:   .res 8*2 ; Timestamp - a copy of framecount
+
   ; Dynamically uploading sprite palettes
-  PaletteRequestIndex: .res 1
+  PaletteRequestIndex: .res 1 ; 8-15, 0 if unused
   PaletteRequestValue: .res 1
+
+  ; And sprite tiles
+  SpriteTilesRequestDestination: .res 2 ; VRAM address
+  SpriteTilesRequestSource:      .res 3 ; Source address, zero if unused
+  ; Size is always 1KB
+
   PlayerOnLadder:      .res 1
   PlayerInWater:       .res 1
 

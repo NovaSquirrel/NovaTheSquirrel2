@@ -138,6 +138,7 @@ IRIS_EFFECT_END = 30
 .proc GameMainLoop
   phk
   plb
+  stz framecount
 forever:
   ; Draw the player to a display list in main memory
   setaxy16

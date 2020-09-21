@@ -39,6 +39,16 @@ SlopeY = 2
   sta PaletteInUseLast+0
   lda PaletteInUse+2
   sta PaletteInUseLast+2
+  lda SpriteTilesInUse+0
+  sta SpriteTilesInUseLast+0
+  lda SpriteTilesInUse+2
+  sta SpriteTilesInUseLast+2
+  lda SpriteTilesInUse+4
+  sta SpriteTilesInUseLast+4
+  lda SpriteTilesInUse+6
+  sta SpriteTilesInUseLast+6
+  lda SpriteTilesInUse+8
+  sta SpriteTilesInUseLast+8
 
   ; Load X with the actual pointer
   ldx #ActorStart
@@ -193,49 +203,75 @@ CallDraw:
 
   ; Get the desired tileset
   lda f:ActorGraphic,x
+  jmi UseZero ; Using $ffff to indicate a tileset is not needed
 
   ; Detect the correct tile base
   ; using an unrolled loop
   cmp SpriteTileSlots+2*0
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*0
+    inc SpriteTilesInUse+0
     lda #$100
-    bra FoundTileset
+    jmp FoundTileset
   :
   cmp SpriteTileSlots+2*1
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*1
+    inc SpriteTilesInUse+1
     lda #$120
     bra FoundTileset
   :
   cmp SpriteTileSlots+2*2
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*2
+    inc SpriteTilesInUse+2
     lda #$140
     bra FoundTileset
   :
   cmp SpriteTileSlots+2*3
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*3
+    inc SpriteTilesInUse+3
     lda #$160
     bra FoundTileset
   :
   cmp SpriteTileSlots+2*4
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*4
+    inc SpriteTilesInUse+4
     lda #$180
     bra FoundTileset
   :
   cmp SpriteTileSlots+2*5
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*5
+    inc SpriteTilesInUse+5
     lda #$1A0
     bra FoundTileset
   :
   cmp SpriteTileSlots+2*6
   bne :+
+    lda framecount
+    sta SpriteTilesUseTime+2*6
+    inc SpriteTilesInUse+6
     lda #$1C0
     bra FoundTileset
   :
   cmp SpriteTileSlots+2*7
-  bne :+
+  jne SpriteTilesNotFound
+    lda framecount
+    sta SpriteTilesUseTime+2*7
+    inc SpriteTilesInUse+7
     lda #$1E0
     bra FoundTileset
-  :
+
+UseZero:
   lda #0
 FoundTileset:
   sta SpriteTileBase
@@ -379,6 +415,96 @@ CallDraw:
   rts
 .endproc
 .popseg
+
+.a16
+.i16
+.proc SpriteTilesNotFound
+; 0 1 and 2 are used as a pointer we don't want to overwrite
+WantedGraphic = 4
+SmallestValue = 6
+SmallestIndex = 8
+  ; Attempt to load in the missing tileset dynamically
+  sta WantedGraphic ; Accumulator is f:ActorGraphic,x
+
+  lda SpriteTilesRequestSource+2
+  and #255
+  beq :+
+Fail:
+    ; Figure out what to do here?
+    jmp RunAllActors::FoundTileset
+  :
+
+  ; First look for empty slots
+  ; (and keep track of what the smallest index is)
+  ldy #2*8-2
+FindEmpty:
+  lda SpriteTileSlots,y ; $00ff marks empty slots currently
+  cmp #$00ff
+  beq FoundEmpty
+  dey
+  dey
+  bpl FindEmpty
+
+  ; -----------------------------------
+
+  ; If that fails, try to find the smallest slot
+  lda #$ffff
+  sta SmallestValue
+  stz SmallestIndex
+
+  phx
+  ldx #7
+  ldy #2*8-2
+FindSmallest:
+  lda SpriteTilesInUseLast,x
+  and #255
+  bne :+
+  lda SpriteTilesUseTime,y
+  cmp SmallestValue
+  bcs :+
+    sta SmallestValue
+    sty SmallestIndex
+  :
+  dex
+  dey
+  dey
+  bpl FindSmallest
+  plx
+
+  ; If it somehow couldn't find anything, fail
+  lda SmallestValue
+  ina
+  beq Fail
+
+  ; Okay, now we're ready
+  ldy SmallestIndex
+FoundEmpty:
+  ; Store the value into the correct spot
+  lda WantedGraphic
+  sta SpriteTileSlots,y
+
+  ; Multiply by 7 by subtracting the original value from value*8
+  phx
+  lda WantedGraphic
+  asl
+  asl
+  asl
+  sub WantedGraphic
+  tax
+  ; First three bytes are the pointer
+  .import GraphicsDirectory
+  lda f:GraphicsDirectory+0,x
+  sta SpriteTilesRequestSource+0
+  lda f:GraphicsDirectory+1,x
+  sta SpriteTilesRequestSource+1 ; Gets +2 too
+
+  tya ; Y = Sprite slot number * 2
+  xba
+  ora #$a000 >> 1
+  sta SpriteTilesRequestDestination
+  plx
+  jmp RunAllActors::FoundTileset
+.endproc
 
 .a16
 .i16

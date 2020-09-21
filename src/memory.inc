@@ -194,10 +194,11 @@ ParticleLen = 32
 .global SpritePaletteSlots
 .global BackgroundPaletteSlots
 .global GraphicalAssets
-.global PaletteInUse        ; For dynamically allocating palette slots
-.global PaletteInUseLast
-.global PaletteRequestIndex
-.global PaletteRequestValue
+.global PaletteInUse, PaletteInUseLast        ; For dynamically allocating palette slots
+.global SpriteTilesInUse, SpriteTilesInUseLast ; And sprite tileset slots
+.global SpriteTilesUseTime ; Framecount when the slot is used
+.global PaletteRequestIndex, PaletteRequestValue
+.global SpriteTilesRequestDestination, SpriteTilesRequestSource
 
 .global GraphicUploadOffset
 SpriteXYOffset = GraphicUploadOffset ; in the order X, Y

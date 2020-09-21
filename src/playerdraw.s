@@ -81,6 +81,8 @@
   lda YCOORD
   lsr
   bcs @TimeUp
+  bit VBLSTATUS ; Need to be in vblank
+  bpl @TimeUp
 
   ; -----------------------------------
   ; Is there an ability icon to copy in?

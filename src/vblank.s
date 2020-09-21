@@ -244,3 +244,38 @@ SkipBlock:
 
   ; -----------------------------------
   jsl PlayerFrameUpload
+
+  ; Lowest priority is loading in new sprite tilesets
+  seta8
+  lda SpriteTilesRequestSource+2 ; Won't have sources with a zero bank
+  beq @DontUploadSpriteTiles
+  bit PPUSTATUS2 ; Resets the flip flop for GETXY
+  bit GETXY
+  lda YCOORD
+  cmp #261-(8+1) ; Should measure how many scanlines are needed - there's less overhead than the ability tile update
+  bcs @DontUploadSpriteTiles
+  ; Read YCOORD a second time - if the high bit of the Y position is set, there is definitely not enough time
+  lda YCOORD
+  lsr
+  bcs @DontUploadSpriteTiles
+  bit VBLSTATUS ; Need to be in vblank
+  bpl @DontUploadSpriteTiles
+    lda SpriteTilesRequestSource
+    sta DMAADDR
+    seta16
+    lda SpriteTilesRequestSource+1
+    sta DMAADDRHI ; Gets the bank too
+    lda SpriteTilesRequestDestination
+    sta PPUADDR
+
+    lda #DMAMODE_PPUDATA
+    sta DMAMODE
+    lda #1024
+    sta DMALEN
+    seta8
+    lda #1
+    sta COPYSTART
+
+    stz SpriteTilesRequestSource+2 ; Bank
+  @DontUploadSpriteTiles:
+  seta16
