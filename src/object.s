@@ -49,6 +49,13 @@ SlopeY = 2
   sta SpriteTilesInUseLast+6
   lda SpriteTilesInUse+8
   sta SpriteTilesInUseLast+8
+  ; Prepare for the next frame
+  stz PaletteInUse+0
+  stz PaletteInUse+2
+  stz SpriteTilesInUse+0
+  stz SpriteTilesInUse+2
+  stz SpriteTilesInUse+4
+  stz SpriteTilesInUse+6
 
   ; Load X with the actual pointer
   ldx #ActorStart
