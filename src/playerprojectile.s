@@ -317,6 +317,23 @@ DoExplode:
   inc 0
   beq DoExplode
 
+  ; Make smoke particle repeatedly
+  lda framecount
+  and #3
+  bne :+
+    jsl FindFreeParticleY
+    bcc :+
+      lda #Particle::SmokeParticle
+      sta ParticleType,y
+      lda ActorPX,x
+      sta ParticlePX,y
+      lda ActorPY,x
+      sub #8*16
+      sta ParticlePY,y
+      lda #25
+      sta ParticleTimer,y
+  :
+
   jml ActorApplyXVelocity
 
 Stationary:
