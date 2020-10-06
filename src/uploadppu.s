@@ -105,6 +105,7 @@ Exit:
 
   ; -----------------------------------
   ; Counter for how many times to do this
+  seta16
   txa
   lsr
   lsr
