@@ -1062,23 +1062,50 @@ Divide:
   sta ActorPY,x
 
   ; Explode certain types
-  ldy ActorPY,x
+  lda ActorPY,x
+  sub #$0060
+  tay
   lda ActorPX,x
-  ; Or try running their "below" interactions at least?
+  sub #$0060
+  jsr InteractWithBlock
+
+  lda ActorPY,x
+  sub #$0060
+  tay
+  lda ActorPX,x
+  add #$0060
+  jsr InteractWithBlock
+
+  lda ActorPY,x
+  add #$0060
+  tay
+  lda ActorPX,x
+  sub #$0060
+  jsr InteractWithBlock
+
+  lda ActorPY,x
+  add #$0060
+  tay
+  lda ActorPX,x
+  add #$0060
+  jsr InteractWithBlock
+
+ExpireThen:
+  jsr ActorExpire
+  rtl
+
+InteractWithBlock:
   phx
   jsl GetLevelPtrXY
   jsl GetBlockFlag
   jsl BlockRunInteractionBelow
   plx
-;  cmp #Block::Bricks
-;  beq ExplodeBlock
-;  cmp #Block::Ice
-;  beq ExplodeBlock
-
-ExpireThen:
-  jsr ActorExpire
-  rtl
+  ; Insert additional types the Below interaction doesn't do
+  cmp #Block::Ice
+  beq ExplodeBlock
+  rts
 ExplodeBlock:
+  pla ; Pop the return address off
   tdc
   jsl ChangeBlock
   bra ExpireThen

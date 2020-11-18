@@ -533,7 +533,6 @@ BombBelow:
     lda PlayerDir
     sta ActorDirection,x
     seta16
-    stz PlayerVY
     jsr AbilityPositionProjectile16x16
   NoBombBelow:
   rts
