@@ -507,7 +507,10 @@ PlayerIsntOnLadder:
   ; (Determine if solid all must be set, or solid top)
   lda #$8000
   sta BottomCmp
-  lda PlayerVY
+  lda PlayerOnLadder ; On a ladder, one-way platforms are still solid below you
+  and #255
+  bne LadderDropThroughFix
+  lda PlayerVY ; When not on a ladder, it's determined by the player's vertical speed
   bmi :+
     seta8
     stz PlayerJumping
@@ -515,6 +518,7 @@ PlayerIsntOnLadder:
     lda PlayerPY
     and #$80
     bne :+
+LadderDropThroughFix:
       lda #$4000
       sta BottomCmp
   :
@@ -893,7 +897,8 @@ OfferJumpFromGracePeriod:
     seta8
     stz PlayerOnLadder
     stz JumpGracePeriod
-    inc PlayerJumping
+    lda #1
+    sta PlayerJumping
     seta16
     lda #.loword(-$50)
     sta PlayerVY
