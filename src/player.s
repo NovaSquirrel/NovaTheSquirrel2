@@ -111,6 +111,8 @@ MaxSpeedRight = 12
     bra CantAttack
   :
 
+  lda NeedAbilityChange
+  bne :+
   lda keynew
   and #AttackKeys
   beq :+
