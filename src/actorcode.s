@@ -2610,12 +2610,11 @@ Flipped:
   add ParticlePY,x
   sta ParticlePY,x
   cmp #256*32
-  bcc :+
-    stz ParticleType,x
-  :
+  bcs Erase
 
   dec ParticleTimer,x
   bne :+
+Erase:
     stz ParticleType,x
   :
 
