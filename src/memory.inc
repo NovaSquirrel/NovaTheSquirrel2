@@ -37,6 +37,7 @@
 .global PlayerNeedsGroundAtAttack
 .globalzp PlayerWalkLock
 .globalzp PlayerDownTimer
+.global PlayerDownRecently
 .globalzp PlayerJumping
 .globalzp OamPtr
 .globalzp TempVal

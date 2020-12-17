@@ -737,6 +737,7 @@ No:
 
     lda #.loword(-$20)
     sta ActorVY,x
+    stz ActorVarC,x
 
     seta8
     lda TailAttackDirection
@@ -751,6 +752,12 @@ No:
     beq :+
       lda #<(-$38)
       sta ActorVY,x
+
+      lda PlayerDownRecently ; Go straight up if down+up+attack is used
+      sta ActorVarC,x
+      beq :+
+		lda #<(-$58)
+		sta ActorVY,x
     :
 
     lda PlayerDir

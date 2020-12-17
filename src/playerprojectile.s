@@ -630,6 +630,8 @@ TilesB:
 
   jsl ActorFall
   bcs :+
+    lda ActorVarC,x ; Don't move forward if variable C is set
+    bne :+
     lda #$50
     jsl ActorWalk
     jsl ActorAutoBump
@@ -837,7 +839,12 @@ NoTarget:
   sta ThisAngle,x
   asl
   tay
-  lda #1
+  lda PlayerWasRunning ; Go faster when holding the run button?
+  and #255
+  cmp #1 ; Must be nonzero
+  lda #0
+  rol
+  add #1
   jsl SpeedAngle2Offset256
   ; Results in
   ; 0,1,2 X

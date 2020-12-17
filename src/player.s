@@ -57,8 +57,15 @@ MaxSpeedRight = 12
   countdown PlayerInWater
   countdown PlayerInvincible
   countdown PlayerWalkLock
+  countdown PlayerDownRecently
   stz PlayerOnSlope
 
+  lda keydown+1
+  and #>(KEY_DOWN)
+  beq :+
+    lda #20
+    sta PlayerDownRecently
+  :
 
   ; Tap run
   lda UseTapRun
