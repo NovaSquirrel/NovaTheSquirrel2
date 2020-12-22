@@ -1015,8 +1015,11 @@ Loop:
   sta NTADDR+1
   lda #0 | (InventoryTilemapText >> 9) ; Text
   sta NTADDR+2
+  stz BGCHRADDR+0                      ; Both 4bpp layers at the start
   lda #$c>>1
   sta BGCHRADDR+1                      ; Text CHR at $d000
+  lda #$8000 >> 14
+  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
 
   ; Reset all scrolling
   ldx #2*3-1

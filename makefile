@@ -259,8 +259,8 @@ $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 #	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
 
 
-$(bgdir)/%.chrsfc: $(bgdir)/%.png
-	$(PY) tools/makebackgroundmap.py $<e
+$(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
+	$(PY) tools/makebackgroundmap.py $<
 tools/M7Tileset.chrm7: tools/M7Tileset.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py

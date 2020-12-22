@@ -46,7 +46,7 @@
   sta DMALEN+$00
   sta DMALEN+$10
 
-  lda #($8000)>>1
+  lda #(SpriteCHRBase+$000)>>1
   sta PPUADDR
   seta8
   lda #^PlayerGraphics
@@ -58,7 +58,7 @@
 
   ; Bottom row -------------------
   seta16
-  lda #($8200)>>1
+  lda #(SpriteCHRBase+$200)>>1
   sta PPUADDR
   seta8
   lda #%00000010
@@ -108,7 +108,7 @@
     sta DMALEN+$10
 
     ; Top row ----------------------
-    lda #($8100)>>1
+    lda #(SpriteCHRBase+$100)>>1
     sta PPUADDR
     seta8
     lda #%00000001
@@ -116,7 +116,7 @@
 
     ; Bottom row -------------------
     seta16
-    lda #($8300)>>1
+    lda #(SpriteCHRBase+$300)>>1
     sta PPUADDR
     seta8
     lda #%00000010
@@ -141,7 +141,7 @@
 
     lda #1024 ; Two rows of tiles
     sta DMALEN
-    lda #($8400)>>1
+    lda #(SpriteCHRBase+$400)>>1
     sta PPUADDR
     seta8
     lda #%00000001

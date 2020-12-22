@@ -507,7 +507,7 @@ FoundEmpty:
 
   tya ; Y = Sprite slot number * 2
   xba
-  ora #$a000 >> 1
+  ora #(SpriteCHRBase+$2000) >> 1
   sta SpriteTilesRequestDestination
   plx
   jmp RunAllActors::FoundTileset

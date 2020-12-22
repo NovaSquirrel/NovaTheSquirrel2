@@ -5,13 +5,13 @@ from PIL import Image
 # Palette to use
 palette_base = 7
 # Tile number the background tiles start at
-tile_number_base = 1024 - 256
+tile_number_base = 256
 
 # Base value for a tilemap value
 tile_base = (palette_base<<10) | tile_number_base
 
-# Tiles that are completely solid
-all_solid = [("%x" % i) * 64 for i in range(16)]
+## Tiles that are completely solid
+#all_solid = [("%x" % i) * 64 for i in range(16)]
 
 def tilestring_hflip(ts):
 	out = []
@@ -74,33 +74,33 @@ def convert(f):
 					imtile = im.crop((screenw*256+tw*8, screenh*256+th*8, screenw*256+tw*8+8, screenh*256+th*8+8))
 					tilestring = ''.join(['%x' % p for p in imtile.getdata()])
 
-					if tilestring in all_solid:
-						row.append((palette_base<<10) | all_solid.index(tilestring))
-						continue
+#					if tilestring in all_solid:
+#						row.append((palette_base<<10) | all_solid.index(tilestring))
+#						continue
 
 					if tilestring in all_tiles:
-						row.append(tile_base | all_tiles.index(tilestring))
+						row.append(tile_base + all_tiles.index(tilestring))
 						continue
 
 					# Test for tiles that can be saved with flips
 					tilestring_h = tilestring_hflip(tilestring)
 					if tilestring_h in all_tiles:
-						row.append(0x4000 | tile_base | all_tiles.index(tilestring_h))
+						row.append(0x4000 + tile_base + all_tiles.index(tilestring_h))
 						flips += 1
 						continue
 					tilestring_v = tilestring_vflip(tilestring)
 					if tilestring_v in all_tiles:
-						row.append(0x8000 | tile_base | all_tiles.index(tilestring_v))
+						row.append(0x8000 + tile_base + all_tiles.index(tilestring_v))
 						flips += 1
 						continue
 					tilestring_hv = tilestring_hflip(tilestring_v)
 					if tilestring_hv in all_tiles:
-						row.append(0xc000 | tile_base | all_tiles.index(tilestring_hv))
+						row.append(0xc000 + tile_base + all_tiles.index(tilestring_hv))
 						flips += 1
 						continue
 
 					all_tiles.append(tilestring)
-					row.append(tile_base | all_tiles.index(tilestring))
+					row.append(tile_base + all_tiles.index(tilestring))
 
 				background_tilemap.append(row)
 

@@ -534,7 +534,7 @@ SpriteLoop:
   lda ForegroundLayerThree
   bne :+
     ; Clear layer 3
-    ldx #$e000 >> 1
+    ldx #ExtraBG >> 1
     ldy #32*4
     jsl ppu_clear_nt
   :
@@ -550,30 +550,31 @@ SpriteLoop:
   lda #1
   sta BGMODE       ; mode 1
 
-  stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
-  lda #$e>>1
+  lda #($4>>1)<<4
+  sta BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
+  lda #$4>>1
   sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
 
-  lda #$8000 >> 14
-  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
+  lda #SpriteCHRBase >> 14
+  sta OBSEL      ; sprite CHR at $c000, sprites are 8x8 and 16x16
 
-  lda #1 | ($c000 >> 9)
-  sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
+  lda #1 | (ForegroundBG >> 9)
+  sta NTADDR+0   ; plane 0 nametable at $b000, 2 screens wide
   tdc
   lda LevelBackgroundId
   tax
   .import BackgroundFlags
   lda f:BackgroundFlags,x
   and #3
-  ora #$d000 >> 9
-  sta NTADDR+1   ; plane 1 nametable also at $d000, size specified by BackgroundFlags
+  ora #BackgroundBG >> 9
+  sta NTADDR+1   ; plane 1 nametable at $a000, size specified by BackgroundFlags
   lda TwoLayerLevel ; Force two screens wide on two-layer levels
   beq :+
-    lda #1 | ($d000 >> 9)
+    lda #1 | (BackgroundBG >> 9)
     sta NTADDR+1   ; plane 0 nametable at $d000, 2 screens wide  
   :
-  lda #0 | ($e000 >> 9)
-  sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
+  lda #0 | (ExtraBG >> 9)
+  sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
 
   stz PPURES
   lda #%00010011  ; enable sprites, plane 0 and 1
@@ -588,6 +589,7 @@ SpriteLoop:
 
   lda ForegroundLayerThree
   beq :+
+    ; TODO
     lda #1 | ($f000 >> 9)
     sta NTADDR+2    ; plane 2 nametable at $f000, 2 screens wide
     ; Tiles go on $e000 still
@@ -612,6 +614,7 @@ SpriteLoop:
     sta BLENDSUB
   :
 
+  ; Make sure to synchronize these with wherever the toggle blocks are located!
   lda ToggleSwitch1
   beq :+
     ldx #$4a00>>1
@@ -962,14 +965,14 @@ TileNumbers:
   plx
   rtl
 Addresses:
-  .word $9000>>1
-  .word $9100>>1
-  .word $9400>>1
-  .word $9500>>1
-  .word $9800>>1
-  .word $9900>>1
-  .word $9C00>>1
-  .word $9D00>>1
+  .word (SpriteCHRBase+$1000)>>1
+  .word (SpriteCHRBase+$1100)>>1
+  .word (SpriteCHRBase+$1400)>>1
+  .word (SpriteCHRBase+$1500)>>1
+  .word (SpriteCHRBase+$1800)>>1
+  .word (SpriteCHRBase+$1900)>>1
+  .word (SpriteCHRBase+$1C00)>>1
+  .word (SpriteCHRBase+$1D00)>>1
 .endproc
 
 ; Queues a DMA to happen during the next vblank

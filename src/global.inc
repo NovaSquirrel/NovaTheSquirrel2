@@ -3,9 +3,13 @@ LEVEL_WIDTH = 256
 LEVEL_HEIGHT = 32
 LEVEL_TILE_SIZE = 2
 
-ForegroundBG = $C000
-BackgroundBG = $D000
-ExtraBG = $E000
+ForegroundBG = $B000
+BackgroundBG = $A000
+ExtraBG = $9800
+SpriteCHRBase = $C000
+BG1CHRBase = $0000
+BG2CHRBase = $4000
+BG3CHRBase = $4000
 
 PlayerHeight = 16*16+14*16
 
