@@ -1306,7 +1306,7 @@ Shift:
   lsr
   lsr
   lsr
-  add #.loword(-($8000 >> 4))
+  adc #.loword(-($8000 >> 4))
   rts
 .endproc
 
