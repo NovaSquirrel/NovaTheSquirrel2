@@ -202,6 +202,7 @@
   lsr
   lsr
   lsr
+  adc #0
 HaveY:
   sta 2
 
@@ -415,6 +416,7 @@ XToPixels:
   lsr
   lsr
   lsr
+  adc #0
   sta 0
   rts
 .endproc

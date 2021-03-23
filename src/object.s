@@ -1274,6 +1274,7 @@ Good:
 .a16
 .proc ActorDrawPosition
   lda ActorPX,x
+  dea           ; <--- Seems to be required to make sprite positions and scroll positions round the same?
   sub ScrollX
   cmp #.loword(-1*256)
   bcs :+
@@ -1314,6 +1315,7 @@ Shift:
 .a16
 .proc ActorDrawPositionMeta
   lda ActorPX,x
+  dea           ; <--- Seems to be required to make sprite positions and scroll positions round the same?
   sub ScrollX
   cmp #.loword(-1*256)
   bcs :+
