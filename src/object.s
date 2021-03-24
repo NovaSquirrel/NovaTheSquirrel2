@@ -1269,19 +1269,92 @@ Good:
 .endproc
 
 
-; Calculate the position of the Actor on-screen
+; Calculate the position of the 16x16 Actor on-screen
 ; and whether it's visible in the first place
 .a16
-.proc ActorDrawPosition
+.proc ActorDrawPosition16x16
   lda ActorPX,x
-  dea           ; <--- Seems to be required to make sprite positions and scroll positions round the same?
+  lsr
+  lsr
+  lsr
+  lsr
+  sub FGScrollXPixels
+  sub #8
+  cmp #.loword(-1*16)
+  bcs :+
+  cmp #256
+  bcs Invalid
+: sta 0
+
+  lda ActorPY,x
+  lsr
+  lsr
+  lsr
+  lsr
+  adc #0 ; Why do I need to round Y and not X?
+  sub FGScrollYPixels
+  sub #17
+  cmp #.loword(-1*16)
+  bcs :+
+  cmp #15*16
+  bcs Invalid
+: sta 2
+  sec
+  rts
+Invalid:
+  clc
+  rts
+.endproc
+
+; Calculate the position of the 8x8 Actor on-screen
+; and whether it's visible in the first place
+.a16
+.proc ActorDrawPosition8x8
+  lda ActorPX,x
+  lsr
+  lsr
+  lsr
+  lsr
+  sub FGScrollXPixels
+  sub #4
+  cmp #.loword(-1*16)
+  bcs :+
+  cmp #256
+  bcs Invalid
+: sta 0
+
+  lda ActorPY,x
+  lsr
+  lsr
+  lsr
+  lsr
+  adc #0 ; Why do I need to round Y and not X?
+  sub FGScrollYPixels
+  sub #9
+  cmp #.loword(-1*16)
+  bcs :+
+  cmp #15*16
+  bcs Invalid
+: sta 2
+  sec
+  rts
+Invalid:
+  clc
+  rts
+.endproc
+
+; For meta sprites
+; TODO: Don't round the object and camera positions together
+.a16
+.proc ActorDrawPositionMeta
+  lda ActorPX,x
   sub ScrollX
   cmp #.loword(-1*256)
   bcs :+
-  cmp #16*256
-  bcs Invalid
+  cmp #17*256
+  bcs ActorDrawPosition16x16::Invalid
 : jsr Shift
-  sub #8
+  ; No hardcoded offset
   sta 0
 
   lda ActorPY,x
@@ -1289,16 +1362,13 @@ Good:
   ; TODO: properly allow sprites to be partially offscreen on the top
 ;  cmp #.loword(-1*256)
 ;  bcs :+
-  cmp #15*256
-  bcs Invalid
+  cmp #16*256
+  bcs ActorDrawPosition16x16::Invalid
   jsr Shift
-  sub #16
+  ; No hardcoded offset
   sta 2
 
   sec
-  rts
-Invalid:
-  clc
   rts
 
 Shift:
@@ -1307,36 +1377,7 @@ Shift:
   lsr
   lsr
   lsr
-  adc #.loword(-($8000 >> 4))
-  rts
-.endproc
-
-; For meta sprites
-.a16
-.proc ActorDrawPositionMeta
-  lda ActorPX,x
-  dea           ; <--- Seems to be required to make sprite positions and scroll positions round the same?
-  sub ScrollX
-  cmp #.loword(-1*256)
-  bcs :+
-  cmp #17*256
-  bcs ActorDrawPosition::Invalid
-: jsr ActorDrawPosition::Shift
-  ; No hardcoded offset
-  sta 0
-
-  lda ActorPY,x
-  sub ScrollY
-  ; TODO: properly allow sprites to be partially offscreen on the top
-;  cmp #.loword(-1*256)
-;  bcs :+
-  cmp #16*256
-  bcs ActorDrawPosition::Invalid
-  jsr ActorDrawPosition::Shift
-  ; No hardcoded offset
-  sta 2
-
-  sec
+  add #.loword(-($8000 >> 4))
   rts
 .endproc
 
@@ -1356,7 +1397,7 @@ Shift:
 
   ldy OamPtr
 
-  jsr ActorDrawPosition
+  jsr ActorDrawPosition16x16
   bcs :+
     seta8
     stz ActorOnScreen,x
@@ -1485,8 +1526,7 @@ Finish:
 .proc DispActor8x8
   sta 4
 
-  lda #$0804
-  sta SpriteXYOffset
+  stz SpriteXYOffset
 CustomOffset:
   ; If facing left, set the X flip bit
   lda ActorDirection,x ; Ignore high byte
@@ -1498,7 +1538,7 @@ CustomOffset:
 
   ldy OamPtr
 
-  jsr ActorDrawPosition
+  jsr ActorDrawPosition8x8
   bcs :+
     rtl
   :

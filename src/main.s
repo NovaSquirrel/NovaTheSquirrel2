@@ -73,6 +73,7 @@ IRIS_EFFECT_END = 30
   phk
   plb
 
+
   ; Clear the first 512 bytes manually here
   ldx #512-1
 : stz 0, x
@@ -114,6 +115,15 @@ IRIS_EFFECT_END = 30
   stz CGDATA
   dex
   bne :-
+  ; Clear VRAM too
+  seta16
+  stz PPUADDR
+  ldx #$8000
+: stz PPUDATA
+  dex
+  bne :-
+
+
 
   setaxy16
 
@@ -237,7 +247,30 @@ DelayedBlockLoop:
 ;  bcc :+
     jsl RunPlayer
 ;  :
+
   jsl AdjustCamera
+
+  ; Calculate the scroll positions ahead of time so their integer values are ready
+  lda ScrollX
+  lsr
+  lsr
+  lsr
+  lsr
+  sta FGScrollXPixels
+  lsr
+  sta BGScrollXPixels
+  ; ---
+  lda ScrollY
+  lsr
+  lsr
+  lsr
+  lsr
+  adc #0
+  dec a ; SNES displays lines 1-224 so shift it up to 0-223
+  sta FGScrollYPixels
+  lsr
+  add #128
+  sta BGScrollYPixels
 
   lda FG2OffsetX
   sta OldFG2OffsetX
@@ -282,7 +315,7 @@ DelayedBlockLoop:
 ;  lda RunGameLogic
 ;  lsr
 ;  bcc SkipActors
-  ; Move all of the actors that are standing on 
+  ; Move all of the actors that are standing on a second FG layer
   bit TwoLayerInteraction-1
   bpl @NotTwoLayerForActors
     ldx #ActorStart
@@ -379,59 +412,26 @@ padwait:
 
   ; Update scroll registers
   ; ---Primary foreground---
-  seta16
-  lda ScrollX
-  lsr
-  lsr
-  lsr
-  lsr
-  adc #0
-  sta 0
-  sta FGScrollXPixels
-
-  lda ScrollY
-  lsr
-  lsr
-  lsr
-  lsr
-  adc #0
-  dec a ; SNES displays lines 1-224 so shift it up to 0-223
-  sta 2
-  sta FGScrollYPixels
   seta8
-
-  lda 0
+  lda FGScrollXPixels+0
   sta BGSCROLLX
-  lda 1
+  lda FGScrollXPixels+1
   sta BGSCROLLX
-  lda 2
+  lda FGScrollYPixels+0
   sta BGSCROLLY
-  lda 3
+  lda FGScrollYPixels+1
   sta BGSCROLLY
 
-  ; ---Parallax background layer---
-  seta16
-  ; TODO: allow for different speeds?
-  lsr 0
-  lsr 2
-  lda 0
-  sta BGScrollXPixels
-
-  lda 2
-  add #128
-  sta 2
-  sta BGScrollYPixels
-  seta8
   lda TwoLayerLevel
   eor ForegroundLayerThree
   bne :+
-    lda 0
+    lda BGScrollXPixels+0
     sta BGSCROLLX+2
-    lda 1
+    lda BGScrollXPixels+1
     sta BGSCROLLX+2
-    lda 2
+    lda BGScrollYPixels+0
     sta BGSCROLLY+2
-    lda 3
+    lda BGScrollYPixels+1
     sta BGSCROLLY+2
   :
 
@@ -466,7 +466,6 @@ SetScrollForTwoLayerLevel:
   lsr
   lsr
   lsr
-  adc #0
   sta 0
   sta FG2ScrollXPixels
 

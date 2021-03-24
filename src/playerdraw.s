@@ -192,17 +192,15 @@
 
   ; Y coordinate to pixels
   lda PlayerPY
-  sub ScrollY
-  cmp #(224*16)+(32*16)
+  lsr
+  lsr
+  lsr
+  lsr
+  sub FGScrollYPixels
+  cmp #224+32 ; Put the player offscreen if needed
   bcc :+
     lda #255
-    bra HaveY
   :
-  lsr
-  lsr
-  lsr
-  lsr
-  adc #0
 HaveY:
   sta 2
 
@@ -232,7 +230,7 @@ HaveY:
 
   lda 2
   sta PlayerDrawY
-  sub #16
+  sub #17
   sta OAM_YPOS+(4*2),x
   sta OAM_YPOS+(4*3),x
   sub #16
@@ -411,12 +409,11 @@ Exit:
 XToPixels:
   ; X coordinate to pixels
   lda PlayerPX
-  sub ScrollX
   lsr
   lsr
   lsr
   lsr
-  adc #0
+  sub FGScrollXPixels
   sta 0
   rts
 .endproc
