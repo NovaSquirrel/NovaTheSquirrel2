@@ -113,7 +113,8 @@ VblankHandler:
     stz RowUpdateAddress2
     ; --- First screen
     ; Set DMA parameters  
-    stx PPUADDR
+    tax
+    sta PPUADDR
     lda #DMAMODE_PPUDATA
     sta <DMAMODE
     lda #RowUpdateBuffer2

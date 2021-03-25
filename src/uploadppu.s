@@ -285,22 +285,6 @@ hi_source:
 .endproc
 
 ;;
-; Waits for the start of vertical blanking.
-.proc ppu_vsync
-  php
-  seta8
-loop1:
-  bit VBLSTATUS  ; Wait for leaving previous vblank
-  bmi loop1
-loop2:
-  bit VBLSTATUS  ; Wait for start of this vblank
-  bpl loop2
-  plp
-  rtl
-.endproc
-
-
-;;
 ; Uploads a specific graphic asset to VRAM
 ; @param A graphic number (0-255)
 .import GraphicsDirectory
@@ -551,9 +535,9 @@ SpriteLoop:
   sta BGMODE       ; mode 1
 
   lda #($4>>1)<<4
-  sta BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
+  sta BGCHRADDR+0  ; bg plane 0 CHR at $0000, plane 1 CHR at $4000
   lda #$4>>1
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $4000
 
   lda #SpriteCHRBase >> 14
   sta OBSEL      ; sprite CHR at $c000, sprites are 8x8 and 16x16
@@ -571,7 +555,10 @@ SpriteLoop:
   lda TwoLayerLevel ; Force two screens wide on two-layer levels
   beq :+
     lda #1 | (BackgroundBG >> 9)
-    sta NTADDR+1   ; plane 0 nametable at $d000, 2 screens wide  
+    sta NTADDR+1   ; plane 0 nametable at $d000, 2 screens wide
+    lda ForegroundLayerThree
+    bne :+
+     stz BGCHRADDR ; First two planes both at $0000
   :
   lda #0 | (ExtraBG >> 9)
   sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
