@@ -39,6 +39,18 @@
   eor 2
   and #$80
   beq NoUpdateColumn
+    ; Detect rightward movement even if wrapping to zero
+    lda 0
+    cmp #$0100
+    bcs :+
+    lda 2
+    cmp #$ff00
+    bcc :+
+    lda 0
+    jsr ToTiles
+    bra UpdateRight
+  :
+
     lda 0
     cmp 2
     jsr ToTiles
@@ -64,6 +76,18 @@
   eor 2
   and #$80
   beq NoUpdateRow
+    ; Detect downward movement even if wrapping to zero
+    lda 0
+    cmp #$0100
+    bcs :+
+    lda 2
+    cmp #$ff00
+    bcc :+
+    lda 0
+    jsr ToTiles
+    bra UpdateDown
+  :
+
     lda 0
     cmp 2
     jsr ToTiles
@@ -134,7 +158,7 @@ YPos = 6
   ; Take the Y position, rounded to blocks,
   ; as the column of level data to read
   lda Temp
-  and #<~1
+  and #(31*2) ; 32 blocks tall
   tay
 
   ; Generate the top or the bottom as needed
@@ -353,7 +377,10 @@ Loop:
   and #(32*2)-1
   tax
   stx TempVal
-: lda [LevelBlockPtr],y ; Get the next level tile
+: tya
+  and #31*2 ; Keep Y in range - 32 blocks tall?32 blocks tall?
+  tay
+  lda [LevelBlockPtr],y ; Get the next level tile
   iny
   iny
   phy
@@ -397,7 +424,10 @@ Loop:
   and #(32*2)-1
   tax
   stx TempVal
-: lda [LevelBlockPtr],y ; Get the next level tile
+: tya
+  and #31*2 ; Keep Y in range - 32 blocks tall?
+  tay
+  lda [LevelBlockPtr],y ; Get the next level tile
   iny
   iny
   phy
