@@ -259,7 +259,7 @@ $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png
-	$(PY) tools/makebackgroundmap.py $<e
+	$(PY) tools/makebackgroundmap.py $<
 tools/M7Tileset.chrm7: tools/M7Tileset.png
 	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 	$(PY) tools/mode7palette.py

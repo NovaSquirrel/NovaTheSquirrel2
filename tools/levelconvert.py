@@ -221,7 +221,6 @@ outfile.write('.include "paletteenum.s"\n')
 outfile.write('.include "backgroundenum.s"\n')
 outfile.write('.include "blockenum.s"\n')
 outfile.write('.include "leveldata.inc"\n\n')
-outfile.write('.include "levelenum.s"\n\n')
 outfile.write('.segment "LevelBank1"\n\n')
 
 for f in glob.glob("levels/*.json"):

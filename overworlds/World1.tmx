@@ -123,7 +123,7 @@
   </object>
   <object id="48" gid="137" x="96" y="160" width="16" height="16">
    <properties>
-    <property name="Level" value="bombertree"/>
+    <property name="Level" value="demo"/>
     <property name="Slot" type="int" value="4"/>
    </properties>
   </object>

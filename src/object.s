@@ -527,6 +527,7 @@ Wavy:
   jsl ActorApplyXVelocity
 
   ; Bump into enemy barriers
+  .if 0
   ldy ActorPY,x
   lda ActorPX,x
   jsl GetLevelPtrXY
@@ -536,6 +537,7 @@ Wavy:
     neg
     sta ActorVX,x
   :
+  .endif
 
   ; Stop if stunned
   lda ActorState,x ; Ignore high byte
