@@ -958,3 +958,27 @@ Stop:
   sta [MidPointer],y
   rts
 .endproc
+
+.export AutotileSkipEmpty
+.proc AutotileSkipEmpty
+Loop:
+  .repeat 4
+    iny
+    iny
+    cpy ChangeAtIndex
+    bcs Exit
+    lda [MidPointer],y
+    bne Exit
+  .endrep
+  iny
+  iny
+  cpy ChangeAtIndex
+  bcs Exit
+  lda [MidPointer],y
+  beq Loop
+Exit:
+  ; Back this up since it'll INY INY after this routine
+  dey
+  dey
+  rts
+.endproc
