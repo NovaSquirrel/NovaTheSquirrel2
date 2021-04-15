@@ -1205,3 +1205,27 @@ Value = BlockTemp+2
   :
   rts
 .endproc
+
+.a16
+.i16
+.export BlockIceMelt
+.proc BlockIceMelt
+  lda ActorType,x
+  cmp #Actor::PlayerProjectile16x16*2
+  beq :+
+  cmp #Actor::PlayerProjectile*2
+  bne Exit
+:
+
+  lda ActorProjectileType,x
+  cmp #PlayerProjectileType::FireBall
+  beq Melt
+  cmp #PlayerProjectileType::FireStill
+  bne Exit
+Melt:
+  ; Change to nothing
+  tdc
+  jsl ChangeBlock
+Exit:
+  rts
+.endproc

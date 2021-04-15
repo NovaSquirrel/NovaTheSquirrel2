@@ -136,6 +136,8 @@ t 7,4 7,4
 t 7,5 7,5
 
 +Ice
+when ActorSide, BlockIceMelt
+when ActorTopBottom, BlockIceMelt
 solid
 q 8,4
 
