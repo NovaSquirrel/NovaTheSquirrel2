@@ -54,5 +54,6 @@ E000 SPMoai
 E000 SPBubble
 E000 SPBurgerRider
 3800 FGTreehouse
+3A00 FGIndoorDecor
 8800 Mode7HUDSprites
 E000 SPLife

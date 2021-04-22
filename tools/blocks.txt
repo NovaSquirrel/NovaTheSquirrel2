@@ -13,6 +13,7 @@ alias special_push $5800
 alias fg_water $3400
 alias common_pal_sand $3800
 alias treehouse $3800
+alias common_pal_indoor_decor $3A00
 alias toggleblocks $4A00
 
 alias global_palette 1
@@ -739,6 +740,81 @@ t 4,0 5,0
 t 6,0 7,0
 
 #######################################
+# Small indoor decor, for treehouses
+#######################################
+base common_pal_indoor_decor
+palette global_palette
+tileset FGIndoorDecor
+
++IndoorBottles
+t 0:0 0:0
+t 0,0 1,0
+
++IndoorBottlesEmpty
+t 0:0 0:0
+t 2,0 2,0
+
++IndoorPebbles
+t 0:0 0:0
+t 4,0 5,0
+
++IndoorPebbles2
+t 0:0 0:0
+t 6,0 7,0
+
++IndoorBurger
+t 0:0 0:0
+t 0:0 8,0
+
++IndoorLeftBeef
+t 0:0 0:0
+t 8,0 11,0
+
++IndoorBurgerAndWater
+t 0:0 0:0
+t 8,0 0,0
+
++IndoorBucket
+t 0:0 0:0
+t 0:0 13,0
+
++IndoorStar
+t 0:0 0:0
+t 0:0 12,0
+
++IndoorBowls
+t 0:0 0:0
+t 10,0 11,0
+
++IndoorEmptyBowl
+t 0:0 0:0
+t 0:0 9,0
+
++IndoorBottleKnockedOver
+t 0:0 0:0
+t 3,0 0:0
+
++IndoorBottleLeft
+t 0:0 0:0
+t 2,0 0:0
+
++IndoorCushion
+t 0:0 0:0
+t 14,0 15,0
+
++IndoorBowlAndBucket
+t 0:0 0:0
+t 9,0 13,0
+
++IndoorHangingBuckets
+t 13,0 13,0
+t 0:0 0:0
+
++IndoorHangingStars
+t 12,0 12,0
+t 0:0 0:0
+
+#######################################
 # Terrain rocks
 #######################################
 base terrain_rocks
@@ -1409,3 +1485,12 @@ t 6,1 7,1
 +EnemyBarrier
 t 0:0 0:0
 t 0:0 0:0
+
+
+
+#################
+# Glass test I guess
+#################
+base 0
+palette 0
+
