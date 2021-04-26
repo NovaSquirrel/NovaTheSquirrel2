@@ -321,7 +321,8 @@ WasPushRight:
 
   ; Position it where the block is
   jsl GetBlockXCoord
-  ora #$80
+;  ora #$80 <-- was $80 for BlockPushForwardCleanup - why?
+  ora #$40 ; <-- Cancels out offset in object.s ParticleDrawPosition - maybe just not have the offset?
   sta ParticlePX,y
 
   ; For a 16x16 particle
@@ -1226,6 +1227,7 @@ Melt:
   ; Change to nothing
   tdc
   jsl ChangeBlock
+  jsr PoofAtBlock
 Exit:
   rts
 .endproc
