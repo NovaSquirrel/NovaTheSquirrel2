@@ -1343,6 +1343,60 @@ Invalid:
   rts
 .endproc
 
+; Calculate the position of the 8x8 Actor on-screen
+; and whether it's visible in the first place
+; Uses offsets from SpriteXYOffset
+.a16
+.proc ActorDrawPositionWithOffset8x8
+  lda SpriteXYOffset
+  and #255
+  bit #128 ; Sign extend
+  beq :+
+    ora #$ff00
+  :
+  sta 0
+  lda ActorPX,x
+  lsr
+  lsr
+  lsr
+  lsr
+  add 0
+  sub FGScrollXPixels
+  sub #4
+  cmp #.loword(-1*16)
+  bcs :+
+  cmp #256
+  bcs Invalid
+: sta 0
+
+  lda SpriteXYOffset+1
+  and #255
+  bit #128 ; Sign extend
+  beq :+
+    ora #$ff00
+  :
+  sta 2
+  lda ActorPY,x
+  lsr
+  lsr
+  lsr
+  lsr
+  adc #0 ; Why do I need to round Y and not X?
+  add 2
+  sub FGScrollYPixels
+  sub #9
+  cmp #.loword(-1*16)
+  bcs :+
+  cmp #15*16
+  bcs Invalid
+: sta 2
+  sec
+  rts
+Invalid:
+  clc
+  rts
+.endproc
+
 ; For meta sprites
 ; TODO: Don't round the object and camera positions together
 .a16
@@ -1352,7 +1406,7 @@ Invalid:
   cmp #.loword(-1*256)
   bcs :+
   cmp #17*256
-  bcs ActorDrawPosition16x16::Invalid
+  bcs ActorDrawPositionWithOffset8x8::Invalid
 : jsr Shift
   ; No hardcoded offset
   sta 0
@@ -1363,7 +1417,7 @@ Invalid:
 ;  cmp #.loword(-1*256)
 ;  bcs :+
   cmp #16*256
-  bcs ActorDrawPosition16x16::Invalid
+  bcs ActorDrawPositionWithOffset8x8::Invalid
   jsr Shift
   ; No hardcoded offset
   sta 2
@@ -1527,7 +1581,6 @@ Finish:
   sta 4
 
   stz SpriteXYOffset
-CustomOffset:
   ; If facing left, set the X flip bit
   lda ActorDirection,x ; Ignore high byte
   lsr
@@ -1536,12 +1589,12 @@ CustomOffset:
     tsb 4
   :
 
-  ldy OamPtr
-
   jsr ActorDrawPosition8x8
   bcs :+
     rtl
   :
+CustomOffset:
+  ldy OamPtr
 
   lda 4
   ora SpriteTileBase
@@ -1549,10 +1602,8 @@ CustomOffset:
 
   seta8
   lda 0
-  add SpriteXYOffset+0
   sta OAM_XPOS,y
   lda 2
-  add SpriteXYOffset+1
   sta OAM_YPOS,y
 
   ; Get the high bit of the calculated position and plug it in
@@ -1567,14 +1618,29 @@ CustomOffset:
   add #4
   sta OamPtr
   rtl
-
-WithOffset:
-  sta 4
-  bra CustomOffset
 .endproc
-DispActor8x8WithOffset = DispActor8x8::WithOffset
-.export DispActor8x8WithOffset
 
+; A = tile to draw
+; SpriteXYOffset = X,Y offsets
+.a16
+.proc DispActor8x8WithOffset
+  sta 4
+
+  ; If facing left, set the X flip bit
+  lda ActorDirection,x ; Ignore high byte
+  lsr
+  bcc :+
+    lda #OAM_XFLIP
+    tsb 4
+  :
+
+  jsr ActorDrawPositionWithOffset8x8
+  bcs :+
+    rtl
+  :
+  bra DispActor8x8::CustomOffset
+.endproc
+.export DispActor8x8WithOffset
 
 .a16
 .i16
