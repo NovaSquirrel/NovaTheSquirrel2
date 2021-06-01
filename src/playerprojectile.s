@@ -1121,7 +1121,7 @@ ExplodeBlock:
 .pushseg
 .segment "DynamicExplosion"
 DSExplosion:
-.incbin "../tilesets4/DSExplosion.chrsfc"
+.incbin "../tilesetsX/DSExplosion.chr"
 .popseg
 
 .include "actorframedefine.s"

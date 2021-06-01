@@ -4,6 +4,7 @@
 # Python Imaging Library
 #
 # Copyright 2014-2015 Damian Yerrick
+# Modified 2021 NovaSquirrel
 # Copying and distribution of this file, with or without
 # modification, are permitted in any medium without royalty
 # provided the copyright notice and this notice are preserved.
@@ -79,6 +80,8 @@ def pilbmp2chr(im, tileWidth=8, tileHeight=8,
 def parse_argv(argv):
     from optparse import OptionParser
     parser = OptionParser(usage="usage: %prog [options] [-i] INFILE [-o] OUTFILE")
+    parser.add_option("-f", "--flag-file", dest="flagfilename",
+                      help="read additional flags from FLAGFILE", metavar="FLAGFILE")
     parser.add_option("-i", "--image", dest="infilename",
                       help="read image from INFILE", metavar="INFILE")
     parser.add_option("-o", "--output", dest="outfilename",
@@ -97,6 +100,9 @@ def parse_argv(argv):
                       action="store_const", const="0", default="0;1")
     parser.add_option("--planes", dest="planes",
                       help="set the plane map (1bpp: 0) (NES: 0;1) (GB: 0,1) (SMS:0,1,2,3) (TG16/SNES: 0,1;2,3) (MD: 3210)")
+    parser.add_option("--rearrange-16x16", dest="rearrange16x16",
+                      help="for every four rows, swaps the second and third row",
+                      action="store_true", default=False)
     parser.add_option("--hflip", dest="hflip",
                       help="horizontally flip all tiles (most significant pixel on right)",
                       action="store_true", default=False)
@@ -104,25 +110,35 @@ def parse_argv(argv):
                       help="reverse the bytes within each row-plane (needed for GBA and a few others)",
                       action="store_true", default=False)
     (options, args) = parser.parse_args(argv[1:])
+    options = vars(options)
 
-    tileWidth = int(options.tileWidth)
+    # Let the flag file override flags
+    if options['flagfilename'] != None:
+        with open(options['flagfilename']) as ff:
+            (ff_options, ff_args) = parser.parse_args(ff.read().split(" "))
+            ff_options = vars(ff_options)
+            for k,v in ff_options.items():
+                if v and (k not in ['tileWidth', 'tileHeight'] or v != 8):
+                    options[k] = ff_options[k]
+
+    tileWidth = int(options['tileWidth'])
     if tileWidth <= 0:
         raise ValueError("tile width '%d' must be positive" % tileWidth)
 
-    tileHeight = int(options.tileHeight)
+    tileHeight = int(options['tileHeight'])
     if tileHeight <= 0:
         raise ValueError("tile height '%d' must be positive" % tileHeight)
 
     # Fill unfilled roles with positional arguments
     argsreader = iter(args)
     try:
-        infilename = options.infilename
+        infilename = options['infilename']
         if infilename is None:
             infilename = next(argsreader)
     except StopIteration:
         raise ValueError("not enough filenames")
 
-    outfilename = options.outfilename
+    outfilename = options['outfilename']
     if outfilename is None:
         try:
             outfilename = next(argsreader)
@@ -134,7 +150,7 @@ def parse_argv(argv):
             raise ValueError("cannot write CHR to terminal")
 
     return (infilename, outfilename, tileWidth, tileHeight,
-            options.packbits, options.planes, options.hflip, options.little)
+            options['packbits'], options['planes'], options['hflip'], options['little'], options['rearrange16x16'])
 
 argvTestingMode = True
 
@@ -157,12 +173,26 @@ def main(argv=None):
             argv.extend(input('args:').split())
     try:
         (infilename, outfilename, tileWidth, tileHeight,
-         usePackBits, planes, hflip, little) = parse_argv(argv)
+         usePackBits, planes, hflip, little, rearrange16x16) = parse_argv(argv)
     except Exception as e:
         sys.stderr.write("%s: %s\n" % (argv[0], str(e)))
+        raise
         sys.exit(1)
 
     im = Image.open(infilename)
+
+	# Rearrange rows for the purpose of displaying a 32x32 metasprite out of 16x16 sprites on SNES
+    if rearrange16x16:
+        rearranged = im.copy()
+        if im.height%32 != 0:
+            raise ValueError("Image height must be a multiple of 32 if --rearrange-16x16 is on")
+        for frame in range(im.height//32):
+            base = frame*32
+            rearranged.paste(im.crop((0, base+16, im.width, base+16+8)), (0, base+8))
+            rearranged.paste(im.crop((0, base+8,  im.width, base+8+8)),  (0, base+16))
+            rearranged.paste(im.crop((0, base+24, im.width, base+24+8)), (0, base+24))
+        im.close()
+        im = rearranged
 
     outdata = pilbmp2chr(im, tileWidth, tileHeight,
                          lambda im: formatTilePlanar(im, planes, hflip, little))

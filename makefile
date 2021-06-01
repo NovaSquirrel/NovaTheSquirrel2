@@ -36,6 +36,7 @@ LD65 := ld65
 CFLAGS65 = -g
 objdir := obj/snes
 srcdir := src
+imgdirX := tilesetsX
 imgdir4 := tilesets4
 imgdir2 := tilesets2
 bgdir := backgrounds
@@ -105,6 +106,7 @@ $(objdir)/index.txt: makefile
 objlisto = $(foreach o,$(objlist),$(objdir)/$(o).o)
 objlistospc = $(foreach o,$(objlistspc),$(objdir)/$(o).o)
 brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
+chrXall := $(patsubst %.png,%.chr,$(wildcard tilesetsX/*.png))
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
 chr4_lz4          := $(patsubst %.png,%.chrsfc.lz4,$(wildcard tilesets4/lz4/*.png))
@@ -181,7 +183,7 @@ $(srcdir)/vwf_fontdata.s: tools/fonts/BaseSeven.png tools/makefontvwf.py
 	$(PY) tools/makefontvwf.py
 
 # Automatically insert graphics into the ROM
-$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chr4allbackground) $(chr4_lz4) $(chr2_lz4) tools/gfxlist.txt tools/insertthegfx.py
+$(srcdir)/graphicsenum.s: $(chr2all) $(chr4all) $(chrXall) $(chr4allbackground) $(chr4_lz4) $(chr2_lz4) tools/gfxlist.txt tools/insertthegfx.py
 	$(PY) tools/insertthegfx.py
 
 # Automatically create the list of blocks from a description
@@ -255,6 +257,10 @@ $(imgdir2)/%.chrgb: $(imgdir2)/%.png
 #	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
 $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+
+$(imgdirX)/%.chr: $(imgdirX)/%.txt $(imgdirX)/%.png
+	$(PY) tools/pilbmp2nes.py "--flag-file" $^ $@
+
 #$(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
 #	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
 

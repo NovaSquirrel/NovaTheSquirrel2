@@ -5,6 +5,7 @@
 *~
 *.chrgb
 *.chrsfc
+*.chr
 /obj/snes/*.s
 /obj/snes/*.wav
 /zip.in
