@@ -59,22 +59,31 @@ Planemap opcodes:
                 out.extend(thisrow[::-1] if little else thisrow)
     return bytes(out)
 
-def pilbmp2chr(im, tileWidth=8, tileHeight=8,
+def pilbmp2chr(im, tileWidth=8, tileHeight=8, columnMajor=False,
                formatTile=lambda im: formatTilePlanar(im, "0;1")):
     """Convert a bitmap image into a list of byte strings representing tiles."""
     im.load()
     (w, h) = im.size
+
     outdata = []
     for mt_y in range(0, h, tileHeight):
         for mt_x in range(0, w, tileWidth):
             metatile = im.crop((mt_x, mt_y,
                                 mt_x + tileWidth, mt_y + tileHeight))
-            for tile_y in range(0, tileHeight, 8):
+            if columnMajor:
                 for tile_x in range(0, tileWidth, 8):
-                    tile = metatile.crop((tile_x, tile_y,
-                                          tile_x + 8, tile_y + 8))
-                    data = formatTile(tile)
-                    outdata.append(data)
+                    for tile_y in range(0, tileHeight, 8):
+                        tile = metatile.crop((tile_x, tile_y,
+                                              tile_x + 8, tile_y + 8))
+                        data = formatTile(tile)
+                        outdata.append(data)
+            else:
+                for tile_y in range(0, tileHeight, 8):
+                    for tile_x in range(0, tileWidth, 8):
+                        tile = metatile.crop((tile_x, tile_y,
+                                              tile_x + 8, tile_y + 8))
+                        data = formatTile(tile)
+                        outdata.append(data)
     return outdata
 
 def parse_argv(argv):
@@ -102,6 +111,9 @@ def parse_argv(argv):
                       help="set the plane map (1bpp: 0) (NES: 0;1) (GB: 0,1) (SMS:0,1,2,3) (TG16/SNES: 0,1;2,3) (MD: 3210)")
     parser.add_option("--rearrange-16x16", dest="rearrange16x16",
                       help="for every four rows, swaps the second and third row",
+                      action="store_true", default=False)
+    parser.add_option("--column-major", dest="columnMajor",
+                      help="Go over metatiles by columns first",
                       action="store_true", default=False)
     parser.add_option("--hflip", dest="hflip",
                       help="horizontally flip all tiles (most significant pixel on right)",
@@ -150,7 +162,8 @@ def parse_argv(argv):
             raise ValueError("cannot write CHR to terminal")
 
     return (infilename, outfilename, tileWidth, tileHeight,
-            options['packbits'], options['planes'], options['hflip'], options['little'], options['rearrange16x16'])
+            options['packbits'], options['planes'], options['hflip'], options['little'],
+            options['rearrange16x16'], options['columnMajor'])
 
 argvTestingMode = True
 
@@ -173,7 +186,7 @@ def main(argv=None):
             argv.extend(input('args:').split())
     try:
         (infilename, outfilename, tileWidth, tileHeight,
-         usePackBits, planes, hflip, little, rearrange16x16) = parse_argv(argv)
+         usePackBits, planes, hflip, little, rearrange16x16, columnMajor) = parse_argv(argv)
     except Exception as e:
         sys.stderr.write("%s: %s\n" % (argv[0], str(e)))
         raise
@@ -194,7 +207,7 @@ def main(argv=None):
         im.close()
         im = rearranged
 
-    outdata = pilbmp2chr(im, tileWidth, tileHeight,
+    outdata = pilbmp2chr(im, tileWidth, tileHeight, columnMajor,
                          lambda im: formatTilePlanar(im, planes, hflip, little))
     outdata = b''.join(outdata)
     if usePackBits:

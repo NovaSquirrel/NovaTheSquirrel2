@@ -8,7 +8,7 @@ outfile.write('; This is automatically generated. Edit "M7Tileset.png" instead\n
 
 outfile.write('.proc Mode7Palette\n')
 
-im = Image.open("tools/M7Tileset.png")
+im = Image.open("tilesetsX/M7Tileset.png")
 pal = im.getpalette()[3:]
 # Read out 90 colors
 for i in range(90):

@@ -155,7 +155,7 @@ $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 $(objdir)/main.o: $(srcdir)/vblank.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/m7blockdata.o: $(srcdir)/m7blockenum.s
-$(objdir)/mode7actors.o: $(srcdir)/m7blockenum.s tools/M7SoftSprites.chrm7
+$(objdir)/mode7actors.o: $(srcdir)/m7blockenum.s tilesetsX/M7SoftSprites.chr
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/object.o: $(srcdir)/blockenum.s
@@ -267,13 +267,10 @@ $(imgdirX)/%.chr: $(imgdirX)/%.txt $(imgdirX)/%.png
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
 	$(PY) tools/makebackgroundmap.py $<
-tools/M7Tileset.chrm7: tools/M7Tileset.png
-	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
+$(srcdir)/m7palettedata: tilesetsX/M7Tileset.png
 	$(PY) tools/mode7palette.py
-tools/M7SoftSprites.chrm7: tools/M7SoftSprites.png
-	$(PY) tools/pilbmp2nes.py "--planes=76543210" $< $@
 
-$(objdir)/mode7.o: tools/M7Tileset.chrm7 $(m7levels_lz4)
+$(objdir)/mode7.o: tilesetsX/M7Tileset.chr $(m7levels_lz4)
 #tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
 #	$(lz4_compress) $(lz4_flags) $< $@
 #	@touch $@

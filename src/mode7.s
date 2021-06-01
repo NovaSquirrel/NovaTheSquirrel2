@@ -2230,4 +2230,4 @@ M7C_M7D_Table2:
 .segment "Mode7Tiles"
 .export Mode7Tiles
 Mode7Tiles:
-.incbin "../tools/M7Tileset.chrm7", 0, CommonTilesetLength
+.incbin "../tilesetsX/M7Tileset.chr", 0, CommonTilesetLength

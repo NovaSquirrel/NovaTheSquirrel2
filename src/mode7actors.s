@@ -913,5 +913,5 @@ DoRenderAligned = Mode7UpdateActorPicture::RenderAligned
 .pushseg
 .segment "Mode7SoftwareSprites"
 SoftwareSprites:
-  .incbin "tools/M7SoftSprites.chrm7"
+  .incbin "tilesetsX/M7SoftSprites.chr"
 .popseg
