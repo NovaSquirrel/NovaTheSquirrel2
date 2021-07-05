@@ -42,7 +42,7 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
 .import Overworld_LevelMarkers, Overworld_LevelPointers
 .export OpenOverworld
 
-.segment "Overworld"
+.segment "C_Overworld"
 
 .a16
 .i16

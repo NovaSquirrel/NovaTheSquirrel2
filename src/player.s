@@ -26,7 +26,7 @@
 
 .segment "ZEROPAGE"
 
-.segment "Player"
+.segment "C_Player"
 .importzp SlopeBCC, SlopeBCS
 .import SlopeHeightTable, SlopeFlagTable
 

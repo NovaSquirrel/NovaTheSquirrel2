@@ -22,7 +22,7 @@
 .include "actorframedefine.s"
 .smart
 
-.segment "ActorData"
+.segment "C_ActorData"
 CommonTileBase = $40
 
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
@@ -2447,7 +2447,7 @@ NoMove:
 ; -------------------------------------
 ; Maybe move particles to a separate file, though we don't have many yet
 .pushseg
-.segment "ParticleCode"
+.segment "C_ParticleCode"
 .a16
 .i16
 .export DrawPoofParticle
@@ -2851,7 +2851,7 @@ Exit:
   rtl
 .endproc
 
-.segment "ActorCommon" ; Must be in the same bank as RunAllActors
+.segment "C_ActorCommon" ; Must be in the same bank as RunAllActors
 .export ActorRunOverrideList
 .proc ActorRunOverrideList
   .addr .loword(Nothing)

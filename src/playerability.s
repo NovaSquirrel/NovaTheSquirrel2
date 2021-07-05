@@ -23,7 +23,7 @@
 .import ActorClearX, PlayerNegIfLeft, SpeedAngle2Offset256
 .import BlockRunInteractionBelow
 
-.segment "Player"
+.segment "C_Player"
 
 .export AbilityIcons, AbilityGraphics, AbilityTilesetForId, AbilityRoutineForId
 AbilityIcons:

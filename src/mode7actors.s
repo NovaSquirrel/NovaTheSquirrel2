@@ -22,7 +22,7 @@
 .import Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
 .import Mode7BlockAddress, Mode7Tiles
 
-.segment "Mode7Game"
+.segment "C_Mode7Game"
 ActorM7DynamicSlot = ActorIndexInLevel ; Reuse this
 ActorM7LastDrawX = ActorState    ; and ActorOnGround
 ActorM7LastDrawY = ActorOnScreen ; and ActorDamage

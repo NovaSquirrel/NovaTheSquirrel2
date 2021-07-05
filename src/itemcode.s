@@ -18,7 +18,7 @@
 .include "global.inc"
 .smart
 
-.segment "Items"
+.segment "C_Items"
 
 
 .export InventoryHasItem, InventoryGiveItem, InventoryTakeItem

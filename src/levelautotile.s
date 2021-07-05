@@ -23,7 +23,7 @@
 .export AutotileLevel
 .import BlockAutotile
 
-.segment "LevelDecompress"
+.segment "C_LevelDecompress"
 
 ChangeAtIndex     = 5 ; and 6
 LeftPointer       = 7 ; and 8 9

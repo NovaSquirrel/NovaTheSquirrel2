@@ -124,7 +124,7 @@ for corner, cornername in enumerate(corners):
 	outfile.write(".endproc\n\n")
 
 # Write block interaction information
-outfile.write('.segment "BlockInteraction"\n\n')
+outfile.write('.segment "C_BlockInteraction"\n\n')
 
 outfile.write('.proc BlockFlags\n')
 for b in all_blocks:
@@ -150,7 +150,7 @@ for interaction in interaction_types:
 	outfile.write(".endproc\n\n")
 
 # Write all the autotile settings
-outfile.write('.segment "LevelDecompress"\n\n')
+outfile.write('.segment "C_LevelDecompress"\n\n')
 
 outfile.write('.export BlockAutotile\n')
 outfile.write('.proc BlockAutotile\n')

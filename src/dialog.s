@@ -22,7 +22,7 @@ MenuBGScroll = SpriteTileBase
 .include "vwf.inc"
 .smart
 
-.segment "Dialog"
+.segment "C_Dialog"
 .import InventoryTilemapMenu, InventoryTilemapBG, InventoryTilemapText, InventoryPalette
 DialogTileBase = $3e0|InventoryPalette
 

@@ -1,7 +1,7 @@
 ; This is automatically generated. Edit "makesincos.py" instead
 .export MathSinTable, MathCosTable
 MathCosTable = MathSinTable + 64*2
-.segment "ActorData"
+.segment "C_ActorData"
 MathSinTable:
   .word .loword(0)
   .word .loword(402)

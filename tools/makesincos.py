@@ -9,7 +9,7 @@ def output_tables():
 	outfile.write('; This is automatically generated. Edit "makesincos.py" instead\n')
 	outfile.write('.export MathSinTable, MathCosTable\n')
 	outfile.write('MathCosTable = MathSinTable + %d*2\n' % (angles//4))
-	outfile.write('.segment "ActorData"\n')
+	outfile.write('.segment "C_ActorData"\n')
 	outfile.write('MathSinTable:\n')
 
 	for angle in range(angles + angles//4):

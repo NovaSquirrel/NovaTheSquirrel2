@@ -59,7 +59,7 @@ def output_tables():
 		outfile.write('.export m7a_m7b_list, m7a_m7b_0\n')
 	else:
 		outfile.write('.export m7a_m7b_list, m7c_m7d_list, m7a_m7b_0, m7c_m7d_0\n')
-	outfile.write('.segment "Mode7Game"\n')
+	outfile.write('.segment "C_Mode7Game"\n')
 	outfile.write('m7a_m7b_list:\n')
 	for a in range(denominator):
 		outfile.write('  .addr .loword(m7a_m7b_%d)\n' % a)

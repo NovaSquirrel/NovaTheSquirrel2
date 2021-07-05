@@ -21,7 +21,7 @@
 .global LevelBuf
 .import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
 
-.segment "Player"
+.segment "C_Player"
 
 .a16
 .i16

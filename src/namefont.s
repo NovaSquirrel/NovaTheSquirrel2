@@ -20,7 +20,7 @@ MenuBGScroll = SpriteTileBase
 .include "vwf.inc"
 .smart
 
-.segment "Dialog"
+.segment "C_Dialog"
 
 FontDrawX        = TouchTemp ; 8-bit
 PrintedCharacter = TouchTemp + 1

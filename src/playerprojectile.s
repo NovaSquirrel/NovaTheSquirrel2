@@ -29,7 +29,7 @@
 
 .assert ^ChangeToExplosion = ^RunPlayerProjectile, error, "Player projectiles and other actors should share a bank"
 
-.segment "ActorData"
+.segment "C_ActorData"
 CommonTileBase = $40
 
 .a16
@@ -1381,7 +1381,8 @@ Hook:
 
 ; Look up the enemy's type and copy the corresponding ability
 Copy:
-  lda #0 ; <--- only the copy projectile copies, so don't need ActorSafeRemoveY
+  lda #0 ; <--- Don't need ActorSafeRemoveY for Copy, because only one
+         ; kind of projectile uses it, and it does not allocate dynamic sprite slots
   sta ActorType,y
 
   ; Find the enemy's type

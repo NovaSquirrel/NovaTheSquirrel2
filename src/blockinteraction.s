@@ -21,7 +21,7 @@
 .include "itemenum.s"
 .smart
 
-.segment "BlockInteraction"
+.segment "C_BlockInteraction"
 
 .export BlockAutoItem, BlockInventoryItem, BlockHeart, BlockSmallHeart
 .export BlockMoney, BlockPickupBlock, BlockPushBlock, BlockPrize, BlockBricks

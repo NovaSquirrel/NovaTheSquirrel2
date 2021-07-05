@@ -82,7 +82,7 @@ outfile.write('.include "m7blockenum.s"\n\n')
 outfile.write('.export M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight\n')
 outfile.write('.export M7BlockFlags, M7BlockInteractionSet, M7BlockInteractionEnter, M7BlockInteractionExit, M7BlockInteractionBump\n')
 outfile.write('.import %s\n' % str(", ".join(all_interaction_procs)))
-outfile.write('\n.segment "Mode7Game"\n\n') # Put it in the game segment
+outfile.write('\n.segment "C_Mode7Game"\n\n') # Put it in the game segment
 
 # Block appearance information
 corners = ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]

@@ -18,7 +18,7 @@
 .include "global.inc"
 .smart
 
-.segment "IrisEffect"
+.segment "C_IrisEffect"
 .a16
 .i16
 .export IrisInitTable

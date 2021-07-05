@@ -117,7 +117,7 @@ DIRECTION_LEFT  = 1
 DIRECTION_DOWN  = 2
 DIRECTION_RIGHT = 3
 
-.segment "Mode7Game"
+.segment "C_Mode7Game"
 
 .export StartMode7Level
 .proc StartMode7Level

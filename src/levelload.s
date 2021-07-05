@@ -24,7 +24,7 @@
 .import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
 .import GetBlockX_Horizontal, GetBlockY_Horizontal, GetBlockXCoord_Horizontal, GetBlockYCoord_Horizontal
 
-.segment "LevelDecompress"
+.segment "C_LevelDecompress"
 
 ; Accumulator = level number
 .a16

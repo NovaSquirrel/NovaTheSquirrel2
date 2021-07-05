@@ -5,7 +5,7 @@ import glob, os
 outfile = open("src/m7leveldata.s", "w")
 outfile.write('; This is automatically generated. Edit mode 7 level Tiled maps instead\n')
 outfile.write('.include "snes.inc"\n')
-outfile.write('.segment "Mode7Game"\n\n')
+outfile.write('.segment "C_Mode7Game"\n\n')
 
 all_m7pointers = []
 

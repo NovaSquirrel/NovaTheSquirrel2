@@ -22,7 +22,7 @@
 .import ActorGetShot
 .smart
 
-.segment "ActorCommon"
+.segment "C_ActorCommon"
 
 ; Two comparisons to make to determine if something is a slope
 SlopeBCC = Block::MedSlopeL_DL
@@ -379,7 +379,7 @@ FoundPalette:
 .endproc
 
 .pushseg
-.segment "ParticleCode"
+.segment "C_ParticleCode"
 .a16
 .i16
 .import ParticleRun, ParticleDraw
@@ -2050,7 +2050,7 @@ Invalid:
 .endproc
 
 .pushseg
-.segment "Player"
+.segment "C_Player"
 .export SlopeFlagTable
 .proc SlopeFlagTable
 Left  = $8000

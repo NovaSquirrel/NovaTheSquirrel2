@@ -7,7 +7,7 @@ im = Image.open("tilesets2/DialogNameFont.png")
 # Do the enum in a separate file because I can't export enums
 outfile = open("src/namefontwidth.s", "w")
 outfile.write('; This is automatically generated. Edit "namefontwidthtable.py"\n')
-outfile.write('.segment "Dialog"\n')
+outfile.write('.segment "C_Dialog"\n')
 outfile.write('.export DialogNameFontWidths\n')
 outfile.write('DialogNameFontWidths:\n')
 

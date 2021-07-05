@@ -30,7 +30,7 @@ outfile.write('.include "graphicsenum.s"\n')
 outfile.write('.include "paletteenum.s"\n')
 outfile.write('.include "pathenum.s"\n')
 outfile.write('.include "overworldblockenum.s"\n')
-outfile.write('.segment "Overworld"\n\n')
+outfile.write('.segment "C_Overworld"\n\n')
 
 for f in sorted(glob.glob("overworlds/*.tmx")):
 	plain_name = os.path.splitext(os.path.basename(f))[0]

@@ -18,7 +18,7 @@
 .include "global.inc"
 .smart
 
-.segment "Player"
+.segment "C_Player"
 
 .a16
 .i16

@@ -69,7 +69,7 @@ outfile = open("src/overworldblockdata.s", "w")
 
 outfile.write('; This is automatically generated. Edit "overworldblocks.txt" instead\n')
 outfile.write('.export OWBlockTopLeft, OWBlockTopRight, OWBlockBottomLeft, OWBlockBottomRight\n')
-outfile.write('\n.segment "Overworld"\n\n')
+outfile.write('\n.segment "C_Overworld"\n\n')
 
 # Block appearance information
 corners = ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]

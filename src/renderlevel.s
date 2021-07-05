@@ -23,7 +23,7 @@
 .import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
 .import ActorSafeRemoveX
 
-.segment "Player"
+.segment "C_Player"
 
 .a16
 .i16
