@@ -50,7 +50,7 @@ FontDrawY        = TouchTemp + 5 ; 16-bit
 TextPointer      = DecodePointer
 DoubleWideBuffer1 = 8  ; First half
 DoubleWideBuffer2 = 10 ; Second half
-.segment "VWF"
+.segment "C_VWF"
 
 .export InitVWF
 .proc InitVWF

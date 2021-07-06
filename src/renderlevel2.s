@@ -387,11 +387,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
-  sta ColumnUpdateBuffer2,x
+  sta f:ColumnUpdateBuffer2,x
   inx
   inx
   lda BlockBottomLeft,y
-  sta ColumnUpdateBuffer2,x
+  sta f:ColumnUpdateBuffer2,x
   inx
   inx
   ply
@@ -434,11 +434,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopRight,y
-  sta ColumnUpdateBuffer2,x
+  sta f:ColumnUpdateBuffer2,x
   inx
   inx
   lda BlockBottomRight,y
-  sta ColumnUpdateBuffer2,x
+  sta f:ColumnUpdateBuffer2,x
   inx
   inx
   ply
@@ -476,11 +476,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockTopLeft,y
-  sta RowUpdateBuffer2,x
+  sta f:RowUpdateBuffer2,x
   inx
   inx
   lda BlockTopRight,y
-  sta RowUpdateBuffer2,x
+  sta f:RowUpdateBuffer2,x
   inx
   inx
   ply
@@ -524,11 +524,11 @@ Loop:
   tay
   ; Write the two tiles in
   lda BlockBottomLeft,y
-  sta RowUpdateBuffer2,x
+  sta f:RowUpdateBuffer2,x
   inx
   inx
   lda BlockBottomRight,y
-  sta RowUpdateBuffer2,x
+  sta f:RowUpdateBuffer2,x
   inx
   inx
   ply

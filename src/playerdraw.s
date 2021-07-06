@@ -37,7 +37,7 @@
   and #255         ; Zero extend
   xba              ; *256
   asl              ; *512
-  ora #$8000
+  ;ora #$8000      <-- For LoROM
   sta DMAADDR+$00
   ora #256
   sta DMAADDR+$10

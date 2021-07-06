@@ -56,7 +56,7 @@ romname:
   .if * - romname < 21
     .res romname + 21 - *, $20  ; space padding
   .endif
-  .byte MAPPER_LOROM|ROMSPEED_120NS
+  .byte MAPPER_HIROM|ROMSPEED_120NS
   .byte $00   ; 00: no extra RAM; 02: RAM with battery
   .byte MEMSIZE_1MB  ; ROM size (08-0C typical)
   .byte MEMSIZE_NONE   ; backup RAM size (01,03,05 typical; Dezaemon has 07)

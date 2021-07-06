@@ -125,8 +125,8 @@ all_npc_gfx := $(wildcard npc/*.png)
 backgrounds := $(wildcard backgrounds/*.png)
 chr4allbackground := $(patsubst %.png,%.chrsfc,$(wildcard backgrounds/*.png))
 
-auto_linker.cfg: lorom1024k.cfg $(objlisto)
-	$(PY) tools/uncle_fill.py auto_linker.cfg $^
+auto_linker.cfg: linker_template.cfg $(objlisto)
+	$(PY) tools/uncle_fill_hirom.py auto_linker.cfg $^
 map.txt $(title).sfc: auto_linker.cfg
 	$(LD65) -o $(title).sfc -m map.txt --dbgfile $(title).dbg -C auto_linker.cfg $(objlisto)
 	$(PY) tools/fixchecksum.py $(title).sfc
