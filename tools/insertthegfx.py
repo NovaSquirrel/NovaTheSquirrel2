@@ -53,7 +53,7 @@ banks_free = {}
 banks_files = {}
 ordered_files = []
 for bank in ["Graphics1", "Graphics2", "Graphics3", "Graphics4"]:
-	banks_free[bank] = 0x8000
+	banks_free[bank] = 0x8000 * 2
 	banks_files[bank] = []
 
 for graphic in all_graphics:
