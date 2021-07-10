@@ -63,6 +63,7 @@ RunPlayerProjectileTable:
   .word .loword(RunProjectileRemoteMissile-1)
   .word .loword(RunProjectileBubble-1)
   .word .loword(RunProjectileExplosion-1)
+  .word .loword(RunProjectileCopyAnimation-1)
 
 .a16
 .i16
@@ -95,6 +96,7 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileRemoteMissile-1)
   .word .loword(DrawProjectileBubble-1)
   .word .loword(DrawProjectileExplosion-1)
+  .word .loword(DrawProjectileCopyAnimation-1)
 
 .a16
 .i16
@@ -140,7 +142,7 @@ DrawPlayerProjectileTable:
 
   lda #1
   jsr ThwaiteSpeedAngle2Offset
-
+CustomRadius:
   ; Remove the subpixels
   lda 0
   jsr Reduce
@@ -156,7 +158,6 @@ DrawPlayerProjectileTable:
   lda 0
   sta SpriteXYOffset+0
   lda 2
-  add #4
   sta SpriteXYOffset+1
   seta16
 
@@ -178,7 +179,6 @@ DrawPlayerProjectileTable:
   lda 2
   eor #255
   ina
-  add #4
   sta SpriteXYOffset+1
   seta16
 
@@ -193,6 +193,134 @@ Reduce:
 .endproc
 DrawProjectileCopyReduce = DrawProjectileCopy::Reduce
 .export DrawProjectileCopyReduce
+
+.if 0
+RunProjectileCopyAnimationFlyIn:
+  lda PlayerPX
+  sub ActorPX,x
+  asr_n 3
+  add ActorPX,x
+  sta ActorPX,x
+
+  lda PlayerPY
+  sub #$100
+  sub ActorPY,x
+  asr_n 3
+  add ActorPY,x
+  sta ActorPY,x
+  rtl
+.endif
+
+.a16
+.i16
+.proc RunProjectileCopyAnimation
+;  lda ActorVarB,x
+;  bne RunProjectileCopyAnimationFlyIn
+
+  inc ActorTimer,x
+  lda ActorTimer,x
+  cmp #50
+  bne :+
+    stz ActorType,x
+    rtl
+    .if 0
+    inc ActorVarB,x
+
+    ; Move up for real
+    lda ActorTimer,x
+    asl
+    asl
+    rsb ActorPY,x
+    sta ActorPY,x
+    bra RunProjectileCopyAnimationFlyIn
+    .endif
+  :
+
+  ; Increase radius
+  lda ActorTimer,x
+  and #%11
+  bne :+
+    lda ActorVarA,x
+    cmp #3
+    beq :+
+      inc ActorVarA,x
+  :
+
+  ; Move to the thing being copied
+  ldy ActorVarC,x
+  beq DontMove
+  lda ActorType,y
+  bne DoMove
+DontMove:
+    ; There is a potential for this enemy slot to die and then immediately get replaced on the same frame,
+    ; but that should be ok?
+    stz ActorVarC,x
+    rtl
+  DoMove:
+
+  ; Okay actually do move to it
+  lda ActorPX,y
+  sta ActorPX,x
+  phx
+  .import ActorHeight
+  lda ActorType,y
+  tax
+  lda f:ActorHeight,x
+  lsr
+  plx
+  rsb ActorPY,y ; Reverse subtract
+  sta ActorPY,x
+  rtl
+.endproc
+
+.if 0
+DrawProjectileCopyAnimationFlyIn:
+  lda #8|OAM_PRIORITY_2
+  jml DispActor16x16
+.endif
+
+.a16
+.i16
+.proc DrawProjectileCopyAnimation
+;  lda ActorVarB,x
+;  bne DrawProjectileCopyAnimationFlyIn
+
+  ; Move up a bit according to the timer
+  lda ActorTimer,x
+  asl
+  asl
+  sta 0
+
+  ; ---
+  lda ActorTimer,x ; Flicker effect
+  cmp #2
+  beq No
+  cmp #4
+  beq No
+  cmp #48
+  beq No
+  cmp #46
+  beq No
+
+  lda ActorPY,x
+  pha
+  sub 0
+  sta ActorPY,x
+  lda #8|OAM_PRIORITY_2
+  jsl DispActor16x16FlippedAbsolute
+  pla
+  sta ActorPY,x
+No:
+
+  lda framecount ; Pick angle for ThwaiteSpeedAngle2Offset
+  and #31
+  tay
+  lda ActorVarA,x ; The radius
+  ina
+  jsr ThwaiteSpeedAngle2Offset
+
+  jmp DrawProjectileCopy::CustomRadius
+.endproc
 
 .a16
 .i16
@@ -1363,6 +1491,7 @@ HitProjectileResponse:
   .word .loword(Nothing-1) ; RC missile
   .word .loword(DamageALittle-1) ; Bubble
   .word .loword(Kill-1) ; Explosion
+  .word .loword(Nothing-1) ; Copy animation
 
 ; Hook an enemy and pull them to the player
 Hook:
@@ -1381,9 +1510,17 @@ Hook:
 
 ; Look up the enemy's type and copy the corresponding ability
 Copy:
-  lda #0 ; <--- Don't need ActorSafeRemoveY for Copy, because only one
-         ; kind of projectile uses it, and it does not allocate dynamic sprite slots
-  sta ActorType,y
+;  lda #0 ; <--- Don't need ActorSafeRemoveY for Copy, because only one
+;         ; kind of projectile uses it, and it does not allocate dynamic sprite slots
+;  sta ActorType,y
+  lda #PlayerProjectileType::CopyAnimation
+  sta ActorProjectileType,y
+  tdc ; Clear A
+  sta ActorTimer,y
+  sta ActorVarA,y
+  sta ActorVarB,y
+  txa
+  sta ActorVarC,y
 
   ; Find the enemy's type
   ldy #0

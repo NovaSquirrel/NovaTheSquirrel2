@@ -665,10 +665,9 @@ ActorCannonCommon1NoHover = ActorCannonCommon1::NoHover
 
   seta8
   lda 0
-  add #4
   sta SpriteXYOffset+0
   lda 2
-  add #4
+  sub #4
   sta SpriteXYOffset+1
   seta16
 
@@ -686,11 +685,10 @@ ActorCannonCommon1NoHover = ActorCannonCommon1::NoHover
   seta8
   lda 0
   neg
-  add #4
   sta SpriteXYOffset+0
   lda 2
   neg
-  add #4
+  sub #4
   sta SpriteXYOffset+1
   seta16
 

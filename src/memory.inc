@@ -178,6 +178,7 @@ ProjectileLen = 8
   RemoteMissile
   Bubble
   Explosion
+  CopyAnimation
 .endenum
 
 ParticleLen = 32
