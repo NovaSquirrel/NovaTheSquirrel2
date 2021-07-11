@@ -240,8 +240,23 @@ HaveY:
   ; Ability icon
   lda #15
   sta OAM_XPOS+(4*4),x
-  lda #8
-  sta OAM_YPOS+(4*4),x
+
+  lda CopyingAnimationTimer ; If the timer is going don't display
+  beq DoDisplayAbilityIcon
+    lda #225
+    sta OAM_YPOS+(4*4),x
+    dec CopyingAnimationTimer
+    lda CopyingAnimationTimer
+    cmp #6
+    beq DoDisplayAbilityIcon
+    cmp #2
+    beq DoDisplayAbilityIcon
+    cmp #4
+    bne :+
+  DoDisplayAbilityIcon:
+    lda #8
+    sta OAM_YPOS+(4*4),x
+  :
 
   ; Tile numbers
   lda #0

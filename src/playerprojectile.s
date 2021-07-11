@@ -301,6 +301,8 @@ DrawProjectileCopyAnimationFlyIn:
   beq No
   cmp #46
   beq No
+  cmp #44
+  beq No
 
   lda ActorPY,x
   pha
@@ -1521,6 +1523,10 @@ Copy:
   sta ActorVarB,y
   txa
   sta ActorVarC,y
+  seta8
+  lda #50
+  sta CopyingAnimationTimer
+  seta16
 
   ; Find the enemy's type
   ldy #0

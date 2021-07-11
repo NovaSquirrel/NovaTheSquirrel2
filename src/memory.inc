@@ -248,7 +248,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable
 .global AbilityMovementLock
-
+.global CopyingAnimationTimer
 
 ; Save stuff
 .global MoneyAmount

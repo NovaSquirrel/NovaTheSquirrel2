@@ -282,6 +282,7 @@ LevelZeroWhenLoad_Start:
   TailAttackFrame:     .res 1 ; Current frame to use for the player during the attack
   TailAttackCooldown:  .res 1 ; Frames before the attack button can be used again
   AbilityMovementLock: .res 1
+  CopyingAnimationTimer: .res 1
 LevelZeroWhenLoad_End:
   TailAttackVariable:  .res 2 ; Zero'd when an attack starts
 
