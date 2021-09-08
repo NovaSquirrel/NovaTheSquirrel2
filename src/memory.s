@@ -101,11 +101,11 @@
   ActorPY           = 4 ;
   ActorVX           = 6 ; Speeds
   ActorVY           = 8 ;
-  ActorVarA         = 10 ; 
-  ActorVarB         = 12 ; 
-  ActorVarC         = 14 ; 
-  ActorIndexInLevel = 16 ; Actor's index in level list, prevents Actor from being respawned until it's despawned
-  ActorTimer        = 18 ; when timer reaches 0, reset state
+  ActorTimer        = 10 ; when timer reaches 0, reset state
+  ActorVarA         = 12 ; 
+  ActorVarB         = 14 ; 
+  ActorVarC         = 16 ; 
+  ActorIndexInLevel = 18 ; Actor's index in level list, prevents Actor from being respawned until it's despawned
   ActorDirection    = 20 ; 0 (Right) or 1 (Left). Other bits may be used later. Good place for parameters from level?
   ActorState        = 21 ; Nonzero usually means stunned
   ActorOnGround     = 22 ; Nonzero means on ground
