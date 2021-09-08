@@ -370,7 +370,7 @@ for f in glob.glob("levels/*.json"):
 	outfile.write("  .byt 255\n\n")
 
 	outfile.write("\n")
-	print("Total size: %d" % total_level_size)
+	print("Total size: %d (%s)" % (total_level_size, plain_name))
 
 outfile.write('.segment "C_BlockInteraction"\n')
 outfile.write('.export DoorLevelTeleportList\nDoorLevelTeleportList:\n')

@@ -30,6 +30,7 @@ alias foreststone_palette 4
 base common
 palette global_palette
 tileset FGCommon
+editor_category Main
 
 +Empty
 autotile AutotileSkipEmpty
@@ -63,11 +64,13 @@ t 2,3 2,3h
 solid
 t 8,1 8,1h
 t 8,2 8,2h
+editor_hide
 
 +PrizeAnimation2
 solid
 t 9,1 9,1h
 t 9,2 9,2h
+editor_hide
 
 +UsedPrize
 solid
@@ -154,6 +157,7 @@ t 2,4 3,4
 +SpringPressed
 t 0,0 0,0
 t 4,4 4,4h
+editor_hide
 
 +DoorTop
 autotile AutotileDoor
@@ -174,6 +178,7 @@ t 1,0 1,0
 when InsideBody, BlockDoor
 t 1,0 1,0
 t 1,0 1,0
+editor_hide
 
 # Wood stuff
 base wood
@@ -184,6 +189,7 @@ solid_top
 when InsideBody, BlockLadder
 when Above, BlockLadderTop
 q 0,0
+editor_hide
 
 +Ladder
 autotile AutotileLadder
@@ -197,6 +203,7 @@ when InsideBody, BlockLadder
 when Above, BlockLadderTop
 t 4,1 5,1
 t 6,1 7,1
+editor_hide
 
 +RopeLadder
 autotile AutotileRopeLadder
@@ -225,16 +232,19 @@ t 0:0 0:0
 solid_top
 t 0,2 1,2
 t 0:0 0:0
+editor_hide
 
 +FloatingPlatformRight
 solid_top
 t 1,2 2,2
 t 0:0 0:0
+editor_hide
 
 +FloatingPlatformMiddle
 solid_top
 t 1,2 1,2
 t 0:0 0:0
+editor_hide
 
 +FloatingPlatformFallthrough
 autotile AutotileFloatingPlatformFallthrough
@@ -248,18 +258,21 @@ when Above, BlockFallthrough
 solid_top
 t 0,3 1,3
 t 0:0 0:0
+editor_hide
 
 +FloatingPlatformRightFallthrough
 when Above, BlockFallthrough
 solid_top
 t 1,3 2,3
 t 0:0 0:0
+editor_hide
 
 +FloatingPlatformMiddleFallthrough
 when Above, BlockFallthrough
 solid_top
 t 1,3 1,3
 t 0:0 0:0
+editor_hide
 
 +Bridge
 autotile AutotileBridge
@@ -271,26 +284,31 @@ t 0:0 0:0
 solid_top
 t 3,3 4,3
 t 0:0 0:0
+editor_hide
 
 +BridgeRight
 solid_top
 t 4,3 5,3
 t 0:0 0:0
+editor_hide
 
 +BridgeTop
 priority
 t 0:0 0:0
 t 4,2 4,2
+editor_hide
 
 +BridgeLeftTop
 priority
 t 0:0 0:0
 t 3,2 4,2
+editor_hide
 
 +BridgeRightTop
 priority
 t 0:0 0:0
 t 4,2 5,2
+editor_hide
 
 +WoodPlatform
 autotile AutotileWoodPlatform
@@ -302,16 +320,19 @@ t 2,1 3,1
 solid_top
 t 2,0 3,0
 t 2,1 3,1
+editor_hide
 
 +WoodPlatformRight
 solid_top
 t 4,0 5,0
 t 2,1 3,1
+editor_hide
 
 +WoodPlatformMiddle
 solid_top
 t 4,0 3,0
 t 2,1 3,1
+editor_hide
 
 +WoodPlatformPole
 t 2,1 3,1
@@ -327,16 +348,19 @@ t 12,1 14,1
 priority
 t 12,0 13,0
 t 12,1 13,1
+editor_hide
 
 +FenceRight
 priority
 t 13,0 14,0
 t 13,1 14,1
+editor_hide
 
 +FenceMiddle
 priority
 t 13,0 13,0
 t 13,1 13,1
+editor_hide
 
 +Pier
 autotile AutotilePier
@@ -356,16 +380,19 @@ t 10,0 11,0
 priority
 t 0:0 0:0
 t 10,0 11,1
+editor_hide
 
 +PierTopRight
 priority
 t 0:0 0:0
 t 10,1 11,0
+editor_hide
 
 +PierTopMiddle
 priority
 t 0:0 0:0
 t 10,1 11,1
+editor_hide
 
 +LogPlatform
 solid
@@ -395,11 +422,13 @@ q 0,2
 solid_top
 t 2,2 1,2
 t 2,3 1,3
+editor_hide
 
 +LedgeRight
 solid_top
 t 0,2 3,2
 t 0,3 3,3
+editor_hide
 
 +LedgeSolidLeft
 autotile AutotileLedgeSolidLeft
@@ -417,23 +446,27 @@ t 6,3 11,3
 solid_top
 t 3,5 1,2
 t 2,3 1,3
+editor_hide
 
 +LedgeRight_Dirt
 solid_top
 t 0,2 4,5
 t 0,3 3,3
+editor_hide
 
 +LedgeSolidLeft_Dirt
 autotile AutotileLedgeSolidLeft
 solid
 t 9,5 1,2
 t 8,3 5,3
+editor_hide
 
 +LedgeSolidRight_Dirt
 autotile AutotileLedgeSolidRight
 solid
 t 0,2 10,5
 t 6,3 11,3
+editor_hide
 
 +LedgeMiddle
 autotile AutotileExpandDirt
@@ -443,36 +476,44 @@ t 5,2 6,2
 +LedgeLeftSide
 t 4,3 6,2
 t 4,3 6,2
+editor_hide
 
 +LedgeRightSide
 t 5,2 7,3
 t 5,2 7,3
+editor_hide
 
 +LedgeSolidLeftSide
 solid
 q 8,2
+editor_hide
 
 +LedgeSolidRightSide
 solid
 q 10,2
+editor_hide
 
 +LedgeSolidLeftSideCorner
 solid
 q 14,2
+editor_hide
 
 +LedgeSolidRightSideCorner
 solid
 q 12,2
+editor_hide
 
 +LedgeSolidLeftSideCornerBottom
 solid
 t 5,2 6,2
 t 15,1 6,2
+editor_hide
 
 +LedgeSolidRightSideCornerBottom
 solid
 t 5,2 6,2
 t 5,2 14,0
+editor_hide
 
 +LedgeSolidBottom
 autotile AutotileLedgeSolidBottom
@@ -484,11 +525,13 @@ t 15,0 14,1
 solid
 t 8,2 9,2
 t 14,4 15,4
+editor_hide
 
 +LedgeSolidBottomRight
 solid
 t 10,2 11,2
 t 14,5 15,5
+editor_hide
 
 #######################################
 # Terrain (slopes) - fully solid
@@ -498,41 +541,49 @@ autotile AutotileExpandDirt
 solid
 t 2,1 3,1
 t 5,2 6,2
+editor_hide
 
 +MedSlopeR_DR
 autotile AutotileExpandDirt
 t 4,1 5,1
 t 5,2 6,2
+editor_hide
 
 +GradualSlopeL_D1
 autotile AutotileExpandDirt
 t 6,1 7,1
 t 5,2 6,2
+editor_hide
 
 +GradualSlopeL_D2
 autotile AutotileExpandDirt
 t 8,1 9,1
 t 5,2 6,2
+editor_hide
 
 +GradualSlopeR_D3
 autotile AutotileExpandDirt
 t 10,1 11,1
 t 5,2 6,2
+editor_hide
 
 +GradualSlopeR_D4
 autotile AutotileExpandDirt
 t 12,1 13,1
 t 5,2 6,2
+editor_hide
 
 +SteepSlopeL_D
 autotile AutotileExpandDirt
 t 0,1 6,2
 t 5,2 6,2
+editor_hide
 
 +SteepSlopeR_D
 autotile AutotileExpandDirt
 t 5,2 1,1
 t 5,2 6,2
+editor_hide
 
 #######################################
 # Terrain (slopes) - partially solid
@@ -542,58 +593,72 @@ t 5,2 6,2
 +MedSlopeL_UL
 t 0:0 0:0
 t 2,0 3,0
+editor_hide
 
 +MedSlopeL_UR
 q 2,0
+editor_hide
 
 +MedSlopeR_UL
 q 4,0
+editor_hide
 
 +MedSlopeR_UR
 t 0:0 0:0
 t 4,0 5,0
+editor_hide
 
 # Goes up every 1
 +SteepSlopeL_U
 t 0:0 0,0
 t 0,0 0,1
+editor_hide
 
 +SteepSlopeR_U
 t 1,0 0:0
 t 1,1 1,0
+editor_hide
 
 # Goes up every 4
 +GradualSlopeL_U1
 t 0:0 0:0
 t 6,0 7,0
+editor_hide
 
 +GradualSlopeL_U2
 t 0:0 0:0
 t 8,0 9,0
+editor_hide
 
 +GradualSlopeL_U3
 t 6,0 7,0
 t 6,1 7,1
+editor_hide
 
 +GradualSlopeL_U4
 t 8,0 9,0
 t 8,1 9,1
+editor_hide
 
 +GradualSlopeR_U1
 t 10,0 11,0
 t 10,1 11,1
+editor_hide
 
 +GradualSlopeR_U2
 t 12,0 13,0
 t 12,1 13,1
+editor_hide
 
 +GradualSlopeR_U3
 t 0:0 0:0
 t 10,0 11,0
+editor_hide
 
 +GradualSlopeR_U4
 t 0:0 0:0
 t 12,0 13,0
+editor_hide
 
 #######################################
 # Terrain (slopes) - partially solid (with dirt behind)
@@ -603,60 +668,74 @@ t 12,0 13,0
 +MedSlopeL_UL_Dirt
 t 3,3 3,3
 t 2,4 3,4
+editor_hide
 
 +MedSlopeL_UR_Dirt
 t 2,4 3,4
 t 2,1 3,1
+editor_hide
 
 +MedSlopeR_UL_Dirt
 t 4,4 5,4
 t 4,1 5,1
+editor_hide
 
 +MedSlopeR_UR_Dirt
 t 3,3 3,3
 t 4,4 5,4
+editor_hide
 
 # Goes up every 1
 +SteepSlopeL_U_Dirt
 t 3,3 0,4
 t 0,4 0,1
+editor_hide
 
 +SteepSlopeR_U_Dirt
 t 1,4 3,3
 t 1,1 1,4
+editor_hide
 
 # Goes up every 4
 +GradualSlopeL_U1_Dirt
 t 3,3 3,3
 t 6,4 7,4
+editor_hide
 
 +GradualSlopeL_U2_Dirt
 t 3,3 3,3
 t 8,4 9,4
+editor_hide
 
 +GradualSlopeL_U3_Dirt
 t 6,4 7,4
 t 6,1 7,1
+editor_hide
 
 +GradualSlopeL_U4_Dirt
 t 8,4 9,4
 t 8,1 9,1
+editor_hide
 
 +GradualSlopeR_U1_Dirt
 t 10,4 11,4
 t 10,1 11,1
+editor_hide
 
 +GradualSlopeR_U2_Dirt
 t 12,4 13,4
 t 12,1 13,1
+editor_hide
 
 +GradualSlopeR_U3_Dirt
 t 3,3 3,3
 t 10,4 11,4
+editor_hide
 
 +GradualSlopeR_U4_Dirt
 t 3,3 3,3
 t 12,4 13,4
+editor_hide
 
 #######################################
 # Sand I guess
@@ -664,11 +743,13 @@ t 12,4 13,4
 base common_pal_sand
 palette global_palette
 tileset FGCommonPalSand
+editor_category Themed
 
 +SandLeft
 solid
 t 3,0 4,0
 t 3,0 4,0
+editor_hide
 
 +Sand
 autotile AutotileSand
@@ -680,36 +761,43 @@ t 4,0 4,0
 solid
 t 4,0 5,0
 t 4,0 5,0
+editor_hide
 
 +SandTopLeft
 solid
 t 0,0 1,0
 t 3,0 4,0
+editor_hide
 
 +SandTop
 solid
 t 1,0 1,0
 t 4,0 4,0
+editor_hide
 
 +SandTopRight
 solid
 t 1,0 2,0
 t 4,0 5,0
+editor_hide
 
 +SandBottomLeft
 solid
 t 3,0 4,0
 t 6,0 7,0
+editor_hide
 
 +SandBottom
 solid
 t 4,0 4,0
 t 7,0 7,0
+editor_hide
 
 +SandBottomRight
 solid
 t 4,0 5,0
 t 7,0 8,0
+editor_hide
 
 #######################################
 # Treehouse, currently wooden planks
@@ -728,16 +816,19 @@ t 2,0 3,0
 solid
 t 0,0 5,0
 t 2,0 7,0
+editor_hide
 
 +WoodPlanksRight
 solid
 t 4,0 1,0
 t 6,0 3,0
+editor_hide
 
 +WoodPlanksMiddle
 solid
 t 4,0 5,0
 t 6,0 7,0
+editor_hide
 
 #######################################
 # Small indoor decor, for treehouses
@@ -745,7 +836,7 @@ t 6,0 7,0
 base common_pal_indoor_decor
 palette global_palette
 tileset FGIndoorDecor
-
+editor_category Decoration
 +IndoorBottles
 t 0:0 0:0
 t 0,0 1,0
@@ -820,78 +911,94 @@ t 0:0 0:0
 base terrain_rocks
 palette foreststone_palette
 tileset FGForestStone
+editor_category Themed
 
 +StoneSingle
 solid
 q 6,0
+editor_hide
 
 +StoneHorizontalRight
 solid
 t 4,0 7,0
 t 4,1 7,1
+editor_hide
 
 +StoneHorizontalLeft
 solid
 t 6,0 5,0
 t 6,1 5,1
+editor_hide
 
 +StoneHorizontal
 solid
 q 4,0
+editor_hide
 
 +StoneVerticalTop
 solid
 t 6,0 7,0
 t 2,1 3,1
+editor_hide
 
 +StoneTopRight
 solid
 t 4,0 7,0
 t 1,1 3,1
+editor_hide
 
 +StoneTopLeft
 solid
 t 6,0 5,0
 t 2,1 1,1
+editor_hide
 
 +StoneTop
 solid
 t 4,0 5,0
 t 1,1 1,1
+editor_hide
 
 +StoneVerticalBottom
 solid
 t 2,0 3,0
 t 6,1 7,1
+editor_hide
 
 +StoneBottomRight
 solid
 t 0,0 3,0
 t 4,1 7,1
+editor_hide
 
 +StoneBottomLeft
 solid
 t 2,0 1,0
 t 6,1 5,1
+editor_hide
 
 +StoneBottom
 solid
 t 0,0 1,0
 t 4,1 5,1
+editor_hide
 
 +StoneVertical
 solid
 q 2,0
+editor_hide
 
 +StoneRight
 solid
 t 0,0 3,0
 t 1,1 3,1
+editor_hide
 
 +StoneLeft
 solid
 t 2,0 1,0
 t 2,1 1,1
+editor_hide
 
 +Stone
 autotile AutotileStone
@@ -909,78 +1016,91 @@ q 8,0
 base fg_water
 palette foreststone_palette
 tileset FGWater
+editor_uncategorized
 
 +WaterSingle
 class Water
 when InsideBody, BlockWater
 t 0,0 1,0
 t 4,0 5,0
+editor_hide
 
 +WaterVerticalBottom
 class Water
 when InsideBody, BlockWater
 t 3,1 4,1
 t 0,1 2,1
+editor_hide
 
 +WaterVerticalTop
 class Water
 when InsideBody, BlockWater
 t 0,0 1,0
 t 10,0 11,0
+editor_hide
 
 +WaterVertical
 class Water
 when InsideBody, BlockWater
 t 3,1 4,1
 t 3,1 4,1
+editor_hide
 
 +WaterHorizontalLeft
 class Water
 when InsideBody, BlockWater
 t 0,0 3,0
 t 4,0 7,0
+editor_hide
 
 +WaterLowerLeft
 class Water
 when InsideBody, BlockWater
 t 3,1 0:11
 t 0,1 1,1
+editor_hide
 
 +WaterUpperLeft
 class Water
 when InsideBody, BlockWater
 t 0,0 3,0
 t 3,1 9,0
+editor_hide
 
 +WaterLeftSide
 class Water
 when InsideBody, BlockWater
 t 3,1 0:11
 t 3,1 0:11
+editor_hide
 
 +WaterHorizontalRight
 class Water
 when InsideBody, BlockWater
 t 2,0 1,0
 t 6,0 5,0
+editor_hide
 
 +WaterLowerRight
 class Water
 when InsideBody, BlockWater
 t 0:11 4,1
 t 1,1 2,1
+editor_hide
 
 +WaterUpperRight
 class Water
 when InsideBody, BlockWater
 t 2,0 1,0
 t 8,0 11,0
+editor_hide
 
 +WaterRightSide
 class Water
 when InsideBody, BlockWater
 t 0:11 4,1
 t 0:11 4,1
+editor_hide
 
 +WaterHorizontal
 class Water
@@ -993,12 +1113,14 @@ class Water
 when InsideBody, BlockWater
 t 0:11 0:11
 t 1,1 1,1
+editor_hide
 
 +WaterTopside
 class Water
 when InsideBody, BlockWater
 t 2,0 3,0
 t 8,0 9,0
+editor_hide
 
 +Water
 class Water
@@ -1013,6 +1135,7 @@ autotile AutotileWater
 when InsideBody, BlockWater
 t 0:11 6,1
 t 0:11 0:11
+editor_hide
 
 +WaterInnerCornerLeft
 class Water
@@ -1020,6 +1143,7 @@ autotile AutotileWater
 when InsideBody, BlockWater
 t 5,1 0:11
 t 0:11 0:11
+editor_hide
 
 +WaterInnerCornerBoth
 class Water
@@ -1027,6 +1151,7 @@ autotile AutotileWater
 when InsideBody, BlockWater
 t 5,1 6,1
 t 0:11 0:11
+editor_hide
 
 #######################################
 # Small trees (and other plants)
@@ -1048,20 +1173,25 @@ q 2,0
 
 +SmallTreeTopRight
 q 4,0
+editor_hide
 
 +SmallTreeBottomLeft
 q 10,0
+editor_hide
 
 +SmallTreeBottomRight
 q 12,0
+editor_hide
 
 +SmallTreeTrunkTopLeft
 t 0:0 6,0
 t 0:0 6,1
+editor_hide
 
 +SmallTreeTrunkTopRight
 t 7,0 0:0
 t 7,1 0:0
+editor_hide
 
 +SmallTreeTrunkLeft
 t 0:0 6,1
@@ -1079,14 +1209,17 @@ t 2,0 3,0
 +SmallTreeBushTopRight
 t 0:0 0:0
 t 4,0 5,0
+editor_hide
 
 +SmallTreeBushBottomLeft
 t 2,1 3,1
 t 14,0 15,0
+editor_hide
 
 +SmallTreeBushBottomRight
 t 4,1 5,1
 t 14,1 15,1
+editor_hide
 
 +SmallTreeTrunk
 t 6,1 7,1
@@ -1101,6 +1234,7 @@ t 8,1 9,1
 when Touch, BlockAnimateGrass
 t 0:0 0:0
 t 9,2 10,2
+editor_hide
 
 +Vines
 t 5,2 6,2
@@ -1110,11 +1244,13 @@ t 7,2 8,2
 solid_top
 t 0,2 1,2
 t 0:0 0:0
+editor_hide
 
 +BranchPlatformRight
 solid_top
 t 1,2 2,2
 t 0:0 0:0
+editor_hide
 
 +BranchPlatformMiddle
 solid_top
@@ -1160,6 +1296,7 @@ t 14,0 15,0
 base colored_locks
 palette locks_palette
 tileset FGSuitLocks
+editor_category Puzzle
 
 +HeartsKey
 when Touch, BlockKey
@@ -1233,21 +1370,25 @@ t 14,0 15,0
 solid
 t 8,1 9,1
 t 0:0 0:0
+editor_hide
 
 +ClubsLockBottom
 solid
 t 10,1 11,1
 t 0:0 0:0
+editor_hide
 
 +DiamondsLockBottom
 solid
 t 12,1 13,1
 t 0:0 0:0
+editor_hide
 
 +SpadesLockBottom
 solid
 t 14,1 15,1
 t 0:0 0:0
+editor_hide
 
 +InvisibleWall
 solid
@@ -1260,6 +1401,7 @@ t 0:0 0:0
 base special_push
 palette global_palette
 tileset FGSpecialPush
+editor_category Puzzle
 
 +NoGravityPushBlock
 when Side, BlockPushNoGravity
@@ -1282,6 +1424,7 @@ q 4,0
 base $2800
 palette glass_palette
 tileset FGGlassBlocks
+editor_category Themed
 
 +GlassRedSolid
 solid
@@ -1310,6 +1453,7 @@ q 6,0
 
 +GlassPillarTop
 q 2,0
+editor_hide
 
 +GlassPillarMiddle
 autotile AutotileGlassPillar
@@ -1319,6 +1463,7 @@ t 2,1 3,1
 +GlassPillarBottom
 t 2,1 3,1
 t 4,0 5,0
+editor_hide
 
 #######################################
 # Arrow blocks
@@ -1326,6 +1471,7 @@ t 4,0 5,0
 base $5000
 palette global_palette
 tileset FGHannah
+editor_category Puzzle
 
 +WoodArrowRight
 when Touch, BlockWoodArrow
@@ -1390,6 +1536,7 @@ t 0:0 0:0
 base colorfulflower
 palette colorfulflower_palette
 tileset FGColorfulFlowers
+editor_category Decoration
 
 +ColorfulFlower1
 q 0,0
@@ -1420,7 +1567,8 @@ q 14,0
 #######################################
 base toggleblocks
 palette colorfulflower_palette
-tileset FGColorfulFlowers
+tileset FGToggleBlocks
+editor_category Puzzle
 
 +Toggle1Switch
 when Touch, BlockToggleSwitch
@@ -1440,14 +1588,17 @@ t 0,2 1,2
 +Toggle1SwitchPressed
 t 8,1 9,1
 t 12,1 13,1
+editor_hide
 
 +Toggle2SwitchPressed
 t 4,2 5,2
 t 8,2 9,2
+editor_hide
 
 +Toggle3SwitchPressed
 t 14,1 15,1
 t 2,2 3,2
+editor_hide
 
 +Toggle1BlockNonsolid
 when SolidCheck, BlockToggleNonsolid
@@ -1493,4 +1644,71 @@ t 0:0 0:0
 #################
 base 0
 palette 0
+editor_category Test
+tileset layer3test
 
++FG3Glass1A
+priority
+t 1,0 1,0
+t 1,0 1,0
+
++FG3Glass1B
+priority
+t 2,0 2,0
+t 2,0 2,0
+
++FG3Glass1C
+priority
+t 3,0 3,0
+t 3,0 3,0
+
+palette 1
+
++FG3Glass2A
+priority
+t 1,0 1,0
+t 1,0 1,0
+
++FG3Glass2B
+priority
+t 2,0 2,0
+t 2,0 2,0
+
++FG3Glass2C
+priority
+t 3,0 3,0
+t 3,0 3,0
+
+palette 2
+
++FG3Glass3A
+priority
+t 1,0 1,0
+t 1,0 1,0
+
++FG3Glass3B
+priority
+t 2,0 2,0
+t 2,0 2,0
+
++FG3Glass3C
+priority
+t 3,0 3,0
+t 3,0 3,0
+
+palette 3
+
++FG3Glass4A
+priority
+t 1,0 1,0
+t 1,0 1,0
+
++FG3Glass4B
+priority
+t 2,0 2,0
+t 2,0 2,0
+
++FG3Glass4C
+priority
+t 3,0 3,0
+t 3,0 3,0
