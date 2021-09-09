@@ -64,6 +64,7 @@ RunPlayerProjectileTable:
   .word .loword(RunProjectileBubble-1)
   .word .loword(RunProjectileExplosion-1)
   .word .loword(RunProjectileCopyAnimation-1)
+  .word .loword(RunProjectileBubbleHeld-1)
 
 .a16
 .i16
@@ -97,6 +98,7 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileBubble-1)
   .word .loword(DrawProjectileExplosion-1)
   .word .loword(DrawProjectileCopyAnimation-1)
+  .word .loword(DrawProjectileBubble-1)
 
 .a16
 .i16
@@ -261,14 +263,9 @@ DontMove:
   ; Okay actually do move to it
   lda ActorPX,y
   sta ActorPX,x
-  phx
-  .import ActorHeight
-  lda ActorType,y
-  tax
-  lda f:ActorHeight,x
+  lda ActorHeight,y
   lsr
-  plx
-  rsb ActorPY,y ; Reverse subtract
+  rsb ActorPY,y
   sta ActorPY,x
   rtl
 .endproc
@@ -1087,7 +1084,7 @@ Right = $2e
 
 .a16
 .i16
-.proc RunProjectileBubble
+.proc RunProjectileBubbleShared
   lda ActorTimer,x
   beq NotLaunched
     cmp #60
@@ -1096,6 +1093,7 @@ Right = $2e
     :
     inc ActorTimer,x
 	jsl ActorApplyVelocity
+    clc
     rtl
   NotLaunched:
   ; -------
@@ -1126,24 +1124,50 @@ Right = $2e
   bne NoRearrange
     jsl RandomPlayerBubblePosition
   NoRearrange:
-
-  ; Need to press attack, but not up or down
-  lda keynew
-  and #KEY_X|KEY_A|KEY_L|KEY_R
-  beq :+
-  lda keydown
-  and #KEY_DOWN|KEY_UP
-  bne :+
-    inc ActorTimer,x
-    lda #$50
-    jsl PlayerNegIfLeft
-    sta ActorVX,x
-  :
+  sec
   rtl
 
 Divide:
   asr_n 3
   rts
+.endproc
+
+.a16
+.i16
+.proc RunProjectileBubbleHeld
+  jsl RunProjectileBubbleShared
+  bcc Exit
+
+  ; Launch when no longer holding the button
+  lda keydown
+  and #KEY_X|KEY_A|KEY_L|KEY_R
+  bne :+
+Go:
+    inc ActorTimer,x
+    lda #$50
+    jsl PlayerNegIfLeft
+    sta ActorVX,x
+  :
+Exit:
+  rtl
+.endproc
+
+.a16
+.i16
+.proc RunProjectileBubble
+  jsl RunProjectileBubbleShared
+  bcc Exit
+
+  ; Need to press attack, but not up or down
+  lda keynew
+  and #KEY_X|KEY_A|KEY_L|KEY_R
+  beq :+
+    lda keydown
+    and #KEY_DOWN|KEY_UP
+    beq RunProjectileBubbleHeld::Go
+  :
+Exit:
+  rtl
 .endproc
 
 .a16
@@ -1419,10 +1443,15 @@ BumpStunOnly:
 Kill:
   jml ActorBecomePoof
 
+DamageALittleLess:
+  jsl ActorSafeRemoveY
+  lda #$02
+  bra AddDamage
+
 DamageALittle:
   jsl ActorSafeRemoveY
   lda #$04
-  bra AddDamage  
+  bra AddDamage
 
 DamageAndRemoveHalf:
   jsl ActorSafeRemoveY
@@ -1494,6 +1523,7 @@ HitProjectileResponse:
   .word .loword(DamageALittle-1) ; Bubble
   .word .loword(Kill-1) ; Explosion
   .word .loword(Nothing-1) ; Copy animation
+  .word .loword(DamageALittleLess-1) ; Bubble (Held)
 
 ; Hook an enemy and pull them to the player
 Hook:

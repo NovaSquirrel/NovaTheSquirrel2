@@ -156,6 +156,8 @@ ProjectileLen = 8
 .globalzp ActorDamage
 .globalzp ActorProjectileType
 .globalzp ActorDynamicSlot
+.globalzp ActorWidth
+.globalzp ActorHeight
 .global ProjectileStart
 .global ProjectileEnd
 
@@ -179,6 +181,7 @@ ProjectileLen = 8
   Bubble
   Explosion
   CopyAnimation
+  BubbleHeld
 .endenum
 
 ParticleLen = 32

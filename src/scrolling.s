@@ -406,8 +406,6 @@ CheckExistsLoop:
   stz ActorVarC,x
   stz ActorTimer,x
   stz ActorOnScreen,x ; also ActorDamage
-  lda #ActorStateValue::Init
-  sta ActorState,x
   tya
   sta ActorIndexInLevel,x
 
@@ -438,6 +436,8 @@ CheckExistsLoop:
   and #$fff
   asl
   sta ActorType,x
+  .import InitActorX
+  jsl InitActorX
 
   ; Store the flags into Actor generic variable A
   lda [LevelActorPointer],y

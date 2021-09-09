@@ -21,7 +21,8 @@
 .include "actorenum.s"
 .smart
 .import ActorClearX, PlayerNegIfLeft, SpeedAngle2Offset256
-.import BlockRunInteractionBelow
+.import BlockRunInteractionBelow, CountProjectileAmount
+.import InitActorX
 
 .segment "C_Player"
 
@@ -84,7 +85,7 @@ AbilityRoutineForId:
   pha
   dea
   lsr
-  tax
+  tax ; <--- Make sure higher byte of A is clear
   lda AttackAnimationSequence,x
   sta TailAttackFrame
 
@@ -258,6 +259,7 @@ WasSolid:
     bcc :+
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
+    jsl InitActorX
 
     stz ActorProjectileType,x
 
@@ -272,6 +274,7 @@ CopyInstead:
   bcc _rts
   lda #Actor::PlayerProjectile16x16*2
   sta ActorType,x
+  jsl InitActorX
 
   lda #PlayerProjectileType::Copy
   sta ActorProjectileType,x
@@ -331,6 +334,7 @@ BurgerSide:
 DoBurgerShared:
   lda #Actor::PlayerProjectile16x16*2
   sta ActorType,x
+  jsl InitActorX
 
   lda #PlayerProjectileType::Burger
   sta ActorProjectileType,x
@@ -360,6 +364,7 @@ DoBurgerShared:
     bcc :+
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
+    jsl InitActorX
 
     lda #PlayerProjectileType::Glider
     sta ActorProjectileType,x
@@ -483,6 +488,7 @@ ThrowNow:
     bcc NoThrow
     lda #Actor::PlayerProjectile16x16*2
     sta ActorType,x
+    jsl InitActorX
 
     lda #PlayerProjectileType::Bomb
     sta ActorProjectileType,x
@@ -524,6 +530,7 @@ BombBelow:
     stz ActorVY,x
     lda #Actor::PlayerProjectile16x16*2
     sta ActorType,x
+    jsl InitActorX
     lda #PlayerProjectileType::Bomb
     sta ActorProjectileType,x
     lda #200
@@ -576,6 +583,7 @@ IceSide:
 DoIceShared:
   lda #Actor::PlayerProjectile16x16*2
   sta ActorType,x
+  jsl InitActorX
 
   lda #PlayerProjectileType::Ice
   sta ActorProjectileType,x
@@ -611,6 +619,7 @@ DoIceShared:
     bcc No
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
+    jsl InitActorX
 
     lda #PlayerProjectileType::FireBall
     sta ActorProjectileType,x
@@ -655,6 +664,7 @@ No:
     bcc :+
     lda #Actor::PlayerProjectile16x16*2
     sta ActorType,x
+    jsl InitActorX
 
     lda #PlayerProjectileType::WaterBottle
     sta ActorProjectileType,x
@@ -725,6 +735,7 @@ No:
     bcc NoCreateHook
     lda #Actor::PlayerProjectile16x16*2
     sta ActorType,x
+    jsl InitActorX
 
     lda #PlayerProjectileType::FishingHook
     sta ActorProjectileType,x
@@ -898,6 +909,7 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
     bcc NoCreateRocket
     lda #Actor::PlayerProjectile16x16*2
     sta ActorType,x
+    jsl InitActorX
 
     lda #PlayerProjectileType::RemoteMissile
     sta ActorProjectileType,x
@@ -942,8 +954,18 @@ NoCreateRocket:
 
 
 .a8
+.i16
 .proc RunAbilityBubble
+  lda TailAttackVariable
+  bne InitializedWithCount
+    inc TailAttackVariable
+    jsr HaveFloatingBubbles
+    sta TailAttackVariable+1
+  InitializedWithCount:
+
   ; Need Up+Attack or Down+Attack to charge
+  lda TailAttackVariable+1
+  beq ChargeUp
   lda TailAttackDirection
   and #>(KEY_DOWN|KEY_UP)
   bne ChargeUp
@@ -951,8 +973,12 @@ NoCreateRocket:
   rts
 ChargeUp:
 
-  lda #1
-  sta AbilityMovementLock
+  lda TailAttackDirection
+  and #>(KEY_DOWN|KEY_UP)
+  beq :+
+    lda #1
+    sta AbilityMovementLock
+  :
   lda #PlayerFrame::FISHING
   sta TailAttackFrame
 
@@ -980,7 +1006,7 @@ ChargeUp:
   inx
   stx OamPtr
 
-  lda keydown
+  lda keydown ; Cancel the charging
   and #AttackKeys
   bne :+
     stz TailAttackTimer
@@ -989,12 +1015,8 @@ ChargeUp:
   :
 
   ; Force a bubble out immediately if there's none
-  seta16
-  .import CountProjectileAmount
-  lda #Actor::PlayerProjectile*2
-  jsl CountProjectileAmount
+  jsr HaveFloatingBubbles
   beq ForceBubble
-  seta8
 
   ; Use the amount of time the ability has been out instead of the frame counter
   lda TailAttackTimer
@@ -1010,9 +1032,17 @@ ForceBubble:
 	jsl ActorClearX
     lda #Actor::PlayerProjectile*2
     sta ActorType,x
+    jsl InitActorX
 
-    lda #PlayerProjectileType::Bubble
+    lda #PlayerProjectileType::BubbleHeld
     sta ActorProjectileType,x
+    ; But if using down+attack, override
+    lda TailAttackDirection
+    and #>(KEY_DOWN|KEY_UP)
+    beq :+
+      lda #PlayerProjectileType::Bubble
+      sta ActorProjectileType,x
+    :
 
     jsr AbilityPositionProjectile8x8
     lda PlayerPY
@@ -1032,6 +1062,30 @@ ForceBubble:
   rts
 WandOffsetX: .lobytes 1, -16-1
 WandAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
+
+; Bubbles are floating if their timer is zero
+HaveFloatingBubbles:
+  seta16
+  ldy #ProjectileStart
+@Loop:
+  lda ActorType,y
+  cmp #Actor::PlayerProjectile*2
+  bne :+
+  lda ActorTimer,y ; Flying bubbles don't count here
+  bne :+
+    seta8
+    lda #1 ; High byte is zero because a BNE skips this
+    rts
+  :
+  .a16 ; Branch not taken? still in 16-bit land
+  tya
+  add #ActorSize
+  tay
+  cpy #ProjectileEnd
+  bne @Loop
+  tdc ; Clear accumulator
+  seta8
+  rts
 .endproc
 
 .a16

@@ -226,8 +226,12 @@ NotWalkSpeed:
   and #KEY_RIGHT
   bne NotLeft
     seta8
+    lda PlayerAbility
+    cmp #Ability::Bubble
+    beq @Force
     lda TailAttackTimer
     bne :+
+@Force:
       lda #1
       sta PlayerDir
     :
@@ -249,8 +253,12 @@ NotLeft:
   and #KEY_LEFT
   bne NotRight
     seta8
+    lda PlayerAbility
+    cmp #Ability::Bubble
+    beq @Force
     lda TailAttackTimer
     bne :+
+@Force:
       stz PlayerDir
     :
     seta16
@@ -486,7 +494,7 @@ PlayerIsntOnLadder:
     lda keydown+1
     and #(KEY_B>>8)
     bne :+
-      lda PlayerJumpCancelLock
+      lda PlayerJumpCancelLock ; Set by springs
       bne :+
         inc PlayerJumpCancel
 

@@ -18,7 +18,7 @@
 .include "snes.inc"
 .include "global.inc"
 .include "blockenum.s"
-.import ActorRun, ActorDraw, ActorFlags, ActorWidth, ActorHeight, ActorBank, ActorGraphic, ActorPalette
+.import ActorRun, ActorDraw, ActorFlags, ActorWidthTable, ActorHeightTable, ActorBank, ActorGraphic, ActorPalette
 .import ActorGetShot
 .smart
 
@@ -1027,11 +1027,7 @@ ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
 .a16
 .export ActorBumpAgainstCeiling
 .proc ActorBumpAgainstCeiling
-  phx
-  lda ActorType,x
-  tax
-  lda f:ActorHeight,x
-  plx
+  lda ActorHeight,x
   ; Reverse subtraction
   eor #$ffff
   sec
@@ -1464,12 +1460,9 @@ Shift:
   and #$00ff
   cmp #ActorStateValue::Stunned
   bne :+
-    phx
     ; Adjust Y position, for actors that are not the full 16 pixels tall
-    lda ActorType,x
-    tax
     lda #16<<4
-    sub f:ActorHeight,x
+    sub ActorHeight,x
     lsr
     lsr
     lsr
@@ -1480,7 +1473,6 @@ Shift:
     ; Use Y flip
     lda #OAM_YFLIP
     tsb 4
-    plx
   :
 
   lda 4
@@ -2100,21 +2092,16 @@ AYPos    = TouchTemp+6
   ; Test X positions
 
   ; Add the two widths together
-  phx
-  lda ActorType,x
-  tax
-  lda f:ActorHeight,x
+  lda ActorHeight,x
   sta AHeight1
 
   ; The two actors' widths are added together, so just do this math now
-  lda f:ActorWidth,x
-  ldx ActorType,y
-  add f:ActorWidth,x
+  lda ActorWidth,x
+  add ActorWidth,y
   sta AWidth
 
-  lda f:ActorHeight,x
+  lda ActorHeight,y
   sta AHeight2
-  plx
 
   ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
   lda ActorPX,x
@@ -2169,18 +2156,13 @@ AHeight1 = TouchTemp+2
 AYPos    = TouchTemp+4
   ; Test X positions
 
-  ; Add the two widths together
-  phx
-  lda ActorType,x
-  tax
-  lda f:ActorHeight,x
+  lda ActorHeight,x
   sta AHeight1
 
   ; Player and actor width are added together
-  lda f:ActorWidth,x
+  lda ActorWidth,x
   add #8<<4 ; Player width
   sta AWidth
-  plx
 
   ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
   lda PlayerPX
@@ -2488,3 +2470,52 @@ Loop:
   plx
   rtl
 .endproc
+
+.a16
+.i16
+.export InitActorX
+.proc InitActorX
+  lda #ActorStateValue::Init
+  sta ActorState,x
+  ; Fall into UpdateActorSizeX
+.endproc
+.export UpdateActorSizeX
+.proc UpdateActorSizeX
+  phx
+  phy
+  txy
+  lda ActorType,x
+  tax
+  lda f:ActorWidthTable,x
+  sta ActorWidth,y
+  lda f:ActorHeightTable,x
+  sta ActorHeight,y
+  ply
+  plx
+  rtl
+.endproc
+
+.a16
+.i16
+.export InitActorY
+.proc InitActorY
+  lda #ActorStateValue::Init
+  sta ActorState,y
+  ; Fall into UpdateActorSizeY
+.endproc
+.export UpdateActorSizeY
+.proc UpdateActorSizeY
+  phx
+  phy
+  tyx
+  lda ActorType,x
+  tax
+  lda f:ActorWidthTable,x
+  sta ActorWidth,y
+  lda f:ActorHeightTable,x
+  sta ActorHeight,y
+  ply
+  plx
+  rtl
+.endproc
+

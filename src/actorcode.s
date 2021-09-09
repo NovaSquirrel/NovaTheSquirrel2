@@ -38,6 +38,7 @@ CommonTileBase = $40
 .import ActorNegIfLeft, AllocateDynamicSpriteSlot
 .import GetAngle512
 .import ActorTryUpInteraction, ActorTryDownInteraction, ActorBumpAgainstCeiling
+.import InitActorX, UpdateActorSizeX, InitActorY, UpdateActorSizeY
 
 .a16
 .i16
@@ -530,6 +531,7 @@ SlowBackDown:
 
       lda #Actor::Burger*2
       sta ActorType,y
+      jsl InitActorY
       lda #0
       sta ActorTimer,y
       sta ActorVY,y
@@ -583,6 +585,7 @@ Left:
 
       lda #Actor::Burger*2
       sta ActorType,y
+      jsl InitActorY
       lda #0
       sta ActorTimer,y
       sta ActorVY,y
@@ -741,6 +744,7 @@ NormalWalk:
 
         lda #Actor::FireFlames*2
         sta ActorType,y
+        jsl InitActorY
         lda #32
         sta ActorTimer,y
   :
@@ -783,6 +787,7 @@ NormalWalk:
 
           lda #Actor::FireFlames*2
           sta ActorType,y
+          jsl InitActorY
           lda #40
           sta ActorTimer,y
   :
@@ -967,6 +972,7 @@ DoShoot:
 
     lda #Actor::FireBullet*2
     sta ActorType,y
+    jsl InitActorY
     lda #40
     sta ActorTimer,y
     seta8
@@ -1106,6 +1112,7 @@ GoToNotNear:
 
       lda #Actor::GeorgeBottle*2
       sta ActorType,y
+      jsl InitActorY
 
       lda #60
       sta ActorTimer,y
@@ -1251,6 +1258,7 @@ TilesB:
       jsl ActorCopyPosXY
       lda #Actor::BomberTreeSeed*2
       sta ActorType,y
+      jsl InitActorY
   NoShoot:
   rtl
 .endproc
@@ -1280,6 +1288,7 @@ Tree:
       stz ActorVarA,x ; Used for "emerged" flag
       lda #Actor::BomberTreeTurnip*2
       sta ActorType,x
+      jsl UpdateActorSizeX
       lda #.loword(-$30)
       sta ActorVY,x
 
@@ -2808,17 +2817,7 @@ ThwaiteCosineTable:
 .a16
 .export ActorBecomePoof
 .proc ActorBecomePoof
-  phx
-  lda ActorType,x
-  pha
   jsl ActorSafeRemoveX
-  pla
-  tax
-  .import ActorHeight
-  lda f:ActorHeight,x
-  sta 0
-  plx
-
   jsl FindFreeParticleY
   bcc Exit
     lda #Particle::Poof
@@ -2826,7 +2825,7 @@ ThwaiteCosineTable:
     lda ActorPX,x
     sta ParticlePX,y
     lda ActorPY,x
-    sub 0
+    sub ActorHeight,x
     add #4*16
     sta ParticlePY,y
 Exit:

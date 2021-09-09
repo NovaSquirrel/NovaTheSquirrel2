@@ -67,7 +67,7 @@ outfile = open("src/actordata.s", "w")
 outfile.write('; This is automatically generated. Edit "actors.txt" instead\n')
 outfile.write('.include "snes.inc"\n.include "global.inc"\n.include "graphicsenum.s"\n.include "paletteenum.s"\n')
 
-outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidth, ActorHeight, ActorPalette, ActorGraphic, ActorHealth\n')
+outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidthTable, ActorHeightTable, ActorPalette, ActorGraphic, ActorHealth\n')
 outfile.write('.export ParticleRun, ParticleDraw\n')
 outfile.write('.export OWDecorationGraphic, OWDecorationPalette, OWDecorationPic\n')
 
@@ -105,12 +105,12 @@ for b in all_actors:
 	outfile.write('  .byt ^%s, ^%s\n' % (b["run"], b["draw"]))
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ActorWidth\n  .word 0\n')
+outfile.write('.proc ActorWidthTable\n  .word 0\n')
 for b in all_actors:
 	outfile.write('  .word %s<<4 ; %s\n' % (b["size"][0], b["name"]))
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc ActorHeight\n  .word 0\n')
+outfile.write('.proc ActorHeightTable\n  .word 0\n')
 for b in all_actors:
 	outfile.write('  .word %s<<4 ; %s\n' % (b["size"][1], b["name"]))
 outfile.write('.endproc\n\n')
@@ -137,7 +137,7 @@ for b in all_actors:
 outfile.write('.endproc\n\n')
 
 # Particles
-outfile.write('.segment "ParticleCode"\n')
+outfile.write('.segment "C_ParticleCode"\n')
 outfile.write('.proc ParticleDraw\n  .addr .loword(ParticleNothing-1)\n')
 for b in all_particles:
 	outfile.write('  .addr .loword(%s-1)\n' % b["draw"])
@@ -150,7 +150,7 @@ outfile.write('.endproc\n\n')
 
 
 # Overworld decorations
-outfile.write('.segment "Overworld"\n\n')
+outfile.write('.segment "C_Overworld"\n\n')
 
 outfile.write('.proc OWDecorationGraphic\n')
 for b in all_owdecorations:
