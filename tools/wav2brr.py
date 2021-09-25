@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+#
+# Wave to BRR converter
+# Copyright 2016, 2021 Damian Yerrick
+#
+# Copying and distribution of this file, with or without
+# modification, are permitted in any medium without royalty
+# provided the copyright notice and this notice are preserved.
+# This file is offered as-is, without any warranty.
+
 from contextlib import closing
 import array, wave, sys, os, optparse
 try:
@@ -98,7 +107,8 @@ quant: None during test filtering; 2 to 4096 during encoding
                    for coeff, prev in zip(coeffs, prevs[-len(coeffs):]))
         rescaled = resid = (c - pred)
         if quant:
-            resid = max(-8, min(7, int(round(resid / quant))))
+            resid = int(round(resid / quant))
+            resid = max(-8, min(7, resid))
             rescaled = resid * quant
         out.append(resid)
         prevs.append(rescaled + pred)
@@ -125,11 +135,20 @@ quant: number by which all residuals shall be multiplied
         prevs.append(c)
     return out
 
+CLIP_MAX = 32000
+
 def encode_brr(wav, looped=False):
     prevs = []
-    out = array.array('B')
+    out = bytearray()
     for t in range(0, len(wav), 16):
         piece = wav[t:t + 16]
+
+        # Occasionally, treble boost may cause a sample to clip.
+        peak = max(abs(c) for c in piece)
+        if peak > CLIP_MAX:
+##            print("clip peak %d at time %d" % (peak, t))
+            piece = [max(min(c, CLIP_MAX), -CLIP_MAX) for c in piece]
+
         if prevs:
             # Calculate the peak residual for this piece with
             # each filter, then choose the smallest
@@ -141,11 +160,12 @@ def encode_brr(wav, looped=False):
             # first block always uses filter 0
             peak = max(abs(resid) for resid in piece)
             filterid = 0
+
         logquant = 0
-        while logquant < 12 and peak > (15 << logquant):
+        while logquant < 12 and peak >= (7 << logquant):
             logquant += 1
         resids, prevs = enfilter(piece, brr_filters[filterid],
-                                 prevs or [], 2 << logquant)
+                                 prevs or [], 1 << (logquant + 0))
         resids.extend([0] * (16 - len(resids)))
         byte0 = (logquant << 4) | (filterid << 2)
         if t + 16 >= len(wav):
@@ -157,19 +177,19 @@ def encode_brr(wav, looped=False):
             hinibble = resids[i] & 0x0F
             lonibble = resids[i + 1] & 0x0F
             out.append((hinibble << 4) | lonibble)
-    return out.tostring()
+    return bytes(out)
 
 def decode_brr(brrdata):
     prevs = [0, 0]
     out = []
     for i in range(0, len(brrdata), 9):
-        piece = array.array('B', brrdata[i:i + 9])
+        piece = bytes(brrdata[i:i + 9])
         logquant = piece[0] >> 4
         filterid = (piece[0] >> 2) & 0x03
         resids = [((b >> i & 0x0F) ^ 8) - 8
                   for b in piece[1:] for i in (4, 0)]
         decoded = defilter(resids, brr_filters[filterid],
-                           prevs, 2 << logquant)
+                           prevs, 1 << (logquant + 0))
 ##        print("filter #%d, scale %d,\nresids %s\n%s"
 ##              % (filterid, 1 << logquant, repr(resids), repr(decoded)))
         out.extend(decoded)
@@ -197,28 +217,35 @@ Audio converter for Super NES S-DSP.
 def parse_argv(argv):
     parser = optparse.OptionParser(usage=usageText, version=versionText,
                                    description=descriptionText)
-    parser.add_option("-i", dest="infilename",
+    parser.add_option("-i", "--input", dest="infilename",
                       help="read from INFILE",
                       metavar="INFILE")
-    parser.add_option("-o", dest="outfilename",
+    parser.add_option("-o", "--output", dest="outfilename",
                       help="write output to OUTFILE",
                       metavar="OUTFILE")
     parser.add_option("-d", "--decompress",
                       action="store_true", dest="decompress", default=False,
                       help="decompress BRR to wave (default: compress wave to BRR)")
+    parser.add_option("--emph", "--emphasize",
+                      action="store_true", dest="emph", default=False,
+                      help="read wave, write preemphasized (treble boosted) wave")
+    parser.add_option("--deemph", "--deemphasize",
+                      action="store_true", dest="deemph", default=False,
+                      help="read wave, write deemphasized wave")
     parser.add_option("-r", "--rate", dest="rate",
-                      metavar="RATE", type="int", default=8372,
-                      help="with -d, set the wave sample rate in Hz (default: 8372)")
+                      metavar="RATE", type="int", default=None,
+                      help="output wave sample rate in Hz "
+                      "(default: 8372 for -d; input rate for --emph and --deeemph)")
     parser.add_option("--loop",
                       action="store_true", dest="loop", default=False,
                       help="set the BRR's loop bit")
     parser.add_option("--skip-filter",
                       action="store_true", dest="skipfilter", default=False,
-                      help="skip the preemphasis filter")
+                      help="skip (de)emphasis when (de)compressing")
 
     (options, pos) = parser.parse_args(argv[1:])
 
-    if not 10 <= options.rate <= 128000:
+    if options.rate is not None and not 10 <= options.rate <= 128000:
         parser.error("output sample rate must be 10 to 128000 Hz")
 
     # Fill unfilled roles with positional arguments
@@ -241,16 +268,25 @@ def parse_argv(argv):
         pass
     return options
 
+DEFAULT_RATE = 8372
+
 def main(argv=None):
-    argv = argv or sys.argv
-    opts = parse_argv(argv)
-    if opts.decompress:
+    opts = parse_argv(argv or sys.argv)
+    if opts.emph:
+        freq, wave = load_wave_as_mono_s16(opts.infilename)
+        wave = brr_preemphasize(wave)
+        save_wave_as_mono_s16(opts.outfilename, opts.rate or freq, wave)
+    elif opts.deemph:
+        freq, wave = load_wave_as_mono_s16(opts.infilename)
+        wave = brr_deeemphasize(wave)
+        save_wave_as_mono_s16(opts.outfilename, opts.rate or freq, wave)
+    elif opts.decompress:
         with open(opts.infilename, 'rb') as infp:
             brrdata = infp.read()
         out = decode_brr(brrdata)
         if not opts.skipfilter:
             out = brr_deemphasize(out)
-        save_wave_as_mono_s16(opts.outfilename, opts.rate, out)
+        save_wave_as_mono_s16(opts.outfilename, opts.rate or DEFAULT_RATE, out)
     else:
         freq, wave = load_wave_as_mono_s16(opts.infilename)
         if not opts.skipfilter:
@@ -260,5 +296,8 @@ def main(argv=None):
             outfp.write(brrdata)
 
 if __name__=='__main__':
-    main()
+    if "idlelib" in sys.modules:
+        main()
+    else:
+        main()
 ##    convolve_test()
