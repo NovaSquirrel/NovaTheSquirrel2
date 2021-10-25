@@ -57,3 +57,5 @@ E000 SPBurgerRider
 3A00 FGIndoorDecor
 8800 Mode7HUDSprites
 E000 SPLife
+E000 SPKnuckleSandwich
+E000 SPPumpkinBoat
