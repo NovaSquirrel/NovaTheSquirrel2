@@ -267,10 +267,10 @@ $(imgdirX)/%.chr: $(imgdirX)/%.txt $(imgdirX)/%.png
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
 	$(PY) tools/makebackgroundmap.py $<
-$(srcdir)/m7palettedata: tilesetsX/M7Tileset.png
+$(srcdir)/m7palettedata.s: tilesetsX/M7Tileset.png
 	$(PY) tools/mode7palette.py
 
-$(objdir)/mode7.o: tilesetsX/M7Tileset.chr $(m7levels_lz4)
+$(objdir)/mode7.o: tilesetsX/M7Tileset.chr $(srcdir)/m7palettedata.s $(m7levels_lz4)
 #tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
 #	$(lz4_compress) $(lz4_flags) $< $@
 #	@touch $@
