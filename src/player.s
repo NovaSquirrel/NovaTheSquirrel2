@@ -282,13 +282,12 @@ NotWalk:
   lsr
   bcs DecelerateAnyway
 
-  ; Adjust the deceleration speed if you're trying to turn around
+  ; Don't decelerate if pushing in the direction you're moving
   lda keydown
   and #KEY_LEFT
   beq :+
     lda PlayerVX
     bmi IsMoving
-    lsr Temp
   :
   lda keydown
   and #KEY_RIGHT
@@ -296,7 +295,6 @@ NotWalk:
     lda PlayerVX
     beq Stopped
     bpl IsMoving
-    lsr Temp
   :
 DecelerateAnyway:
   lda PlayerVX
