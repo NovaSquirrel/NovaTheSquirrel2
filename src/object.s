@@ -1437,14 +1437,6 @@ Shift:
 .proc DispActor16x16
   sta 4
 
-  ; If facing left, set the X flip bit
-  lda ActorDirection,x ; Ignore high byte
-  lsr
-  bcc :+
-    lda #OAM_XFLIP
-    tsb 4
-  :
-
   ldy OamPtr
 
   jsr ActorDrawPosition16x16
@@ -1454,6 +1446,14 @@ Shift:
     seta16
     rtl
   :  
+
+  ; If facing left, set the X flip bit
+  lda ActorDirection,x ; Ignore high byte
+  lsr
+  bcc :+
+    lda #OAM_XFLIP
+    tsb 4
+  :
 
   ; If stunned, flip upside down
   lda ActorState,x
@@ -1496,6 +1496,145 @@ Shift:
 
   tya
   add #4
+  sta OamPtr
+  rtl
+.endproc
+
+; Y = address to four tiles to draw, in order
+.a16
+.export DispActor16x16FourTiles
+.proc DispActor16x16FourTiles
+  ; Locals:
+  ; 0 - OAM x pos
+  ; 2 - OAM y pos
+  ; 4  - Tile number TL
+  ; 6  - Tile number TR
+  ; 8  - Tile number BL
+  ; 10 - Tile number BR
+Tile1=4
+Tile2=6
+Tile3=8
+Tile4=10
+  lda a:0,y
+  sta Tile1
+  lda a:2,y
+  sta Tile2
+  lda a:4,y
+  sta Tile3
+  lda a:6,y
+  sta Tile4
+Custom:
+
+  ldy OamPtr
+
+  seta8
+  stz ActorOnScreen,x
+  seta16
+  jsr ActorDrawPosition16x16
+  bcs :+
+    rtl
+  :
+  inc ActorOnScreen,x
+
+  ; If facing left, set the X flip bit
+  lda ActorDirection,x ; Ignore high byte
+  lsr
+  bcc :+
+    ; Toggle X flip and swap horizontally
+    lda Tile2
+    pha
+    lda Tile1
+    eor #OAM_XFLIP
+    sta Tile2
+    pla
+    eor #OAM_XFLIP
+    sta Tile1
+    ; ---
+    lda Tile3
+    pha
+    lda Tile4
+    eor #OAM_XFLIP
+    sta Tile3
+    pla
+    eor #OAM_XFLIP
+    sta Tile4
+  :
+
+  ; If stunned, flip upside down
+  lda ActorState,x
+  and #$00ff
+  cmp #ActorStateValue::Stunned
+  bne :+
+    ; Adjust Y position, for actors that are not the full 16 pixels tall
+    lda #16<<4
+    sub ActorHeight,x
+    lsr
+    lsr
+    lsr
+    lsr
+    add 2
+    sta 2
+
+    ; Toggle Y flip and swap vertically
+    lda Tile1
+    pha
+    lda Tile3
+    eor #OAM_YFLIP
+    sta Tile1
+    pla
+    eor #OAM_YFLIP
+    sta Tile3
+    ; ---
+    lda Tile2
+    pha
+    lda Tile4
+    eor #OAM_YFLIP
+    sta Tile2
+    pla
+    eor #OAM_YFLIP
+    sta Tile4
+  :
+
+  lda Tile1
+  ora SpriteTileBase
+  sta OAM_TILE+(4*0),y
+  lda Tile2
+  ora SpriteTileBase
+  sta OAM_TILE+(4*1),y
+  lda Tile3
+  ora SpriteTileBase
+  sta OAM_TILE+(4*2),y
+  lda Tile4
+  ora SpriteTileBase
+  sta OAM_TILE+(4*3),y
+
+  seta8
+  lda 0
+  sta OAM_XPOS+(4*0),y
+  sta OAM_XPOS+(4*2),y
+  add #8
+  sta OAM_XPOS+(4*1),y
+  sta OAM_XPOS+(4*3),y
+  lda 2
+  sta OAM_YPOS+(4*0),y
+  sta OAM_YPOS+(4*1),y
+  add #8
+  sta OAM_YPOS+(4*2),y
+  sta OAM_YPOS+(4*3),y
+
+  ; Get the high bit of the calculated position and plug it in
+  lda 1
+  cmp #%00000001
+  lda #0 ; 16x16 sprites
+  rol
+  sta OAMHI+1+(4*0),y
+  sta OAMHI+1+(4*1),y
+  sta OAMHI+1+(4*2),y
+  sta OAMHI+1+(4*3),y
+  seta16
+
+  tya
+  add #4*4
   sta OamPtr
   rtl
 .endproc

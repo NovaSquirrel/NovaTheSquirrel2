@@ -27,7 +27,7 @@ CommonTileBase = $40
 
 .import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
 .import DispParticle16x16
-.import DispActor16x16Flipped, DispActor16x16FlippedAbsolute
+.import DispActor16x16FourTiles, DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import ActorTurnAround, ActorSafeRemoveX

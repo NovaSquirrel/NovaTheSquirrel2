@@ -109,7 +109,7 @@
   ActorDirection    = 20 ; 0 (Right) or 1 (Left). Other bits may be used later. Good place for parameters from level?
   ActorState        = 21 ; Nonzero usually means stunned
   ActorOnGround     = 22 ; Nonzero means on ground
-  ActorOnScreen     = 23 ; Nonzero means on screen
+  ActorOnScreen     = 23 ; Nonzero means on screen - only maintained for 16x16 actors
   ActorDamage       = 24 ; Amount of damage the actor has
   ActorDynamicSlot  = 25 ; Dynamic sprite slot (0-7) or 255 if none
   ActorWidth        = 26 ; Width in subpixels
