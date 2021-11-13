@@ -1167,6 +1167,8 @@ NotSlope:
 .proc ActorGetSlopeYPosBelow
   jsr ActorIsSlope
   bcc NotSlope
+    phk
+    plb
     assert_same_banks ActorGetSlopeYPos, SlopeHeightTable
     lda ActorPY,x
     add #$0100
