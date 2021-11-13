@@ -1131,6 +1131,7 @@ ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
 ; and also return if they're on a slope at all (carry)
 .a16
 .proc ActorGetSlopeYPos
+  phb
   ldy ActorPY,x
   lda ActorPX,x
   jsl GetLevelPtrXY
@@ -1159,17 +1160,19 @@ ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
     :
   sec
 NotSlope:
+  plb
   rts
 .endproc
 
 .a16
 ; Similar but for checking one block below
 .proc ActorGetSlopeYPosBelow
+  phb
   jsr ActorIsSlope
   bcc NotSlope
+    assert_same_banks ActorGetSlopeYPosBelow, SlopeHeightTable
     phk
     plb
-    assert_same_banks ActorGetSlopeYPos, SlopeHeightTable
     lda ActorPY,x
     add #$0100
     and #$ff00
@@ -1190,6 +1193,7 @@ NotSlope:
     :
   sec
 NotSlope:
+  plb
   rts
 .endproc
 
