@@ -32,7 +32,7 @@ CommonTileBase = $40
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
 .import ActorTurnAround, ActorSafeRemoveX
 .import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
-.import PlayerActorCollision, TwoActorCollision
+.import PlayerActorCollision, TwoActorCollision, PlayerActorCollisionMultiRect
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
 .import ActorNegIfLeft, AllocateDynamicSpriteSlot
@@ -2451,6 +2451,550 @@ NoMove:
   jml DispActor16x16
 .endproc
 
+.a16
+.i16
+.export RunKnuckleSandwich
+.proc RunKnuckleSandwich
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawKnuckleSandwich
+.proc DrawKnuckleSandwich
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunKnuckleSandwichSign
+.proc RunKnuckleSandwichSign
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawKnuckleSandwichSign
+.proc DrawKnuckleSandwichSign
+  lda ActorVarA,x
+  asl
+  adc #OAM_PRIORITY_2|12
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunPumpkinBoat
+.proc RunPumpkinBoat
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawPumpkinBoat
+.proc DrawPumpkinBoat
+  lda framecount
+  and #%100
+  beq :+
+    lda #.loword(Frame1)
+    jml DispActorMetaPriority2
+: lda #.loword(Frame2)
+  jml DispActorMetaPriority2
+
+Frame1:
+  Row16x16  -12,  0,  $02, $04
+  Row16x16  -12,  0,  $00
+  EndMetasprite
+Frame2:
+  Row8x8    0, 0
+  Row16x16  -12,  0,  $00
+  EndMetasprite
+.endproc
+
+.a16
+.i16
+.export RunRideableBoat
+.proc RunRideableBoat
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawRideableBoat
+.proc DrawRideableBoat
+  lda framecount
+  and #%100
+  beq :+
+    lda #.loword(Frame1)
+    jml DispActorMetaPriority2
+: lda #.loword(Frame2)
+  jml DispActorMetaPriority2
+
+Frame1:
+  Row8x8    0,  0,  $12, $13, $14, $15
+  Row8x8    0, -8,  $17
+  EndMetasprite
+
+Frame2:
+  Row8x8    0,  0,  $16, $13, $14, $15
+  Row8x8    0, -8,  $17
+  EndMetasprite
+
+.endproc
+
+.a16
+.i16
+.export RunPumpkinMan
+.proc RunPumpkinMan
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawPumpkinMan
+.proc DrawPumpkinMan
+  rtl
+.endproc
+
+.a16
+.i16
+.export RunPumpkinSpiceLatte
+.proc RunPumpkinSpiceLatte
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawPumpkinSpiceLatte
+.proc DrawPumpkinSpiceLatte
+  jmp DrawGeorgeBottle
+.endproc
+
+.a16
+.i16
+.export RunPumpkin
+.proc RunPumpkin
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawPumpkin
+.proc DrawPumpkin
+  lda #OAM_PRIORITY_2|11
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunSwordSlime
+.proc RunSwordSlime
+  lda #$10
+  jsl ActorWalkOnPlatform
+  jsl ActorFall
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawSwordSlime
+.proc DrawSwordSlime
+  lda framecount
+  lsr
+  lsr
+  lsr
+  and #%110
+  tay
+  lda Frames,y
+  jml DispActorMetaPriority2
+
+Frame1:
+  Row16x16  -4,  0,  $00
+  Row16x16   4,  0,  $01
+  EndMetasprite
+Frame2:
+  Row16x16  -4,  0,  $03
+  Row16x16   4,  0,  $04
+  EndMetasprite
+Frame3:
+  Row16x16  -4,  0,  $06
+  Row16x16   4,  0,  $07
+  EndMetasprite
+Frames:
+  .addr .loword(Frame1)
+  .addr .loword(Frame2)
+  .addr .loword(Frame3)
+  .addr .loword(Frame2)
+.endproc
+
+.a16
+.i16
+.export RunSwordSlimeSword
+.proc RunSwordSlimeSword
+  inc ActorVarA,x
+  lda ActorVarA,x
+  cmp #20
+  bne :+
+    stz ActorType,x
+  :
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawSwordSlimeSword
+.proc DrawSwordSlimeSword
+  lda ActorVarA,x
+  lsr
+  lsr
+  bne :+
+    ; Frame 1
+    lda #.loword(VerticalFrame)
+    jml DispActorMetaPriority2
+  :
+  dea
+  bne :+
+    ; Frame 2
+    lda #10|OAM_PRIORITY_2
+    jml DispActor16x16
+  :
+  dea
+  bne :+
+    ; Frame 3
+    lda #12|OAM_PRIORITY_2
+    jml DispActor16x16
+  :
+  ; Frame 4
+  lda #.loword(HorizontalFrame)
+  jml DispActorMetaPriority2
+
+VerticalFrame:
+  Row8x8   -4, -8,  $09
+  Row8x8   -4,  0,  $19
+  EndMetasprite
+
+HorizontalFrame:
+  Row8x8   -4,  0,  $1e, $1f
+  EndMetasprite
+
+HorizontalGreenFrame:
+  Row8x8   -4,  0,  $0e, $0f
+  EndMetasprite
+.endproc
+
+.a16
+.i16
+.export RunStrifeCloud
+.proc RunStrifeCloud
+  ; If too far, move in
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #2*256
+  bcs Move
+
+  lda ActorState,x
+  and #255
+  bne NoShoot
+  jsl ActorLookAtPlayer
+
+  lda ActorIndexInLevel,x
+  eor framecount
+  and #31
+  bne NoShoot
+    jsl FindFreeActorY
+    bcc NoShoot
+      jsl ActorClearY
+      jsl ActorCopyPosXY ; Put the sword onscreen
+      jsl AllocateDynamicSpriteSlot
+      bcc NoShoot
+          seta8
+          sta ActorDynamicSlot,y
+		  lda ActorDirection,x
+		  sta ActorDirection,y
+
+          lda #ActorStateValue::Paused
+          sta ActorState,x
+          seta16
+
+          ; Copy over the origin point
+          lda ActorPY,x
+          sta ActorVY,y
+          lda ActorPX,x
+          sta ActorVX,y
+
+          lda #Actor::StrifeCloudSword*2
+          sta ActorType,y
+
+          jsl InitActorY
+
+          lda #15
+          sta ActorTimer,x
+NoShoot:
+  rtl
+
+Move:
+  lda #$10
+  jsl ActorWalk
+  jsl ActorAutoBump
+  jsl ActorHover
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawStrifeCloud
+.proc DrawStrifeCloud
+  lda framecount
+  lsr
+  and #%110
+  ora #OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunBurgerRiderJumper
+.proc RunBurgerRiderJumper
+  jsl ActorFall
+  bcc InAir
+    jsl ActorLookAtPlayer
+    inc ActorVarB,x
+    lda ActorVarB,x
+    cmp #20
+    bcc :+
+      stz ActorVarB,x
+      lda #.loword(-$60)
+      sta ActorVY,x
+    :
+    jml PlayerActorCollisionHurt
+InAir:
+  lda #20
+  jsl ActorWalk
+  jml PlayerActorCollisionHurt
+.endproc
+
+.a16
+.i16
+.export DrawBurgerRiderJumper
+.proc DrawBurgerRiderJumper
+  lda ActorOnGround,x
+  and #255
+  bne :+
+    lda #.loword(InAir)
+    jml DispActorMetaPriority2
+  :
+  lda #.loword(Standing)
+  jml DispActorMetaPriority2
+
+InAir:
+  Row8x8   -4,-32+4,    $16, $17
+  Row16x16  0,-16+4,    $04
+  Row16x16  0,  0+4,    $08
+  EndMetasprite
+
+Standing:
+  Row8x8   -4,-32+4,    $16, $17
+  Row16x16  0,-16+4,    $04
+  Row8x8   -4, -8+4,    $06, $07
+  Row8x8   -4,  0+4,    $0f, $1f
+  EndMetasprite
+.endproc
+
+.a16
+.i16
+.export RunDave
+.proc RunDave
+  lda #$10
+  jsl ActorWalkOnPlatform
+  jml ActorFall
+.endproc
+
+.a16
+.i16
+.export DrawDave
+.proc DrawDave
+  lda framecount
+  lsr
+  lsr
+  and #%10
+  tay
+  lda WalkFrames,y
+  jml DispActorMetaPriority2
+Standing:
+  Row16x16   0, -16,   $00
+  Row16x16   0,   0,   $02
+  EndMetasprite
+Walk1:
+  Row16x16   0,-16,    $00
+  Row8x8    -4, -8,    $02, $03
+  Row8x8    -4, 0,     $12, $15
+  EndMetasprite
+Walk2:
+  Row16x16   0,-16,    $00
+  Row8x8     -4, -8,    $02, $03
+  Row8x8     -4, 0,     $14, $13
+  EndMetasprite
+Jump:
+  Row16x16   0,-16,    $00
+  Row8x8     -4, -8,    $02, $03
+  Row8x8     -4, 0,     $0a, $0b
+  EndMetasprite
+Mad:
+  Row16x16   0, -16,   $06
+  Row16x16   0,   0,   $02
+  EndMetasprite
+WalkFrames:
+  .word .loword(Walk1)
+  .word .loword(Walk2)
+.endproc
+
+
+; A = pointer to the data for the current frame
+; Y = bank for the data, should have the most significant bit set so that two DMAs are queued (for two rows in VRAM)
+.a16
+.i16
+.proc DrawUpdate32x32DynamicFrame
+  sty 0    ; Y = Source address bank | $8000
+  phx
+  pha
+  lda ActorDynamicSlot,x
+  and #7
+  tax      ; X = Sprite number
+  ldy #256 ; Y = Number of bytes
+  pla      ; A = Source address
+  .import QueueDynamicSpriteUpdate
+  jsl QueueDynamicSpriteUpdate
+  plx
+
+DisplayOnly:
+  lda ActorDynamicSlot,x
+  and #7
+  .import GetDynamicSpriteTileNumber
+  jsl GetDynamicSpriteTileNumber
+  ora #OAM_PRIORITY_2
+  sta SpriteTileBase
+
+  lda #.loword(Frame)
+  .import DispActorMetaPriority2
+  jml DispActorMetaPriority2
+
+Frame: ; Should have the program bank = data bank here!
+  Row16x16 -8, -8,  $00, $02
+  Row16x16 -8,  8,  $04, $06
+  EndMetasprite
+.endproc
+Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
+
+.a16
+.i16
+.export RunStrifeCloudSword
+.proc RunStrifeCloudSword
+  inc ActorVarA,x
+  lda ActorVarA,x
+  cmp #5*3+4
+  bne :+
+    jml ActorSafeRemoveX
+  :
+  asl
+  tay
+
+  lda TableX,y
+  jsl ActorNegIfLeft  
+  add ActorVX,x
+  sta ActorPX,x
+
+  lda TableY,y
+  add ActorVY,x
+  sta ActorPY,x
+
+  lda #0
+  sta $7faaaa
+
+  lda #.loword(RectTest)
+  jsl PlayerActorCollisionMultiRect
+  bcc :+
+    lda #1
+    sta $7faaaa
+;    .import HurtPlayer
+;    jml HurtPlayer
+  :
+  rtl
+
+RectTest:
+  .word .loword(-16*32), .loword(-16*0), 0*16, 32*16
+;  .word y_offset_top, y_offset_bottom, x_offset, width/2
+  .word 0
+
+TableX:
+  .word .loword(160), .loword(190), .loword(221), .loword(250), .loword(278), .loword(305), .loword(330), .loword(352), .loword(373), .loword(390), .loword(405), .loword(417), .loword(425), .loword(430), .loword(432)
+  .word .loword(432), .loword(432), .loword(432), .loword(432)
+
+TableY:
+  .word .loword(-448), .loword(-446), .loword(-441), .loword(-433), .loword(-421), .loword(-406), .loword(-389), .loword(-368), .loword(-346), .loword(-321), .loword(-294), .loword(-266), .loword(-237), .loword(-206), .loword(-176)
+  .word .loword(-176), .loword(-176), .loword(-176), .loword(-176)
+.endproc
+
+.a16
+.i16
+.export RunDaveSord
+.proc RunDaveSord
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawStrifeCloudSword
+.proc DrawStrifeCloudSword
+  lda ActorVarA,x
+;  lsr
+;  and #.loword(~1)
+  asl
+  tay
+  lda Frames,y
+  ldy #^DSSwordSwing | $8000
+  jml DrawUpdate32x32DynamicFrame
+Frames:
+  .word .loword(DSSwordSwing+(512*0))
+  .word .loword(DSSwordSwing+(512*0))
+  .word .loword(DSSwordSwing+(512*0))
+  .word .loword(DSSwordSwing+(512*1))
+  .word .loword(DSSwordSwing+(512*1))
+  .word .loword(DSSwordSwing+(512*1))
+  .word .loword(DSSwordSwing+(512*2))
+  .word .loword(DSSwordSwing+(512*2))
+  .word .loword(DSSwordSwing+(512*2))
+  .word .loword(DSSwordSwing+(512*3))
+  .word .loword(DSSwordSwing+(512*3))
+  .word .loword(DSSwordSwing+(512*3))
+  .word .loword(DSSwordSwing+(512*4))
+  .word .loword(DSSwordSwing+(512*4))
+  .word .loword(DSSwordSwing+(512*4))
+
+  .word .loword(DSSwordSwing+(512*4))
+  .word .loword(DSSwordSwing+(512*4))
+  .word .loword(DSSwordSwing+(512*4))
+  .word .loword(DSSwordSwing+(512*4))
+.endproc
+
+.a16
+.i16
+.export DrawDaveSord
+.proc DrawDaveSord
+  lda ActorVarA,x
+  and #.loword(~1)
+  tay
+  lda Frames,y
+  ldy #^DSSordSwing | $8000
+  jml DrawUpdate32x32DynamicFrame
+Frames:
+  .word .loword(DSSordSwing+(512*0))
+  .word .loword(DSSordSwing+(512*1))
+  .word .loword(DSSordSwing+(512*2))
+  .word .loword(DSSordSwing+(512*3))
+  .word .loword(DSSordSwing+(512*4))
+.endproc
+
 ; -------------------------------------
 ; Maybe move particles to a separate file, though we don't have many yet
 .pushseg
@@ -2660,22 +3204,49 @@ Erase:
 : jml PlayerActorCollision
 .endproc
 
+; Allocate a dynamic sprite slot if there isn't already one
 .a16
 .i16
-.export ChangeToExplosion
-.proc ChangeToExplosion
-  sta ActorTimer,x
+.export AllocateDynamicSlotIfNeeded
+.proc AllocateDynamicSlotIfNeeded
   bit ActorDynamicSlot-1,x
   bpl AlreadyDynamic
     jsl AllocateDynamicSpriteSlot
     bcs :+
-      stz ActorType,x
+      stz ActorType,x ; Get rid of the type if it can't allocate
       rtl
     :
     seta8
     sta ActorDynamicSlot,x
     seta16
-  AlreadyDynamic:
+AlreadyDynamic:
+  sec
+  rtl
+.endproc
+
+.export AllocateDynamicSpriteSlotForY
+.proc AllocateDynamicSpriteSlotForY
+  jsl AllocateDynamicSpriteSlot
+  bcs :+
+    tdc ; Clear accumulator
+    sta ActorType,y ; Get rid of the type if it can't allocate
+    clc
+    rtl
+  :
+  seta8
+  sta ActorDynamicSlot,y
+  seta16
+  sec
+  rtl
+.endproc
+
+; A = explosion size
+.a16
+.i16
+.export ChangeToExplosion
+.proc ChangeToExplosion
+  sta ActorTimer,x
+  jsl AllocateDynamicSlotIfNeeded
 
   ; Save the position into the velocity
   lda ActorPX,x
@@ -2930,3 +3501,13 @@ Flying:
   jsl ActorGetShot
   rts
 .endproc
+
+.pushseg
+.segment "SordSwing"
+DSSordSwing:
+.incbin "../tilesetsX/DSSordSwing.chr"
+
+.segment "SwordSwing"
+DSSwordSwing:
+.incbin "../tilesetsX/DSSwordSwing.chr"
+.popseg

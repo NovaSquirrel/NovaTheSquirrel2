@@ -1321,8 +1321,6 @@ DSExplosion:
   lda #.loword(Frame)
   .import DispActorMetaPriority2
   jml DispActorMetaPriority2
-;  lda #(6*16)|OAM_PRIORITY_2
-;  jml DispActor16x16
 
 Frame:
   Row16x16 -8, -8,  $00, $02

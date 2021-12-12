@@ -823,11 +823,15 @@ SixteenTileLoop:
 ; Queues a DMA to happen during the next vblank
 ; A = Source address (CPU)
 ; 0 = Source bank
+; 1 = Flags
+;   Most significant bit means do a second DMA, using the same length but using GenericUpdateSource2 and GenericUpdateDestination2 
+;   (You have to write these yourself - use carry to check if this routine succeeded first)
 ; X = Destination address (PPU)
+;   Most significant bit set means it's a palette update
 ; Y = Number of bytes to copy
 ; Returns success in carry
 .proc QueueGenericUpdate
-Flags = 0
+BankAndFlags = 0
 Source = 2
 Destination = 4
 Length = 6
@@ -848,7 +852,7 @@ Fail:
   rtl
 
 Found:
-  lda Flags
+  lda BankAndFlags
   sta GenericUpdateFlags,x
   lda Source
   sta GenericUpdateSource,x
@@ -965,7 +969,7 @@ Addresses:
 ; Queues a DMA to happen during the next vblank
 ; A = Source address (CPU)
 ; 0 = Source bank
-; 1 = Should be negative
+; 1 = Flags - should have the most significant bit set to signal doing two DMAs
 ; X = Dynamic sprite number
 ; Y = Number of bytes to copy
 ; Returns success in carry

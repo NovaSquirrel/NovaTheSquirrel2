@@ -2297,48 +2297,29 @@ No:
 .i16
 .proc PlayerActorCollision
 AWidth   = TouchTemp+0
-AHeight1 = TouchTemp+2
-AYPos    = TouchTemp+4
-  ; Test X positions
+  lda ActorPY,x
+  cmp PlayerPYTop
+  bcc No
 
-  lda ActorHeight,x
-  sta AHeight1
-
-  ; Player and actor width are added together
   lda ActorWidth,x
-  add #8<<4 ; Player width
+  lsr
   sta AWidth
 
-  ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
-  lda PlayerPX
-  sub ActorPX,x
-  bpl :+       ; Take the absolute value
-    eor #$ffff
-    ina
-  :
-  asl
-  cmp AWidth
+  lda ActorPX,x
+  sec
+  sbc AWidth
+  cmp PlayerPXRight
   bcs No
-
-  ; -----------------------------------
-
-  ; Test Y positions
-  ; Y positions of actors are the bottom, so get the top of the actor
-  lda ActorPY,x
-  sub AHeight1
-  pha
-
-  ; And we also need the two heights added together
-  lda AHeight1
-  add #PlayerHeight-1
-  sta AHeight1
-
-  pla
-  clc
-  sbc PlayerPYTop     ; Note will subtract n-1
-  sbc #PlayerHeight-1 ; #SIZE2-1
-  adc AHeight1        ; #SIZE1+SIZE2-1; Carry set if overlap
+  lda ActorPX,x
+  sec
+  adc AWidth
+  cmp PlayerPXLeft
   bcc No
+
+  lda ActorPY,x
+  sub ActorHeight,x
+  cmp PlayerPY
+  bcs No
 
 Yes:
   sec
@@ -2664,3 +2645,94 @@ Loop:
   rtl
 .endproc
 
+
+
+; Put this up here so that the branch can reach it
+PlayerActorCollisionMultiRect_Fail:
+  clc
+  rtl
+
+; X = actor to test against
+; A = pointer to the list of rectangles
+; Format:
+;   .word y_offset_top, y_offset_bottom, x_offset, width/2
+;   (Repeat for however many rectangles)
+;   .word 0
+; X offsets and Y offsets start at the bottom center of the actor, and are the center of the collision box
+; Carry = true if overlapping
+; TODO: Test?
+.export PlayerActorCollisionMultiRect
+.a16
+.i16
+.proc PlayerActorCollisionMultiRect
+Size    = TouchTemp+0
+Pointer = TouchTemp+2
+XPos    = TouchTemp+4
+  sta Pointer
+  ldy #0
+
+Loop:
+  ; Bottom edge should not be above the player's top edge
+  lda (Pointer),y
+  beq PlayerActorCollisionMultiRect_Fail
+  add ActorPY,x
+  wdm 0
+  iny
+  iny
+  cmp PlayerPYTop
+  bcs :+
+     tya
+     adc #6-1 ; Carry set, so -1
+     tay
+     bra Loop
+  :
+
+  ; Top edge should not be below the player's bottom edge
+  lda (Pointer),y
+  add ActorPY,x
+  iny
+  iny
+  cmp PlayerPY
+  bcc :+
+     iny
+     iny
+     iny
+     iny
+     bra Loop
+  :
+
+  wdm 0
+  sec
+  rtl
+
+  ; -------------------------------------------------------
+
+  lda (Pointer),y ; X offset
+  iny
+  iny
+  jsl ActorNegIfLeft
+  add ActorPX,x
+  sta XPos
+
+  ; Left edge should not be to the left of the right edge
+  sub (Pointer),y ; Width/2
+  cmp PlayerPXRight
+  bcs :+
+    iny
+    iny
+    bra Loop
+  :
+
+  ; Right edge should not be to the right of the left edge
+  lda XPos
+  add (Pointer),y
+  cmp PlayerPXLeft
+  bcc :+
+    iny
+    iny
+    bra Loop
+  :
+
+  sec
+  rtl
+.endproc

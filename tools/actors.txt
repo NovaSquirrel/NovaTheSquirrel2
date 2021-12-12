@@ -369,6 +369,120 @@ run RunEnemyLWSS
 draw DrawEnemyLWSS
 size 16x15
 
+# Extra: 1=up, 2=down
++KnuckleSandwich
+flag AutoRemove GetShot AutoReset
+gfx SPKnuckleSandwich
+pal SPCannon
+run RunKnuckleSandwich
+draw DrawKnuckleSandwich
+size 14x14
+
+# Extra: 1=metal sign
++KnuckleSandwichSign
+flag AutoRemove
+gfx SPKnuckleSandwich
+pal SPCannon
+run RunKnuckleSandwichSign
+draw DrawKnuckleSandwichSign
+size 16x16
+
++PumpkinBoat
+flag AutoRemove GetShot AutoReset
+gfx SPPumpkinBoat
+pal SPPumpkinBoat
+run RunPumpkinBoat
+draw DrawPumpkinBoat
+size 16x25
+
++RidableBoat
+flag AutoRemove GetShot AutoReset
+gfx SPPumpkinBoat
+pal SPPumpkinBoat
+run RunRideableBoat
+draw DrawRideableBoat
+size 24x8
+
++PumpkinMan
+flag AutoRemove GetShot AutoReset
+gfx SPPumpkinBoat
+pal SPPumpkinBoat
+run RunPumpkinMan
+draw DrawPumpkinMan
+size 16x27
+
+# Extra: 1=thrown projectile
++Pumpkin
+flag AutoRemove
+gfx SPPumpkinBoat
+pal SPPumpkinBoat
+run RunPumpkin
+draw DrawPumpkin
+size 16x16
+
++PumpkinSpiceLatte
+flag AutoRemove
+gfx SPPumpkinBoat
+pal SPPumpkinBoat
+run RunPumpkinSpiceLatte
+draw DrawPumpkinSpiceLatte
+size 8x8
+
++SwordSlime
+flag AutoRemove GetShot AutoReset
+gfx SPSwordSlime
+pal SPWalker
+run RunSwordSlime
+draw DrawSwordSlime
+size 16x14
+
++SwordSlimeSword
+flag AutoRemove
+gfx SPSwordSlime
+pal SPWalker
+run RunSwordSlimeSword
+draw DrawSwordSlimeSword
+size 8x16
+
++StrifeCloud
+flag AutoRemove GetShot AutoReset
+gfx SPStrifeCloud
+run RunStrifeCloud
+draw DrawStrifeCloud
+size 16x16
+
++StrifeCloudSword
+flag AutoRemove
+gfx SPSwordSlime
+pal SPWalker
+run RunStrifeCloudSword
+draw DrawStrifeCloudSword
+size 8x16
+
++Dave
+flag AutoRemove GetShot AutoReset
+gfx SPStrider
+pal SPWalker
+run RunDave
+draw DrawDave
+size 16x32
+
++DaveSord
+flag AutoRemove
+gfx SPStrider
+pal SPWalker
+run RunDaveSord
+draw DrawDaveSord
+size 32x32
+
++BurgerRiderJumper
+flag AutoRemove GetShot AutoReset
+gfx SPBurgerRider
+pal SPCannon
+run RunBurgerRiderJumper
+draw DrawBurgerRiderJumper
+size 16x40
+
 # ---------- particles ----------
 +Poof
 particle

@@ -16,6 +16,8 @@
 .globalzp SpriteTileBase
 
 .globalzp PlayerPX
+.globalzp PlayerPXLeft
+.globalzp PlayerPXRight
 .globalzp PlayerPY
 .globalzp PlayerPYTop
 .globalzp PlayerVX

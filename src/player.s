@@ -618,8 +618,8 @@ SkipGroundCheck:
 
   ; Above
   lda PlayerPY
-  sub #PlayerHeight ; Top of the head
-  sta PlayerPYTop   ; Used in collision detection with enemies
+  sub #PlayerHeight
+  sta PlayerPYTop     ; Used in collision detection with enemies
   tay
   lda PlayerPX
   jsr TryBelowInteraction
@@ -633,14 +633,22 @@ SkipGroundCheck:
   jsl GetBlockFlag
   jsl BlockRunInteractionInsideBody
 
-
   bit TwoLayerInteraction-1
   bpl :+
     jsr PlayerSecondLayerInteraction
   :
 
+  ; ----------------------------------------
+  ; Precompute collision detection variables
+  lda PlayerPX
+  sub #PlayerCollideWidth/2
+  sta PlayerPXLeft
+  lda PlayerPX
+  add #PlayerCollideWidth/2
+  sta PlayerPXRight
 
   ; -------------------
+  ; Do particle effects when running
   lda PlayerWasRunning
   and #255
   beq :+

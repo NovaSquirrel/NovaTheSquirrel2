@@ -50,12 +50,17 @@
 
   PlayerPX:        .res 2 ; \ player X and Y positions
   PlayerPY:        .res 2 ; /
-  PlayerPYTop:     .res 2 ; Y position for the top of the player
+
   PlayerVX:        .res 2 ; \
   PlayerVY:        .res 2 ; /
   PlayerFrame:     .res 1 ; Player animation frame
   PlayerFrameXFlip: .res 1
   PlayerFrameYFlip: .res 1
+
+  ; Precomputed hitbox edges to speed up collision detection with the player
+  PlayerPXLeft:    .res 2 ; 
+  PlayerPXRight:   .res 2 ;
+  PlayerPYTop:     .res 2 ; Y position for the top of the player
 
   ForceControllerBits: .res 2
   ForceControllerTime: .res 1

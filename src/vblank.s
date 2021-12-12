@@ -160,19 +160,20 @@ GenericUpdateLoop:
   lda #DMAMODE_PPUDATA
   sta DMAMODE
   seta8
-  lda GenericUpdateFlags,x
+  lda GenericUpdateFlags,x   ; First byte is the bank
   sta DMAADDRBANK
   lda #1
   sta COPYSTART
-  lda GenericUpdateFlags+1,x ; Check metadata
+  lda GenericUpdateFlags+1,x ; Second byte is flags.
+  ; Flag format:
+  ; s.......
+  ; +------- Do a second DMA with the same length, coming from GenericUpdateSource2
   bpl @NoSecondRow
     seta16
     sty DMALEN ; Length stored from earlier
     lda GenericUpdateSource2,x
     sta DMAADDR
-    ; Can probably leave the bank the same;
-    ; I don't think I'll ever have data straddle two banks, due to LoROM
-    ; and I don't think DMA can modify the source bank anyway
+    ; Leave the bank the same - the data will not straddle two banks
     lda GenericUpdateDestination2,x
     sta PPUADDR
     seta8

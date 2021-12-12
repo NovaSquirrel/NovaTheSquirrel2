@@ -59,3 +59,6 @@ E000 SPBurgerRider
 E000 SPLife
 E000 SPKnuckleSandwich
 E000 SPPumpkinBoat
+E000 SPStrider
+E000 SPSwordSlime
+E000 SPStrifeCloud
