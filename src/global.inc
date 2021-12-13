@@ -111,7 +111,7 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
   ;   .word x_offset, width/2, y_offset_bottom, y_offset_top
   ;   (Repeat for however many rectangles)
   ;   .word $8000
-  .word .loword((left+width/2)*16), .loword((width/2)*16)
+  .word .loword(left*16+(width*8)), .loword(width*8)
   ; Now the bottom and the top
   .word .loword((top+height-1)*16), .loword((top)*16)
 .endmacro

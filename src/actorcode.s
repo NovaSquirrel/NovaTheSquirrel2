@@ -2687,11 +2687,11 @@ HorizontalGreenFrame:
 .export RunStrifeCloud
 .proc RunStrifeCloud
   ; If too far, move in
-;  lda ActorPX,x
-;  sub PlayerPX
-;  abs
-;  cmp #2*256
-;  bcs Move
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #2*256
+  bcs Move
 
   lda ActorState,x
   and #255
@@ -2888,6 +2888,16 @@ Frame: ; Should have the program bank = data bank here!
 .endproc
 Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
 
+
+  .byt 0 ; Because the collision is one frame behind
+StrifeCloudSwordFrames:
+  .byt 0, 0, 0
+  .byt 2, 2, 2
+  .byt 4, 4, 4
+  .byt 6, 6, 6
+  .byt 8, 8, 8
+  .byt 8, 8, 8, 8
+
 .a16
 .i16
 .export RunStrifeCloudSword
@@ -2912,10 +2922,12 @@ Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
   add ActorVY,x
   sta ActorPY,x
 
-  phk
-  plb
-
-  lda #.loword(RectTest)
+  ; Pick a hitbox to use
+  ldy ActorVarA,x
+  lda StrifeCloudSwordFrames-2,y
+  and #255
+  tay
+  lda CollisionFrames,y
   jsl PlayerActorCollisionMultiRect
   bcc :+
     .import HurtPlayer
@@ -2923,8 +2935,23 @@ Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
   :
   rtl
 
-RectTest:
-  CollisionMultiRect -16, 32, -31, 32
+CollisionFrames:
+  .word .loword(Frame1), .loword(Frame2), .loword(Frame3), .loword(Frame4), .loword(Frame5)  
+; left, width, top, height
+Frame1:
+  CollisionMultiRect -12,  6, -31, 24
+  CollisionMultiRectEnd
+Frame2:
+  CollisionMultiRect -10, 11, -28, 21
+  CollisionMultiRectEnd
+Frame3:
+  CollisionMultiRect -7,  18, -17, 13
+  CollisionMultiRectEnd
+Frame4:
+  CollisionMultiRect -6,  20, -13, 10
+  CollisionMultiRectEnd
+Frame5:
+  CollisionMultiRect -7,  22, -7,  6
   CollisionMultiRectEnd
 
 TableX:
@@ -2948,34 +2975,18 @@ y_offset = 8*16
 .i16
 .export DrawStrifeCloudSword
 .proc DrawStrifeCloudSword
-  lda ActorVarA,x
-;  lsr
-;  and #.loword(~1)
-  asl
+  ldy ActorVarA,x
+  lda StrifeCloudSwordFrames,y
+  and #255
   tay
   lda Frames,y
   ldy #^DSSwordSwing | $8000
   jml DrawUpdate32x32DynamicFrame
 Frames:
   .word .loword(DSSwordSwing+(512*0))
-  .word .loword(DSSwordSwing+(512*0))
-  .word .loword(DSSwordSwing+(512*0))
-  .word .loword(DSSwordSwing+(512*1))
-  .word .loword(DSSwordSwing+(512*1))
   .word .loword(DSSwordSwing+(512*1))
   .word .loword(DSSwordSwing+(512*2))
-  .word .loword(DSSwordSwing+(512*2))
-  .word .loword(DSSwordSwing+(512*2))
   .word .loword(DSSwordSwing+(512*3))
-  .word .loword(DSSwordSwing+(512*3))
-  .word .loword(DSSwordSwing+(512*3))
-  .word .loword(DSSwordSwing+(512*4))
-  .word .loword(DSSwordSwing+(512*4))
-  .word .loword(DSSwordSwing+(512*4))
-
-  .word .loword(DSSwordSwing+(512*4))
-  .word .loword(DSSwordSwing+(512*4))
-  .word .loword(DSSwordSwing+(512*4))
   .word .loword(DSSwordSwing+(512*4))
 .endproc
 

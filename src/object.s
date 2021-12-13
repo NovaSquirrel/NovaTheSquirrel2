@@ -2646,6 +2646,7 @@ Loop:
 .endproc
 
 
+; Test collision against a series of rectangles offset from the bottom center of an actor.
 ; X = actor to test against
 ; A = pointer to the list of rectangles
 ; Format:
