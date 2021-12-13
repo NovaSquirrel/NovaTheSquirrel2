@@ -104,3 +104,18 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
   .endrep
   .byt 0
 .endmacro
+
+; For PlayerActorCollisionMultiRect
+.macro CollisionMultiRect left, width, top, height
+  ; Format:
+  ;   .word x_offset, width/2, y_offset_bottom, y_offset_top
+  ;   (Repeat for however many rectangles)
+  ;   .word $8000
+  .word .loword((left+width/2)*16), .loword((width/2)*16)
+  ; Now the bottom and the top
+  .word .loword((top+height-1)*16), .loword((top)*16)
+.endmacro
+
+.macro CollisionMultiRectEnd
+  .word $8000
+.endmacro

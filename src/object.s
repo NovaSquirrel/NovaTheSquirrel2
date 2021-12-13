@@ -2646,21 +2646,14 @@ Loop:
 .endproc
 
 
-
-; Put this up here so that the branch can reach it
-PlayerActorCollisionMultiRect_Fail:
-  clc
-  rtl
-
 ; X = actor to test against
 ; A = pointer to the list of rectangles
 ; Format:
-;   .word y_offset_top, y_offset_bottom, x_offset, width/2
+;   .word x_offset, width/2, y_offset_top, y_offset_bottom
 ;   (Repeat for however many rectangles)
-;   .word 0
-; X offsets and Y offsets start at the bottom center of the actor, and are the center of the collision box
+;   .word $8000
+; X offsets and Y offsets start at the bottom center of the actor. X offset is the center, Y offsets define the top and bottom
 ; Carry = true if overlapping
-; TODO: Test?
 .export PlayerActorCollisionMultiRect
 .a16
 .i16
@@ -2668,71 +2661,82 @@ PlayerActorCollisionMultiRect_Fail:
 Size    = TouchTemp+0
 Pointer = TouchTemp+2
 XPos    = TouchTemp+4
+EndMarker = $8000
   sta Pointer
   ldy #0
 
 Loop:
+  ; Y = 0
+
+  lda ActorDirection,x
+  lsr
+  bcs Negate
+  lda (Pointer),y ; X offset
+  bra NoNegate
+Negate:
+  lda (Pointer),y ; X offset
+  eor #$ffff
+  ina
+NoNegate:
+  add ActorPX,x
+  sta XPos
+
+  iny
+  iny
+  ; Y  = 2
+
+  ; Left edge should not be to the right of the right edge
+  sub (Pointer),y ; Width/2
+  cmp PlayerPXRight
+  bcc :+
+AddSix:
+    tya
+    add #6
+    tay
+    lda (Pointer),y
+    cmp #EndMarker
+    bne Loop
+    clc
+    rtl
+  :
+
+  ; Right edge should not be to the left of the left edge
+  lda XPos
+  add (Pointer),y ; Width/2
+  cmp PlayerPXLeft
+  bcc AddSix
+
+  ; -------------------------------------------------------
+  iny
+  iny
+  ; Y = 4
+
   ; Bottom edge should not be above the player's top edge
   lda (Pointer),y
-  beq PlayerActorCollisionMultiRect_Fail
   add ActorPY,x
-  wdm 0
-  iny
-  iny
   cmp PlayerPYTop
   bcs :+
-     tya
-     adc #6-1 ; Carry set, so -1
-     tay
-     bra Loop
+AddFour:
+     iny
+     iny
+AddTwo:
+     iny
+     iny
+     lda (Pointer),y
+     cmp #EndMarker
+     bne Loop
+     clc
+     rtl
   :
+  iny
+  iny
+  ; Y = 6
 
   ; Top edge should not be below the player's bottom edge
   lda (Pointer),y
   add ActorPY,x
-  iny
-  iny
   cmp PlayerPY
-  bcc :+
-     iny
-     iny
-     iny
-     iny
-     bra Loop
-  :
-
-  wdm 0
-  sec
-  rtl
-
-  ; -------------------------------------------------------
-
-  lda (Pointer),y ; X offset
-  iny
-  iny
-  jsl ActorNegIfLeft
-  add ActorPX,x
-  sta XPos
-
-  ; Left edge should not be to the left of the right edge
-  sub (Pointer),y ; Width/2
-  cmp PlayerPXRight
-  bcs :+
-    iny
-    iny
-    bra Loop
-  :
-
-  ; Right edge should not be to the right of the left edge
-  lda XPos
-  add (Pointer),y
-  cmp PlayerPXLeft
-  bcc :+
-    iny
-    iny
-    bra Loop
-  :
-
+  bcs AddTwo
   sec
   rtl
 .endproc

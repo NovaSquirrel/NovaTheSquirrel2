@@ -2687,11 +2687,11 @@ HorizontalGreenFrame:
 .export RunStrifeCloud
 .proc RunStrifeCloud
   ; If too far, move in
-  lda ActorPX,x
-  sub PlayerPX
-  abs
-  cmp #2*256
-  bcs Move
+;  lda ActorPX,x
+;  sub PlayerPX
+;  abs
+;  cmp #2*256
+;  bcs Move
 
   lda ActorState,x
   and #255
@@ -2880,8 +2880,10 @@ DisplayOnly:
   jml DispActorMetaPriority2
 
 Frame: ; Should have the program bank = data bank here!
-  Row16x16 -8, -8,  $00, $02
-  Row16x16 -8,  8,  $04, $06
+  Row16x16 -8, -16,  $00, $02
+  Row16x16 -8,   0,  $04, $06
+;  Row16x16 -8, -8,  $00, $02
+;  Row16x16 -8,  8,  $04, $06
   EndMetasprite
 .endproc
 Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
@@ -2894,6 +2896,8 @@ Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
   lda ActorVarA,x
   cmp #5*3+4
   bne :+
+    lda #2
+    sta $7faaaa
     jml ActorSafeRemoveX
   :
   asl
@@ -2908,31 +2912,29 @@ Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
   add ActorVY,x
   sta ActorPY,x
 
-  lda #0
-  sta $7faaaa
+  phk
+  plb
 
   lda #.loword(RectTest)
   jsl PlayerActorCollisionMultiRect
   bcc :+
-    lda #1
-    sta $7faaaa
-;    .import HurtPlayer
-;    jml HurtPlayer
+    .import HurtPlayer
+    jml HurtPlayer
   :
   rtl
 
 RectTest:
-  .word .loword(-16*32), .loword(-16*0), 0*16, 32*16
-;  .word y_offset_top, y_offset_bottom, x_offset, width/2
-  .word 0
+  CollisionMultiRect -16, 32, -31, 32
+  CollisionMultiRectEnd
 
 TableX:
   .word .loword(160), .loword(190), .loword(221), .loword(250), .loword(278), .loword(305), .loword(330), .loword(352), .loword(373), .loword(390), .loword(405), .loword(417), .loword(425), .loword(430), .loword(432)
   .word .loword(432), .loword(432), .loword(432), .loword(432)
 
 TableY:
-  .word .loword(-448), .loword(-446), .loword(-441), .loword(-433), .loword(-421), .loword(-406), .loword(-389), .loword(-368), .loword(-346), .loword(-321), .loword(-294), .loword(-266), .loword(-237), .loword(-206), .loword(-176)
-  .word .loword(-176), .loword(-176), .loword(-176), .loword(-176)
+y_offset = 8*16
+  .word .loword(-448+y_offset), .loword(-446+y_offset), .loword(-441+y_offset), .loword(-433+y_offset), .loword(-421+y_offset), .loword(-406+y_offset), .loword(-389+y_offset), .loword(-368+y_offset), .loword(-346+y_offset), .loword(-321+y_offset), .loword(-294+y_offset), .loword(-266+y_offset), .loword(-237+y_offset), .loword(-206+y_offset), .loword(-176+y_offset)
+  .word .loword(-176+y_offset), .loword(-176+y_offset), .loword(-176+y_offset), .loword(-176+y_offset)
 .endproc
 
 .a16
