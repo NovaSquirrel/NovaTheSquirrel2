@@ -2231,22 +2231,26 @@ Steep   = 4
 .i16
 .proc TwoActorCollision
 AWidth   = TouchTemp+0
-AHeight1 = TouchTemp+2
-AHeight2 = TouchTemp+4
-AYPos    = TouchTemp+6
-  ; Test X positions
+  ; Test Y positions
 
-  ; Add the two widths together
-  lda ActorHeight,x
-  sta AHeight1
+  ; Actor 1's top edge should not be below actor 2's bottom edge
+  lda ActorPY,x
+  sub ActorHeight,x
+  cmp ActorPY,y
+  bcs No
+
+  ; Actor 2's top edge should not be below actor 1's bottom edge
+  lda ActorPY,y
+  sub ActorHeight,y
+  cmp ActorPY,x
+  bcs No
+
+  ; Test X positions
 
   ; The two actors' widths are added together, so just do this math now
   lda ActorWidth,x
-  add ActorWidth,y
+  adc ActorWidth,y ; Carry clear - guaranteed by the bcs above
   sta AWidth
-
-  lda ActorHeight,y
-  sta AHeight2
 
   ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
   lda ActorPX,x
@@ -2260,28 +2264,6 @@ AYPos    = TouchTemp+6
   bcs No
 
   ; -----------------------------------
-
-  ; Test Y positions
-  ; Y positions of actors are the bottom, so get the top of the actors
-  lda ActorPY,x
-  sub AHeight1
-  pha
-
-  lda ActorPY,y
-  sub AHeight2
-  sta AYPos
-
-  dec AHeight2 ; For satisfying the SIZE2-1
-  lda AHeight2
-  add AHeight1 ; And now it's modified so it'll have the -1 for SIZE1+SIZE2-1
-  sta AHeight1
-
-  pla
-  clc
-  sbc AYPos    ; Note will subtract n-1
-  sbc AHeight2 ; #SIZE2-1
-  adc AHeight1 ; #SIZE1+SIZE2-1; Carry set if overlap
-  bcc No
 
 Yes:
   sec
@@ -2297,6 +2279,7 @@ No:
 .i16
 .proc PlayerActorCollision
 AWidth   = TouchTemp+0
+  ; Actor's bottom edge should not be above player's top edge
   lda ActorPY,x
   cmp PlayerPYTop
   bcc No
@@ -2305,17 +2288,21 @@ AWidth   = TouchTemp+0
   lsr
   sta AWidth
 
+  ; Actor's left edge should not be more right than the player's right edge
   lda ActorPX,x
   sec
   sbc AWidth
   cmp PlayerPXRight
   bcs No
+
+  ; Actor's right edge should not be more left than the player's left edge
   lda ActorPX,x
   sec
   adc AWidth
   cmp PlayerPXLeft
   bcc No
 
+  ; Actor's top edge should not be below the player's bottom edge
   lda ActorPY,x
   sub ActorHeight,x
   cmp PlayerPY
