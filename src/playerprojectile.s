@@ -1627,7 +1627,7 @@ CopyAbility:
     cmp PlayerPY
     bcc :+
       seta8
-      lda #2
+      lda #1
       sta PlayerRidingSomething
       seta16
       lda ActorPY,x

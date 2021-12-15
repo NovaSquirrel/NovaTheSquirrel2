@@ -396,7 +396,7 @@ draw DrawPumpkinBoat
 size 16x25
 
 +RidableBoat
-flag AutoRemove GetShot AutoReset
+flag AutoRemove AutoReset
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunRideableBoat

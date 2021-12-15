@@ -356,14 +356,14 @@ Platform:
     add DYList,y
     sta ActorPY,x
 
-    lda ActorPY,x
+    ;lda ActorPY,x
     sub #$70
     sta PlayerPY
 
     stz PlayerVY
 
     seta8
-    lda #2
+    lda #1
     sta PlayerRidingSomething
     stz PlayerNeedsGround
     seta16
@@ -1221,20 +1221,20 @@ NotPaused:
 ; X + 4
 ; Y + 8
 OffsetsA:
-  .lobytes 4, 8-4
-  .lobytes 4+4, 8
-  .lobytes 4, 8+4
-  .lobytes 4-4, 8
+  .lobytes 0, 0-4
+  .lobytes 4, 0
+  .lobytes 0, 0+4
+  .lobytes -4, 0
 TilesA:
   .word $0e|OAM_PRIORITY_2
   .word $1f|OAM_PRIORITY_2
   .word $0e|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
   .word $1f|OAM_PRIORITY_2|OAM_XFLIP|OAM_YFLIP
 OffsetsB:
-  .lobytes 4, 8+4
-  .lobytes 4-4, 8
-  .lobytes 4, 8-4
-  .lobytes 4+4, 8
+  .lobytes 0, 0+4
+  .lobytes -4, 0
+  .lobytes 0, 0-4
+  .lobytes 4, 0
 TilesB:
   .word $1e|OAM_PRIORITY_2
   .word $0f|OAM_PRIORITY_2
@@ -2486,6 +2486,9 @@ NoMove:
 .i16
 .export RunPumpkinBoat
 .proc RunPumpkinBoat
+  jsl ActorFall
+  lda #$10
+  jsl ActorWalk
   rtl
 .endproc
 
@@ -2494,20 +2497,42 @@ NoMove:
 .export DrawPumpkinBoat
 .proc DrawPumpkinBoat
   lda framecount
-  and #%100
-  beq :+
-    lda #.loword(Frame1)
-    jml DispActorMetaPriority2
-: lda #.loword(Frame2)
+  and #%1110
+  tay
+  lda Frames,y
   jml DispActorMetaPriority2
 
+Frames:
+  .word .loword(Frame1)
+  .word .loword(Frame2)
+  .word .loword(Frame1)
+  .word .loword(Frame2)
+  .word .loword(Frame3)
+  .word .loword(Frame4)
+  .word .loword(Frame3)
+  .word .loword(Frame4)
+
 Frame1:
-  Row16x16  -12,  0,  $02, $04
-  Row16x16  -12,  0,  $00
+  Row16x16  -8,  0,     $02, $04 ; Bottom of the boat and the body
+  Row16x16   2,  0-13,  $00 ; Head
   EndMetasprite
 Frame2:
-  Row8x8    0, 0
-  Row16x16  -12,  0,  $00
+  Row8x8   -12,  0,  $16, $13, $14, $15 ; Bottom of the boat
+  Row8x8   -12, -8,  $02 ; Engine thing
+  Row8x8    -4, -8,  $03, $04 ; Body
+  Row16x16   2,  0-13,  $00 ; Head
+  EndMetasprite
+Frame3:
+  Row8x8   -12,  0+0,  $16, $13, $14, $15 ; Bottom of the boat
+  Row8x8   -12, -8+0,  $02 ; Engine thing
+  Row8x8    -4, -8+0+1,   $03, $04 ; Body
+  Row16x16   2,  0-13+1,  $00 ; Head
+  EndMetasprite
+Frame4:
+  Row8x8   -12,  0+0,  $16, $13, $14, $15 ; Bottom of the boat
+  Row8x8   -12, -8+0,  $02 ; Engine thing
+  Row8x8    -4, -8+0+1,  $03, $04 ; Body
+  Row16x16   2,  0-13+1,  $00 ; Head
   EndMetasprite
 .endproc
 
@@ -2515,7 +2540,48 @@ Frame2:
 .i16
 .export RunRideableBoat
 .proc RunRideableBoat
+; TODO: give it a different behavior? at least it's rideable
+  lda PlayerPY
+  cmp ActorPY,x
+  bcs NoRide
+  jsl CollideRide
+  bcc NoRide
+    lda ActorVarA,x
+    asl
+    tay
+
+    lda ActorPX,x
+    add DXList,y
+    sta ActorPX,x
+
+    lda PlayerPX
+    add DXList,y
+    sta PlayerPX
+
+    lda ActorPY,x
+    add DYList,y
+    sta ActorPY,x
+
+    ;lda ActorPY,x
+    sub #$50
+    sta PlayerPY
+
+    stz PlayerVY
+
+    seta8
+    lda #1
+    sta PlayerRidingSomething
+    stz PlayerNeedsGround
+    seta16
+  NoRide:
   rtl
+DXList:
+  .word .loword($10), .loword($00), .loword(-$10), .loword($00)
+  .word .loword($20), .loword($00), .loword(-$20), .loword($00)
+
+DYList:
+  .word .loword($00), .loword($10), .loword($00), .loword(-$10)
+  .word .loword($00), .loword($20), .loword($00), .loword(-$20)
 .endproc
 
 .a16
@@ -2531,15 +2597,14 @@ Frame2:
   jml DispActorMetaPriority2
 
 Frame1:
-  Row8x8    0,  0,  $12, $13, $14, $15
-  Row8x8    0, -8,  $17
+  Row8x8   -12,  0+2,  $12, $13, $14, $15
+  Row8x8   -12, -8+2,  $17
   EndMetasprite
 
 Frame2:
-  Row8x8    0,  0,  $16, $13, $14, $15
-  Row8x8    0, -8,  $17
+  Row8x8   -12,  0+2,  $16, $13, $14, $15
+  Row8x8   -12, -8+2,  $17
   EndMetasprite
-
 .endproc
 
 .a16
@@ -2560,7 +2625,7 @@ Frame2:
 .i16
 .export RunPumpkinSpiceLatte
 .proc RunPumpkinSpiceLatte
-  rtl
+  jmp RunGeorgeBottle
 .endproc
 
 .a16
