@@ -65,6 +65,7 @@ RunPlayerProjectileTable:
   .word .loword(RunProjectileExplosion-1)
   .word .loword(RunProjectileCopyAnimation-1)
   .word .loword(RunProjectileBubbleHeld-1)
+  .word .loword(RunProjectileCopyFailAnimation-1)
 
 .a16
 .i16
@@ -99,6 +100,7 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileExplosion-1)
   .word .loword(DrawProjectileCopyAnimation-1)
   .word .loword(DrawProjectileBubble-1)
+  .word .loword(DrawProjectileCopyFailAnimation-1)
 
 .a16
 .i16
@@ -320,6 +322,22 @@ No:
 
   jmp DrawProjectileCopy::CustomRadius
 .endproc
+
+.a16
+.i16
+.proc RunProjectileCopyFailAnimation
+  jsl ActorApplyXVelocity
+  jsl ActorGravity
+  inc ActorTimer,x
+  lda ActorTimer,x
+  cmp #32
+  bcc :+
+    stz ActorType,x
+  :
+  rtl
+.endproc
+
+DrawProjectileCopyFailAnimation = DrawProjectileCopy
 
 .a16
 .i16
@@ -1522,6 +1540,7 @@ HitProjectileResponse:
   .word .loword(Kill-1) ; Explosion
   .word .loword(Nothing-1) ; Copy animation
   .word .loword(DamageALittleLess-1) ; Bubble (Held)
+  .word .loword(Nothing-1) ; Copy fail animation
 
 ; Hook an enemy and pull them to the player
 Hook:
@@ -1533,7 +1552,6 @@ Hook:
   sta ActorState,x
   stz AbilityMovementLock
   seta16
-
   lda #ActorOverrideValue::Hooked
   sta ActorTimer,x
   rtl
@@ -1559,7 +1577,7 @@ Copy:
   ; Find the enemy's type
   ldy #0
 : lda CopyEnemy,y
-  beq @NoCopy
+  beq NoCopy
   cmp ActorType,x
   beq @YesCopy
   iny
@@ -1577,10 +1595,33 @@ Copy:
   lda #1
   sta NeedAbilityChange
   seta16
-@NoCopy:
 Nothing:
   rtl
 
+NoCopy:
+  seta8
+  stz CopyingAnimationTimer
+  seta16
+  ldy ProjectileIndex
+  lda #PlayerProjectileType::CopyFailAnimation
+  sta ActorProjectileType,y
+
+  lda #.loword(-$30)
+  sta ParticleVY,y
+
+  lda ParticleVX,y
+  php
+  jsl RandomByte
+  and #31
+  sta ParticleVX,y
+
+  plp
+  bmi :+
+    eor #$ffff
+    ina
+    sta ParticleVX,y
+  :
+  rtl
 CopyEnemy:
   .word Actor::FireWalk*2
   .word Actor::FireJump*2

@@ -184,6 +184,7 @@ ProjectileLen = 8
   Explosion
   CopyAnimation
   BubbleHeld
+  CopyFailAnimation
 .endenum
 
 ParticleLen = 32
