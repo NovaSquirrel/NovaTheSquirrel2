@@ -2611,14 +2611,87 @@ Frame2:
 .i16
 .export RunPumpkinMan
 .proc RunPumpkinMan
-  rtl
+  .if 0
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #3*256
+  bcs NotClose
+    lda ActorState,x
+    ; TODO
+
+    seta8
+    lda #ActorStateValue::Active
+    sta ActorState,x
+    seta16
+    lda #30
+    sta ActorTimer,x
+  NotClose:
+
+  lda ActorState,x
+  and #255
+  beq :+
+    rtl
+  :
+  .endif
+
+  ; Move instead
+  lda ActorVarB,x
+  beq NoHover
+  cmp #64 ; One full cycle through the ActorHover table
+  bcs NoHover
+    inc ActorVarB,x
+    jsl ActorHover
+    bra WasInAir
+NoHover:
+  jsl ActorFall
+  bcs :+
+    inc ActorVarB,x
+    bra WasInAir
+  :
+  stz ActorVarB,x
+WasInAir:
+  lda #10
+  jsl ActorWalk
+  jsl ActorAutoBump
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
 .i16
 .export DrawPumpkinMan
 .proc DrawPumpkinMan
-  rtl
+  lda ActorState,x
+  and #255
+  cmp #ActorStateValue::Active
+  bne :+
+    lda #.loword(Holding)
+    jml DispActorMetaPriority2
+  :
+
+  lda framecount
+  and #%1000
+  beq :+
+    lda #.loword(Walk1)
+    jml DispActorMetaPriority2
+: lda #.loword(Walk2)
+  jml DispActorMetaPriority2
+
+Walk1:
+  Row8x8     -4,  -8,  $03, $04
+  Row8x8     -4,   0,  $09, $0a
+  Row16x16    2,  -13, $00
+  EndMetasprite
+Walk2:
+  Row8x8     -4,  -8,  $03, $04
+  Row8x8     -4,   0,  $19, $1a
+  Row16x16    2,  -13, $00
+  EndMetasprite
+Holding:
+  Row8x8     -4,  -8,  $08, $06
+  Row8x8     -4,   0,  $18, $0a
+  Row16x16    2,  -13, $00
+  EndMetasprite
 .endproc
 
 .a16
@@ -2654,9 +2727,56 @@ Frame2:
 .i16
 .export RunSwordSlime
 .proc RunSwordSlime
-  lda #$10
-  jsl ActorWalkOnPlatform
   jsl ActorFall
+
+  ; If too far, move in
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #2*256
+  bcs Move
+
+  lda ActorState,x
+  and #255
+  bne NoShoot
+  jsl ActorLookAtPlayer
+
+  lda ActorIndexInLevel,x
+  eor framecount
+  and #31
+  bne NoShoot
+    jsl FindFreeActorY
+    bcc NoShoot
+      seta8
+      lda ActorDirection,x
+      sta ActorDirection,y
+
+      lda #ActorStateValue::Paused
+      sta ActorState,x
+      seta16
+
+      lda #$16*16
+      jsl ActorNegIfLeft
+      add ActorPX,x
+      sta ActorPX,y
+
+      lda ActorPY,x
+      sta ActorPY,y
+
+      lda #Actor::SwordSlimeSword*2
+      sta ActorType,y
+
+      jsl InitActorY
+
+      lda #15
+      sta ActorTimer,x
+NoShoot:
+  rtl
+
+Move:
+  lda #$10
+  jsl ActorWalk
+  jsl ActorAutoBump
   jml PlayerActorCollisionHurt
 .endproc
 
@@ -2699,7 +2819,7 @@ Frames:
   inc ActorVarA,x
   lda ActorVarA,x
   cmp #20
-  bne :+
+  bcc :+
     stz ActorType,x
   :
   jml PlayerActorCollisionHurt
@@ -2802,8 +2922,7 @@ Move:
   lda #$10
   jsl ActorWalk
   jsl ActorAutoBump
-  jsl ActorHover
-  rtl
+  jml ActorHover
 .endproc
 
 .a16
