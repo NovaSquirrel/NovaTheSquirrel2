@@ -1447,10 +1447,8 @@ Bump:
   sta ActorVY,x
 BumpStunOnly:
   jsl ActorTurnAround
-  seta8
   lda #ActorStateValue::Stunned
   sta ActorState,x
-  seta16
   lda #90
   sta ActorTimer,x
   rtl
@@ -1511,10 +1509,8 @@ AddDamage:
 Defeated:
   jml ActorBecomePoof
 Damaged:
-  seta8
   lda #ActorStateValue::Stunned
   sta ActorState,x
-  seta16
   lda #60
   sta ActorTimer,x
   rtl

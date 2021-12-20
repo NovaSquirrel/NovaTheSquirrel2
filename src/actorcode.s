@@ -58,7 +58,6 @@ CommonTileBase = $40
   :
 
   lda ActorState,x
-  and #255
   beq :+
     rtl
   :
@@ -166,7 +165,6 @@ CommonTileBase = $40
   lda ActorVarA,x ; if behavior set to 1, home in on player
   beq :+
   lda ActorState,x
-  and #255
   bne :+
     lda #$10
     jsl ActorWalk
@@ -178,29 +176,23 @@ CommonTileBase = $40
     jsl ActorLookAtPlayer
   :
 
-  seta8
   lda ActorState,x
   cmp #ActorStateValue::Active
   bne :+
-    seta16
     jsl ActorFall
-    seta8
     bcc :+
       lda #ActorStateValue::Paused
       sta ActorState,x
-      seta16
       lda #.loword(-4*16)
       sta 0
       lda #.loword(-8*16)
       sta 2
       jsl ActorMakePoofAtOffset
-      seta8
   :
 
   lda ActorState,x
   cmp #ActorStateValue::Paused
   bne :+
-    seta16
     lda ActorPY,x
     sub #$10
     sta ActorPY,x
@@ -219,7 +211,7 @@ CommonTileBase = $40
     stz ActorState,x
   :
 
-  .a8
+  seta8
   lda ActorState,x
   bne :+
   lda ActorPX+1,x ; Player within 4 blocks horizontally
@@ -468,7 +460,6 @@ DYList:
 .proc RunSneaker
   ; Gradually get faster
   lda ActorState,x
-  and #255
   bne :+
   lda ActorVarC,x
   cmp #$20
@@ -613,7 +604,6 @@ NoShoot:
 NoHover:
   ; Initialize the timer if object is initializing
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Init
   beq InitTimer
 
@@ -721,7 +711,6 @@ NormalWalk:
   and #255
   beq :+
   lda ActorState,x
-  and #255
   bne :+
     lda framecount
     and #15
@@ -771,7 +760,6 @@ NormalWalk:
   jsl ActorFall
   bcc :+
     lda ActorState,x
-    and #255
     bne :+
       lda #.loword(-$40)
       sta ActorVY,x
@@ -896,7 +884,6 @@ Nope:
 
   ; Don't jump or shoot when stunned
   lda ActorState,x
-  and #255
   beq Normal
   cmp #ActorStateValue::Active
   bne :+
@@ -988,7 +975,6 @@ DoShoot:
 .export DrawFireFox
 .proc DrawFireFox
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Active
   beq Shooting
 
@@ -1116,12 +1102,10 @@ GoToNotNear:
 
       lda #60
       sta ActorTimer,y
-      seta8
       lda #ActorStateValue::Paused
       sta ActorState,y
 
       ; Put a warning
-      seta16
       jsl FindFreeParticleY
       bcc NotThrow
         lda #Particle::WarningParticle
@@ -1178,16 +1162,13 @@ Frame2:
 .export RunGeorgeBottle
 .proc RunGeorgeBottle
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Paused
   bne NotPaused
   dec ActorTimer,x
   bne :+
     lda #30
     sta ActorTimer,x
-    seta8
     stz ActorState,x
-    seta16
 : rtl
 
 NotPaused:
@@ -1847,7 +1828,6 @@ DoShoot:
 .export DrawBubbleCat
 .proc DrawBubbleCat
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Active
   beq Active
 
@@ -2050,7 +2030,6 @@ Falling:
   :
 
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Init
   bne :+
     ; Place an invisible wall at the current position
@@ -2289,7 +2268,6 @@ MakeForkedArrow:
 .proc RunEnemyGlider
 Direction = 0
   lda ActorState,x
-  and #255
   bne NoMove
 
   ; Increase the counter
@@ -2393,7 +2371,6 @@ WasUp:
 .export RunEnemyLWSS
 .proc RunEnemyLWSS
   lda ActorState,x
-  and #255
   bne NoMove
 
   ; Increase the counter
@@ -2629,7 +2606,6 @@ Frame2:
   NotClose:
 
   lda ActorState,x
-  and #255
   beq :+
     rtl
   :
@@ -2662,7 +2638,6 @@ WasInAir:
 .export DrawPumpkinMan
 .proc DrawPumpkinMan
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Active
   bne :+
     lda #.loword(Holding)
@@ -2737,7 +2712,6 @@ Holding:
   bcs Move
 
   lda ActorState,x
-  and #255
   bne NoShoot
   jsl ActorLookAtPlayer
 
@@ -2879,7 +2853,6 @@ HorizontalGreenFrame:
   bcs Move
 
   lda ActorState,x
-  and #255
   bne NoShoot
   jsl ActorLookAtPlayer
 
@@ -3649,10 +3622,8 @@ Hooked:
   and #>KEY_UP
   bne :+
 GetStunned:
-    seta8
     lda #ActorStateValue::Stunned
     sta ActorState,x
-    seta16
     stz ActorVX,x
     lda #180
     sta ActorTimer,x

@@ -69,7 +69,6 @@ Loop:
 
 
   lda ActorState,x
-  and #255
   cmp #ActorStateValue::Override
   bne NotOverride
     ; Substitute the run routine for something else
@@ -129,9 +128,7 @@ Loop:
     dec ActorTimer,x
     bne :+
       ; Clear the state
-      seta8
       stz ActorState,x
-      seta16
     :
     pla
   NotAutoReset:
@@ -533,7 +530,8 @@ Found:
   seta8
   sta ActorDynamicSlot,x
   seta16
-  stz ActorState,x ; Also zeros ActorOnGround
+  stz ActorState,x
+  sta ActorOnGround,x ; Also zeros ActorOnScreen
   sec
   rtl
 .endproc
@@ -559,7 +557,8 @@ Found:
   sta ActorDynamicSlot,y
   seta16
   tdc ; A = 0
-  sta ActorState,y ; Also zeros ActorOnGround
+  sta ActorState,y
+  sta ActorOnGround,y ; Also zeros ActorOnScreen
   sec
   rtl
 .endproc
@@ -678,7 +677,6 @@ Wavy:
 
   ; Stop if stunned
   lda ActorState,x ; Ignore high byte
-  and #255
   beq :+
     stz ActorVX,x
   :
@@ -930,7 +928,6 @@ WalkDistance = 0
 
   ; Don't walk if the state is nonzero
   lda ActorState,x
-  and #255
   beq :+
     clc
     rtl
@@ -1463,7 +1460,6 @@ Shift:
 
   ; If stunned, flip upside down
   lda ActorState,x
-  and #$00ff
   cmp #ActorStateValue::Stunned
   bne :+
     ; Adjust Y position, for actors that are not the full 16 pixels tall
@@ -1568,7 +1564,6 @@ Custom:
 
   ; If stunned, flip upside down
   lda ActorState,x
-  and #$00ff
   cmp #ActorStateValue::Stunned
   bne :+
     ; Adjust Y position, for actors that are not the full 16 pixels tall
@@ -2323,7 +2318,6 @@ No:
 .proc PlayerActorCollisionHurt
   ; Don't hurt the player if the actor is stunned
   lda ActorState,x
-  and #$00ff
   cmp #ActorStateValue::Stunned
   beq Exit
 
