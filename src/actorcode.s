@@ -30,7 +30,7 @@ CommonTileBase = $40
 .import DispActor16x16FourTiles, DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
-.import ActorTurnAround, ActorSafeRemoveX
+.import ActorTurnAround, ActorSafeRemoveX, ActorWalkIgnoreState
 .import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
 .import PlayerActorCollision, TwoActorCollision, PlayerActorCollisionMultiRect
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
@@ -1487,6 +1487,7 @@ LaunchFry:
     jsl ActorClearY ; Includes clearing VarA and velocity and such
     lda #Actor::FrenchFry*2
     sta ActorType,y
+    jsl InitActorY
 
     lda ActorPX,x
     sta ActorPX,y
@@ -1528,8 +1529,16 @@ ExplodedFrame:
 .proc RunFrenchFry
   jsl ActorApplyXVelocity
   jsl ActorGravity
+  lda ActorPY,x
+  cmp #32*256 ; Or level height
+  bcc :+
+    stz ActorType,x
+  :
   jml PlayerActorCollisionHurt
 .endproc
+.export RunPumpkinPiece
+RunPumpkinPiece = RunFrenchFry
+
 .a16
 .i16
 .export DrawFrenchFry
@@ -2588,28 +2597,62 @@ Frame2:
 .i16
 .export RunPumpkinMan
 .proc RunPumpkinMan
-  .if 0
   lda ActorPX,x
   sub PlayerPX
   abs
   cmp #3*256
   bcs NotClose
     lda ActorState,x
-    ; TODO
+    bne NoThrow
+    jsl FindFreeActorY
+    bcc NoThrow
+      jsl ActorLookAtPlayer
+      seta8
+      lda #0
+      sta ActorDirection,y
 
-    seta8
-    lda #ActorStateValue::Active
-    sta ActorState,x
-    seta16
-    lda #30
-    sta ActorTimer,x
+      lda #ActorStateValue::Paused
+      sta ActorState,x
+      seta16
+
+      lda #.loword(-6*16)
+      jsl ActorNegIfLeft
+      add ActorPX,x
+      sta ActorPX,y
+
+      lda ActorPY,x
+      sub #16*12
+      sta ActorPY,y
+
+      lda #Actor::PumpkinSpiceLatte*2
+      sta ActorType,y
+
+      jsl InitActorY
+
+      lda #.loword(-$60)
+      sta ActorVY,y
+
+      jsl RandomByte
+      and #15
+      add #7
+      jsl ActorNegIfLeft
+      sta ActorVX,y
+
+      lda #15
+      sta ActorTimer,y
+      lda #ActorStateValue::Paused
+      sta ActorState,y
+
+      lda #15
+      sta ActorTimer,x
+
+      lda #ActorStateValue::Active
+      sta ActorState,x
+  NoThrow:
   NotClose:
 
   lda ActorState,x
-  beq :+
-    rtl
-  :
-  .endif
+  bne Hurt
 
   ; Move instead
   lda ActorVarB,x
@@ -2630,6 +2673,7 @@ WasInAir:
   lda #10
   jsl ActorWalk
   jsl ActorAutoBump
+Hurt:
   jml PlayerActorCollisionHurt
 .endproc
 
@@ -2673,7 +2717,20 @@ Holding:
 .i16
 .export RunPumpkinSpiceLatte
 .proc RunPumpkinSpiceLatte
-  jmp RunGeorgeBottle
+  lda ActorState,x
+  cmp #ActorStateValue::Paused
+  bne NotPaused
+  dec ActorTimer,x
+  bne :+
+    lda #50
+    sta ActorTimer,x ; Different value from RunGeorgeBottle
+    stz ActorState,x
+: rtl
+
+NotPaused:
+  .import RunProjectileWaterBottle
+  jsl RunProjectileWaterBottle ; Reuse the projectile's behavior
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
@@ -2687,7 +2744,66 @@ Holding:
 .i16
 .export RunPumpkin
 .proc RunPumpkin
+  stz ActorState,x ; Can't stun the pumpkin
+  jsl ActorFall
+  bcc InAir
+
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #3*16*16
+  bcs TooFar
+  lda ActorPY,x
+  sub PlayerPY
+  abs
+  cmp #3*16*16
+  bcs TooFar
+
+  ; Explode!
+  lda #.loword(-4*16)
+  sta 0
+  lda #.loword(-8*16)
+  sta 2
+  jsl ActorMakePoofAtOffset
+
+  stz ActorType,x
+  jsr LaunchPiece
+  jsr LaunchPiece
+  jsr LaunchPiece
+  jsr LaunchPiece
+  jsr LaunchPiece
+  jsr LaunchPiece
+TooFar:
+InAir:
   rtl
+
+LaunchPiece:
+  jsl FindFreeActorY
+  bcc :+
+    jsl ActorClearY ; Includes clearing VarA and velocity and such
+    lda #Actor::PumpkinPiece*2
+    sta ActorType,y
+    lda #8*16
+    sta ActorWidth,y
+    sta ActorHeight,y
+
+    lda ActorPX,x
+    sta ActorPX,y
+    lda ActorPY,x
+    sta ActorPY,y
+
+    jsl RandomByte
+    and #15
+    add #.loword(-$60)
+    sta ActorVY,y
+
+    jsl RandomByte
+    sta ActorVarA,y
+    and #$000f
+    jsl VelocityLeftOrRight
+    sta ActorVX,y
+  :
+  rts
 .endproc
 
 .a16
@@ -2700,15 +2816,34 @@ Holding:
 
 .a16
 .i16
+.export DrawPumpkinPiece
+.proc DrawPumpkinPiece
+  lda ActorVarA,x
+  and #$10
+  ora #13|OAM_PRIORITY_2
+  jml DispActor8x8
+.endproc
+
+.a16
+.i16
 .export RunSwordSlime
 .proc RunSwordSlime
   jsl ActorFall
+
+  lda ActorState,x
+  cmp #ActorStateValue::Active
+  bne NoJump
+    lda #$30
+    jsl ActorWalkIgnoreState
+    jsl ActorAutoBump
+    jml PlayerActorCollisionHurt
+  NoJump:
 
   ; If too far, move in
   lda ActorPX,x
   sub PlayerPX
   abs
-  cmp #2*256
+  cmp #4*256
   bcs Move
 
   lda ActorState,x
@@ -2717,7 +2852,7 @@ Holding:
 
   lda ActorIndexInLevel,x
   eor framecount
-  and #31
+  and #63
   bne NoShoot
     jsl FindFreeActorY
     bcc NoShoot
@@ -2725,7 +2860,7 @@ Holding:
       lda ActorDirection,x
       sta ActorDirection,y
 
-      lda #ActorStateValue::Paused
+      lda #ActorStateValue::Active
       sta ActorState,x
       seta16
 
@@ -2737,15 +2872,34 @@ Holding:
       lda ActorPY,x
       sta ActorPY,y
 
+      lda #0
+      sta ActorVarA,y
+
       lda #Actor::SwordSlimeSword*2
       sta ActorType,y
+
+      ; Store the index of the actor to follow
+      txa
+      sta ActorVarB,y
 
       jsl InitActorY
 
       lda #15
       sta ActorTimer,x
+
+      jsl RandomByte
+      sta ActorVarC,x
+      and #15
+      add #.loword(-$30)
+      sta ActorVY,x
+      rtl
 NoShoot:
-  rtl
+  jsl ActorTurnAround
+  lda #$5
+  jsl ActorWalk
+  jsl ActorAutoBump
+  jsl ActorTurnAround  
+  jml PlayerActorCollisionHurt
 
 Move:
   lda #$10
@@ -2790,6 +2944,25 @@ Frames:
 .i16
 .export RunSwordSlimeSword
 .proc RunSwordSlimeSword
+  ; Move to the thing being copied
+  ldy ActorVarB,x
+  beq DontMove
+  lda ActorType,y
+  bne DoMove
+DontMove:
+    ; There is a potential for this enemy slot to die and then immediately get replaced on the same frame,
+    ; but that should be ok?
+    stz ActorVarB,x
+    rtl
+  DoMove:
+  ldy ActorVarB,x
+  lda ActorPY,y
+  sta ActorPY,x
+  lda #16*16
+  jsl ActorNegIfLeft
+  add ActorPX,y
+  sta ActorPX,x
+
   inc ActorVarA,x
   lda ActorVarA,x
   cmp #20

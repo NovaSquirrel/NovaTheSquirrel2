@@ -920,6 +920,14 @@ FirstSolid:
 .endproc
 
 .a16
+.export ActorWalkIgnoreState
+.proc ActorWalkIgnoreState
+  jsl ActorNegIfLeft
+  sta 0
+  bra ActorWalkSkipCheck
+.endproc
+
+.a16
 .export ActorWalk
 .proc ActorWalk
 WalkDistance = 0
@@ -933,6 +941,7 @@ WalkDistance = 0
     rtl
   :
 
+SkipCheck:
   ; Look up if the wall is solid
   lda ActorPY,x
   sub #1<<7
@@ -952,6 +961,7 @@ WalkDistance = 0
   sta ActorPX,x
   ; Fall into ActorDownhillFix
 .endproc
+ActorWalkSkipCheck = ActorWalk::SkipCheck
 .a16
 .proc ActorDownhillFix
 
