@@ -2917,6 +2917,10 @@ Move:
   lsr
   lsr
   and #%110
+  cmp #%110
+  bcc :+
+    lda #%110
+  :
   tay
   lda Frames,y
   jml DispActorMetaPriority2
@@ -2952,10 +2956,15 @@ Frames:
 DontMove:
     ; There is a potential for this enemy slot to die and then immediately get replaced on the same frame,
     ; but that should be ok?
-    stz ActorVarB,x
+    stz ActorType,x
     rtl
   DoMove:
   ldy ActorVarB,x
+
+  seta8
+  lda ActorDirection,y
+  sta ActorDirection,x
+  seta16
   lda ActorPY,y
   sta ActorPY,x
   lda #16*16
@@ -2965,7 +2974,7 @@ DontMove:
 
   inc ActorVarA,x
   lda ActorVarA,x
-  cmp #20
+  cmp #25
   bcc :+
     stz ActorType,x
   :
