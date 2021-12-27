@@ -134,6 +134,18 @@
   ParticleTimer      = 10
   ParticleVariable   = 12
 
+  ; The ActorAdvertise array allows actors that other actors may care about interacting with
+  ; into a little list together, so that they can look at this list instead of the full actor array.
+  ; the Next array is copied into the main one after all actors are done.
+  ActorAdvertisePointer:     .res ActorAdvertiseLen*2
+  ActorAdvertiseType:        .res ActorAdvertiseLen*2
+  .segment "ZEROPAGE"
+  ActorAdvertiseCount:       .res 2 ; Counts up by 2
+  .segment "BSS"
+  ActorAdvertisePointerNext: .res ActorAdvertiseLen*2
+  ActorAdvertiseTypeNext:    .res ActorAdvertiseLen*2
+  ActorAdvertiseCountNext:   .res 2
+
   ; For automatically detecting which tile slot or palette has the right data
   SpriteTileSlots:     .res 2*8
   SpritePaletteSlots:  .res 2*4

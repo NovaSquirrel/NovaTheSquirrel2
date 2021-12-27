@@ -49,6 +49,17 @@ SlopeY = 2
   sta SpriteTilesInUseLast+6
   lda SpriteTilesInUse+8
   sta SpriteTilesInUseLast+8
+  ; Do the ActorAdvertise array
+  .repeat 5, I ; Update if ActorAdvertiseLen is changed
+    lda ActorAdvertisePointerNext+I*2
+    sta ActorAdvertisePointer+I*2
+    lda ActorAdvertiseTypeNext+I*2
+    sta ActorAdvertiseType+I*2
+  .endrep
+  lda ActorAdvertiseCountNext
+  sta ActorAdvertiseCount
+  stz ActorAdvertiseCountNext
+
   ; Prepare for the next frame
   stz PaletteInUse+0
   stz PaletteInUse+2
@@ -2730,5 +2741,26 @@ AddTwo:
   cmp PlayerPY
   bcs AddTwo
   sec
+  rtl
+.endproc
+
+; Adds the actor to ActorAdvertisement if there's room
+; X = Actor to advertise
+.a16
+.i16
+.export ActorAdvertiseMe
+.proc ActorAdvertiseMe
+  ldy ActorAdvertiseCountNext
+  cpy #ActorAdvertiseLen*2
+  bcs TooMuch
+    txa ; Store "this"
+    sta ActorAdvertisePointerNext,y
+    lda ActorType,x
+    sta ActorAdvertiseTypeNext,y
+    iny
+    iny
+    sty ActorAdvertiseCountNext
+TooMuch:
+  ; No success/failure since I don't need it yet
   rtl
 .endproc

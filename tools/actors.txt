@@ -376,6 +376,14 @@ gfx SPKnuckleSandwich
 pal SPCannon
 run RunKnuckleSandwich
 draw DrawKnuckleSandwich
+size 14x18
+
++KnuckleSandwichFist
+flag AutoRemove AutoReset
+gfx SPKnuckleSandwich
+pal SPCannon
+run RunKnuckleSandwichFist
+draw DrawKnuckleSandwichFist
 size 14x14
 
 # Extra: 1=metal sign

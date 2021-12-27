@@ -1563,8 +1563,7 @@ Copy:
   sta ActorTimer,y
   sta ActorVarA,y
   sta ActorVarB,y
-  txa
-  sta ActorVarC,y
+  stx ActorVarC,y
   seta8
   lda #50
   sta CopyingAnimationTimer

@@ -198,6 +198,15 @@ ParticleLen = 32
 .globalzp ParticleVY
 .globalzp ParticleTimer
 
+; Actors that other actors might be interested in
+ActorAdvertiseLen = 5
+.global ActorAdvertisePointer     ; Prevous frame, series of pointers
+.global ActorAdvertiseType        ; Type of each actor in the list, to speed up finding the actor you want
+.globalzp ActorAdvertiseCount       ; How many pointers there are (counts up by 2)
+.global ActorAdvertisePointerNext ; For the next frame
+.global ActorAdvertiseCountNext
+.global ActorAdvertiseTypeNext
+
 .global SpriteTileSlots
 .global SpritePaletteSlots
 .global BackgroundPaletteSlots

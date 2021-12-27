@@ -35,7 +35,7 @@ CommonTileBase = $40
 .import PlayerActorCollision, TwoActorCollision, PlayerActorCollisionMultiRect
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
-.import ActorNegIfLeft, AllocateDynamicSpriteSlot
+.import ActorNegIfLeft, AllocateDynamicSpriteSlot, ActorAdvertiseMe
 .import GetAngle512
 .import ActorTryUpInteraction, ActorTryDownInteraction, ActorBumpAgainstCeiling
 .import InitActorX, UpdateActorSizeX, InitActorY, UpdateActorSizeY
@@ -2441,20 +2441,216 @@ NoMove:
 .i16
 .export RunKnuckleSandwich
 .proc RunKnuckleSandwich
-  rtl
+  jsl ActorFall
+
+  inc ActorVarB,x
+  lda ActorVarB,x
+  cmp #18*2
+  bne NotEndOfBounce
+    stz ActorVarB,x
+
+    ; Are there any signs?
+    ldy #0
+  Search:
+    lda ActorAdvertiseType,y
+    cmp #Actor::KnuckleSandwichSign*2
+    beq Found
+  NextIteration:
+    iny
+    iny
+    cpy ActorAdvertiseCount
+    bcc :-
+    bra NotFound
+  Found:
+    sty 0
+    lda ActorAdvertisePointer,y
+    tay
+    lda ActorPX,x
+    sub ActorPX,y
+    abs
+    cmp #8*256
+    bcc :+
+      ldy 0 
+      bra NextIteration
+    :
+
+    ; Look at sign
+    lda ActorPX,x
+    cmp ActorPX,y
+    ; No harm in using it as a 16-bit value here, it's just written back
+    lda ActorDirection,x
+    and #$fffe
+    adc #0
+    sta ActorDirection,x
+    bra NotEndOfBounce
+  NotFound:
+    jsl ActorLookAtPlayer
+NotEndOfBounce:
+
+  lda ActorVarB,x
+  cmp #5*2
+  bcc NoWalk
+  cmp #15*2
+  bcs NoWalk
+  lda #20
+  jsl ActorWalk
+NoWalk:
+  jml PlayerActorCollisionHurt
 .endproc
 
 .a16
 .i16
 .export DrawKnuckleSandwich
 .proc DrawKnuckleSandwich
+  lda ActorVarB,x
+  and #%111110
+  tay
+  lda BounceFrames,y
+  jml DispActorMetaPriority2
+
+BounceFrames:
+  .word .loword(Bounce1)
+  .word .loword(Bounce2)
+  .word .loword(Bounce3)
+  .word .loword(Bounce4)
+  .word .loword(Bounce5)
+  .word .loword(Bounce6)
+  .word .loword(Bounce7)
+  .word .loword(Bounce8)
+  .word .loword(Bounce9)
+  .word .loword(Bounce10)
+  .word .loword(Bounce11)
+  .word .loword(Bounce12)
+  .word .loword(Bounce13)
+  .word .loword(Bounce14)
+  .word .loword(Bounce15)
+  .word .loword(Bounce16)
+  .word .loword(Bounce17)
+  .word .loword(Bounce18)
+
+Bounce1:
+Bounce4:
+  Row8x8   -4,  -14,  $08, $09
+  Row16x16  0,   -3,  $00
+  Row8x8   -4,    0,  $18, $19
+  EndMetasprite
+Bounce2:
+Bounce3:
+  Row8x8   -4,  -13,  $08, $09
+  Row16x16  0,   -2,  $00
+  Row8x8   -4,    0,  $18, $19
+  EndMetasprite
+Bounce5:
+  Row8x8   -4,  -16,  $08, $09
+  Row16x16  0,   -5,  $00
+  Row8x8   -4,   -1,  $18, $19
+  EndMetasprite
+Bounce6:
+  Row8x8   -4,  -18,  $08, $09
+  Row16x16  0,   -7,  $00
+  Row8x8   -4,   -3,  $18, $19
+  EndMetasprite
+Bounce7:
+  Row8x8   -4,  -19,  $08, $09
+  Row16x16  0,   -8,  $00
+  Row8x8   -4,   -4,  $18, $19
+  EndMetasprite
+Bounce8:
+  Row8x8   -4,  -20,  $08, $09
+  Row16x16  0,   -9,  $00
+  Row8x8   -4,   -4,  $18, $19
+  EndMetasprite
+Bounce9:
+  Row8x8   -4,  -21,  $08, $09
+  Row16x16  0,   -9,  $00
+  Row8x8   -4,   -4,  $18, $19
+  EndMetasprite
+Bounce10:
+  Row8x8   -4,  -22,  $08, $09
+  Row16x16  0,   -9,  $00
+  Row8x8   -4,   -4,  $18, $19
+  EndMetasprite
+Bounce11:
+  Row8x8   -4,  -23,  $08, $09
+  Row16x16  0,   -9,  $00
+  Row8x8   -4,   -3,  $18, $19
+  EndMetasprite
+Bounce12:
+  Row8x8   -4,  -23,  $08, $09
+  Row16x16  0,   -8,  $00
+  Row8x8   -4,   -2,  $18, $19
+  EndMetasprite
+Bounce13:
+  Row8x8   -4,  -23,  $08, $09
+  Row16x16  0,   -8,  $00
+  Row8x8   -4,   -1,  $18, $19
+  EndMetasprite
+Bounce14:
+  Row8x8   -4,  -22,  $08, $09
+  Row16x16  0,   -7,  $00
+  Row8x8   -4,   -1,  $18, $19
+  EndMetasprite
+Bounce15:
+  Row8x8   -4,  -21,  $08, $09
+  Row16x16  0,   -6,  $00
+  Row8x8   -4,    0,  $18, $19
+  EndMetasprite
+Bounce16:
+  Row8x8   -4,  -19,  $08, $09
+  Row16x16  0,   -5,  $00
+  Row8x8   -4,    0,  $18, $19
+  EndMetasprite
+Bounce17:
+  Row8x8   -4,  -17,  $08, $09
+  Row16x16  0,   -4,  $00
+  Row8x8   -4,    0,  $18, $19
+  EndMetasprite
+Bounce18:
+  Row8x8   -4,  -16,  $08, $09
+  Row16x16  0,   -3,  $00
+  Row8x8   -4,    0,  $18, $19
+  EndMetasprite
+
+PunchUp1:
+  EndMetasprite
+PunchUp2:
+  EndMetasprite
+PunchUp3:
+  EndMetasprite
+PunchUp4:
+  EndMetasprite
+PunchOpen:
+  EndMetasprite
+PunchDown1:
+  EndMetasprite
+PunchDown2:
+  EndMetasprite
+PunchDown3:
+  EndMetasprite
+.endproc
+
+.a16
+.i16
+.export RunKnuckleSandwichFist
+.proc RunKnuckleSandwichFist
+  lda #$10
+  jsl ActorWalk
   rtl
+.endproc
+
+.a16
+.i16
+.export DrawKnuckleSandwichFist
+.proc DrawKnuckleSandwichFist
+  lda #0|OAM_PRIORITY_2
+  jml DispActor16x16
 .endproc
 
 .a16
 .i16
 .export RunKnuckleSandwichSign
 .proc RunKnuckleSandwichSign
+  jsl ActorAdvertiseMe
   rtl
 .endproc
 
@@ -2648,6 +2844,7 @@ Frame2:
 
       lda #ActorStateValue::Active
       sta ActorState,x
+      stz ActorVY,x
   NoThrow:
   NotClose:
 
@@ -2878,9 +3075,8 @@ LaunchPiece:
       lda #Actor::SwordSlimeSword*2
       sta ActorType,y
 
-      ; Store the index of the actor to follow
-      txa
-      sta ActorVarB,y
+      ; Store the pointer of the actor to follow
+      stx ActorVarB,y
 
       jsl InitActorY
 
@@ -3245,8 +3441,6 @@ StrifeCloudSwordFrames:
   lda ActorVarA,x
   cmp #5*3+4
   bne :+
-    lda #2
-    sta $7faaaa
     jml ActorSafeRemoveX
   :
   asl
