@@ -2441,12 +2441,64 @@ NoMove:
 .i16
 .export RunKnuckleSandwich
 .proc RunKnuckleSandwich
+; VarB: Animation timer
+; VarC: 0=Moving, 1=Punching
+  lda ActorVarC,x
+  beq NotPunching
+    inc ActorVarB,x
+    lda ActorVarC,x ; Is it 2?
+    dea
+    beq :++
+      lda ActorVarB,x
+      cmp #4*2
+      bne :+
+        stz ActorVarB,x
+        stz ActorVarC,x
+      :
+      rtl
+    :
+
+    lda ActorVarB,x
+    cmp #8
+    bne :+
+      jsl FindFreeActorY
+      bcc :+
+        seta8
+        lda ActorDirection,x
+        sta ActorDirection,y
+        seta16
+
+        lda #50 ; Initial speed
+        jsl ActorNegIfLeft
+        sta ActorVX,y
+        lda #8  ; Flash timer
+        sta ActorVarB,y
+
+        lda ActorPX,x
+        sta ActorPX,y
+
+        lda ActorPY,x
+        sub #6*16
+        sta ActorPY,y
+
+        lda #Actor::KnuckleSandwichFist*2
+        sta ActorType,y
+
+        jsl InitActorY
+    :
+    cmp #8+$6e-1
+    bne :+
+      stz ActorVarB,x
+      inc ActorVarC,x
+    :
+    rtl
+NotPunching:
   jsl ActorFall
 
   inc ActorVarB,x
   lda ActorVarB,x
   cmp #18*2
-  bne NotEndOfBounce
+  jne NotEndOfBounce
     stz ActorVarB,x
 
     ; Are there any signs?
@@ -2459,17 +2511,28 @@ NoMove:
     iny
     iny
     cpy ActorAdvertiseCount
-    bcc :-
+    bcc Search
     bra NotFound
   Found:
     sty 0
     lda ActorAdvertisePointer,y
     tay
+
+    ; Is this sign close enough vertically?
+    lda ActorPY,x
+    sub ActorPY,y
+    abs
+    cmp #2*256
+    bcs TooFar
+
+    ; How about horizontally?
     lda ActorPX,x
     sub ActorPX,y
     abs
+    sta 2
     cmp #8*256
     bcc :+
+    TooFar:
       ldy 0 
       bra NextIteration
     :
@@ -2482,11 +2545,32 @@ NoMove:
     and #$fffe
     adc #0
     sta ActorDirection,x
-    bra NotEndOfBounce
-  NotFound:
+
+    ; Close enough to punch?
+    lda 2
+    cmp #3*256
+    bcs NotEndOfBounce
+  StartPunch:
+    inc ActorVarC,x
+    rtl
+  NotFound: ; Look at the player instead
     jsl ActorLookAtPlayer
+
+    ; Close enough to punch?
+    lda ActorPY,x
+    sub PlayerPY
+    abs
+    cmp #3*256
+    bcs NotEndOfBounce
+
+    lda ActorPX,x
+    sub PlayerPX
+    abs
+    cmp #5*256
+    bcc StartPunch
 NotEndOfBounce:
 
+  ; Only move forward when the bun is off the ground in the animation
   lda ActorVarB,x
   cmp #5*2
   bcc NoWalk
@@ -2502,11 +2586,46 @@ NoWalk:
 .i16
 .export DrawKnuckleSandwich
 .proc DrawKnuckleSandwich
+  lda ActorVarC,x
+  bne Punching
   lda ActorVarB,x
   and #%111110
   tay
   lda BounceFrames,y
   jml DispActorMetaPriority2
+
+Punching:
+  dea
+  beq PunchingRise
+PunchingLower:
+  lda ActorVarB,x
+  and #%110
+  tay
+  lda PunchLowerFrames,y
+  jml DispActorMetaPriority2
+
+PunchingRise:
+  lda ActorVarB,x
+  cmp #8
+  bcc :+
+    lda #8
+  :
+  and #%1110
+  tay
+  lda PunchRiseFrames,y
+  jml DispActorMetaPriority2
+
+PunchRiseFrames:
+  .word .loword(PunchUp1)
+  .word .loword(PunchUp2)
+  .word .loword(PunchUp3)
+  .word .loword(PunchUp4)
+  .word .loword(PunchOpen)
+
+PunchLowerFrames:
+  .word .loword(PunchDown1)
+  .word .loword(PunchDown2)
+  .word .loword(PunchDown3)
 
 BounceFrames:
   .word .loword(Bounce1)
@@ -2612,20 +2731,44 @@ Bounce18:
   EndMetasprite
 
 PunchUp1:
+  Row8x8   -4,  -15,  $08, $09
+  Row16x16  0,   -4,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchUp2:
+  Row8x8   -4,  -17,  $08, $09
+  Row16x16  0,   -5,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchUp3:
+  Row8x8   -4,  -18,  $08, $09
+  Row16x16  0,   -5,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchUp4:
+  Row8x8   -4,  -20,  $08, $09
+  Row16x16  0,   -6,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchOpen:
+  Row8x8   -4,  -21,  $08, $09
+  ;Row16x16  0,   -6,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchDown1:
+  Row8x8   -4,  -19,  $08, $09
+  Row16x16  0,   -5,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchDown2:
+  Row8x8   -4,  -18,  $08, $09
+  Row16x16  0,   -4,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 PunchDown3:
+  Row8x8   -4,  -17,  $08, $09
+  Row16x16  0,   -4,  $00
+  Row8x8   -4,    0,  $18, $19
   EndMetasprite
 .endproc
 
@@ -2633,8 +2776,35 @@ PunchDown3:
 .i16
 .export RunKnuckleSandwichFist
 .proc RunKnuckleSandwichFist
-  lda #$10
-  jsl ActorWalk
+  ; Flash first
+  lda ActorVarB,x
+  beq :+
+    dec ActorVarB,x
+    rtl
+  :
+
+  ; Then fly out and come back
+  jsl ActorApplyXVelocity
+  jsl PlayerActorCollisionHurt
+
+  lda ActorDirection,x
+  lsr
+  bcs Left
+Right:
+  dec ActorVX,x
+  lda ActorVX,x
+  cmp #.loword(-52)
+  bne :+
+    stz ActorType,x
+  :
+  rtl
+Left:
+  inc ActorVX,x
+  lda ActorVX,x
+  cmp #.loword(52)
+  bne :+
+    stz ActorType,x
+  :
   rtl
 .endproc
 
@@ -2642,7 +2812,13 @@ PunchDown3:
 .i16
 .export DrawKnuckleSandwichFist
 .proc DrawKnuckleSandwichFist
-  lda #0|OAM_PRIORITY_2
+  lda ActorVarB,x
+  lsr
+  bcs :+
+    lda #0|OAM_PRIORITY_2
+    jml DispActor16x16
+  :
+  lda #2|OAM_PRIORITY_2
   jml DispActor16x16
 .endproc
 
