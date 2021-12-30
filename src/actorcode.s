@@ -2503,6 +2503,8 @@ NotPunching:
 
     ; Are there any signs?
     ldy #0
+    lda ActorAdvertiseCount
+    beq NotFound
   Search:
     lda ActorAdvertiseType,y
     cmp #Actor::KnuckleSandwichSign*2
@@ -2546,9 +2548,12 @@ NotPunching:
     adc #0
     sta ActorDirection,x
 
+    lda ActorOnGround,x
+    and #255
+    beq NotEndOfBounce ; Don't punch in midair
     ; Close enough to punch?
     lda 2
-    cmp #3*256
+    cmp #5*256
     bcs NotEndOfBounce
   StartPunch:
     inc ActorVarC,x
@@ -2556,17 +2561,21 @@ NotPunching:
   NotFound: ; Look at the player instead
     jsl ActorLookAtPlayer
 
+    lda ActorOnGround,x
+    and #255
+    beq NotEndOfBounce ; Don't punch in midair
+
     ; Close enough to punch?
     lda ActorPY,x
     sub PlayerPY
     abs
-    cmp #3*256
+    cmp #4*256
     bcs NotEndOfBounce
 
     lda ActorPX,x
     sub PlayerPX
     abs
-    cmp #5*256
+    cmp #7*256
     bcc StartPunch
 NotEndOfBounce:
 
@@ -2776,6 +2785,8 @@ PunchDown3:
 .i16
 .export RunKnuckleSandwichFist
 .proc RunKnuckleSandwichFist
+  wdm 0
+
   ; Flash first
   lda ActorVarB,x
   beq :+
@@ -2786,6 +2797,43 @@ PunchDown3:
   ; Then fly out and come back
   jsl ActorApplyXVelocity
   jsl PlayerActorCollisionHurt
+
+  ; Try to destroy blocks
+  lda ActorPY,x
+  tay
+  jsr BreakBlocks
+  lda ActorPY,x
+  sub #16*16
+  tay
+  jsr BreakBlocks
+
+  ; Try to find the sign
+  ; (maybe I could store the sign index when the fist is thrown?)
+  lda ActorAdvertiseCount
+  beq NotFound
+  ldy #0
+Search:
+  lda ActorAdvertiseType,y
+  cmp #Actor::KnuckleSandwichSign*2
+  beq Found
+NextIteration:
+  iny
+  iny
+  cpy ActorAdvertiseCount
+  bcc Search
+  bra NotFound
+Found:
+  sty 0
+  lda ActorAdvertisePointer,y
+  tay
+  jsl TwoActorCollision
+  bcs :+
+    ldy 0
+    bra NextIteration
+  :
+  lda #0
+  sta ActorType,y
+NotFound:
 
   lda ActorDirection,x
   lsr
@@ -2806,6 +2854,16 @@ Left:
     stz ActorType,x
   :
   rtl
+
+BreakBlocks:
+  lda ActorPX,x
+  phx
+  jsl GetLevelPtrXY
+  .import GetBlockFlag, BlockRunInteractionBelow
+  jsl GetBlockFlag
+  jsl BlockRunInteractionBelow
+  plx
+  rts
 .endproc
 
 .a16
