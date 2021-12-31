@@ -2551,6 +2551,8 @@ NotPunching:
     lda ActorOnGround,x
     and #255
     beq NotEndOfBounce ; Don't punch in midair
+    lda ActorState,x
+    bne NotEndOfBounce ; Don't punch when stunned
     ; Close enough to punch?
     lda 2
     cmp #5*256
@@ -2564,6 +2566,8 @@ NotPunching:
     lda ActorOnGround,x
     and #255
     beq NotEndOfBounce ; Don't punch in midair
+    lda ActorState,x
+    bne NotEndOfBounce ; Don't punch when stunned
 
     ; Close enough to punch?
     lda ActorPY,x
