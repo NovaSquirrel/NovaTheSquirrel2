@@ -24,9 +24,9 @@
 .import BlockRunInteractionBelow, CountProjectileAmount
 .import InitActorX
 
-.segment "C_Player"
-
 .export AbilityIcons, AbilityGraphics, AbilityTilesetForId, AbilityRoutineForId
+
+.segment "AbilityGraphics"
 AbilityIcons:
   .incbin "../tilesets4/AbilityIcons.chrsfc"
 AbilityGraphics:
@@ -35,29 +35,40 @@ AbilityGraphics:
   .incbin "../tilesets4/AbilityMirror.chrsfc"
   .incbin "../tilesets4/AbilityRemote.chrsfc"
   .incbin "../tilesets4/AbilityWaterFishing.chrsfc"
+  .incbin "../tilesets4/AbilityBurger.chrsfc"
+  .incbin "../tilesets4/AbilityFire.chrsfc"
+  .incbin "../tilesets4/AbilityIce.chrsfc"
 SetNone   = 0 ; Don't need anything
-SetMisc   = 0
-SetHammer = 1
-SetMirror = 2
-SetRemote = 3
-SetWater  = 4
+.enum
+SetMisc
+SetHammer
+SetMirror
+SetRemote
+SetWater
+SetBurger
+SetFire
+SetIce
+.endenum
+
+.segment "C_Player"
 AbilityTilesetForId:
   .byt SetNone   ; None
-  .byt SetMisc   ; Burger
+  .byt SetBurger ; Burger
   .byt SetMisc   ; Glider
   .byt SetMisc   ; Bomb
-  .byt SetMisc   ; Ice
-  .byt SetMisc   ; Fire
+  .byt SetIce    ; Ice
+  .byt SetFire   ; Fire
   .byt SetWater  ; Water
   .byt SetHammer ; Hammer
   .byt SetWater  ; Fishing
   .byt SetMisc   ; Yoyo
-  .byt SetNone   ; Wheel
+  .byt SetNone   ; Sword
   .byt SetMirror ; Mirror
   .byt SetNone   ; Wing
   .byt SetRemote ; Remote
   .byt SetRemote ; Rocket
   .byt SetHammer ; Bubble
+  .byt SetNone   ; Bounce
 AbilityRoutineForId:
   .addr .loword(RunAbilityNone)
   .addr .loword(RunAbilityBurger)
@@ -341,6 +352,7 @@ DoBurgerShared:
 
   lda #40
   sta ActorTimer,x
+  stz ActorVarA,x
 
   ; Set this for the actor riding stuff to work correctly
   lda #3*16

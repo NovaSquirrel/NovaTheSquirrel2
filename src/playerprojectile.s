@@ -342,9 +342,20 @@ DrawProjectileCopyFailAnimation = DrawProjectileCopy
 .a16
 .i16
 .proc RunProjectileBurger
+  ; If nonzero, it's about to explode
+  lda ActorVarA,x
+  beq NotStopped
+    dec ActorTimer,x
+    bne :+
+      lda #5*4
+      jmp ChangeToExplosion
+    :
+    rtl
+  NotStopped:
+
   lda #$30
   jsl ActorWalk
-  bcs Explode
+  bcs GetReadyToExplode
 
   jsl CollideRide
   jsl RideOnProjectile
@@ -357,9 +368,11 @@ DrawProjectileCopyFailAnimation = DrawProjectileCopy
 
   dec ActorTimer,x
   bne :+
-Explode:
-    lda #5*4
-    jmp ChangeToExplosion
+    inc ActorVarA,x
+GetReadyToExplode:
+    inc ActorVarA,x
+    lda #4
+    sta ActorTimer,x
   :
   rtl
 .endproc
@@ -367,8 +380,32 @@ Explode:
 .a16
 .i16
 .proc DrawProjectileBurger
-  lda #32|OAM_PRIORITY_2
+  lda ActorVarA,x
+  dea
+  beq One
+  dea
+  beq Two
+Zero:
+  lda framecount
+  lsr
+  and #%110
+  ora #32|OAM_PRIORITY_2
   jml DispActor16x16
+
+Two: ; About to explode
+  lda #32|8|OAM_PRIORITY_2
+  jml DispActor16x16
+
+
+One: ; Collided with something
+  lda framecount
+  lsr
+  bcc :+
+    lda #32|10|OAM_PRIORITY_2
+    jml DispActor16x16
+: lda #32|12|OAM_PRIORITY_2
+  jml DispActor16x16
+
 .endproc
 
 .a16
@@ -614,7 +651,7 @@ Exit:
 .proc DrawProjectileFireBall
   lda framecount
   and #1
-  ora #$3a|OAM_PRIORITY_2
+  ora #$38|OAM_PRIORITY_2
   jml DispActor8x8
 .endproc
 
@@ -648,7 +685,9 @@ Exit:
   lsr
   bcc Nope
 Always:
-  lda #OAM_PRIORITY_2|$28
+  lda framecount
+  and #%110
+  ora #OAM_PRIORITY_2|$20
   jml DispActor16x16
 Nope:
   rtl
@@ -1634,6 +1673,13 @@ CopyEnemy:
   .word Actor::BurgerRider*2
   .word Actor::EnemyGlider*2
   .word Actor::EnemyLWSS*2
+  .word Actor::KnuckleSandwich*2
+  .word Actor::PumpkinBoat*2
+  .word Actor::PumpkinMan*2
+  .word Actor::SwordSlime*2
+  .word Actor::StrifeCloud*2
+  .word Actor::Dave*2
+  .word Actor::BurgerRiderJumper*2
   .word 0
 
 CopyAbility:
@@ -1653,6 +1699,13 @@ CopyAbility:
   .byt Ability::Burger
   .byt Ability::Glider
   .byt Ability::Glider
+  .byt Ability::Burger
+  .byt Ability::Water
+  .byt Ability::Water
+  .byt Ability::Sword
+  .byt Ability::Sword
+  .byt Ability::Sword
+  .byt Ability::Burger
 .endproc
 
 .a16

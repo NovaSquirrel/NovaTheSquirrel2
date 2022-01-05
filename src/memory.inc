@@ -63,12 +63,13 @@
   Hammer
   Fishing
   Yoyo
-  Wheel
+  Sword
   Mirror
   Wing
   Remote
   Rocket
   Bubble
+  Bounce
 .endenum
 
 .global   NeedAbilityChange
