@@ -38,6 +38,7 @@ AbilityGraphics:
   .incbin "../tilesets4/AbilityBurger.chrsfc"
   .incbin "../tilesets4/AbilityFire.chrsfc"
   .incbin "../tilesets4/AbilityIce.chrsfc"
+  .incbin "../tilesets4/AbilityRocket.chrsfc"
 SetNone   = 0 ; Don't need anything
 .enum
 SetMisc
@@ -48,6 +49,7 @@ SetWater
 SetBurger
 SetFire
 SetIce
+SetRocket
 .endenum
 
 .segment "C_Player"
@@ -66,7 +68,7 @@ AbilityTilesetForId:
   .byt SetMirror ; Mirror
   .byt SetNone   ; Wing
   .byt SetRemote ; Remote
-  .byt SetRemote ; Rocket
+  .byt SetRocket ; Rocket
   .byt SetHammer ; Bubble
   .byt SetNone   ; Bounce
 AbilityRoutineForId:

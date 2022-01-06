@@ -1165,22 +1165,27 @@ TargetAngleTable:
 .proc DrawProjectileRemoteMissile
   lda ActorVarB,x
   add #8
-  lsr ; %01110000
-  lsr ; %00111000
-  lsr ; %00011100
-  lsr ; %00001110
-  and  #%00001110
+  lsr ; %01111000
+  lsr ; %00111100
+  lsr ; %00011110
+  and  #%00011110
   tay
   lda Frames,y
   jml DispActor16x16FlippedAbsolute
 
 Frames:
-Up    = $2a
-Diag  = $2c
-Right = $2e
+Up     = $20
+DiagU  = $22
+Diag   = $24
+DiagR  = $26
+Right  = $28
   PR = OAM_PRIORITY_2
-  .word PR|Right, PR|Diag|OAM_YFLIP, PR|Up|OAM_YFLIP, PR|Diag|OAM_XFLIP|OAM_YFLIP
-  .word PR|Right|OAM_XFLIP, PR|Diag|OAM_XFLIP, PR|Up, PR|Diag
+  .word PR|Right, PR|DiagR|OAM_YFLIP, PR|Diag|OAM_YFLIP, PR|DiagU|OAM_YFLIP
+  .word PR|Up|OAM_YFLIP, PR|DiagU|OAM_YFLIP|OAM_XFLIP, PR|Diag|OAM_XFLIP|OAM_YFLIP, PR|DiagR|OAM_XFLIP|OAM_YFLIP
+  .word PR|Right|OAM_XFLIP, PR|DiagR|OAM_XFLIP, PR|Diag|OAM_XFLIP, PR|DiagU|OAM_XFLIP
+  .word PR|Up, PR|DiagU, PR|Diag, PR|DiagR
+;  .word PR|Right, PR|Diag|OAM_YFLIP, PR|Up|OAM_YFLIP, PR|Diag|OAM_XFLIP|OAM_YFLIP
+;  .word PR|Right|OAM_XFLIP, PR|Diag|OAM_XFLIP, PR|Up, PR|Diag
 .endproc
 
 .a16
