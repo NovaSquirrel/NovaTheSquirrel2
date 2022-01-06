@@ -2789,8 +2789,6 @@ PunchDown3:
 .i16
 .export RunKnuckleSandwichFist
 .proc RunKnuckleSandwichFist
-  wdm 0
-
   ; Flash first
   lda ActorVarB,x
   beq :+
@@ -3882,6 +3880,43 @@ Flipped:
   rts
 .endproc
 
+.export DrawIceBlockParticle
+.proc DrawIceBlockParticle
+  lda framecount
+  lsr
+  lsr
+  eor ParticleVariable,x
+  pha
+  xba
+  and #OAM_XFLIP|OAM_YFLIP
+  sta 0
+  pla
+  and #3
+  add #$26+OAM_PRIORITY_2
+  tsb 0
+
+  lda ParticleTimer,x
+  cmp #10
+  bcs :+
+    lda #$10
+    tsb 0
+  :
+
+  lda 0
+  jsl DispParticle8x8
+  rts
+.endproc
+
+.export DrawIceBlockFreezeParticle
+.proc DrawIceBlockFreezeParticle
+  lda ParticleVariable,x
+  and #2
+  add #$2c+OAM_PRIORITY_2
+  jsl DispParticle16x16
+  rts
+.endproc
+
+
 .a16
 .i16
 .export RunParticleDisappear
@@ -4168,6 +4203,22 @@ ThwaiteCosineTable:
   rts
 .endproc
 
+.if 0
+.export CenterParticleOnActor
+.proc CenterParticleOnActor
+  lda ActorWidth,x
+  lsr
+  rsb ActorPX,x
+  add #4*16
+  sta ParticlePX,y
+
+  lda ActorPY,x
+  sub ActorHeight,x
+  add #4*16
+  sta ParticlePY,y
+  rtl
+.endproc
+.endif
 
 .a16
 .export ActorBecomePoof
@@ -4177,7 +4228,10 @@ ThwaiteCosineTable:
   bcc Exit
     lda #Particle::Poof
     sta ParticleType,y
-    lda ActorPX,x
+    lda ActorWidth,x
+    lsr
+    rsb ActorPX,x
+    add #4*16
     sta ParticlePX,y
     lda ActorPY,x
     sub ActorHeight,x

@@ -24,7 +24,7 @@
 .import ActorBecomePoof, ActorTurnAround, TwoActorCollision, DispActor8x8, DispActor8x8WithOffset, DispActor16x16, ActorExpire
 .import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorWalk, ActorFall, ActorAutoBump
 .import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
-.import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256
+.import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256, DispParticle8x8
 .import ActorSafeRemoveY, BlockRunInteractionBelow
 
 .assert ^ChangeToExplosion = ^RunPlayerProjectile, error, "Player projectiles and other actors should share a bank"
@@ -613,14 +613,58 @@ Bigger:
     stz PlayerNeedsGround
     seta16
 ActorExists:
+
+  ; Make ice particles
+  lda framecount
+  and #3
+  bne NoMakeParticle
+    jsl FindFreeParticleY
+    bcc :+
+      lda #Particle::IceBlockParticle
+      sta ParticleType,y
+
+      jsl RandomByte
+      sta 0
+      lda ActorPX,x
+      sub #8*16
+      add 0
+      sta ParticlePX,y
+
+      jsl RandomByte
+      sta ParticleVariable,y
+      
+      jsl RandomByte
+      sta 0
+      lda ActorPY,x
+      sub ActorHeight,x
+      add 0
+
+      sta ParticlePY,y
+      lda #30
+      sta ParticleTimer,y
+    :
+  NoMakeParticle:
   rtl
 .endproc
 
 .a16
 .i16
 .proc DrawProjectileIce
-  lda #34|OAM_PRIORITY_2
+  lda ActorTimer,x
+  cmp #6
+  bcc :+
+  lda #32|OAM_PRIORITY_2
   jml DispActor16x16
+: cmp #4
+  bcc :+
+  lda #32|2|OAM_PRIORITY_2
+  jml DispActor16x16
+: cmp #2
+  bcc :+
+  lda #32|4|OAM_PRIORITY_2
+  jml DispActor16x16
+: lda #32|10|$10|OAM_PRIORITY_2
+  jml DispActor8x8
 .endproc
 
 .a16
@@ -1475,6 +1519,41 @@ StunAndRemove:
   ldy ProjectileIndex
   jml ActorSafeRemoveY
 
+
+BumpFreeze:
+  ; Must be moving in order to bump
+  lda ActorVX,y
+  ora ActorVY,y
+  bne :+
+    rtl
+  :
+
+  ; Try to make a freeze particle!
+  lda framecount
+  lsr
+  bcs :+
+  jsl FindFreeParticleY
+  bcc :+
+    jsl RandomByte
+    sta ParticleVariable,y
+
+    lda #Particle::IceBlockFreezeParticle
+    sta ParticleType,y
+
+    lda ActorPX,x
+    sub #4*16
+    sta ParticlePX,y
+
+    lda ActorPY,x
+    sub #16*16
+    sta ParticlePY,y
+
+    lda #15
+    sta ParticleTimer,y
+  :
+
+  bra BumpUpward
+
 Bump:
   ; Must be moving in order to bump
   lda ActorVX,y
@@ -1482,6 +1561,7 @@ Bump:
   bne :+
     rtl
   :
+BumpUpward:
   lda #.loword(-$30)
   sta ActorVY,x
 BumpStunOnly:
@@ -1560,7 +1640,7 @@ HitProjectileResponse:
   .word .loword(Bump-1) ; Burger
   .word .loword(DamageAndRemove-1) ; Glider
   .word .loword(Bump-1) ; Bomb
-  .word .loword(Bump-1) ; Ice
+  .word .loword(BumpFreeze-1) ; Ice
   .word .loword(DamageAndRemove-1) ; Fire ball
   .word .loword(Damage-1) ; Fire still
   .word .loword(DamageAndRemoveHalf-1) ; Water bottle

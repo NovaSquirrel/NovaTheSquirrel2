@@ -535,6 +535,16 @@ particle
 run RunParticleDisappear
 draw DrawSmokeParticle
 
++IceBlockParticle
+particle
+run RunParticleDisappear
+draw DrawIceBlockParticle
+
++IceBlockFreezeParticle
+particle
+run RunParticleDisappear
+draw DrawIceBlockFreezeParticle
+
 # ---------- static overworld sprites ----------
 +Tree
 owdecoration

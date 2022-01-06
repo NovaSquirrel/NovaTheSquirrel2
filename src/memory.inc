@@ -198,6 +198,7 @@ ParticleLen = 32
 .globalzp ParticleVX
 .globalzp ParticleVY
 .globalzp ParticleTimer
+.globalzp ParticleVariable
 
 ; Actors that other actors might be interested in
 ActorAdvertiseLen = 5
