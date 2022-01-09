@@ -35,7 +35,7 @@ for line in text:
 		# Reset to prepare for the new actor
 		actor = {"name": line[1:], "particle": False, "owdecoration": False, "pic": 0, "size": [16, 16],
 			"run": "ActorNothing", "draw": "ActorNothing", "flags": [], "health": "$10",
-			"gfx": None, "pal": None, "essential": False, "secondary": False}
+			"gfx": None, "pal": None, "essential": False, "secondary": False, "after": "SharedNone"}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -50,7 +50,7 @@ for line in text:
 		actor["flags"] = arg.split()
 	elif word in ["gfx", "pal", "pic", "health"]:
 		actor[word] = arg
-	elif word in ["run", "draw"]:
+	elif word in ["run", "draw", "after"]:
 		actor[word] = arg
 		all_subroutines.append(arg)
 	elif word in ["essential", "secondary", "particle", "owdecoration"]:
@@ -67,7 +67,7 @@ outfile = open("src/actordata.s", "w")
 outfile.write('; This is automatically generated. Edit "actors.txt" instead\n')
 outfile.write('.include "snes.inc"\n.include "global.inc"\n.include "graphicsenum.s"\n.include "paletteenum.s"\n')
 
-outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidthTable, ActorHeightTable, ActorPalette, ActorGraphic, ActorHealth\n')
+outfile.write('.export ActorFlags, ActorBank, ActorRun, ActorDraw, ActorWidthTable, ActorHeightTable, ActorPalette, ActorGraphic, ActorHealth, ActorAfterRun\n')
 outfile.write('.export ParticleRun, ParticleDraw\n')
 outfile.write('.export OWDecorationGraphic, OWDecorationPalette, OWDecorationPic\n')
 
@@ -87,7 +87,6 @@ outfile.write('.endproc\n\n')
 
 # no-operation routine
 outfile.write(".proc ActorNothing\n  rtl\n.endproc\n\n")
-outfile.write(".proc ParticleNothing\n  rts\n.endproc\n\n")
 
 # Actors
 outfile.write('.proc ActorDraw\n  .addr .loword(ActorNothing)\n')
@@ -138,6 +137,8 @@ outfile.write('.endproc\n\n')
 
 # Particles
 outfile.write('.segment "C_ParticleCode"\n')
+outfile.write(".proc ParticleNothing\n  rts\n.endproc\n\n")
+
 outfile.write('.proc ParticleDraw\n  .addr .loword(ParticleNothing-1)\n')
 for b in all_particles:
 	outfile.write('  .addr .loword(%s-1)\n' % b["draw"])
@@ -146,6 +147,15 @@ outfile.write('.endproc\n\n')
 outfile.write('.proc ParticleRun\n  .addr .loword(ParticleNothing-1)\n')
 for b in all_particles:
 	outfile.write('  .addr .loword(%s-1)\n' % b["run"])
+outfile.write('.endproc\n\n')
+
+# Shared routine table
+outfile.write('.segment "C_ActorCommon"\n')
+outfile.write('.proc SharedNone\n  rts\n.endproc\n')
+
+outfile.write('.proc ActorAfterRun\n  .word .loword(SharedNone-1)\n')
+for b in all_actors:
+	outfile.write('  .word .loword(%s-1)\n' % (b["after"]))
 outfile.write('.endproc\n\n')
 
 

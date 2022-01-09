@@ -2,61 +2,64 @@
 # The "Empty" entity type is created automatically, no need to specify here.
 
 +SlowSneaker
-flag AutoRemove AutoReset GetShot WaitUntilNear
 pal SPWalker
 gfx SPWalker
 run RunSlowSneaker
 draw DrawSlowSneaker
+after SharedEnemyWaitNear
 size 16x16
 
 +Sneaker
-flag AutoRemove AutoReset GetShot
 pal SPWalker
 gfx SPWalker
 run RunSneaker
 draw DrawSneaker
+after SharedEnemyNormal
 size 16x16
 
 +Spinner
-flag AutoRemove AutoReset GetShot
 pal SPWalker
 gfx SPWalker2
 run RunSpinner
 draw DrawSpinner
+after SharedEnemyNormal
 size 16x16
 
 +Bunny
-flag AutoRemove AutoReset GetShot WaitForCameraVertically
 pal SPWalker
 gfx SPWalker
 run RunBunny
 draw DrawBunny
+after SharedEnemyWaitVertically
 size 16x16
 
 +LedgeWalker
-flag AutoRemove AutoReset GetShot
 pal SPWalker
 gfx SPWalker2
 run RunLedgeWalker
 draw DrawLedgeWalker
+after SharedEnemyNormal
 size 16x14
 
 +MovingPlatformHoriz
 essential
 run RunMovingPlatformH
 draw DrawMovingPlatform
+after SharedRemoveIfFarther
 size 32x8
 
 +MovingPlatformLine
 essential
 run RunMovingPlatformLine
 draw DrawMovingPlatform
+after SharedRemoveIfFarther
 size 32x8
 
 +MovingPlatformPush
 essential
 run RunMovingPlatformPush
 draw DrawMovingPlatform
+after SharedRemoveIfFarther
 size 32x8
 
 +Checkpoint
@@ -64,6 +67,7 @@ essential
 flag AutoRemove
 run RunCheckpoint
 draw DrawCheckpoint
+after SharedRemoveIfFarther
 size 16x16
 
 +PlayerProjectile
@@ -79,7 +83,7 @@ size 16x16
 +FireWalk
 run RunFireWalk
 draw DrawFireWalk
-flag AutoRemove AutoReset GetShot WaitForCameraVertically
+after SharedEnemyWaitVertically
 gfx SPFire
 pal SPFire
 size 16x16
@@ -87,7 +91,7 @@ size 16x16
 +FireJump
 run RunFireJump
 draw DrawFireJump
-flag AutoRemove AutoReset GetShot WaitForCameraVertically
+after SharedEnemyWaitVertically
 gfx SPFire
 pal SPFire
 size 16x16
@@ -95,7 +99,6 @@ size 16x16
 +FireBall
 run RunFireBall
 draw DrawFireBall
-flag AutoRemove
 gfx SPFire
 pal SPFire
 size 8x8
@@ -103,7 +106,6 @@ size 8x8
 +FireBullet
 run RunFireBullet
 draw DrawFireBullet
-flag AutoRemove
 gfx SPFire
 pal SPFire
 size 8x8
@@ -111,7 +113,6 @@ size 8x8
 +FireFlames
 run RunFireFlames
 draw DrawFireFlames
-flag AutoRemove
 gfx SPFire
 pal SPFire
 size 16x16
@@ -119,7 +120,7 @@ size 16x16
 +FireFox
 run RunFireFox
 draw DrawFireFox
-flag AutoRemove AutoReset GetShot
+after SharedEnemyNormal
 gfx SPFire2
 pal SPFire
 size 16x16
@@ -127,7 +128,7 @@ size 16x16
 +Grillbert
 run RunGrillbert
 draw DrawGrillbert
-flag AutoRemove AutoReset GetShot
+after SharedEnemyNormal
 gfx SPFire2
 pal SPFire
 size 16x16
@@ -135,7 +136,7 @@ size 16x16
 +George
 run RunGeorge
 draw DrawGeorge
-flag AutoRemove AutoReset GetShot
+after SharedEnemyNormal
 gfx SPGeorge
 pal SPWalker
 size 16x16
@@ -144,7 +145,6 @@ health $20
 +GeorgeBottle
 run RunGeorgeBottle
 draw DrawGeorgeBottle
-flag AutoRemove
 gfx SPGeorge
 pal SPWalker
 size 8x8
@@ -152,7 +152,7 @@ size 8x8
 +MirrorRabbit
 run RunMirrorRabbit
 draw DrawMirrorRabbit
-flag AutoRemove AutoReset GetShot
+after SharedEnemyNormal
 gfx SPMirrorRabbit
 pal SPWalker
 size 16x32
@@ -160,7 +160,7 @@ size 16x32
 +MirrorRabbitInHat
 run RunMirrorRabbitInHat
 draw DrawMirrorRabbitInHat
-flag AutoRemove AutoReset GetShot
+after SharedEnemyNormal
 gfx SPMirrorRabbit
 pal SPWalker
 size 16x16
@@ -168,7 +168,7 @@ size 16x16
 +BomberTree
 run RunBomberTree
 draw DrawBomberTree
-flag AutoRemove GetShot AutoReset
+after SharedEnemyNormal
 gfx SPBomberTree
 pal SPWalker
 size 16x32
@@ -176,7 +176,6 @@ size 16x32
 +BomberTreeSeed
 run RunBomberTreeSeed
 draw DrawBomberTreeSeed
-flag AutoRemove
 gfx SPBomberTree
 pal SPWalker
 size 8x8
@@ -184,7 +183,7 @@ size 8x8
 +BomberTreeTurnip
 run RunBomberTreeTurnip
 draw DrawBomberTreeTurnip
-flag AutoRemove GetShot AutoReset
+after SharedEnemyNormal
 gfx SPBomberTree
 pal SPWalker
 size 16x16
@@ -192,42 +191,42 @@ size 16x16
 +BomberTreeTurnipCool
 run RunBomberTreeTurnipCool
 draw DrawBomberTreeTurnipCool
-flag AutoRemove GetShot AutoReset
+after SharedEnemyNormal
 gfx SPBomberTree
 pal SPWalker
 size 16x16
 
 # ---------- cannon stuff ----------
 +Burger
-flag AutoRemove GetShot
 gfx SPCannon
 pal SPCannon
 run RunBurger
 draw DrawBurger
+after SharedEnemyNoReset
 size 16x16
 
 +PinkBall
-flag AutoRemove GetShot
 gfx SPCannon
 pal SPCannon
 run RunPinkBall
 draw DrawPinkBall
+after SharedEnemyNoReset
 size 16x16
 
 +BurgerCannonH
-flag AutoRemove
 gfx SPCannon
 pal SPCannon
 run RunBurgerCannonH
 draw DrawCannonH
+after SharedRemoveIfFar
 size 16x16
 
 +BurgerCannonV
-flag AutoRemove
 gfx SPCannon
 pal SPCannon
 run RunBurgerCannonV
 draw DrawCannonV
+after SharedRemoveIfFar
 size 16x16
 
 +AnyCannonH
@@ -236,32 +235,33 @@ gfx SPCannon
 pal SPCannon
 run RunAnyCannonH
 draw DrawCannonH
+after SharedRemoveIfFar
 size 16x16
 
 +AnyCannonV
-flag AutoRemove
 gfx SPCannon
 pal SPCannon
 run RunAnyCannonH
 draw DrawCannonV
+after SharedRemoveIfFar
 size 16x16
 
 # --------------------
 
 +BounceGuy
-flag AutoRemove GetShot AutoReset
 gfx SPCannon
 pal SPCannon
 run RunBounceGuy
 draw DrawBounceGuy
+after SharedEnemyNormal
 size 16x16
 
 +SmashGuy
-flag AutoRemove GetShot AutoReset
 gfx SPCannon
 pal SPCannon
 run RunSmashGuy
 draw DrawSmashGuy
+after SharedEnemyNormal
 size 16x16
 
 +ActivePushBlock
@@ -279,26 +279,26 @@ size 16x16
 gfx SPHannah
 run RunBoulder
 draw DrawBoulder
+# Handles removing itself automatically
 size 16x16
 
 +BurgerRider
-flag AutoRemove GetShot AutoReset
 gfx SPBurgerRider
 pal SPCannon
 run RunBurgerRider
 draw DrawBurgerRider
+after SharedEnemyNormal
 size 16x40
 
 +ExplodingFries
-flag AutoRemove GetShot AutoReset
 gfx SPBurgerRider
 pal SPCannon
 run RunExplodingFries
 draw DrawExplodingFries
+after SharedEnemyNormal
 size 16x16
 
 +FrenchFry
-flag AutoRemove
 gfx SPBurgerRider
 pal SPCannon
 run RunFrenchFry
@@ -306,23 +306,22 @@ draw DrawFrenchFry
 size 8x16
 
 +BubbleWizard
-flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
 run RunBubbleWizard
 draw DrawBubbleWizard
+after SharedEnemyNormal
 size 8x18
 
 +BubbleBuddy
-flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
 run RunBubbleBuddy
 draw DrawBubbleBuddy
+after SharedEnemyNormal
 size 16x16
 
 +BubbleBullet
-flag AutoRemove
 gfx SPBubble
 pal SPWalker
 run RunBubbleBullet
@@ -330,56 +329,55 @@ draw DrawBubbleBullet
 size 8x8
 
 +BubbleCat
-flag AutoRemove GetShot AutoReset
 gfx SPBubble
 pal SPWalker
 run RunBubbleCat
 draw DrawBubbleCat
+after SharedEnemyNormal
 size 16x14
 
 +BubbleMoai
-flag AutoRemove GetShot AutoReset
 gfx SPMoai
 pal SPFire
 run RunBubbleMoai
 draw DrawBubbleMoai
+after SharedEnemyNormal
 size 16x22
 
 +SkateboardMoai
-flag AutoRemove GetShot AutoReset
 gfx SPMoai
 pal SPFire
 run RunSkateboardMoai
 draw DrawSkateboardMoai
+after SharedEnemyNormal
 size 16x28
 
 +EnemyGlider
-flag AutoRemove GetShot AutoReset
 gfx SPLife
 pal SPWalker
 run RunEnemyGlider
 draw DrawEnemyGlider
+after SharedEnemyNormal
 size 16x15
 
 +EnemyLWSS
-flag AutoRemove GetShot AutoReset
 gfx SPLife
 pal SPWalker
 run RunEnemyLWSS
 draw DrawEnemyLWSS
+after SharedEnemyNormal
 size 16x15
 
 # Extra: 1=up, 2=down
 +KnuckleSandwich
-flag AutoRemove GetShot AutoReset
 gfx SPKnuckleSandwich
 pal SPCannon
 run RunKnuckleSandwich
 draw DrawKnuckleSandwich
+after SharedEnemyNormal
 size 14x18
 
 +KnuckleSandwichFist
-flag AutoRemove AutoReset
 gfx SPKnuckleSandwich
 pal SPCannon
 run RunKnuckleSandwichFist
@@ -388,48 +386,47 @@ size 14x14
 
 # Extra: 1=metal sign
 +KnuckleSandwichSign
-flag AutoRemove
 gfx SPKnuckleSandwich
 pal SPCannon
 run RunKnuckleSandwichSign
 draw DrawKnuckleSandwichSign
+after SharedRemoveIfFarther
 size 16x16
 
 +PumpkinBoat
-flag AutoRemove GetShot AutoReset
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunPumpkinBoat
 draw DrawPumpkinBoat
+after SharedEnemyNormal
 size 16x25
 
 +RidableBoat
-flag AutoRemove AutoReset
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunRideableBoat
 draw DrawRideableBoat
+after SharedRemoveIfFarther
 size 24x8
 
 +PumpkinMan
-flag AutoRemove GetShot AutoReset
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunPumpkinMan
 draw DrawPumpkinMan
+after SharedEnemyNormal
 size 16x27
 
 # Extra: 1=thrown projectile
 +Pumpkin
-flag AutoRemove GetShot
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunPumpkin
 draw DrawPumpkin
+after SharedEnemyNoReset
 size 16x16
 
 +PumpkinPiece
-flag AutoRemove
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunPumpkinPiece
@@ -437,7 +434,6 @@ draw DrawPumpkinPiece
 size 8x8
 
 +PumpkinSpiceLatte
-flag AutoRemove
 gfx SPPumpkinBoat
 pal SPPumpkinBoat
 run RunPumpkinSpiceLatte
@@ -445,15 +441,14 @@ draw DrawPumpkinSpiceLatte
 size 8x8
 
 +SwordSlime
-flag AutoRemove GetShot AutoReset
 gfx SPSwordSlime
 pal SPWalker
 run RunSwordSlime
 draw DrawSwordSlime
+after SharedEnemyNormal
 size 16x14
 
 +SwordSlimeSword
-flag AutoRemove
 gfx SPSwordSlime
 pal SPWalker
 run RunSwordSlimeSword
@@ -461,14 +456,13 @@ draw DrawSwordSlimeSword
 size 8x16
 
 +StrifeCloud
-flag AutoRemove GetShot AutoReset
 gfx SPStrifeCloud
 run RunStrifeCloud
 draw DrawStrifeCloud
+after SharedEnemyNormal
 size 16x16
 
 +StrifeCloudSword
-flag AutoRemove
 gfx SPSwordSlime
 pal SPWalker
 run RunStrifeCloudSword
@@ -476,15 +470,14 @@ draw DrawStrifeCloudSword
 size 8x16
 
 +Dave
-flag AutoRemove GetShot AutoReset
 gfx SPStrider
 pal SPWalker
 run RunDave
 draw DrawDave
+after SharedEnemyNormal
 size 16x32
 
 +DaveSord
-flag AutoRemove
 gfx SPStrider
 pal SPWalker
 run RunDaveSord
@@ -492,11 +485,11 @@ draw DrawDaveSord
 size 32x32
 
 +BurgerRiderJumper
-flag AutoRemove GetShot AutoReset
 gfx SPBurgerRider
 pal SPCannon
 run RunBurgerRiderJumper
 draw DrawBurgerRiderJumper
+after SharedEnemyNormal
 size 16x40
 
 # ---------- particles ----------

@@ -18,7 +18,7 @@
 .include "snes.inc"
 .include "global.inc"
 .include "blockenum.s"
-.import ActorRun, ActorDraw, ActorFlags, ActorWidthTable, ActorHeightTable, ActorBank, ActorGraphic, ActorPalette
+.import ActorRun, ActorDraw, ActorAfterRun, ActorFlags, ActorWidthTable, ActorHeightTable, ActorBank, ActorGraphic, ActorPalette
 .import ActorGetShot
 .smart
 
@@ -107,63 +107,14 @@ Loop:
   lda ActorType,x
   jsl CallDraw
 
-  ; Call the common routines
+  ; Call the shared routine the actor uses (or call a stub if there isn't one)
   lda ActorType,x
   beq SkipEntity
   phx
   tax
-  lda f:ActorFlags,x
+  lda f:ActorAfterRun,x
   plx
-
-  lsr ; AutoRemove
-  bcc NotAutoRemove
-    ; Remove entity if too far away from the player
-    pha
-    lda ActorPX,x
-    sub PlayerPX
-    abs
-    cmp #$2000 ; How about two screens of distance does it?
-    bcc :+
-      jsl ActorSafeRemoveX
-      pla
-      bra SkipEntity   ; Skip doing anything else with this entity since it no longer exists
-    :
-    pla
-  NotAutoRemove:
-
-  lsr ; AutoReset
-  bcc NotAutoReset
-    pha
-    lda ActorTimer,x
-    beq :+
-    dec ActorTimer,x
-    bne :+
-      ; Clear the state
-      stz ActorState,x
-    :
-    pla
-  NotAutoReset:
-
-  lsr ; GetShot
-  bcc NotGetShot
-    pha
-    jsl ActorGetShot
-    pla
-  NotGetShot:
-
-  lsr ; WaitUntilNear
-  bcc NotWaitUntilNear
-    pha
-    jsl ActorActivateIfNear
-    pla
-  NotWaitUntilNear:
-
-  lsr ; WaitForCameraVertically
-  bcc NotWaitCameraVertically
-    pha
-    jsl ActorWaitForCameraVertically
-    pla
-  NotWaitCameraVertically:
+  jsr CallAfter
 
   ; Reset the "init" state
   seta8
@@ -183,6 +134,11 @@ SkipEntity:
   jne Loop
 
   jml RunAllParticles
+
+.a16
+CallAfter:
+  pha
+  rts
 
 ; Call the Actor run code
 .a16
@@ -384,6 +340,50 @@ FoundPalette:
   ; Jump to the per-Actor routine and return with an RTL
   plx ; X now equals the Actor index base again
   jml [0]
+.endproc
+
+.export SharedEnemyNormal, SharedEnemyNoReset, SharedRemoveIfFar, SharedRemoveIfFarther, SharedEnemyWaitNear, SharedEnemyWaitVertically
+.a16
+.i16
+SharedEnemyWaitVertically:
+  jsl ActorWaitForCameraVertically
+  bra SharedEnemyNormal
+SharedEnemyWaitNear:
+  jsl ActorActivateIfNear
+SharedEnemyNormal:
+  ; Reset the state
+  lda ActorTimer,x
+  beq :+
+  dec ActorTimer,x
+  bne :+
+    ; Clear the state
+    stz ActorState,x
+  :
+SharedEnemyNoReset:
+  jsl ActorGetShot
+SharedRemoveIfFar:
+  lda ActorPX
+  sub ScrollX
+  cmp #.loword(-24*256)
+  bcs @Good
+  cmp #(16+24)*256
+  bcc @Good
+  jsl ActorSafeRemoveX
+@Good:
+  rts
+
+.a16
+.i16
+.proc SharedRemoveIfFarther
+  lda ActorPX
+  sub ScrollX
+  cmp #.loword(-40*256)
+  bcs Good
+  cmp #(16+40)*256
+  bcc Good
+  jsl ActorSafeRemoveX
+Good:
+  rts
 .endproc
 
 .pushseg
@@ -1256,38 +1256,6 @@ NotSlope:
 NoBump:
   rtl
 .endproc
-
-; Automatically removes an Actor if they're too far away from the camera
-.a16
-.export ActorAutoRemove
-.proc ActorAutoRemove
-  lda ActorPX
-  sub ScrollX
-  cmp #.loword(-8*256)
-  bcs Good
-  cmp #32*256
-  bcc Good
-  jml ActorSafeRemoveX
-Good:
-  rtl
-.endproc
-
-; Automatically removes an Actor if they're too far away from the camera
-; (Bigger range)
-.a16
-.export ActorAutoRemoveFar
-.proc ActorAutoRemoveFar
-  lda ActorPX
-  sub ScrollX
-  cmp #.loword(-24*256)
-  bcs Good
-  cmp #40*256
-  bcc Good
-  jml ActorSafeRemoveX
-Good:
-  rtl
-.endproc
-
 
 ; Calculate the position of the 16x16 Actor on-screen
 ; and whether it's visible in the first place
