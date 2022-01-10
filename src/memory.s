@@ -77,15 +77,14 @@
                                ; (used for fallthrough platforms)
   PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
   PlayerHealth:     .res 1     ; current health, measured in half hearts
+  PlayerHoldingSomething: .res 1 ; true if holding anything
 
   StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
 
   SpriteTileBase:   .res 2 ; Detected tile base for the current entity (includes palette index)
 
-  OamPtr:           .res 2 ;
+  OamPtr:           .res 2 ; Current index into OAM and OAMHI
   TempVal:          .res 4
-  TempX:            .res 1 ; for saving the X register
-  TempY:            .res 1 ; for saving the Y register
   TouchTemp:        .res 8
 
   LevelColumnSize:  .res 2 ; for moving left and right in a level buffer

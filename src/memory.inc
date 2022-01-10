@@ -34,6 +34,7 @@
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
+.globalzp PlayerHoldingSomething
 .global PlayerInvincible
 .global PlayerNeedsGround
 .global PlayerNeedsGroundAtAttack
@@ -43,8 +44,6 @@
 .globalzp PlayerJumping
 .globalzp OamPtr
 .globalzp TempVal
-.globalzp TempX
-.globalzp TempY
 .globalzp TouchTemp
 .globalzp DecodePointer
 .globalzp ScriptPointer

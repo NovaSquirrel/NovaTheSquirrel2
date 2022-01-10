@@ -64,10 +64,9 @@ size 32x8
 
 +Checkpoint
 essential
-flag AutoRemove
 run RunCheckpoint
 draw DrawCheckpoint
-after SharedRemoveIfFarther
+after SharedRemoveIfFar
 size 16x16
 
 +PlayerProjectile
@@ -230,7 +229,6 @@ after SharedRemoveIfFar
 size 16x16
 
 +AnyCannonH
-flag AutoRemove
 gfx SPCannon
 pal SPCannon
 run RunAnyCannonH

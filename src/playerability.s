@@ -22,7 +22,7 @@
 .smart
 .import ActorClearX, PlayerNegIfLeft, SpeedAngle2Offset256
 .import BlockRunInteractionBelow, CountProjectileAmount
-.import InitActorX
+.import InitActorX, CalculateNextPlayerFrame
 
 .export AbilityIcons, AbilityGraphics, AbilityTilesetForId, AbilityRoutineForId
 
@@ -175,6 +175,17 @@ AbilityRoutineForId:
 
   pla
   cmp #4*2
+  rts
+.endproc
+
+.a8
+.proc UpdateAttackFrameWithHoldFrame
+  inc PlayerHoldingSomething
+  jsl CalculateNextPlayerFrame
+  seta8
+  dec PlayerHoldingSomething
+  lda PlayerFrame
+  sta TailAttackFrame
   rts
 .endproc
 
@@ -791,8 +802,7 @@ NoCreateHook:
 
   lda #1
   sta AbilityMovementLock
-  lda #PlayerFrame::FISHING
-  sta TailAttackFrame
+  jsr UpdateAttackFrameWithHoldFrame
 
 
   ; -----
@@ -993,8 +1003,7 @@ ChargeUp:
     lda #1
     sta AbilityMovementLock
   :
-  lda #PlayerFrame::FISHING
-  sta TailAttackFrame
+  jsr UpdateAttackFrameWithHoldFrame
 
   ; Display bubble wand
   tdc ; Clear A

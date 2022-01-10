@@ -54,11 +54,6 @@ PlayerCollideWidth = 8*16
 
 ; Flags
 .enum ActorFlag
-  AutoRemove    = 1
-  AutoReset     = 2
-  GetShot       = 4
-  WaitUntilNear = 8
-  WaitForCameraVertically = 16
   Priority      = %1100000000000000 ; Priority bits
   Essential     = %1000000000000000 
   Primary       = %0100000000000000

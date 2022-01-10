@@ -335,24 +335,54 @@ HaveY:
     sta OAM_YPOS+(4*3),x
   :
 
-  ; Automatically cycle through the walk animation
+  seta8
+  lda TailAttackTimer
+  beq NoTailAttack
+    lda TailAttackFrame
+    sta PlayerFrame
+    jmp Exit
+  NoTailAttack:
+CalculateNextFrame:
   seta8
   stz PlayerFrame
   stz PlayerFrameXFlip
   stz PlayerFrameYFlip
 
+  lda PlayerHoldingSomething
+  beq :+
+    lda #PlayerFrame::IDLE_HOLD
+    sta PlayerFrame
+  :
+
+  lda AbilityMovementLock
+  bne NoWalkAnimation
   lda keydown+1
   and #(KEY_LEFT|KEY_RIGHT)>>8
-  beq :+
+  beq NoWalkAnimation
+    lda PlayerHoldingSomething
+    beq @NotHoldWalk
+      lda PlayerWasRunning
+      php
+      lda framecount
+      lsr
+      plp
+      bne :+
+        lsr
+      :
+      and #7
+      add #PlayerFrame::WALK1_HOLD
+      sta PlayerFrame
+      bra NoWalkAnimation
+    @NotHoldWalk:
+
     lda PlayerWasRunning
     beq @NotRunning
       lda framecount
       lsr
       and #7
-      add #8
-      inc a
-      sta PlayerFrame 
-      bra :+
+      add #PlayerFrame::RUN1
+      sta PlayerFrame
+      bra NoWalkAnimation
     @NotRunning:
 
     lda framecount
@@ -361,7 +391,7 @@ HaveY:
     and #7
     inc a
     sta PlayerFrame 
-  :
+  NoWalkAnimation:
 
   lda PlayerOnGround
   bne OnGround
@@ -369,17 +399,17 @@ HaveY:
     sta PlayerFrame
 
     lda PlayerJumping
-    beq OnGround
+    beq :+
       dec PlayerFrame
+    :
+
+    lda PlayerHoldingSomething
+    beq :+
+      lda PlayerFrame
+      add #PlayerFrame::JUMP_HOLD - PlayerFrame::JUMP
+      sta PlayerFrame
+    :
   OnGround:
-
-
-  lda TailAttackTimer
-  beq NoTailAttack
-    lda TailAttackFrame
-    sta PlayerFrame
-    bra Exit
-  NoTailAttack:
 
   lda PlayerOnLadder
   beq OffLadder
@@ -432,6 +462,9 @@ XToPixels:
   sta 0
   rts
 .endproc
+
+.export CalculateNextPlayerFrame
+CalculateNextPlayerFrame = DrawPlayer::CalculateNextFrame
 
 .export DrawPlayerStatus
 .proc DrawPlayerStatus
