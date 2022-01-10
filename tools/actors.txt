@@ -536,6 +536,11 @@ particle
 run RunParticleDisappear
 draw DrawIceBlockFreezeParticle
 
++EnemyDamagedParticle
+particle
+run RunEnemyDamagedParticle
+draw DrawEnemyDamagedParticle
+
 # ---------- static overworld sprites ----------
 +Tree
 owdecoration

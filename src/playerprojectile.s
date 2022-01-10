@@ -1499,6 +1499,9 @@ NotProjectile:
 .proc ActorGotShot
 ProjectileIndex = ActorGetShotTest::ProjectileIndex
 ProjectileType  = ActorGetShotTest::ProjectileType
+Temp1 = 2
+Temp2 = 4
+Temp3 = 6
   phk
   plb
   lda ProjectileType
@@ -1582,22 +1585,24 @@ Kill:
   jml ActorBecomePoof
 
 DamageALittleLess:
-  jsl ActorSafeRemoveY
+  jsr ProjectileBecomesLandingParticle
   lda #$02
   bra AddDamage
 
 DamageALittle:
-  jsl ActorSafeRemoveY
+  jsr ProjectileBecomesLandingParticle
   lda #$04
   bra AddDamage
 
 DamageAndRemoveHalf:
-  jsl ActorSafeRemoveY
+  lda #Particle::EnemyDamagedParticle
+  jsr ProjectileBecomesDamageParticle
   lda #$08
   bra AddDamage
 
 DamageAndRemove:
-  jsl ActorSafeRemoveY
+  lda #Particle::EnemyDamagedParticle
+  jsr ProjectileBecomesDamageParticle
 Damage:
   lda #$10
 
@@ -1638,6 +1643,49 @@ Damaged:
   lda #60
   sta ActorTimer,x
   rtl
+
+ProjectileBecomesLandingParticle:
+  lda ActorPX,y
+  sta Temp1
+  lda ActorPY,y
+  sta Temp2
+  jsl ActorSafeRemoveY
+  jsl FindFreeParticleY
+  bcc @Exit
+    lda #Particle::LandingParticle
+    sta ParticleType,y
+    lda Temp1
+    sta ParticlePX,y
+    lda Temp2
+    sta ParticlePY,y
+@Exit:
+  rts
+
+ProjectileBecomesDamageParticle:
+  lda ActorPX,y
+  sta Temp1
+  lda ActorPY,y
+  sta Temp2
+  jsl ActorSafeRemoveY
+  jsl FindFreeParticleY
+  bcc @Exit
+    lda #Particle::EnemyDamagedParticle
+    sta ParticleType,y
+    lda Temp1
+    sta ParticlePX,y
+    lda Temp2
+    sta ParticlePY,y
+    lda #20
+    sta ParticleTimer,y
+    lda #.loword(-$30)
+    sta ParticleVY,y
+    jsl RandomByte
+    and #15
+    add #7
+    jsl VelocityLeftOrRight
+    sta ParticleVX,y
+@Exit:
+  rts
 
 HitProjectileResponse:
   .word .loword(StunAndRemove-1) ; Stun

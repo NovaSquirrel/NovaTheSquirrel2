@@ -3916,6 +3916,33 @@ Flipped:
   rts
 .endproc
 
+.export RunEnemyDamagedParticle
+.proc RunEnemyDamagedParticle
+  jsl ActorGravity
+  lda ParticlePX,x
+  add ParticleVX,x
+  sta ParticlePX,x
+  dec ParticleTimer,x
+  bne :+
+    stz ParticleType,x
+  :
+  rts
+.endproc
+
+.export DrawEnemyDamagedParticle
+.proc DrawEnemyDamagedParticle
+  lda ActorTimer,x
+  cmp #10
+  bcs Always
+  lsr
+  bcc Nope
+Always:
+  lda #CommonTileBase+11+$20+OAM_PRIORITY_2
+  jsl DispParticle8x8
+Nope:
+  rts
+.endproc
+
 
 .a16
 .i16

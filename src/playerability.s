@@ -691,6 +691,10 @@ No:
     sta ActorType,x
     jsl InitActorX
 
+    seta8
+    stz ActorDirection,x
+    seta16
+
     lda #PlayerProjectileType::WaterBottle
     sta ActorProjectileType,x
 
