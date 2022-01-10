@@ -362,7 +362,7 @@ SharedEnemyNormal:
 SharedEnemyNoReset:
   jsl ActorGetShot
 SharedRemoveIfFar:
-  lda ActorPX
+  lda ActorPX,x
   sub ScrollX
   cmp #.loword(-24*256)
   bcs @Good
@@ -375,7 +375,7 @@ SharedRemoveIfFar:
 .a16
 .i16
 .proc SharedRemoveIfFarther
-  lda ActorPX
+  lda ActorPX,x
   sub ScrollX
   cmp #.loword(-40*256)
   bcs Good
