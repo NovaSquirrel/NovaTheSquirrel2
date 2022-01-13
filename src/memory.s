@@ -77,7 +77,6 @@
                                ; (used for fallthrough platforms)
   PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
   PlayerHealth:     .res 1     ; current health, measured in half hearts
-  PlayerHoldingSomething: .res 1 ; true if holding anything
 
   StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
 
@@ -189,6 +188,7 @@
   PlayerDrawX: .res 1
   PlayerDrawY: .res 1
   PlayerOAMIndex: .res 2
+  ActorHeldOAMIndex: .res 2
 
   ; Mirrors, for effects
   FGScrollXPixels: .res 2
@@ -289,6 +289,7 @@ LevelZeroWhenLoad_Start:
   DelayedBlockEditAddr: .res MaxDelayedBlockEdits*2 ; Address to put the block at
   DelayedBlockEditTime: .res MaxDelayedBlockEdits*2 ; Time left until the change
 
+  PlayerHoldingSomething: .res 1 ; true if holding anything
   PlayerInvincible: .res 1     ; timer for player invincibility
   PlayerNeedsGround: .res 1     ; resets to zero when touching the ground
   PlayerNeedsGroundAtAttack: .res 1 ; State at the start of the attack

@@ -65,8 +65,9 @@ PlayerCollideWidth = 8*16
   Paused  = 128|1
   Stunned = 128|2
   Active  = 128|3
-  Init    = 128|4
-  Override= 128|5 ; Call different routine instead of the proper Run routine
+  Init    = 128|4 ; State is set to Init for one frame to allow actors to detect they were just created
+  Override= 128|5 ; Call a different routine (selected by ActorTimer) instead of the usual Run routine
+  Carried = 128|6 ; Actors is being carried by the player
 .endenum
 
 .enum ActorOverrideValue

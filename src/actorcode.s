@@ -25,7 +25,7 @@
 .segment "C_ActorData"
 CommonTileBase = $40
 
-.import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset
+.import DispActor16x16, DispActor8x8, DispParticle8x8, DispActor8x8WithOffset, DispActor16x16CanBeCarried
 .import DispParticle16x16
 .import DispActor16x16FourTiles, DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
@@ -35,7 +35,7 @@ CommonTileBase = $40
 .import PlayerActorCollision, TwoActorCollision, PlayerActorCollisionMultiRect
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
-.import ActorNegIfLeft, AllocateDynamicSpriteSlot, ActorAdvertiseMe
+.import ActorNegIfLeft, AllocateDynamicSpriteSlot, ActorAdvertiseMe, ActorCanBeCarried
 .import GetAngle512
 .import ActorTryUpInteraction, ActorTryDownInteraction, ActorBumpAgainstCeiling
 .import InitActorX, UpdateActorSizeX, InitActorY, UpdateActorSizeY
@@ -2887,6 +2887,7 @@ BreakBlocks:
 .export RunKnuckleSandwichSign
 .proc RunKnuckleSandwichSign
   jsl ActorAdvertiseMe
+  jsl ActorCanBeCarried
   rtl
 .endproc
 
@@ -2897,7 +2898,7 @@ BreakBlocks:
   lda ActorVarA,x
   asl
   adc #OAM_PRIORITY_2|12
-  jml DispActor16x16
+  jml DispActor16x16CanBeCarried
 .endproc
 
 .a16

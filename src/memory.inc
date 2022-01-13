@@ -34,7 +34,7 @@
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
-.globalzp PlayerHoldingSomething
+.global PlayerHoldingSomething
 .global PlayerInvincible
 .global PlayerNeedsGround
 .global PlayerNeedsGroundAtAttack
@@ -85,6 +85,7 @@
 .global PlayerDrawX
 .global PlayerDrawY
 .global PlayerOAMIndex
+.global ActorHeldOAMIndex
 
 .global ColumnUpdateAddress, ColumnUpdateAddress2
 .global ColumnUpdateBuffer, ColumnUpdateBuffer2

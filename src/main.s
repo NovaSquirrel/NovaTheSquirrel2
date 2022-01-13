@@ -310,6 +310,19 @@ DelayedBlockLoop:
   add #4*5
   sta OamPtr
 
+  ; If you're holding onto something, reserve a sprite slot above the player to draw it
+  lda PlayerHoldingSomething
+  lsr
+  bcc :+
+    lda PlayerOAMIndex
+    sta ActorHeldOAMIndex
+    add #4
+    sta PlayerOAMIndex
+    lda OamPtr
+    add #4
+    sta OamPtr
+  :
+
   jsl DrawPlayerStatus
 
 ;  lda RunGameLogic

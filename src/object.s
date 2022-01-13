@@ -2732,3 +2732,72 @@ TooMuch:
   ; No success/failure since I don't need it yet
   rtl
 .endproc
+
+; Player can pick this actor up and place them down
+.a16
+.i16
+.export ActorCanBeCarried
+.proc ActorCanBeCarried
+  lda ActorState,x
+  cmp #ActorStateValue::Carried
+  beq Carried
+    lda PlayerHoldingSomething ; 8-bit variable but it doesn't matter
+    lsr
+    bcs DontCarry
+    lda keynew
+    and #KEY_UP
+    beq DontCarry
+      jsl PlayerActorCollision
+      bcc DontCarry
+        lda #ActorStateValue::Carried
+        sta ActorState,x
+        inc PlayerHoldingSomething ; Should only ever put a 1 here
+        rtl
+DontCarry:
+  jml ActorFall
+
+Carried:
+  ; Put it in the player's hands
+  lda #4*16
+  .import PlayerNegIfLeft
+  jsl PlayerNegIfLeft
+  add PlayerPX
+  sta ActorPX,x
+
+  lda PlayerPY
+  sub #8*16
+  sta ActorPY,x
+
+  lda keynew
+  and #KEY_DOWN
+  beq DontDrop
+    stz ActorState,x
+    dec PlayerHoldingSomething ; Should only ever put a 0 here
+DontDrop:
+  rtl
+.endproc
+
+; Handles putting the actor above the player if it's being carried
+; Otherwise just calls DispActor16x16 as normal
+.a16
+.i16
+.export DispActor16x16CanBeCarried
+.proc DispActor16x16CanBeCarried
+  pha
+  lda ActorState,x
+  cmp #ActorStateValue::Carried
+  beq IsHolding
+  pla
+  jml DispActor16x16
+IsHolding:
+  ply ; Save for later
+  lda OamPtr
+  pha
+  lda ActorHeldOAMIndex
+  sta OamPtr
+  tya ; Get the tile number now
+  jsl DispActor16x16
+  pla
+  sta OamPtr
+  rtl
+.endproc
