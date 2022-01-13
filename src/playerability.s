@@ -594,14 +594,27 @@ NoBelow:
   ; -----------------------------------
 
   jsr StepTailSwish
-  bne :+
+  bne DontMakeProjectile
 IceSide:
+    lda PlayerDownRecently
+    beq @NotDownRecently
+      seta16
+      jsl FindFreeProjectileX
+      bcc DontMakeProjectile
+      jsr DoIceShared
+      lda #0
+      sta ActorVarA,x
+      asl ActorTimer,x
+      jsr AbilityPositionProjectile16x16
+      rts
+    @NotDownRecently:
+
     seta16
     jsl FindFreeProjectileX
-    bcc :+
+    bcc DontMakeProjectile
     jsr DoIceShared
     jsr AbilityPositionProjectile16x16
-  :
+  DontMakeProjectile:
   rts
 
 .a16
