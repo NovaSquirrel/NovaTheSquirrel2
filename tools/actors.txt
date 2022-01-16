@@ -541,6 +541,11 @@ particle
 run RunEnemyDamagedParticle
 draw DrawEnemyDamagedParticle
 
++EnemyStunnedParticle
+particle
+run RunEnemyStunnedParticle
+draw DrawEnemyStunnedParticle
+
 # ---------- static overworld sprites ----------
 +Tree
 owdecoration

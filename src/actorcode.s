@@ -3881,6 +3881,8 @@ Flipped:
   rts
 .endproc
 
+.a16
+.i16
 .export DrawIceBlockParticle
 .proc DrawIceBlockParticle
   lda framecount
@@ -3908,6 +3910,8 @@ Flipped:
   rts
 .endproc
 
+.a16
+.i16
 .export DrawIceBlockFreezeParticle
 .proc DrawIceBlockFreezeParticle
   lda ParticleVariable,x
@@ -3917,6 +3921,8 @@ Flipped:
   rts
 .endproc
 
+.a16
+.i16
 .export RunEnemyDamagedParticle
 .proc RunEnemyDamagedParticle
   jsl ActorGravity
@@ -3930,6 +3936,8 @@ Flipped:
   rts
 .endproc
 
+.a16
+.i16
 .export DrawEnemyDamagedParticle
 .proc DrawEnemyDamagedParticle
   lda ActorTimer,x
@@ -3944,6 +3952,31 @@ Nope:
   rts
 .endproc
 
+.a16
+.i16
+.export RunEnemyStunnedParticle
+.proc RunEnemyStunnedParticle
+  ldy ParticleVariable,x
+  beq DontMove
+  lda ActorType,y
+  bne DoMove
+DontMove:
+    ; There is a potential for this enemy slot to die and then immediately get replaced on the same frame,
+    ; but that should be ok?
+    stz ParticleType,x
+    rts
+  DoMove:
+
+  lda ActorPX,y
+  sta ParticlePX,x
+
+  lda ActorPY,y
+  sub ActorHeight,y
+  sub #$60
+  sta ParticlePY,x
+
+  ; Fall into RunParticleDisappear
+.endproc
 
 .a16
 .i16
@@ -3953,6 +3986,68 @@ Nope:
   bne :+
     stz ParticleType,x
   :
+  rts
+.endproc
+
+.a16
+.i16
+.export DrawEnemyStunnedParticle
+.proc DrawEnemyStunnedParticle
+  lda framecount
+  jsr GetFromThwaiteSineTable
+  seta8
+  jsr Rot3
+  sta SpriteXYOffset
+
+  seta16
+  lda framecount
+  asl
+  jsr GetFromThwaiteSineTable
+  seta8
+  jsr Rot4
+  sta SpriteXYOffset+1
+  seta16
+
+  stz SpriteTileBase
+  lda #CommonTileBase+$2c+OAM_PRIORITY_2
+  jsl DispActor8x8WithOffset
+
+  ; -----------------------------------
+
+  seta8
+  lda SpriteXYOffset
+  eor #255
+  ina
+  sta SpriteXYOffset
+  lda SpriteXYOffset+1
+  eor #255
+  ina
+  sta SpriteXYOffset+1
+  seta16
+  lda #CommonTileBase+$38+OAM_PRIORITY_2
+  jsl DispActor8x8WithOffset
+  rts
+
+.a8
+Rot4:
+  cmp #$80
+  ror
+Rot3:
+  cmp #$80
+  ror
+  cmp #$80
+  ror
+  cmp #$80
+  ror
+  rts
+
+.a16
+GetFromThwaiteSineTable:
+  phx
+  and #31
+  tax
+  lda f:ThwaiteSineTable,x
+  plx
   rts
 .endproc
 

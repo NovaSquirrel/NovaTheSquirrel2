@@ -1525,8 +1525,22 @@ StunAndRemove:
   sta ActorTimer,x
 
   ldy ProjectileIndex
-  jml ActorSafeRemoveY
+  jsl ActorSafeRemoveY
 
+  ; Make a stun animation particle now
+  jsl FindFreeParticleY
+  bcc @Exit
+    lda #Particle::EnemyStunnedParticle
+    sta ParticleType,y
+    lda ActorPX,x
+    sta ParticlePX,y
+    lda ActorPY,x
+    sta ParticlePY,y
+    stx ParticleVariable,y
+    lda #180
+    sta ParticleTimer,y
+@Exit:
+  rtl
 
 BumpFreeze:
   ; Must be moving in order to bump

@@ -602,8 +602,7 @@ IceSide:
       jsl FindFreeProjectileX
       bcc DontMakeProjectile
       jsr DoIceShared
-      lda #0
-      sta ActorVarA,x
+      stz ActorVarA,x
       asl ActorTimer,x
       jsr AbilityPositionProjectile16x16
       rts
