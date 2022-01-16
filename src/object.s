@@ -2745,7 +2745,7 @@ TooMuch:
     lsr
     bcs DontCarry
     lda keynew
-    and #KEY_UP
+    and #KEY_A
     beq DontCarry
       jsl PlayerActorCollision
       bcc DontCarry
@@ -2769,7 +2769,7 @@ Carried:
   sta ActorPY,x
 
   lda keynew
-  and #KEY_DOWN
+  and #KEY_A
   beq DontDrop
     stz ActorState,x
     dec PlayerHoldingSomething ; Should only ever put a 0 here

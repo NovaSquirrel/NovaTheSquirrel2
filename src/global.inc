@@ -80,7 +80,7 @@ PlayerCollideWidth = 8*16
 
 .global RandomByte, VelocityLeftOrRight
 
-AttackKeys = KEY_X|KEY_A|KEY_L|KEY_R
+AttackKeys = KEY_X|KEY_L|KEY_R
 DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
 
 .macro NameFontText String
