@@ -4051,6 +4051,72 @@ GetFromThwaiteSineTable:
   rts
 .endproc
 
+.a16
+.i16
+.export RunAbilityRemoveParticle
+.proc RunAbilityRemoveParticle
+  inc ParticleTimer,x
+  lda ParticleTimer,x
+  cmp #20
+  bne :+
+    stz ParticleType,x
+  :
+  rts
+.endproc
+
+.a16
+.i16
+.export DrawAbilityRemoveParticle
+.proc DrawAbilityRemoveParticle
+  stz SpriteTileBase
+
+  lda #CommonTileBase+$22+OAM_PRIORITY_2
+  jsr DoQuarter
+  lda #CommonTileBase+$23+OAM_PRIORITY_2
+  jsr DoQuarter
+  lda #CommonTileBase+$32+OAM_PRIORITY_2
+  jsr DoQuarter
+  lda #CommonTileBase+$33+OAM_PRIORITY_2
+  bra DoQuarter
+
+DoQuarter:
+  sta 0
+
+  seta8
+  lda ParticleTimer,x
+  lsr
+  lsr
+  add #8
+  sta SpriteXYOffset
+  sta SpriteXYOffset+1
+
+  lda 0
+  lsr
+  bcs :+
+    lda SpriteXYOffset
+    neg
+    sta SpriteXYOffset
+  :
+
+  lda 0
+  and #$10
+  bne :+
+    lda SpriteXYOffset+1
+    neg
+    sta SpriteXYOffset+1
+  :
+  seta16
+
+  lda ParticleTimer,x
+  lsr
+  lsr
+  and #%110
+  add 0
+  jsl DispActor8x8WithOffset
+  rts
+.endproc
+
+
 
 
 .a16

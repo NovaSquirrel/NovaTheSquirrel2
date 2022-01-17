@@ -115,8 +115,50 @@ MaxSpeedRight = 12
   lda TailAttackCooldown
   beq :+
     dec TailAttackCooldown
-    bra CantAttack
+    jmp CantAttack
   :
+
+  ; Allow you to clear your ability with down+select
+  lda keynew+1
+  bit #>KEY_SELECT
+  beq :++
+  lda keydown+1
+  bit #>KEY_DOWN
+  beq :++
+  lda PlayerAbility
+  beq :++
+    stz PlayerAbility
+    lda #1
+    sta NeedAbilityChange
+
+    seta16
+    jsl FindFreeParticleY
+    bcc :+
+      lda #Particle::AbilityRemoveParticle
+      sta ParticleType,y
+      lda PlayerPX
+      sta ParticlePX,y
+      lda PlayerPY
+      sub #PlayerHeight/2
+      sta ParticlePY,y
+    :
+    seta8
+  :
+
+  ; If you just changed abilities, whether through Select or otherwise, clear out all the old ability projectiles
+  lda NeedAbilityChange
+  beq DontClearProjectiles
+  lda NeedAbilityChangeSilent ; Unless the change is silenced, because that would indicate something like unpausing
+  bne DontClearProjectiles
+    seta16
+    lda #ProjectileStart
+  : tax
+    stz ActorType,x
+    add #ActorSize
+    cmp #ProjectileEnd
+    bcc :-
+    seta8
+  DontClearProjectiles:
 
   lda NeedAbilityChange
   bne :+

@@ -174,44 +174,6 @@ forever:
     plb
   :
 
-  ; Temporary debug feature
-  lda keynew
-  and #KEY_SELECT
-  beq :++
-    seta8
-;    lda PlayerAbility
-;    ina
-;    and #15
-;    sta PlayerAbility
-
-    lda keydown+1
-    and #>KEY_DOWN
-    beq :+
-      stz PlayerAbility
-      lda #1
-      sta NeedAbilityChange
-    :
-;    lda #1
-;    sta NeedAbilityChange
-    seta16
-  :
-
-  ; Upon switching abilities, remove all player projectiles
-  seta8
-  lda NeedAbilityChange
-  beq NoAbilityChange
-  ; But don't do it if it should be silent! That probably means an unpause or something
-  lda NeedAbilityChangeSilent
-  bne NoAbilityChange
-    seta16
-    lda #ProjectileStart
-  : tax
-    stz ActorType,x
-    add #ActorSize
-    cmp #ProjectileEnd
-    bcc :-
-NoAbilityChange:
-
   seta16
   lda NeedLevelRerender
   lsr

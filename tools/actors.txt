@@ -546,6 +546,11 @@ particle
 run RunEnemyStunnedParticle
 draw DrawEnemyStunnedParticle
 
++AbilityRemoveParticle
+particle
+run RunAbilityRemoveParticle
+draw DrawAbilityRemoveParticle
+
 # ---------- static overworld sprites ----------
 +Tree
 owdecoration
