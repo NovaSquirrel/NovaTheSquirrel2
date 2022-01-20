@@ -2744,11 +2744,12 @@ TooMuch:
     lda PlayerHoldingSomething ; 8-bit variable but it doesn't matter
     lsr
     bcs DontCarry
-    lda keynew
-    and #KEY_A
-    beq DontCarry
-      jsl PlayerActorCollision
-      bcc DontCarry
+    jsl PlayerActorCollision
+    bcc DontCarry
+      inc OfferAPress ; Also an 8-bit variable - let's be risky I guess 
+      lda keynew
+      and #KEY_A
+      beq DontCarry
         lda #ActorStateValue::Carried
         sta ActorState,x
         inc PlayerHoldingSomething ; Should only ever put a 1 here

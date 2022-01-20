@@ -71,8 +71,9 @@
   Bounce
 .endenum
 
-.global   NeedAbilityChange
-.global   NeedAbilityChangeSilent
+.global NeedAbilityChange
+.global NeedAbilityChangeSilent
+.global OfferAPress
 
 .global PlayerJumpCancel
 .global PlayerJumpCancelLock

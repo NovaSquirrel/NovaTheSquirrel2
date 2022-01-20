@@ -295,6 +295,7 @@ LevelZeroWhenLoad_Start:
   PlayerNeedsGroundAtAttack: .res 1 ; State at the start of the attack
   NeedAbilityChange:       .res 1
   NeedAbilityChangeSilent: .res 1
+  OfferAPress: .res 1 ; Pressing A will do something
 
   TailAttackTimer:     .res 1 ; How far we are into the animation
   TailAttackDirection: .res 1 ; What directional keys were pressed

@@ -19,6 +19,8 @@
 .include "playerframe.inc"
 .smart
 
+CommonTileBase = $40
+
 .segment "C_Player"
 
 .a16
@@ -342,6 +344,28 @@ HaveY:
     sta PlayerFrame
     jmp Exit
   NoTailAttack:
+
+  lda OfferAPress
+  beq DontOfferAPress
+    ldx OamPtr
+
+    lda #CommonTileBase+$18
+    sta OAM_TILE+(4*0),x
+    lda PlayerDrawX
+    sub #4
+    sta OAM_XPOS+(4*0),x
+    lda PlayerDrawY
+    sub #32+8
+    sta OAM_YPOS+(4*0),x
+    lda #>(OAM_PRIORITY_2|OAM_COLOR_0)
+    sta OAM_ATTR+(4*0),x
+    stz OAMHI+(4*0+1),x ; 8x8 sprite
+    inx
+    inx
+    inx
+    inx
+    stx OamPtr
+  DontOfferAPress:
 CalculateNextFrame:
   seta8
   stz PlayerFrame

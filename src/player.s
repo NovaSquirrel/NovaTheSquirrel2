@@ -59,6 +59,7 @@ MaxSpeedRight = 12
   countdown PlayerWalkLock
   countdown PlayerDownRecently
   stz PlayerOnSlope
+  stz OfferAPress
 
   lda keydown+1
   and #>(KEY_DOWN)
