@@ -206,13 +206,27 @@ NoRoutine:
 
 .a8
 .i16
-.export ItemAbilityBurger
-.proc ItemAbilityBurger
-  lda #Ability::Burger
+.proc ChangeAbilityFromItem
   sta PlayerAbility
   lda #1
   sta NeedAbilityChange
+  seta16
+  lda #ProjectileStart
+: tax
+  stz ActorType,x
+  add #ActorSize
+  cmp #ProjectileEnd
+  bcc :-
+  seta8
   rts
+.endproc
+
+.a8
+.i16
+.export ItemAbilityBurger
+.proc ItemAbilityBurger
+  lda #Ability::Burger
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -220,10 +234,7 @@ NoRoutine:
 .export ItemAbilityGlider
 .proc ItemAbilityGlider
   lda #Ability::Glider
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -231,9 +242,7 @@ NoRoutine:
 .export ItemAbilityFishing
 .proc ItemAbilityFishing
   lda #Ability::Fishing
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
+  bra ChangeAbilityFromItem
   rts
 .endproc
 
@@ -242,10 +251,7 @@ NoRoutine:
 .export ItemAbilityRocket
 .proc ItemAbilityRocket
   lda #Ability::Rocket
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -253,10 +259,7 @@ NoRoutine:
 .export ItemAbilityBubble
 .proc ItemAbilityBubble
   lda #Ability::Bubble
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -264,10 +267,7 @@ NoRoutine:
 .export ItemAbilityIce
 .proc ItemAbilityIce
   lda #Ability::Ice
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -275,10 +275,7 @@ NoRoutine:
 .export ItemAbilityFire
 .proc ItemAbilityFire
   lda #Ability::Fire
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -286,10 +283,7 @@ NoRoutine:
 .export ItemAbilityWater
 .proc ItemAbilityWater
   lda #Ability::Water
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
 
 .a8
@@ -297,8 +291,5 @@ NoRoutine:
 .export ItemAbilityBombs
 .proc ItemAbilityBombs
   lda #Ability::Bomb
-  sta PlayerAbility
-  lda #1
-  sta NeedAbilityChange
-  rts
+  bra ChangeAbilityFromItem
 .endproc
