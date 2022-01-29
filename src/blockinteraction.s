@@ -279,8 +279,61 @@ Skip:
   rts
 .endproc
 
+.a16
 .proc BlockPickupBlock
+  lda PlayerHoldingSomething
+  lsr
+  bcc :+
+    rts
+  :
+
+  inc OfferAPress
+  lda #KEY_A
+  bit keynew
+  bne :+
+    rts
+  :
+  trb keynew
+
+  ; See if maybe there's another block directly underneath to switch to
+  lda LevelBlockPtr
+  sta BlockTemp
+  lda PlayerPX
+  ldy PlayerPY
+  jsl GetLevelPtrXY
+  cmp #Block::PickupBlock
+  beq :+
+    ; Can't retarget, put it back
+    lda BlockTemp
+    sta LevelBlockPtr
+  :
+
+  ; Try picking it up - need to find an object
+  jsl FindFreeActorY
+  bcs :+
   rts
+:
+  ; Make the carried block
+  lda #Actor::ActivePickupBlock*2
+  sta ActorType,y
+  lda PlayerPX
+  sta ActorPX,y
+  lda PlayerPY
+  sta ActorPY,y
+  lda #ActorStateValue::Carried
+  sta ActorState,y
+  tdc ; Clear accumulator
+  sta ActorVX,y
+  sta ActorVY,y
+  seta8
+  sta ActorDirection,y
+  seta16
+  inc PlayerHoldingSomething ; 8-bit variable but that's ok
+
+  ; And get rid of the old block
+  lda #Block::Empty
+  jsl ChangeBlock
+  jmp PoofAtBlock
 .endproc
 
 

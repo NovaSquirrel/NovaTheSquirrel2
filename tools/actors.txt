@@ -267,6 +267,11 @@ run RunActivePushBlock
 draw DrawActivePushBlock
 size 16x16
 
++ActivePickupBlock
+run RunActivePickupBlock
+draw DrawActivePickupBlock
+size 16x16
+
 +FlyingArrow
 gfx SPHannah
 run RunFlyingArrow

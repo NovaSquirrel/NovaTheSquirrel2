@@ -2024,6 +2024,60 @@ Falling:
 
 .a16
 .i16
+.export RunActivePickupBlock
+.proc RunActivePickupBlock
+  jsl ActorCanBeCarried
+
+  lda ActorState,x
+  cmp #ActorStateValue::Carried
+  beq DontLand
+  lda PlayerOnGround
+  and #255
+  beq StillCarryMe
+    lda PlayerPX
+    ldy PlayerPY
+    jsl GetLevelPtrXY
+
+    dec LevelBlockPtr
+    dec LevelBlockPtr
+    lda [LevelBlockPtr]
+    bne StillCarryMe
+
+    lda #Block::PickupBlock
+    jsl ChangeBlock    
+
+    lda PlayerPY
+    sub #$100
+    sta PlayerPY
+
+    stz ActorType,x
+  DontLand:
+  rtl
+
+StillCarryMe:
+  ; Cancel out letting go of the thing
+  lda #ActorStateValue::Carried
+  sta ActorState,x
+  seta8
+  lda #1
+  sta PlayerHoldingSomething
+  seta16
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawActivePickupBlock
+.proc DrawActivePickupBlock
+  stz SpriteTileBase
+  lda #CommonTileBase|OAM_PRIORITY_2|4
+  jml DispActor16x16CanBeCarried
+.endproc
+
+
+
+.a16
+.i16
 .export RunBoulder
 .proc RunBoulder
   ; Instead of relying on the AutoRemove flag, only allow removing while not falling
@@ -2906,9 +2960,28 @@ BreakBlocks:
 .export RunPumpkinBoat
 .proc RunPumpkinBoat
   jsl ActorFall
-  lda #$10
+
+  ; Move to the player
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  ; Face the player if too far away
+  xba
+  and #255
+  cmp #8
+  bcc :+
+  pha
+  jsl ActorLookAtPlayer
+  pla
+: ; Run faster when farther away
+  asl
+  asl
+  cmp #4 ; Use a minimum speed
+  bcs :+
+    lda #4
+  :
   jsl ActorWalk
-  rtl
+  jml ActorAutoBump
 .endproc
 
 .a16
@@ -3530,6 +3603,8 @@ Move:
 .proc RunBurgerRiderJumper
   jsl ActorFall
   bcc InAir
+    lda ActorState,x
+    bne InAir
     jsl ActorLookAtPlayer
     inc ActorVarB,x
     lda ActorVarB,x
