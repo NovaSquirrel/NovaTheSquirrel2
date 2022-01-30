@@ -1257,6 +1257,27 @@ NoBump:
   rtl
 .endproc
 
+.a16
+.export ActorHopOverOrBump
+.proc ActorHopOverOrBump
+  bcc :+
+    lda ActorPY,x
+    sub #$0140
+    tay
+    lda #$0070
+    jsl ActorNegIfLeft
+    add ActorPX,x
+    jsl GetLevelPtrXY
+    bne DoBump
+
+    lda #.loword(-$30)
+    sta ActorVY,x
+  :
+  rtl
+DoBump:
+  jml ActorAutoBump
+.endproc
+
 ; Calculate the position of the 16x16 Actor on-screen
 ; and whether it's visible in the first place
 .a16
@@ -2453,7 +2474,6 @@ Exit:
   jsl ActorWalk
   jml ActorAutoBump
 .endproc
-
 
 ; Counts the amount of a certain actor that currently exists
 ; inputs: A (actor type * 2)

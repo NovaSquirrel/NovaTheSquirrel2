@@ -29,7 +29,7 @@ CommonTileBase = $40
 .import DispParticle16x16
 .import DispActor16x16FourTiles, DispActor16x16Flipped, DispActor16x16FlippedAbsolute
 .import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
-.import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorApplyXVelocity
+.import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorHopOverOrBump, ActorApplyXVelocity
 .import ActorTurnAround, ActorSafeRemoveX, ActorWalkIgnoreState
 .import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
 .import PlayerActorCollision, TwoActorCollision, PlayerActorCollisionMultiRect
@@ -2961,14 +2961,75 @@ BreakBlocks:
 .proc RunPumpkinBoat
   jsl ActorFall
 
+  lda ActorVarC,x
+  beq :+
+    dec ActorVarC,x
+  :
+
   ; Move to the player
   lda ActorPX,x
   sub PlayerPX
   abs
+  sta 2
+
+  ; Throw stuff if close?
+  cmp #3*256
+  bcs NotClose
+    lda ActorState,x
+    bne NoThrow
+    jsl FindFreeActorY
+    bcc NoThrow
+      lda ActorVarC,x
+      bne NoThrow
+      jsl ActorLookAtPlayer
+      seta8
+      lda #0
+      sta ActorDirection,y
+
+      lda #ActorStateValue::Active
+      sta ActorState,x
+      seta16
+      lda #60
+      sta ActorVarC,x
+
+      lda #.loword(-6*16)
+      jsl ActorNegIfLeft
+      add ActorPX,x
+      sta ActorPX,y
+
+      lda ActorPY,x
+      sub #16*12
+      sta ActorPY,y
+
+      lda #Actor::PumpkinSpiceLatte*2
+      sta ActorType,y
+
+      jsl InitActorY
+
+      lda #.loword(-$68)
+      sta ActorVY,y
+
+      jsl RandomByte
+      and #15
+      add #3
+      jsl ActorNegIfLeft
+      sta ActorVX,y
+
+      lda #15
+      sta ActorTimer,x
+      sta ActorTimer,y
+      lda #ActorStateValue::Paused
+      sta ActorState,y
+
+      stz ActorVY,x
+  NoThrow:
+  NotClose:
+ 
   ; Face the player if too far away
+  lda 2
   xba
   and #255
-  cmp #8
+  cmp #9
   bcc :+
   pha
   jsl ActorLookAtPlayer
@@ -2981,13 +3042,26 @@ BreakBlocks:
     lda #4
   :
   jsl ActorWalk
-  jml ActorAutoBump
+  jml ActorHopOverOrBump
 .endproc
 
 .a16
 .i16
 .export DrawPumpkinBoat
 .proc DrawPumpkinBoat
+  lda ActorState,x
+  cmp #ActorStateValue::Active
+  bne :++
+    lda framecount
+    and #%10
+    bne :+
+      lda #.loword(FrameHolding1)
+      jml DispActorMetaPriority2
+    :
+    lda #.loword(FrameHolding2)
+    jml DispActorMetaPriority2
+  :
+
   lda framecount
   and #%1110
   tay
@@ -3015,7 +3089,7 @@ Frame2:
   Row16x16   2,  0-13,  $00 ; Head
   EndMetasprite
 Frame3:
-  Row8x8   -12,  0+0,  $16, $13, $14, $15 ; Bottom of the boat
+  Row8x8   -12,  0+0,  $12, $13, $14, $15 ; Bottom of the boat
   Row8x8   -12, -8+0,  $02 ; Engine thing
   Row8x8    -4, -8+0+1,   $03, $04 ; Body
   Row16x16   2,  0-13+1,  $00 ; Head
@@ -3025,6 +3099,19 @@ Frame4:
   Row8x8   -12, -8+0,  $02 ; Engine thing
   Row8x8    -4, -8+0+1,  $03, $04 ; Body
   Row16x16   2,  0-13+1,  $00 ; Head
+  EndMetasprite
+
+FrameHolding1:
+  Row8x8   -12,  0+0,  $12, $13, $14, $15 ; Bottom of the boat
+  Row8x8   -12, -8+0,  $02 ; Engine thing
+  Row8x8    -4, -8+0,   $08, $06 ; Body
+  Row16x16   2,  0-13,  $00 ; Head
+  EndMetasprite
+FrameHolding2:
+  Row8x8   -12,  0+0,  $16, $13, $14, $15 ; Bottom of the boat
+  Row8x8   -12, -8+0,  $02 ; Engine thing
+  Row8x8    -4, -8+0,  $08, $06 ; Body
+  Row16x16   2,  0-13,  $00 ; Head
   EndMetasprite
 .endproc
 
@@ -3117,7 +3204,7 @@ Frame2:
       lda #0
       sta ActorDirection,y
 
-      lda #ActorStateValue::Paused
+      lda #ActorStateValue::Active
       sta ActorState,x
       seta16
 
@@ -3145,15 +3232,11 @@ Frame2:
       sta ActorVX,y
 
       lda #15
+      sta ActorTimer,x
       sta ActorTimer,y
       lda #ActorStateValue::Paused
       sta ActorState,y
 
-      lda #15
-      sta ActorTimer,x
-
-      lda #ActorStateValue::Active
-      sta ActorState,x
       stz ActorVY,x
   NoThrow:
   NotClose:
