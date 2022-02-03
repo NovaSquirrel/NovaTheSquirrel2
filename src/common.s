@@ -154,7 +154,11 @@ FindIndex:
   beq Found
   dey                      ; Next index
   dey
-  bpl FindIndex            ; Give up if all slots full
+  bpl FindIndex            ; If you run out of slots, don't do the update now
+  ; Instead try to do it later
+  ldy #1
+  sty BlockTemp
+  jsl DelayChangeBlock ; Takes A and LevelBlockPtr just like ChangeBlock
   jmp Exit
 Found:
   ; From this point on in the routine, Y = free update queue index
