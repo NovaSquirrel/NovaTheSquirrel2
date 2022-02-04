@@ -114,7 +114,10 @@ Loop:
   tax
   lda f:ActorAfterRun,x
   plx
-  jsr CallAfter
+  pea :+ -1
+    pha
+    rts
+  :
 
   ; Reset the "init" state
   seta8
@@ -134,11 +137,6 @@ SkipEntity:
   jne Loop
 
   jml RunAllParticles
-
-.a16
-CallAfter:
-  pha
-  rts
 
 ; Call the Actor run code
 .a16
@@ -405,10 +403,19 @@ Loop:
   ; Call the run and draw routines
   asl
   pha
-  jsr CallRun
+  pea :+ -1
+    tay
+    lda ParticleRun,y
+    pha
+    rts
+  :
   pla
-  jsr CallDraw
-
+  pea :+ -1
+    tay
+    lda ParticleDraw,y
+    pha
+    rts
+  :
 SkipEntity:
   ; Next particle
   txa
@@ -417,17 +424,6 @@ SkipEntity:
   cpx #ParticleEnd
   bne Loop
   rtl
-
-CallRun:
-  tay
-  lda ParticleRun,y
-  pha
-  rts
-CallDraw:
-  tay
-  lda ParticleDraw,y
-  pha
-  rts
 .endproc
 .popseg
 
