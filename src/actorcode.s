@@ -1589,13 +1589,119 @@ FryPic6:
 .i16
 .export RunBubbleWizard
 .proc RunBubbleWizard
+  jsl ActorFall
+
+  lda ActorState,x
+  bne :+
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  cmp #5*256
+  bcs :+
+  lda ActorPY,x
+  sub PlayerPY
+  abs
+  cmp #7*256
+  bcs :+
+    lda #ActorStateValue::Active
+    sta ActorState,x
+    lda #60
+    sta ActorTimer,x
+  :
+
+  lda ActorState,x
+  cmp #ActorStateValue::Active
+  jne NotActive
+    ; Shoot sometimes
+    lda ActorTimer,x
+    and #7
+    bne :+
+    jsl FindFreeActorY
+    bcc :+
+      jsl ActorClearY
+      lda ActorPX,x
+      sta ActorPX,y
+      lda ActorPY,x
+      sub #$58
+      sta ActorPY,y
+
+      ; Shoot bubble bullets
+      jsl RandomByte
+      and #3
+      jsl VelocityLeftOrRight
+      sta ActorVY,y
+
+      lda #$30
+      jsl ActorNegIfLeft
+      sta ActorVX,y
+
+      lda #Actor::BubbleBullet*2
+      sta ActorType,y
+      lda #80
+      sta ActorTimer,y
+
+      ; Randomly position the bubble
+      lda #12*16
+      jsl ActorNegIfLeft
+      sta 0
+
+      jsl RandomByte
+      lsr
+      jsl VelocityLeftOrRight
+      add ActorPX,x
+      add 0
+      sta ActorVarB,y
+
+      jsl RandomByte
+      lsr
+      neg
+      sub #$0100
+      add ActorPY,x
+      sta ActorVarC,y
+
+      ; Random appearance of bubble
+      jsl RandomByte
+      sta ActorVarA,y
+    :
+
+    ; Switch to paused at the end of the state
+    lda ActorTimer,x
+    dea
+    bne WasActive
+      lda #ActorStateValue::Paused
+      sta ActorState,x
+      lda #90
+      sta ActorTimer,x
+      bra WasActive
+  NotActive:
+    lda #4
+    jsl ActorWalkOnPlatform
+    jsl ActorLookAtPlayer
+  WasActive:
   rtl
 .endproc
+
 .a16
 .i16
 .export DrawBubbleWizard
 .proc DrawBubbleWizard
-  rtl
+  lda ActorState,x
+  cmp #ActorStateValue::Active
+  beq :+
+  lda #.loword(Frame1)
+  jml DispActorMetaPriority2
+: lda #.loword(Frame2)
+  jml DispActorMetaPriority2
+
+Frame1:
+  Row16x16   0,  0,     $0a
+  Row8x8    -4,  -16,   13,13|$10
+  EndMetasprite
+Frame2:
+  Row8x8    -4,   0,    10|$10, 12|$10
+  Row8x8    -4,  -8,    10, 12
+  Row8x8    -4,  -16,   13,13|$10
+  EndMetasprite
 .endproc
 
 .a16
@@ -1710,7 +1816,7 @@ Aim:
   stz ActorDirection,x
   seta16
 Fly:
-  jsl ActorApplyXVelocity  
+  jsl ActorApplyVelocity  
   bra Done
 .endproc
 .a16

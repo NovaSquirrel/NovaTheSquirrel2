@@ -1827,6 +1827,7 @@ CopyEnemy:
   .word Actor::StrifeCloud*2
   .word Actor::Dave*2
   .word Actor::BurgerRiderJumper*2
+  .word Actor::BubbleWizard*2
   .word 0
 
 CopyAbility:
@@ -1853,6 +1854,7 @@ CopyAbility:
   .byt Ability::Sword
   .byt Ability::Sword
   .byt Ability::Burger
+  .byt Ability::Bubble
 .endproc
 
 .a16
