@@ -1407,37 +1407,45 @@ Invalid:
 .a16
 .proc ActorDrawPositionMeta
   lda ActorPX,x
-  sub ScrollX
+  lsr
+  lsr
+  lsr
+  lsr
+  sub FGScrollXPixels
   cmp #.loword(-1*256)
   bcs :+
   cmp #17*256
   bcs ActorDrawPositionWithOffset8x8::Invalid
-: jsr Shift
+:
   ; No hardcoded offset
   sta 0
 
   lda ActorPY,x
-  sub ScrollY
+  lsr
+  lsr
+  lsr
+  lsr
+  adc #.loword(-2) ; Why do I need to round Y and not X?
+  sub FGScrollYPixels
   ; TODO: properly allow sprites to be partially offscreen on the top
 ;  cmp #.loword(-1*256)
 ;  bcs :+
   cmp #16*256
   bcs ActorDrawPositionWithOffset8x8::Invalid
-  jsr Shift
   ; No hardcoded offset
   sta 2
 
   sec
   rts
 
-Shift:
-  eor #.loword(-$8000)
-  lsr
-  lsr
-  lsr
-  lsr
-  add #.loword(-($8000 >> 4))
-  rts
+;Shift:
+;  eor #.loword(-$8000)
+;  lsr
+;  lsr
+;  lsr
+;  lsr
+;  add #.loword(-($8000 >> 4))
+;  rts
 .endproc
 
 ; A = tile to draw
