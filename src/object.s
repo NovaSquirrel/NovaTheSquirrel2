@@ -1412,9 +1412,9 @@ Invalid:
   lsr
   lsr
   sub FGScrollXPixels
-  cmp #.loword(-1*256)
+  cmp #.loword(-1*16)
   bcs :+
-  cmp #17*256
+  cmp #17*16
   bcs ActorDrawPositionWithOffset8x8::Invalid
 :
   ; No hardcoded offset
@@ -1430,7 +1430,7 @@ Invalid:
   ; TODO: properly allow sprites to be partially offscreen on the top
 ;  cmp #.loword(-1*256)
 ;  bcs :+
-  cmp #16*256
+  cmp #16*16
   bcs ActorDrawPositionWithOffset8x8::Invalid
   ; No hardcoded offset
   sta 2
