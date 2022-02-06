@@ -1585,6 +1585,40 @@ FryPic6:
   EndMetasprite
 .endproc
 
+
+.a16
+.i16
+.proc InitBubbleBulletCommon
+  jsl ActorClearY
+  lda ActorPX,x
+  sta ActorPX,y
+  lda ActorPY,x
+  sub #$58
+  sta ActorPY,y
+
+  lda #Actor::BubbleBullet*2
+  sta ActorType,y
+  lda #80
+  sta ActorTimer,y
+
+  ; Randomly position horizontally
+  lda #$30
+  jsl ActorNegIfLeft
+  sta ActorVX,y
+  ;---
+  jsl RandomByte
+  lsr
+  neg
+  sub #$0100
+  add ActorPY,x
+  sta ActorVarC,y
+
+  ; Random appearance of bubble
+  jsl RandomByte
+  sta ActorVarA,y
+  rts
+.endproc
+
 .a16
 .i16
 .export RunBubbleWizard
@@ -1618,27 +1652,13 @@ FryPic6:
     bne :+
     jsl FindFreeActorY
     bcc :+
-      jsl ActorClearY
-      lda ActorPX,x
-      sta ActorPX,y
-      lda ActorPY,x
-      sub #$58
-      sta ActorPY,y
+      jsr InitBubbleBulletCommon
 
       ; Shoot bubble bullets
       jsl RandomByte
       and #3
       jsl VelocityLeftOrRight
       sta ActorVY,y
-
-      lda #$30
-      jsl ActorNegIfLeft
-      sta ActorVX,y
-
-      lda #Actor::BubbleBullet*2
-      sta ActorType,y
-      lda #80
-      sta ActorTimer,y
 
       ; Randomly position the bubble
       lda #12*16
@@ -1651,17 +1671,6 @@ FryPic6:
       add ActorPX,x
       add 0
       sta ActorVarB,y
-
-      jsl RandomByte
-      lsr
-      neg
-      sub #$0100
-      add ActorPY,x
-      sta ActorVarC,y
-
-      ; Random appearance of bubble
-      jsl RandomByte
-      sta ActorVarA,y
     :
 
     ; Switch to paused at the end of the state
@@ -1898,25 +1907,10 @@ DoShoot:
   seta16
   jsl FindFreeActorY
   bcc :+
-    jsl ActorClearY
-    lda ActorPX,x
-    sta ActorPX,y
-    lda ActorPY,x
-    sub #$58
-    sta ActorPY,y
-
+    jsr InitBubbleBulletCommon
     ; Shoot bubble bullets
     lda #0
     sta ActorVY,y
-
-    lda #$30
-    jsl ActorNegIfLeft
-    sta ActorVX,y
-
-    lda #Actor::BubbleBullet*2
-    sta ActorType,y
-    lda #80
-    sta ActorTimer,y
 
     ; Randomly position the bubble
     jsl RandomByte
@@ -1924,16 +1918,6 @@ DoShoot:
     jsl VelocityLeftOrRight
     add ActorPX,x
     sta ActorVarB,y
-    jsl RandomByte
-    lsr
-    neg
-    sub #$0100
-    add ActorPY,x
-    sta ActorVarC,y
-
-    ; Random appearance of bubble
-    jsl RandomByte
-    sta ActorVarA,y
   :
   jml PlayerActorCollisionHurt
 .endproc
