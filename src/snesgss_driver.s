@@ -1338,11 +1338,11 @@ bufRegWrite:
 	pha
 	txa
 	ldx <D_BUFPTR
-	sta <D_BUFFER,x
+	sta D_BUFFER,x
 	inx
 
 	pla
-	sta <D_BUFFER,x
+	sta D_BUFFER,x
 	inx
 	stx D_BUFPTR
 	rts
@@ -1371,10 +1371,10 @@ bufApply:
 	beq @done
 	ldx #0
 @loop:
-	lda <D_BUFFER,x
+	lda D_BUFFER,x
 	sta ADDR
 	inx
-	lda <D_BUFFER,x
+	lda D_BUFFER,x
 	sta DATA
 	inx
 	cpx D_BUFPTR
