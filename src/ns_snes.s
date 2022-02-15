@@ -347,11 +347,14 @@ DJ_Label:
       cmp #$80
       ror
     .else             ; 5+n bytes
-      eor #.loword(-$80)
+      .local positive
       .repeat times
         lsr
       .endrep
-      add #.loword(-($80 >> times))
+      bit #$80 >> times
+      beq positive
+        ora #<($FF00 >> times)
+      positive:
     .endif
   .else
     .if times = 1     ; 4 bytes
@@ -363,11 +366,14 @@ DJ_Label:
       cmp #$8000
       ror
     .else             ; 7+n bytes
-      eor #.loword(-$8000)
+      .local positive
       .repeat times
         lsr
       .endrep
-      add #.loword(-($8000 >> times))
+      bit #$8000 >> times
+      beq positive
+        ora #.loword($FFFF0000 >> times)
+      positive:
     .endif
   .endif
 .endmacro
