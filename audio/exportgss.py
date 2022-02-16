@@ -37,7 +37,7 @@ class TrackerModule:
 					which = int(n[4])
 					field = n[5:].split('=')
 				if not self.songs[which]:
-					self.songs[which] = TrackerSong()
+					self.songs[which] = TrackerSong(self)
 				self.songs[which].set(field[0], field[1])
 			elif song:
 				if len(n) >= 87:
@@ -70,26 +70,58 @@ class TrackerModule:
 		self.instrument_remap = {} # Dict for remapping to the combined list
 
 class TrackerSong:
-	def __init__(self):
+	def __init__(self, module):
 		self.props  = {}
 		self.chans  = [{}, {}, {}, {}, {}, {}, {}, {}]
 		self.speeds = {}
 		self.markers = set()
 		self.last_row = 0
+		self.module = module
 
 	def set(self, field, text):
 		self.props[field] = text if field == 'Name' else int(text)
 
+	def is_not_empty(self):
+		return self.chans != [{}, {}, {}, {}, {}, {}, {}, {}]
+
+	def is_sound_effect(self):
+		return bool(self.props['Effect'])
+
+	def write_to_file(self, f, base):
+		data = encode_song(self.module, self, base)
+		# Write the header
+		f.write('\t.byte %d\n' % len(data))
+		for i in range(len(data)):
+			f.write('\t.addr @song_ch%d+%s\n' % (i,base))
+		# Write the actual song data
+		for i, channel in enumerate(data):
+			f.write('@song_ch%d:\n' % i)
+			f.write(':\t.byt %s\n' % ', '.join([str(x) for x in channel]))
+		return 1+2*len(data)+sum([len(x) for x in data])
+
 class TrackerInstrument:
 	def __init__(self):
 		self.props = {}
+		self.brr_size = None
+		self.brr_loop = None
+		self.brr_data = None
+
 	def set(self, field, text):
 		if field == 'Name' or field == 'SourceData':
 			self.props[field] = text
 		else:
 			self.props[field] = int(text)
+
 	def adsr_string(self):
 		return '$%.2x, $%.2x' % (0x80|self.props['EnvAR']|(self.props['EnvDR']<<4), self.props['EnvSR']|(self.props['EnvSL']<<5))
+
+	def encode_as_brr(self):
+		encoded = encode_brr(self)
+		self.brr_size = int(encoded[0])
+		self.brr_loop = int(encoded[1])
+		if self.brr_loop == -1:
+			self.brr_loop = 0
+		self.brr_data = encoded[2]
 
 class TrackerData:
 	def __init__(self, text):
@@ -114,39 +146,100 @@ def export_files(outfile, outenum, files):
 					break
 			else:
 				m.instrument_remap[used] = len(combined_instruments)
+				data.encode_as_brr() # Prepare
 				combined_instruments.append(data)
-		export_songs = {}
-		for song in m.songs:
-			if song != None and song.chans != [{}, {}, {}, {}, {}, {}, {}, {}]:
-				export_songs[song.props['Name']] = encode_song(m, song)
 
+	# Combine songs/effects from the different modules
+	combined_songs = []
+	combined_effects = []
+	for m in modules:
+		for song in m.songs:
+			if song != None and song.is_not_empty():
+				if song.is_sound_effect():
+					combined_effects.append(song)
+				else:
+					combined_songs.append(song)
+
+	#############################################
 	# Write the processed information
+	#############################################
 	out = open(outfile, 'w')
-	out.write('SampleADSR:\n')
+
+	# Step 1. Directories
+	out.write('GSS_SampleADSR:\n')
 	for i in combined_instruments:
-		out.write('  .byte %s\n' % i.adsr_string())
+		out.write('\t.byte %s\n' % i.adsr_string())
+	out.write('GSS_SoundEffectDirectory:\n')
+	for i in range(len(combined_effects)):
+		out.write('\t.addr sound_effect_%d\n' % i)
+	out.write('\tSOUND_EFFECT_COUNT = %d\n' % len(combined_effects))
 	out.write('.align 256\n')
-	out.write('SampleDirectory:\n')
-	for i in range(len(combined_instruments)):
-		out.write('  .addr instrument_addr_%d, instrument_loop_%d\n' % (i, i))
+	out.write('GSS_SampleDirectory:\n')
+	for i, data in enumerate(combined_instruments):
+		out.write('\t.addr instrument_addr_%d, instrument_addr_%d+%d\n' % (i, i, data.brr_loop))
+
+	# Step 2. Sound effects and instrument data
+	sound_effect_bytes_total = 0
+	print('-Sound effects-')
+	for i, data in enumerate(combined_effects):
+		out.write('sound_effect_%d:\n' % i)		
+		b = data.write_to_file(out, '0')
+		print('%s: %d' % (data.props['Name'], b))
+		sound_effect_bytes_total += b
+	print('Total: %d\n' % sound_effect_bytes_total)
+
+	brr_already_written = {}
+	sample_bytes_total = 0
+	print('-Global samples-')
+	for i, data in enumerate(combined_instruments):
+		if data.brr_data in brr_already_written:
+			out.write('instrument_addr_%d = instrument_addr_%d\n' % (i, brr_already_written[data.brr_data]))
+			print('%s: 0 (reused)' % data.props['Name'])
+		else:
+			out.write('instrument_addr_%d:\n' % i)
+			out.write('  .byte %s\n' % ', '.join(['$'+data.brr_data[x*2:(x+1)*2] for x in range(data.brr_size)]))
+			print('%s: %d' % (data.props['Name'], data.brr_size))
+			sample_bytes_total += data.brr_size
+	print('Total: %d\n' % sample_bytes_total)
+
+	out.write('GSS_MusicUploadAddress:\n')
 
 	out.write('.pushseg\n')
 	out.write('.segment "SongData"\n')
-	for name, data in export_songs.items():
-		out.write('song_%s:\n' % name)
-		out.write('	.byte %d\n' % len(data))
-		for i in range(len(data)):
-			out.write('\t.addr song_%s_ch%d\n' % (name, i))
-		for i, channel in enumerate(data):
-			out.write('song_%s_ch%d:\n' % (name, i))
-			print(len(channel))
-			out.write(':\t.byt %s\n' % ', '.join([str(x) for x in channel]))
-	out.write('.popseg\n')
+	# Song directory
+	for i, data in enumerate(combined_songs):
+		out.write('\t.addr song_%d, song_%d_end - song_%d\n' % (i, i, i))
 
+	# Actual data for song directory
+	song_bytes_total = 0
+	print('-Songs-')
+	for i, data in enumerate(combined_songs):
+		out.write('song_%d:\n' % i)
+		out.write('.org 0\n')
+		b = data.write_to_file(out, 'GSS_MusicUploadAddress')
+		out.write('.reloc\n')
+		out.write('song_%d_end:\n' % i)
+		print('%s: %d' % (data.props['Name'], b))
+		song_bytes_total += b
+	print('Total: %d\n' % song_bytes_total)
+	out.write('.popseg\n')
 	out.close()
 
-	#out = open(outenum, 'w')
-	#for
-	#out.close()
+	#############################################
+	# Write the enum file
+	#############################################
+
+	out = open(outenum, 'w')
+	out.write('.enum Music\n')
+	for i in combined_songs:
+		out.write('\t%s\n' % i.props['Name'])
+	out.write('.endenum\n\n')
+
+	out.write('.enum SoundEffect\n')
+	for i in combined_effects:
+		out.write('\t%s\n' % i.props['Name'])
+	out.write('.endenum\n')
+
+	out.close()
 
 export_files('gss_data.s', 'gss_enum.s', ['SimpleBeat.gsm'])#, 'SimpleBeat.gsm'])

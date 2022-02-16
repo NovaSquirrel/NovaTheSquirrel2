@@ -1,4 +1,4 @@
-# Effect 
+# Effect
 DELAY      = "GSS::DELAY"
 NOTE       = "GSS::NOTE"
 KEYOFF     = "GSS::KEYOFF"
@@ -22,7 +22,7 @@ class TrackerData:
 		self.effect = None
 		self.param = None
 
-def encode_song(module, song):
+def encode_song(module, song, base):
 	# Clean up the song
 	song.chans = [x for x in song.chans if x != {}]
 
@@ -59,9 +59,9 @@ def encode_song(module, song):
 					repeat_row = section_start
 	song_cleanup(song)
 
-	return [encode_song_channel(module, song, data) for data in song.chans]
+	return [encode_song_channel(module, song, data, base) for data in song.chans]
 
-def encode_song_channel(module, song, data):
+def encode_song_channel(module, song, data, base):
 	b = []                  # bytes for the channel
 	keyoff_gap_duration = 2 # number of frames between keyoff and keyon, to prevent clicks
 
@@ -196,7 +196,7 @@ def encode_song_channel(module, song, data):
 
 	# Try compressing it now
 	b.insert(loop_index, 'LOOP')
-	return min([channel_compress(b, loop_index, ref_len, looped_song) for ref_len in range(3, 20+1)], key=lambda x: len(x))
+	return min([channel_compress(b, loop_index, ref_len, looped_song, base) for ref_len in range(3, 20+1)], key=lambda x: len(x))
 
 def command_length(command):
 	lengths = {
@@ -288,7 +288,7 @@ def computeLPSArray(pat, M, lps):
                 lps[i] = 0
                 i += 1
 
-def channel_compress(b, loop_index, ref_max, looped_song):
+def channel_compress(b, loop_index, ref_max, looped_song, base):
 	out = []
 	b = b.copy()
 	loop_index = 0
@@ -306,8 +306,8 @@ def channel_compress(b, loop_index, ref_max, looped_song):
 			index = find_list_in_list(out, match_against)
 			if index != -1:
 				out.append(REFERENCE)
-				out.append('<(:- +%d)'%(index))
-				out.append('>(:- +%d)'%(index))
+				out.append('<(:- +%d+%s)'%(index,base))
+				out.append('>(:- +%d+%s)'%(index,base))
 				out.append(len(match_against))
 				b = new_b
 				break
@@ -318,8 +318,8 @@ def channel_compress(b, loop_index, ref_max, looped_song):
 				out.append(d)
 
 	out.append(LOOP)
-	out.append('<(:- +%d)'%(loop_index))
-	out.append('>(:- +%d)'%(loop_index))
+	out.append('<(:- +%d+%s)'%(loop_index,base))
+	out.append('>(:- +%d+%s)'%(loop_index,base))
 	return out
 
 def delay_compile(b, delay):
@@ -346,7 +346,8 @@ def delay_compile(b, delay):
 
 def note_to_number(note):
 	scale = ['C-', 'C#', 'D-', 'D#', 'E-', 'F-', 'F#', 'G-', 'G#', 'A-', 'A#', 'B-']
-	return scale.index(note[0:2]) + ((int(note[2])-1)*12)
+	#+1 is to copy a SNESGSS bug(?) where it's treating the notes as starting at 150 instead of 149
+	return scale.index(note[0:2]) + (int(note[2])*12+1)
 
 def note_not_blank_or_keyoff(note):
 	return note != None and note != '---'
