@@ -1,9 +1,11 @@
 .setcpu "none"
 .include "spc-65c02.inc"
+.export spc_entry, GSS_MusicUploadAddress, SongDirectory
 
-UPDATE_RATE_HZ	= 160		;quantization of music events
+UPDATE_RATE_HZ	= 160   ;quantization of music events
+BRR_STREAMING = 0       ;set to one to turn on streaming
 
-;memory layout
+;---Memory layout---
 ; $0000..$00ef direct page, all driver variables are there
 ; $00f0..$00ff DSP registers
 ; $0100..$01ff stack page
@@ -13,6 +15,18 @@ UPDATE_RATE_HZ	= 160		;quantization of music events
 ;        $nnnn sound effects data
 ;        $nnnn music data
 ;        $nnnn BRR streamer buffer
+
+;---Interface---
+;65816 ---> SPC
+; CPU0 = Command number
+; CPU1 = Parameter
+; CPU2 = Parameter
+; CPU3 = Parameter
+;65816 <--- SPC
+; CPU0 = Zero if busy, command number if processing that command
+; CPU1 = Unused
+; CPU2 = Used for streaming
+; CPU3 = Command count
 
 ;I/O registers
 TEST = $f0
@@ -76,8 +90,6 @@ DSP_C7    = $7f
 .segment "SPCZEROPAGE"
 D_STEREO:      .res 1
 D_BUFPTR:      .res 1
-D_ADSR_L:      .res 1
-D_ADSR_H:      .res 1
 D_CHx0:        .res 1
 D_CH0x:        .res 1
 D_KON:         .res 1
@@ -92,18 +104,18 @@ D_PITCH_H:     .res 1
 D_TEMP:        .res 1
 D_MUSIC_CHNS:  .res 1
 D_PAUSE:       .res 1
-D_EFFECTS_L:   .res 1
-D_EFFECTS_H:   .res 1
 D_GLOBAL_TGT:  .res 1
 D_GLOBAL_OUT:  .res 1
 D_GLOBAL_STEP: .res 1
 D_GLOBAL_DIV:  .res 1
 
+.if BRR_STREAMING
 S_ENABLE:      .res 1
 S_BUFFER_OFF:  .res 1
 S_BUFFER_PTR:  .res 2
 S_BUFFER_RD:   .res 1
 S_BUFFER_WR:   .res 1
+.endif
 
 D_CHNVOL:      .res 8
 D_CHNPAN:      .res 8
@@ -127,6 +139,8 @@ M_REF_RET_L:   .res 8
 M_REF_RET_H:   .res 8
 M_INSTRUMENT:  .res 8
 
+COMMAND_COUNT: .res 1 ; Used for acknowledgement
+
 ;DSP registers write buffer located in the stack page, as it is not used for the most part
 ;first four bytes are reserved for shortest echo buffer
 
@@ -147,32 +161,26 @@ streamSync  = streamData8+(streamBufSize*9)
 streamPitch = (4096*streamSampleRate/32000)
 
 .segment "SPCIMAGE"
-start:
+spc_entry:
 	clrp
 	ldx #$ef				;stack is located in $100..$1ff
 	txs
 	bra mainLoopInit		;$0204, editor should set two zeroes here
 ;	bra editorInit
 
-sampleADSRPtr:
-	.word sampleADSRAddr	;$0208
-soundEffectsDataPtr:
-	.word 0					;$020a
-musicDataPtr:
-	.word musicDataAddr		;$020c
-
 ;editorInit:
 ;	jsr initDSPAndVars
 ;	ldx #1
-;	stx D_STEREO			;enable stereo in the editor, mono by default
+;	stx <D_STEREO			;enable stereo in the editor, mono by default
 ;	dex
 ;	jsr	startMusic
 
 mainLoopInit:
-	lda #8000/UPDATE_RATE_HZ
-	sta <T0TG
-	lda #$81				;enable timer 0 and IPL
-	sta <CTRL
+  	mov <T0TG,#8000/UPDATE_RATE_HZ
+	mov <CTRL,#$81 ;enable timer 0 and IPL
+    lda #0
+    sta <COMMAND_COUNT
+    sta <CPU3
 	jsr setReady
 
 ;main loop waits for next frame checking the timer
@@ -182,6 +190,12 @@ mainLoop:
 	lda <CPU0				;read command code, when it is zero (<SCMD_NONE), no new command
 	beq commandDone
 	sta <CPU0				;set busy flag for CPU by echoing a command code
+
+    ldy <COMMAND_COUNT      ;acknowledge the command
+    iny
+    sty <COMMAND_COUNT
+    sty <CPU3
+
 	tay
 	and #$0f				;get command offset in the jump table into X
 	asl
@@ -195,7 +209,9 @@ mainLoop:
 
 commandDone:
 ;all commands jump back here
+.if BRR_STREAMING
 	jsr updateBRRStreamerPos
+.endif
 	lda <T0OT
 	beq mainLoop
 	jsr updateGlobalVolume
@@ -223,7 +239,7 @@ cmdGlobalVolume:
 @noClip:
 	asl
 	sta <D_GLOBAL_TGT
-	stx D_GLOBAL_STEP
+	stx <D_GLOBAL_STEP
 	bra commandDone
 
 cmdChannelVolume:
@@ -252,7 +268,7 @@ cmdChannelVolume:
 cmdMusicPlay:
 	jsr setReady
 	ldx #0				;music always uses channels starting from 0
-	stx D_PAUSE			;reset pause flag
+	stx <D_PAUSE			;reset pause flag
 	jsr	startMusic
 	jmp commandDone
 
@@ -298,23 +314,20 @@ cmdSfxPlay:
 		jsr setReady
 		jmp	commandDone
 	@play:
-	sty D_TEMP			;remember requested channel
+	sty <D_TEMP			;remember requested channel
 	ldx <CPU1			;volume
-	stx D_VOL
+	stx <D_VOL
 	lda <CPU2			;effect number
 	ldx <CPU3			;pan
-	stx D_PAN
+	stx <D_PAN
 	jsr setReady
-	ldy #0					;check if there is an effect with this number, just in case
-	cmp (<D_EFFECTS_L),y
+	cmp #SOUND_EFFECT_COUNT ;check if there is an effect with this number, just in case
 	bcs @done
 		asl
 		tay
-		iny
-		lda (<D_EFFECTS_L),y
+		lda GSS_SoundEffectDirectory+0,y
 		sta <D_PTR_L
-		iny
-		lda (<D_EFFECTS_L),y
+		lda GSS_SoundEffectDirectory+1,y
 		sta <D_PTR_H
 
 		ldx <D_TEMP
@@ -324,16 +337,19 @@ cmdSfxPlay:
 
 cmdLoad:
 	jsr setReady
+.if BRR_STREAMING
 	jsr streamStop			;stop BRR streaming to prevent glitches after loading
+.endif
 	ldx #0
-	stx D_KON
+	stx <D_KON
 	dex
-	stx D_KOF
+	stx <D_KOF
 	jsr bufKeyOffApply
 	ldx #$ef
 	txs
 	jmp $ffc9
 
+.if BRR_STREAMING
 cmdStreamStart:
 	jsr setReady
 	lda #0
@@ -362,8 +378,6 @@ cmdStreamStop:
 	jsr setReady
 	jsr streamStop
 	jmp commandDone
-
-
 
 cmdStreamSend:
 	lda S_ENABLE
@@ -514,13 +528,14 @@ streamSetBufPtr:
 	lda #0
 	sta S_BUFFER_OFF
 	rts
+.endif
 
 ;start music, using the channels starting from the specified one
 ;in: X=the starting channel, musicDataPtr=music data location
 startMusic:
-	lda musicDataPtr+0
+	lda #<GSS_MusicUploadAddress
 	sta <D_PTR_L
-	lda musicDataPtr+1
+	lda #>GSS_MusicUploadAddress
 	sta <D_PTR_H
 	ldy #0					;how many channels in the song
 	lda (<D_PTR_L),y
@@ -986,32 +1001,24 @@ updateChannel:
 ;initialize DSP registers and driver variables
 initDSPAndVars:
 	ldx #0
-	stx D_KON					;no keys pressed
-	stx D_KOF					;no keys released
-	stx D_STEREO				;mono by default
-	stx D_MUSIC_CHNS			;how many channels current music uses
-	stx D_PAUSE				;pause mode is inactive
+	stx <D_KON					;no keys pressed
+	stx <D_KOF					;no keys released
+	stx <D_STEREO				;mono by default
+	stx <D_MUSIC_CHNS			;how many channels current music uses
+	stx <D_PAUSE				;pause mode is inactive
+.if BRR_STREAMING
 	stx S_ENABLE				;disable streaming
-	stx D_GLOBAL_DIV			;reset global volume change speed divider
+.endif
+	stx <D_GLOBAL_DIV			;reset global volume change speed divider
 
-	stx D_GLOBAL_OUT			;current global volume
+	stx <D_GLOBAL_OUT			;current global volume
 	ldx #255
-	stx D_GLOBAL_TGT			;target global volume
-	stx D_GLOBAL_STEP			;global volume change speed
+	stx <D_GLOBAL_TGT			;target global volume
+	stx <D_GLOBAL_STEP			;global volume change speed
 	
 	ldx #<DSPInitData
 	ldy #>DSPInitData
 	jsr sendDSPSequence
-
-	lda sampleADSRPtr+0			;set DP pointer to the ADSR list
-	sta <D_ADSR_L
-	lda sampleADSRPtr+1
-	sta <D_ADSR_H
-
-	lda soundEffectsDataPtr+0	;set DP pointer to sound effects data
-	sta <D_EFFECTS_L
-	lda soundEffectsDataPtr+1
-	sta <D_EFFECTS_H
 
 	ldx #0
 @initChannels:
@@ -1028,9 +1035,12 @@ initDSPAndVars:
 	inx
 	cpx #8
 	bne @initChannels
+.if BRR_STREAMING
 	jsr streamClearBuffers
+.endif
 	rts
 
+.if BRR_STREAMING
 ;updates play position for the BRR streamer
 updateBRRStreamerPos:
 	lda #DSP_ENDX				;check if channel 6 stopped playing
@@ -1046,6 +1056,7 @@ updateBRRStreamerPos:
 		sta S_BUFFER_RD
 	@skip:
 	rts
+.endif
 
 ;set the ready flag for the 65816 side, so it can send a new command
 setReady:
@@ -1092,14 +1103,13 @@ setInstrument:
 		lda <D_CHx0					;write adsr parameters
 		ora #DSP_ADSR1
 		tax
-		lda (<D_ADSR_L),y			;first adsr byte
+		lda GSS_SampleADSR,y		;first adsr byte
 		jsr bufRegWrite
 
 		lda <D_CHx0
 		ora #DSP_ADSR2
 		tax
-		iny
-		lda (<D_ADSR_L),y			;second adsr byte
+		lda GSS_SampleADSR+1,y		;second adsr byte
 		jsr bufRegWrite
 	@skip:
 	rts
@@ -1224,7 +1234,7 @@ updateChannelVolume:
 
 	ldy <M_VOL,x			;get music channel volume
 	mul ya
-	sty D_VOL				;resulting volume
+	sty <D_VOL				;resulting volume
 
 	lda <D_STEREO
 	bne @stereo
@@ -1344,7 +1354,7 @@ bufRegWrite:
 	pla
 	sta D_BUFFER,x
 	inx
-	stx D_BUFPTR
+	stx <D_BUFPTR
 	rts
 
 ;set keyon for specified channel in the temp variable
@@ -1410,8 +1420,8 @@ bufKeyOffApply:
 
 ;send sequence of DSP register writes, used for init
 sendDSPSequence:
-	stx D_PTR_L
-	sty D_PTR_H
+	stx <D_PTR_L
+	sty <D_PTR_H
 	ldy #0
 @loop:
 	lda (<D_PTR_L),y
@@ -1430,20 +1440,20 @@ sendDSPSequence:
 cmdList:
 	.word 0					;0 no command, means the APU is ready for a new command
 	.word cmdInitialize		;1 initialize DSP
-	.word cmdLoad				;2 load new music data
+	.word cmdLoad			;2 load new music data
 	.word cmdStereo			;3 change stereo sound mode, mono by default
-	.word cmdGlobalVolume		;4 set global volume
-	.word cmdChannelVolume		;5 set channel volume
-	.word cmdMusicPlay			;6 start music
-	.word cmdMusicStop			;7 stop music
+	.word cmdGlobalVolume	;4 set global volume
+	.word cmdChannelVolume	;5 set channel volume
+	.word cmdMusicPlay		;6 start music
+	.word cmdMusicStop		;7 stop music
 	.word cmdMusicPause		;8 pause music
-	.word cmdSfxPlay			;9 play sound effect
-	.word cmdStopAllSounds		;10 stop all sounds
-	.word cmdStreamStart		;11 start sound streaming
+	.word cmdSfxPlay		;9 play sound effect
+	.word cmdStopAllSounds	;10 stop all sounds
+.if BRR_STREAMING
+	.word cmdStreamStart	;11 start sound streaming
 	.word cmdStreamStop		;12 stop sound streaming
 	.word cmdStreamSend		;13 send a block of data if needed
-
-
+.endif
 
 notePeriodTable:
 	.word $0042,$0046,$004a,$004f,$0054,$0059,$005e,$0064,$006a,$0070,$0077,$007e
@@ -1454,8 +1464,6 @@ notePeriodTable:
 	.word $0859,$08d8,$095f,$09ed,$0a85,$0b25,$0bce,$0c82,$0d41,$0e0a,$0ee0,$0fc3
 	.word $10b3,$11b1,$12be,$13db,$150a,$164a,$179d,$1905,$1a82,$1c15,$1dc1,$1f86
 	.word $2166,$2362,$257d,$27b7,$2a14,$2c95,$2f3b,$320a,$3504,$382b,$3b82,$3f0c
-
-
 
 vibratoTable:
 	.byte $00,$04,$08,$0c,$10,$14,$18,$1c,$20,$24,$28,$2c,$30,$34,$38,$3b
@@ -1471,13 +1479,10 @@ vibratoTable:
 	.byte $93,$95,$97,$99,$9c,$9e,$a1,$a4,$a7,$aa,$ad,$b0,$b3,$b7,$ba,$bd
 	.byte $c1,$c5,$c8,$cc,$d0,$d4,$d8,$dc,$e0,$e4,$e8,$ec,$f0,$f4,$f8,$fc
 
-
-
 channelMask:
 	.byte $01,$02,$04,$08,$10,$20,$40,$80
 
-
-
+.if BRR_STREAMING
 streamBufferPtr:
 	.word streamData1
 	.word streamData2
@@ -1487,8 +1492,7 @@ streamBufferPtr:
 	.word streamData6
 	.word streamData7
 	.word streamData8
-
-
+.endif
 
 DSPInitData:
 	.byte DSP_FLG  ,%01100000				;mute, disable echo
@@ -1499,24 +1503,23 @@ DSPInitData:
 	.byte DSP_ESA  ,1						;echo buffer in the stack page
 	.byte DSP_EDL  ,0						;minimal echo buffer length
 	.byte DSP_EFB  ,0						;no echo feedback
-	.byte DSP_C0	  ,127						;zero echo filter
-	.byte DSP_C1	  ,0
-	.byte DSP_C2	  ,0
-	.byte DSP_C3	  ,0
-	.byte DSP_C4	  ,0
-	.byte DSP_C5	  ,0
-	.byte DSP_C6	  ,0
-	.byte DSP_C7	  ,0
+	.byte DSP_C0   ,127						;zero echo filter
+	.byte DSP_C1   ,0
+	.byte DSP_C2   ,0
+	.byte DSP_C3   ,0
+	.byte DSP_C4   ,0
+	.byte DSP_C5   ,0
+	.byte DSP_C6   ,0
+	.byte DSP_C7   ,0
 	.byte DSP_EON  ,0						;echo disabled
 	.byte DSP_EVOLL,0						;echo volume to zero
 	.byte DSP_EVOLR,0
 	.byte DSP_KOF  ,255						;all keys off
-	.byte DSP_DIR  ,>sampleDirAddr			;sample dir location
+	.byte DSP_DIR  ,>GSS_SampleDirectory	;sample dir location
 	.byte DSP_FLG  ,%00100000				;no mute, disable echo
 	.byte 0
 
-
-
+.if BRR_STREAMING
 BRRStreamInitData:
 	.byte DSP_ADSR1+$70,$00					;disable ADSR on channel 7
 	.byte DSP_GAIN +$70,$1f
@@ -1528,19 +1531,19 @@ BRRStreamInitData:
 	.byte DSP_SRCN +$60,8					;sync stream always playing on channel 6
 	.byte DSP_KON      ,$c0					;start channels 6 and 7
 	.byte 0
+.endif
 
-	.align 256		;sample dir list should be aligned to 256 bytes
-sampleDirAddr:		;four bytes per sample, first 9 entries reserved for the BRR streamer
+;	.align 256		;sample dir list should be aligned to 256 bytes
+;sampleDirAddr:		;four bytes per sample, first 9 entries reserved for the BRR streamer
+;	.word streamData1,streamData1
+;	.word streamData2,streamData2
+;	.word streamData3,streamData3
+;	.word streamData4,streamData4
+;	.word streamData5,streamData5
+;	.word streamData6,streamData6
+;	.word streamData7,streamData7
+;	.word streamData8,streamData8
+;	.word streamSync,streamSync
 
-	.word streamData1,streamData1
-	.word streamData2,streamData2
-	.word streamData3,streamData3
-	.word streamData4,streamData4
-	.word streamData5,streamData5
-	.word streamData6,streamData6
-	.word streamData7,streamData7
-	.word streamData8,streamData8
-	.word streamSync,streamSync
-
-musicDataAddr:
-sampleADSRAddr:
+;------------------------------------------------------------------------------------------------------
+.include "../audio/gss_data.s"

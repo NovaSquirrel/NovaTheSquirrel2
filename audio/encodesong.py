@@ -22,7 +22,7 @@ class TrackerData:
 		self.effect = None
 		self.param = None
 
-def encode_song(module, song, base):
+def encode_song(song, base):
 	# Clean up the song
 	song.chans = [x for x in song.chans if x != {}]
 
@@ -59,9 +59,9 @@ def encode_song(module, song, base):
 					repeat_row = section_start
 	song_cleanup(song)
 
-	return [encode_song_channel(module, song, data, base) for data in song.chans]
+	return [encode_song_channel(song, data, base) for data in song.chans]
 
-def encode_song_channel(module, song, data, base):
+def encode_song_channel(song, data, base):
 	b = []                  # bytes for the channel
 	keyoff_gap_duration = 2 # number of frames between keyoff and keyon, to prevent clicks
 
@@ -171,7 +171,7 @@ def encode_song_channel(module, song, data, base):
 						key_is_on = False
 					if ins_change != -1:
 						b.append(INSTRUMENT)
-						b.append(module.instrument_remap[ins_change])
+						b.append(song.instrument_remap[ins_change])
 						ins_change = -1
 					if effect_volume != 255: #volume, inserted after keyoff to prevent clicks
 						b.append(VOLUME)

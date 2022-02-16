@@ -117,7 +117,7 @@ waitBBAA:
   rtl
 .endproc
 
-.import spc_entry
+.import spc_entry, GSS_MusicUploadAddress, SongDirectory
 .import __SPCIMAGE_RUN__, __SPCIMAGE_LOAD__, __SPCIMAGE_SIZE__
 
 .proc spc_boot_apu
@@ -137,3 +137,89 @@ waitBBAA:
   rtl
 .endproc
 
+; ---------------------------------------------------------
+
+.enum GSS_Commands
+	NO_OP
+	INITIALIZE
+	LOAD
+	STEREO
+	GLOBAL_VOLUME
+	CHANNEL_VOLUME
+	MUSIC_START
+	MUSIC_STOP
+	MUSIC_PAUSE
+	SFX_PLAY
+	STOP_ALL_SOUNDS
+.endenum
+
+.a8
+.export GSS_SendCommand
+.proc GSS_SendCommand
+	sta 0
+NoWrite:
+    lda APU3
+    pha
+:   lda APU0
+	bne :-
+	seta16
+	lda 2
+	sta APU2
+	lda 0
+	seta8
+	xba
+	sta APU1
+	xba
+	sta APU0
+
+	; Wait for acknowledgement
+    pla
+:	cmp APU3
+	beq :-
+	rtl
+.endproc
+
+.export GSS_LoadSong
+.proc GSS_LoadSong
+Pointer = 2
+Length  = 0
+	setaxy16
+    and #$00ff
+    asl
+    asl
+    tax
+    lda f:SongDirectory+0,x
+	sta Pointer
+    lda f:SongDirectory+2,x
+	sta Length
+    seta8
+    lda #^SongDirectory
+    sta Pointer+2
+
+	; Wait for SPC to be ready
+:   lda APU0
+	bne :-
+
+	lda #GSS_Commands::LOAD
+	sta APU0
+	; Wait for the SPC to signal it's ready with APU0=$AA, APU1=$BB
+	seta16
+	lda #$BBAA
+waitBBAA:
+	cmp APU0
+	bne waitBBAA
+	seta8
+
+	; Upload song to SPC
+	ldy #GSS_MusicUploadAddress
+	jsr spc_begin_upload
+
+:	lda [Pointer],y
+	jsr spc_upload_byte
+	cpy Length
+	bne :-
+
+	ldy #spc_entry
+	jsr spc_execute
+	rtl
+.endproc

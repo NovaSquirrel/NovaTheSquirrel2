@@ -17,7 +17,7 @@ version = 0.01
 # (use a backslash to continue on the next line)
 objlist = \
   snesheader init main player memory common renderlevel renderlevel2 \
-  uploadppu blarggapu spcimage musicseq graphics blockdata \
+  uploadppu graphics blockdata snesgss_driver \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode object \
   mode7 perspective_data sincos_data inventory vwf \
@@ -25,16 +25,16 @@ objlist = \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile m7blockdata mode7actors
+  playerprojectile m7blockdata mode7actors blarggapu
 objlistspc = \
   spcheader spcimage musicseq
-brrlist = \
-  karplusbassloop hat kickgen decentsnare
 
+CC := gcc
 AS65 := ca65
 LD65 := ld65
 CFLAGS65 = -g
 objdir := obj/snes
+audiodir := audio
 srcdir := src
 imgdirX := tilesetsX
 imgdir4 := tilesets4
@@ -105,7 +105,6 @@ $(objdir)/index.txt: makefile
 
 objlisto = $(foreach o,$(objlist),$(objdir)/$(o).o)
 objlistospc = $(foreach o,$(objlistspc),$(objdir)/$(o).o)
-brrlisto = $(foreach o,$(brrlist),$(objdir)/$(o).brr)
 chrXall := $(patsubst %.png,%.chr,$(wildcard tilesetsX/*.png))
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
@@ -119,6 +118,7 @@ overworlds := $(wildcard overworlds/*.tmx)
 m7levels_lz4 := $(patsubst %.tmx,%.lz4,$(wildcard m7levels/*.tmx))
 m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
 all_npc_gfx := $(wildcard npc/*.png)
+snesgssall := $(wildcard $(audiodir)/*.gsm)
 
 # Background conversion
 # (nametable conversion is implied)
@@ -142,9 +142,6 @@ $(objdir)/%.o: $(objdir)/%.s
 
 $(objdir)/mktables.s: tools/mktables.py
 	$< > $@
-
-# Files that depend on extra included files
-$(objdir)/spcimage.o: $(brrlisto)
 
 # Files that depend on enums
 $(srcdir)/graphics.s: $(srcdir)/graphicsenum.s
@@ -282,17 +279,9 @@ tilesets2/lz4/%.chrgb.lz4: tilesets2/lz4/%.chrgb
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
 
-
 # Rules for audio
-$(objdir)/%.brr: audio/%.wav
-	$(PY) tools/wav2brr.py $< $@
-$(objdir)/%.brr: $(objdir)/%.wav
-	$(PY) tools/wav2brr.py $< $@
-$(objdir)/%loop.brr: audio/%.wav
-	$(PY) tools/wav2brr.py --loop $< $@
-$(objdir)/%loop.brr: $(objdir)/%.wav
-	$(PY) tools/wav2brr.py --loop $< $@
-$(objdir)/karplusbass.wav: tools/karplus.py
-	$(PY) $< -o $@ -n 1024 -p 64 -r 4186 -e square:1:4 -a 30000 -g 1.0 -f .5
-$(objdir)/hat.wav: tools/makehat.py
-	$(PY) $< $@
+$(objdir)/snesgss_driver.o: $(audiodir)/gss_data.s
+$(audiodir)/gss_data.s: $(audiodir)/exportgss.py $(audiodir)/encodesong.py $(audiodir)/encodebrr.py $(snesgssall) $(audiodir)/brr/gssbrr
+	$(PY) $(audiodir)/exportgss.py $(audiodir)/gss_data.s $(audiodir)/gss_enum.s $(snesgssall)
+$(audiodir)/brr/gssbrr:
+	$(CC) $(audiodir)/brr/gssbrr.c -o $@

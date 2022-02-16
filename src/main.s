@@ -66,7 +66,18 @@ IRIS_EFFECT_END = 30
   ; the sound CPU is running the IPL (initial program load), which is
   ; designed to receive data from the main CPU through communication
   ; ports at $2140-$2143.  Load a program and start it running.
-;  jsl spc_boot_apu
+  jsl spc_boot_apu
+  seta8
+  .import GSS_SendCommand, GSS_LoadSong
+  lda #1
+  jsl GSS_SendCommand
+
+  lda #0
+  jsl GSS_LoadSong
+
+  lda #6
+  jsl GSS_SendCommand
+
 
   seta8
   setxy16

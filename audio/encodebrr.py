@@ -3,7 +3,7 @@ import subprocess
 def encode_brr(instrument):
 	p = subprocess.Popen(
 		[
-			"brr/gssbrr",
+			"audio/brr/gssbrr",
 			str(instrument.props['Length']),
 			str(instrument.props['LoopStart']),
 			str(instrument.props['LoopEnd']),
