@@ -59,31 +59,10 @@ IRIS_EFFECT_END = 30
 .segment "CODE"
 ; init.s sends us here
 .proc main
-  ; In the same way that the CPU of the Commodore 64 computer can
-  ; interact with a floppy disk only through the CPU in the 1541 disk
-  ; drive, the main CPU of the Super NES can interact with the audio
-  ; hardware only through the sound CPU.  When the system turns on,
-  ; the sound CPU is running the IPL (initial program load), which is
-  ; designed to receive data from the main CPU through communication
-  ; ports at $2140-$2143.  Load a program and start it running.
-  jsl spc_boot_apu
-  seta8
-  .import GSS_SendCommand, GSS_LoadSong
-  lda #1
-  jsl GSS_SendCommand
-
-  lda #0
-  jsl GSS_LoadSong
-
-  lda #6
-  jsl GSS_SendCommand
-
-
   seta8
   setxy16
   phk
   plb
-
 
   ; Clear the first 512 bytes manually here
   ldx #512-1
@@ -107,6 +86,24 @@ IRIS_EFFECT_END = 30
   lda #^NoNMIHandler
   sta NMIHandler+2
 
+  ; In the same way that the CPU of the Commodore 64 computer can
+  ; interact with a floppy disk only through the CPU in the 1541 disk
+  ; drive, the main CPU of the Super NES can interact with the audio
+  ; hardware only through the sound CPU.  When the system turns on,
+  ; the sound CPU is running the IPL (initial program load), which is
+  ; designed to receive data from the main CPU through communication
+  ; ports at $2140-$2143.  Load a program and start it running.
+  jsl spc_boot_apu
+  seta8
+  .import GSS_SendCommand, GSS_LoadSong
+  lda #1
+  jsl GSS_SendCommand
+  lda #1
+  jsl GSS_LoadSong
+  lda #6
+  jsl GSS_SendCommand
+
+
   ; Clear three screens
   ldx #$c000 >> 1
   ldy #$15
@@ -117,7 +114,6 @@ IRIS_EFFECT_END = 30
   ldx #$e000 >> 1
   ldy #0
   jsl ppu_clear_nt
-
 
   ; Clear palette
   stz CGADDR
@@ -446,22 +442,22 @@ ReturnFromTwoLayer:
 ; ---------------------------------------------------------
 SetScrollForTwoLayerLevel:
   seta16
-  lda ScrollX
-  add FG2OffsetX
+  lda FG2OffsetX
   lsr
   lsr
   lsr
   lsr
+  add FGScrollXPixels
   sta 0
   sta FG2ScrollXPixels
 
-  lda ScrollY
-  add FG2OffsetY
+  lda FG2OffsetY
   lsr
   lsr
   lsr
   lsr
   adc #0
+  add FGScrollYPixels
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
   sta 2
   sta FG2ScrollYPixels

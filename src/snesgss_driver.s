@@ -335,19 +335,87 @@ cmdSfxPlay:
 	@done:
 	jmp commandDone
 
-cmdLoad:
-	jsr setReady
-.if BRR_STREAMING
-	jsr streamStop			;stop BRR streaming to prevent glitches after loading
-.endif
-	ldx #0
-	stx <D_KON
-	dex
-	stx <D_KOF
-	jsr bufKeyOffApply
-	ldx #$ef
-	txs
-	jmp $ffc9
+
+.proc cmdLoad
+	lda <CPU1 ; 0=normal load, 1=faster load
+	bne :+
+		jsr setReady
+	;.if BRR_STREAMING
+	;	jsr streamStop			;stop BRR streaming to prevent glitches after loading
+	;.endif
+		ldx #0
+		stx <D_KON
+		dex
+		stx <D_KOF
+		jsr bufKeyOffApply
+		ldx #$ef
+		txs
+		jmp $ffc9
+	:
+
+	lda #>GSS_MusicUploadAddress
+	sta store1+2
+	sta store2+2
+	sta store3+2
+	sta store4+2
+
+	mov <CPU0,#69
+	mov <CTRL, #%10010001 ; Reset latch for CPU0 and CPU1, enable timer and IPL
+
+	ldy #0
+:	lda <CPU0
+	cmp #1
+	bne :-
+	bra loop2
+
+loop1:
+	lda <CPU1
+	ldx <CPU2
+	mov <CPU0, #$01
+store1:
+	sta GSS_MusicUploadAddress,y
+	iny
+	txa
+store2:
+	sta GSS_MusicUploadAddress,y
+	iny
+	bne :+
+		inc store1+2
+		inc store2+2
+		inc store3+2
+		inc store4+2
+	:
+
+;wait1:
+;	lda <CPU0
+;	cmp #1
+;	bne wait1
+
+	;----------------------------------
+
+loop2:
+	lda <CPU1
+	ldx <CPU2
+	mov <CPU0, #$80
+store3:
+	sta GSS_MusicUploadAddress,y
+	iny
+	txa
+store4:
+	sta GSS_MusicUploadAddress,y
+	iny
+wait2:
+	lda <CPU0
+	bpl loop1
+;   bmi exit
+;	cmp #2
+;   bne wait2
+;	bra loop1
+
+exit:
+	mov <CPU0, #$00
+	jmp commandDone
+.endproc
 
 .if BRR_STREAMING
 cmdStreamStart:
