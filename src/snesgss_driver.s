@@ -1,6 +1,6 @@
 .setcpu "none"
 .include "spc-65c02.inc"
-.export spc_entry, GSS_MusicUploadAddress, SongDirectory
+.export spc_entry, fast_spc_entry, GSS_MusicUploadAddress, SongDirectory
 
 UPDATE_RATE_HZ	= 160   ;quantization of music events
 BRR_STREAMING = 0       ;set to one to turn on streaming
@@ -1615,3 +1615,57 @@ BRRStreamInitData:
 
 ;------------------------------------------------------------------------------------------------------
 .include "../audio/gss_data.s"
+
+.import __SPCIMAGE_RUN__, __SPCIMAGE_LOAD__, __SPCIMAGE_SIZE__
+
+.segment "SPCFASTBOOT"
+.export fast_spc_entry
+.proc fast_spc_entry
+	clrp
+	mov <CPU0,#69
+	mov <CTRL, #%10010001 ; Reset latch for CPU0 and CPU1, enable timer and IPL
+
+	ldy #0
+:	lda <CPU0
+	cmp #1
+	bne :-
+	bra loop2
+
+loop1:
+	lda <CPU1
+	ldx <CPU2
+	mov <CPU0, #$01
+store1:
+	sta __SPCIMAGE_RUN__,y
+	iny
+	txa
+store2:
+	sta __SPCIMAGE_RUN__,y
+	iny
+	bne :+
+		inc <store1+2
+		inc <store2+2
+		inc <store3+2
+		inc <store4+2
+	:
+	;----------------------------------
+loop2:
+	lda <CPU1
+	ldx <CPU2
+	mov <CPU0, #$80
+store3:
+	sta __SPCIMAGE_RUN__,y
+	iny
+	txa
+store4:
+	sta __SPCIMAGE_RUN__,y
+	iny
+wait2:
+	lda <CPU0
+	bpl loop1
+
+exit:
+	mov <CPU0, #$65
+	mov <CPU1, #$ca
+	jmp spc_entry
+.endproc
