@@ -188,6 +188,9 @@ mainLoopInit:
 
 mainLoop:
 	lda <CPU0				;read command code, when it is zero (<SCMD_NONE), no new command
+	cmp <CPU0
+	bne mainLoop
+	tay
 	beq commandDone
 	sta <CPU0				;set busy flag for CPU by echoing a command code
 
