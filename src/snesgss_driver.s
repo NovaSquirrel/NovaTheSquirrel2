@@ -413,7 +413,7 @@ wait2:
 ;	bra loop1
 
 exit:
-	mov <CPU0, #$00
+	jsr setReady
 	jmp commandDone
 .endproc
 
