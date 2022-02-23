@@ -602,6 +602,7 @@ Nevermind:
 .proc BlockBricks
   lda #Block::Empty
   jsl ChangeBlock
+  jsr PoofAtBlock
 
   jsr Create
 ;  jmp Create
