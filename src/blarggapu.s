@@ -26,7 +26,7 @@
   ; Clear command port in case it already has $CC at reset
   seta8
   stz APU0
-
+without_clear:
   ; Wait for the SPC to signal it's ready with APU0=$AA, APU1=$BB
   seta16
   lda #$BBAA
@@ -36,6 +36,7 @@ waitBBAA:
   seta8
   rts
 .endproc
+spc_wait_boot_without_clear = spc_wait_boot::without_clear
 
 ; Starts upload to SPC addr Y and sets Y to
 ; 0 for use as index with spc_upload_byte.
@@ -140,7 +141,9 @@ waitBBAA:
 ; ---------------------------------------------------------
 
 .a8
-.export GSS_SendCommand
+.export GSS_SendCommand, GSS_SendCommandParamX
+GSS_SendCommandParamX:
+	stx 2
 .proc GSS_SendCommand
 	sta 0
 NoWrite:
@@ -165,6 +168,8 @@ NoWrite:
 	rtl
 .endproc
 
+FAST_LOAD = 0
+
 .export GSS_LoadSong
 .proc GSS_LoadSong
 Pointer = 2
@@ -186,6 +191,25 @@ Length  = 0
 :   lda APU0
 	bne :-
 
+	lda #GSS_Commands::LOAD
+	sta APU0
+
+.if 1
+	.import GSS_MusicUploadAddress
+	setxy16
+	jsr spc_wait_boot_without_clear
+
+	ldy #GSS_MusicUploadAddress
+	jsr spc_begin_upload
+:	lda [Pointer],y
+	jsr spc_upload_byte
+	cpy Length
+	bne :-
+	ldy #spc_entry
+	jsr spc_execute
+.endif
+
+.if 0
 	lda #GSS_Commands::FAST_LOAD
 	sta APU0
 
@@ -211,9 +235,11 @@ Length  = 0
 	sta APU0
 :   lda APU0
     bne :-
+.endif
 	rtl
 .endproc
 
+.if 0
 .proc TransferLoop
 	Pointer = 2
 	Length = 0
@@ -243,3 +269,4 @@ Upload:
 	Exit:
 	rts
 .endproc
+.endif

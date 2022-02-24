@@ -125,6 +125,14 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
 	STOP_ALL_SOUNDS
 	FAST_LOAD
 	LOAD
+	ECHO_VOLUME_CHANNELS
+	ECHO_ADDRESS_DELAY
+	ECHO_FEEDBACK_FIR
+	; unused slot
+	; unused slot
+	; unused slot
+	; unused slot
+	; unused slot
 .endenum
 
 .enum GSS_Commands
@@ -142,4 +150,7 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
 	STOP_ALL_SOUNDS = SUBCOMMAND + (GSS_SubCommands::STOP_ALL_SOUNDS << 4)
 	FAST_LOAD       = SUBCOMMAND + (GSS_SubCommands::FAST_LOAD << 4)
 	LOAD            = SUBCOMMAND + (GSS_SubCommands::LOAD << 4)
+	ECHO_VOLUME_CHANNELS = SUBCOMMAND + (GSS_SubCommands::ECHO_VOLUME_CHANNELS << 4)
+	ECHO_ADDRESS_DELAY   = SUBCOMMAND + (GSS_SubCommands::ECHO_ADDRESS_DELAY << 4)
+	ECHO_FEEDBACK_FIR    = SUBCOMMAND + (GSS_SubCommands::ECHO_FEEDBACK_FIR << 4)
 .endenum

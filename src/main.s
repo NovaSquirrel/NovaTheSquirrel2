@@ -95,11 +95,30 @@ IRIS_EFFECT_END = 30
   ; ports at $2140-$2143.  Load a program and start it running.
   jsl spc_boot_apu
   seta8
-  .import GSS_SendCommand, GSS_LoadSong
+  .import GSS_SendCommand, GSS_SendCommandParamX, GSS_LoadSong
   lda #GSS_Commands::INITIALIZE
   jsl GSS_SendCommand
   lda #0
   jsl GSS_LoadSong
+
+.if 0
+  ldx #0 | ($00<<8) ; volume, channels
+  lda #GSS_Commands::ECHO_VOLUME_CHANNELS
+  jsl GSS_SendCommandParamX
+	
+  ldx #$df | (4<<8) ; address, delay
+  lda #GSS_Commands::ECHO_ADDRESS_DELAY
+  jsl GSS_SendCommandParamX
+	
+  ldx #28 | ($3f<<8) ; Volume, channels
+  lda #GSS_Commands::ECHO_VOLUME_CHANNELS
+
+  jsl GSS_SendCommandParamX
+  ldx #1 | ($50<<8) ; FIR set, feedback
+  lda #GSS_Commands::ECHO_FEEDBACK_FIR
+  jsl GSS_SendCommandParamX
+.endif
+
   lda #GSS_Commands::MUSIC_START
   jsl GSS_SendCommand
 
