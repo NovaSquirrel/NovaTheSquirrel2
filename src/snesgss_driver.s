@@ -117,34 +117,38 @@ S_BUFFER_RD:   .res 1
 S_BUFFER_WR:   .res 1
 .endif
 
-D_CHNVOL:      .res 8
-D_CHNPAN:      .res 8
+CHANNEL_COUNT = 11
+D_CHNVOL:      .res CHANNEL_COUNT
+D_CHNPAN:      .res CHANNEL_COUNT
 
-M_PTR_L:       .res 8
-M_PTR_H:       .res 8
-M_WAIT_L:      .res 8
-M_WAIT_H:      .res 8
-M_PITCH_L:     .res 8
-M_PITCH_H:     .res 8
-M_VOL:         .res 8
-M_DETUNE:      .res 8
-M_SLIDE:       .res 8
-M_PORTAMENTO:  .res 8
-M_PORTA_TO_L:  .res 8
-M_PORTA_TO_H:  .res 8
-M_MODULATION:  .res 8
-M_MOD_OFF:     .res 8
-M_REF_LEN:     .res 8
-M_REF_RET_L:   .res 8
-M_REF_RET_H:   .res 8
-M_INSTRUMENT:  .res 8
+M_PTR_L:       .res CHANNEL_COUNT
+M_PTR_H:       .res CHANNEL_COUNT
+M_WAIT_L:      .res CHANNEL_COUNT
+M_WAIT_H:      .res CHANNEL_COUNT
+M_PITCH_L:     .res CHANNEL_COUNT
+M_PITCH_H:     .res CHANNEL_COUNT
+M_VOL:         .res CHANNEL_COUNT
+M_DETUNE:      .res CHANNEL_COUNT
+M_SLIDE:       .res CHANNEL_COUNT
+M_PORTAMENTO:  .res CHANNEL_COUNT
+M_PORTA_TO_L:  .res CHANNEL_COUNT
+M_PORTA_TO_H:  .res CHANNEL_COUNT
+M_MODULATION:  .res CHANNEL_COUNT
+M_MOD_OFF:     .res CHANNEL_COUNT
+M_REF_LEN:     .res CHANNEL_COUNT
+;M_REF_RET_L:   .res CHANNEL_COUNT
+;M_REF_RET_H:   .res CHANNEL_COUNT
+M_INSTRUMENT:  .res CHANNEL_COUNT
 
 COMMAND_COUNT: .res 1 ; Used for acknowledgement
 
 ;DSP registers write buffer located in the stack page, as it is not used for the most part
 ;first four bytes are reserved for shortest echo buffer
 
-D_BUFFER         = $0104
+M_REF_RET_L = $0104
+M_REF_RET_H = M_REF_RET_L + CHANNEL_COUNT
+D_BUFFER    = M_REF_RET_H + CHANNEL_COUNT
+
 streamBufSize    = 28		;how many BRR blocks in a buffer, max is 28 (28*9=252)
 streamSampleRate = 16000	;stream sample rate
 streamData       = $ffc0-(streamBufSize*9*9) ;fixed location for streaming data
@@ -770,9 +774,9 @@ readChannelByte:
 	dec <M_REF_LEN,x		;decrement reference length
 	bne @done
 
-	lda <M_REF_RET_L,x		;restore original pointer
+	lda M_REF_RET_L,x		;restore original pointer
 	sta <D_PTR_L
-	lda <M_REF_RET_H,x
+	lda M_REF_RET_H,x
 	sta <D_PTR_H
 @done:
 	pla
@@ -1045,9 +1049,9 @@ updateChannel:
 	sta <M_REF_LEN,x
 
 	lda <D_PTR_L			;remember previous pointer as the return address
-	sta <M_REF_RET_L,x
+	sta M_REF_RET_L,x
 	lda <D_PTR_H
-	sta <M_REF_RET_H,x
+	sta M_REF_RET_H,x
 
 	pla						;set reference pointer
 	sta <D_PTR_H
