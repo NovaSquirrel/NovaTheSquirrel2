@@ -5,6 +5,9 @@
 UPDATE_RATE_HZ	= 160   ;quantization of music events
 BRR_STREAMING = 0       ;set to one to turn on streaming
 
+CHANNEL_COUNT = 11
+FIRST_SFX_CHANNEL = 8
+
 ;---Memory layout---
 ; $0000..$00ef direct page, all driver variables are there
 ; $00f0..$00ff DSP registers
@@ -117,7 +120,6 @@ S_BUFFER_RD:   .res 1
 S_BUFFER_WR:   .res 1
 .endif
 
-CHANNEL_COUNT = 11
 D_CHNVOL:      .res CHANNEL_COUNT
 D_CHNPAN:      .res CHANNEL_COUNT
 
@@ -657,6 +659,20 @@ startSoundEffect:
 	sta <D_TEMP
 	iny
 @loop:
+	; Mute the original channel if it's a sound effect interrupt channel
+	cpx #FIRST_SFX_CHANNEL
+	bcc @NotInterrupt
+		phx
+		; Is it necesary to key off the original note here?
+		lda channelToInterruptForSfx,x
+		tax
+		lda #0
+		sta channelMask,x
+		dec a
+		sta channelDspBase,x
+		plx
+@NotInterrupt:
+
 	phx
 	txa
 	jsr setChannel
@@ -978,6 +994,10 @@ updateChannel:
 	jmp @setInstrument
 
 @jumpLoop:	;255
+	cpx #FIRST_SFX_CHANNEL
+	bcc @NotInterrupt
+		jmp RestoreAfterSoundEffect
+@NotInterrupt:
 
 	jsr readChannelByte
 	pha
@@ -1024,7 +1044,7 @@ updateChannel:
 	jsr readChannelByte		;read pan value
 	sta <D_CHNPAN,x
 	jsr updateChannelVolume	;apply volume and pan
-	bra @readLoop
+	jmp @readLoop
 @setEffectDetune:
 	jsr readChannelByte		;read detune value
 	sta <M_DETUNE,x
@@ -1117,6 +1137,27 @@ initDSPAndVars:
 	jsr streamClearBuffers
 .endif
 	rts
+
+RestoreAfterSoundEffect:
+	; Stop reading bytes for the sound effect's channel
+	lda #0
+	sta <M_PTR_H,x
+
+	; Restore the original channel
+	lda channelToInterruptForSfx,x
+	sta <D_CH0x
+	tax
+	lda initialChannelDspBase,x
+	sta <D_CHx0
+	sta channelDspBase,x
+	lda initialChannelMask,x
+	sta channelMask,x
+
+	; Recalculate everything
+	jsr updateChannelVolume
+	jsr updatePitchForce
+	lda <M_INSTRUMENT,x
+	jmp setInstrument
 
 .if BRR_STREAMING
 ;updates play position for the BRR streamer
@@ -1225,9 +1266,9 @@ setPitch:
 ;in: D_CHx0=channel if the pitch change flag is set
 updatePitch:
 	lda <D_PITCH_UPD
-	bne @update
+	bne updatePitchForce
 	rts
-@update:
+updatePitchForce:
 	ldx <D_CH0x
 
 	lda <M_PITCH_L,x
@@ -1568,6 +1609,9 @@ channelDspBase:
 	.byte $00,$10,$20,$30,$40,$50,$60,$70 ; Music
 	.byte $70, $60, $50 ; Sound effects
 
+channelToInterruptForSfx = * - FIRST_SFX_CHANNEL
+.byt 7, 6, 5
+
 .proc resetChannelMaskDspBase
 	ldx #end-mask-1
 :	lda mask,x
@@ -1584,6 +1628,8 @@ dspBase:
 	.byte $70, $60, $50 ; Sound effects
 end:
 .endproc
+initialChannelDspBase = resetChannelMaskDspBase::dspBase
+initialChannelMask = resetChannelMaskDspBase::mask
 
 .if BRR_STREAMING
 streamBufferPtr:
