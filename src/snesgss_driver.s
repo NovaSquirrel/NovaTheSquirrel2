@@ -267,7 +267,7 @@ cmdChannelVolume:
 	sty <D_CHNVOL,x
 @noVol:
 	inx
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bne @check
 	jsr updateAllChannelsVolume
 	bra commandDone
@@ -281,7 +281,7 @@ cmdMusicPlay:
 
 cmdStopAllSounds:
 	jsr setReady
-	lda #8
+	lda #CHANNEL_COUNT
 	sta <D_MUSIC_CHNS
 	bra stopChannels
 
@@ -635,7 +635,7 @@ startMusic:
 	plx
 
 	inx						;the song requires too many channels, skip those that don't fit
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bcs @done
 
 	iny
@@ -675,7 +675,7 @@ startSoundEffect:
 	plx
 
 	inx
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bcs @done
 
 	iny
@@ -746,7 +746,7 @@ updateMusicPlayer:
 @skipChannel:
 	pla
 	inc
-	cmp #8
+	cmp #CHANNEL_COUNT
 	bne @loop
 
 	jsr bufKeyOffApply
@@ -1108,7 +1108,7 @@ initDSPAndVars:
 	sta <M_INSTRUMENT,x
 
 	inx
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bne @initChannels
 .if BRR_STREAMING
 	jsr streamClearBuffers
@@ -1359,7 +1359,7 @@ updateAllChannelsVolume:
 	jsr updateChannelVolume
 	pla
 	inc
-	cmp #8
+	cmp #CHANNEL_COUNT
 	bne @updVol
 	jsr bufApply
 	rts
