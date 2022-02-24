@@ -13,6 +13,7 @@
 ; Be sure to call spc_wait_boot after that.
 
 .include "snes.inc"
+.include "global.inc"
 .smart
 .i16
 
@@ -138,20 +139,6 @@ waitBBAA:
 
 ; ---------------------------------------------------------
 
-.enum GSS_Commands
-	NO_OP
-	INITIALIZE
-	LOAD
-	STEREO
-	GLOBAL_VOLUME
-	CHANNEL_VOLUME
-	MUSIC_START
-	MUSIC_STOP
-	MUSIC_PAUSE
-	SFX_PLAY
-	STOP_ALL_SOUNDS
-.endenum
-
 .a8
 .export GSS_SendCommand
 .proc GSS_SendCommand
@@ -199,9 +186,7 @@ Length  = 0
 :   lda APU0
 	bne :-
 
-	lda #1   ; Fast load
-	sta APU1
-	lda #GSS_Commands::LOAD
+	lda #GSS_Commands::FAST_LOAD
 	sta APU0
 
 	; Wait for SPC to be ready

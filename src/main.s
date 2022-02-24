@@ -96,11 +96,11 @@ IRIS_EFFECT_END = 30
   jsl spc_boot_apu
   seta8
   .import GSS_SendCommand, GSS_LoadSong
-  lda #1
+  lda #GSS_Commands::INITIALIZE
   jsl GSS_SendCommand
-  lda #1
+  lda #0
   jsl GSS_LoadSong
-  lda #6
+  lda #GSS_Commands::MUSIC_START
   jsl GSS_SendCommand
 
 

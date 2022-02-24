@@ -115,3 +115,31 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
 .macro CollisionMultiRectEnd
   .word $8000
 .endmacro
+
+.enum GSS_SubCommands
+	INITIALIZE
+	STEREO
+	MUSIC_START
+	MUSIC_STOP
+	MUSIC_PAUSE
+	STOP_ALL_SOUNDS
+	FAST_LOAD
+	LOAD
+.endenum
+
+.enum GSS_Commands
+	NO_OP
+	SUBCOMMAND
+	GLOBAL_VOLUME
+	CHANNEL_VOLUME
+	SFX_PLAY
+
+	INITIALIZE      = SUBCOMMAND + (GSS_SubCommands::INITIALIZE << 4)
+	STEREO          = SUBCOMMAND + (GSS_SubCommands::STEREO << 4)
+	MUSIC_START     = SUBCOMMAND + (GSS_SubCommands::MUSIC_START << 4)
+	MUSIC_STOP      = SUBCOMMAND + (GSS_SubCommands::MUSIC_STOP << 4)
+	MUSIC_PAUSE     = SUBCOMMAND + (GSS_SubCommands::MUSIC_PAUSE << 4)
+	STOP_ALL_SOUNDS = SUBCOMMAND + (GSS_SubCommands::STOP_ALL_SOUNDS << 4)
+	FAST_LOAD       = SUBCOMMAND + (GSS_SubCommands::FAST_LOAD << 4)
+	LOAD            = SUBCOMMAND + (GSS_SubCommands::LOAD << 4)
+.endenum

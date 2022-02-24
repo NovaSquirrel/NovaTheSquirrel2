@@ -194,7 +194,7 @@ mainLoopInit:
 
 mainLoop:
 	lda <CPU0				;read command code, when it is zero (<SCMD_NONE), no new command
-	cmp <CPU0
+	cmp <CPU0				;apparently if you read at the same time the other side writes that can cause a problem, so reread
 	bne mainLoop
 	tay
 	beq commandDone
@@ -226,6 +226,12 @@ commandDone:
 	jsr updateGlobalVolume
 	jsr updateMusicPlayer
 	bra mainLoop
+
+cmdSubCommand:
+	tya
+	asl
+	tax
+	jmp [!subCmdList+X]
 
 cmdInitialize:
 	jsr setReady
@@ -349,22 +355,21 @@ cmdSfxPlay:
 
 
 .proc cmdLoad
-	lda <CPU1 ; 0=normal load, 1=faster load
-	bne :+
-		jsr setReady
-	;.if BRR_STREAMING
-	;	jsr streamStop			;stop BRR streaming to prevent glitches after loading
-	;.endif
-		ldx #0
-		stx <D_KON
-		dex
-		stx <D_KOF
-		jsr bufKeyOffApply
-		ldx #$ef
-		txs
-		jmp $ffc9
-	:
+	jsr setReady
+;.if BRR_STREAMING
+;	jsr streamStop			;stop BRR streaming to prevent glitches after loading
+;.endif
+	ldx #0
+	stx <D_KON
+	dex
+	stx <D_KOF
+	jsr bufKeyOffApply
+	ldx #$ef
+	txs
+	jmp $ffc9
+.endproc
 
+.proc cmdFastLoad
 	lda #>GSS_MusicUploadAddress
 	sta store1+2
 	sta store2+2
@@ -1561,22 +1566,26 @@ sendDSPSequence:
 	rts
 
 cmdList:
-	.word 0					;0 no command, means the APU is ready for a new command
-	.word cmdInitialize		;1 initialize DSP
-	.word cmdLoad			;2 load new music data
-	.word cmdStereo			;3 change stereo sound mode, mono by default
-	.word cmdGlobalVolume	;4 set global volume
-	.word cmdChannelVolume	;5 set channel volume
-	.word cmdMusicPlay		;6 start music
-	.word cmdMusicStop		;7 stop music
-	.word cmdMusicPause		;8 pause music
-	.word cmdSfxPlay		;9 play sound effect
-	.word cmdStopAllSounds	;10 stop all sounds
+	.word 0                 ;0 no command, means the APU is ready for a new command
+	.word cmdSubCommand     ;1 run subcommand
+	.word cmdGlobalVolume   ;2 set global volume
+	.word cmdChannelVolume  ;3 set channel volume
+	.word cmdSfxPlay        ;4 play sound effect
 .if BRR_STREAMING
-	.word cmdStreamStart	;11 start sound streaming
-	.word cmdStreamStop		;12 stop sound streaming
-	.word cmdStreamSend		;13 send a block of data if needed
+	.word cmdStreamStart	;5 start sound streaming
+	.word cmdStreamStop		;6 stop sound streaming
+	.word cmdStreamSend		;7 send a block of data if needed
 .endif
+
+subCmdList:
+	.word cmdInitialize     ;0 initialize DSP
+	.word cmdStereo         ;1 change stereo sound mode, mono by default
+	.word cmdMusicPlay      ;2 start music
+	.word cmdMusicStop      ;3 stop music
+	.word cmdMusicPause     ;4 pause music
+	.word cmdStopAllSounds  ;5 stop all sounds
+	.word cmdFastLoad       ;6 load new music data (custom loader)
+	.word cmdLoad           ;7 load new music data (jump to IPL)
 
 notePeriodTable:
 	.word $0042,$0046,$004a,$004f,$0054,$0059,$005e,$0064,$006a,$0070,$0077,$007e
