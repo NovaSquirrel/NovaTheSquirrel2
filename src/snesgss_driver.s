@@ -274,6 +274,7 @@ cmdChannelVolume:
 
 cmdMusicPlay:
 	jsr setReady
+	jsr resetChannelMaskDspBase
 	ldx #0				;music always uses channels starting from 0
 	stx <D_PAUSE			;reset pause flag
 	jsr	startMusic
@@ -281,12 +282,14 @@ cmdMusicPlay:
 
 cmdStopAllSounds:
 	jsr setReady
+	jsr resetChannelMaskDspBase
 	lda #CHANNEL_COUNT
 	sta <D_MUSIC_CHNS
 	bra stopChannels
 
 cmdMusicStop:
 	jsr setReady
+	jsr resetChannelMaskDspBase
 	lda <D_MUSIC_CHNS
 	bne stopChannels
 	jmp commandDone
@@ -1148,10 +1151,10 @@ setReady:
 ;in: A=channel 0..7
 setChannel:
 	sta <D_CH0x
-	asl
-	asl
-	asl
-	asl
+	phx
+	tax
+	lda channelDspBase,x
+	plx
 	sta <D_CHx0
 	rts
 
@@ -1420,6 +1423,10 @@ bufClear:
 ;add register write in buffer
 ;in X=reg, A=value
 bufRegWrite:
+	cpx #255 ; Will be 255 when the channel has its output disabled for a sound effect
+	bne :+
+		rts
+	:
 	pha
 	txa
 	ldx <D_BUFPTR
@@ -1437,7 +1444,7 @@ bufRegWrite:
 bufKeyOn:
 	ldx <D_CH0x
 	lda channelMask,x
-	ora D_KON
+	ora <D_KON
 	sta <D_KON
 	rts
 
@@ -1446,7 +1453,7 @@ bufKeyOn:
 bufKeyOff:
 	ldx <D_CH0x
 	lda channelMask,x
-	ora D_KOF
+	ora <D_KOF
 	sta <D_KOF
 	rts
 
@@ -1555,7 +1562,28 @@ vibratoTable:
 	.byte $c1,$c5,$c8,$cc,$d0,$d4,$d8,$dc,$e0,$e4,$e8,$ec,$f0,$f4,$f8,$fc
 
 channelMask:
-	.byte $01,$02,$04,$08,$10,$20,$40,$80
+	.byte $01,$02,$04,$08,$10,$20,$40,$80 ; Music
+	.byte $80, $40, $20 ; Sound effects
+channelDspBase:
+	.byte $00,$10,$20,$30,$40,$50,$60,$70 ; Music
+	.byte $70, $60, $50 ; Sound effects
+
+.proc resetChannelMaskDspBase
+	ldx #end-mask-1
+:	lda mask,x
+	sta channelMask,x
+	dex
+	bpl :-
+	rts
+
+mask:
+	.byte $01,$02,$04,$08,$10,$20,$40,$80 ; Music
+	.byte $80, $40, $20 ; Sound effects
+dspBase:
+	.byte $00,$10,$20,$30,$40,$50,$60,$70 ; Music
+	.byte $70, $60, $50 ; Sound effects
+end:
+.endproc
 
 .if BRR_STREAMING
 streamBufferPtr:
