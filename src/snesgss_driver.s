@@ -1,9 +1,12 @@
 .setcpu "none"
 .include "spc-65c02.inc"
-.export spc_entry, fast_spc_entry, GSS_MusicUploadAddress, SongDirectory
+.export spc_entry, GSS_MusicUploadAddress, SongDirectory
 
 UPDATE_RATE_HZ	= 160   ;quantization of music events
 BRR_STREAMING = 0       ;set to one to turn on streaming
+
+CHANNEL_COUNT = 11
+FIRST_SFX_CHANNEL = 8
 
 ;---Memory layout---
 ; $0000..$00ef direct page, all driver variables are there
@@ -117,34 +120,37 @@ S_BUFFER_RD:   .res 1
 S_BUFFER_WR:   .res 1
 .endif
 
-D_CHNVOL:      .res 8
-D_CHNPAN:      .res 8
+D_CHNVOL:      .res CHANNEL_COUNT
+D_CHNPAN:      .res CHANNEL_COUNT
 
-M_PTR_L:       .res 8
-M_PTR_H:       .res 8
-M_WAIT_L:      .res 8
-M_WAIT_H:      .res 8
-M_PITCH_L:     .res 8
-M_PITCH_H:     .res 8
-M_VOL:         .res 8
-M_DETUNE:      .res 8
-M_SLIDE:       .res 8
-M_PORTAMENTO:  .res 8
-M_PORTA_TO_L:  .res 8
-M_PORTA_TO_H:  .res 8
-M_MODULATION:  .res 8
-M_MOD_OFF:     .res 8
-M_REF_LEN:     .res 8
-M_REF_RET_L:   .res 8
-M_REF_RET_H:   .res 8
-M_INSTRUMENT:  .res 8
+M_PTR_L:       .res CHANNEL_COUNT
+M_PTR_H:       .res CHANNEL_COUNT
+M_WAIT_L:      .res CHANNEL_COUNT
+M_WAIT_H:      .res CHANNEL_COUNT
+M_PITCH_L:     .res CHANNEL_COUNT
+M_PITCH_H:     .res CHANNEL_COUNT
+M_VOL:         .res CHANNEL_COUNT
+M_DETUNE:      .res CHANNEL_COUNT
+M_SLIDE:       .res CHANNEL_COUNT
+M_PORTAMENTO:  .res CHANNEL_COUNT
+M_PORTA_TO_L:  .res CHANNEL_COUNT
+M_PORTA_TO_H:  .res CHANNEL_COUNT
+M_MODULATION:  .res CHANNEL_COUNT
+M_MOD_OFF:     .res CHANNEL_COUNT
+M_REF_LEN:     .res CHANNEL_COUNT
+;M_REF_RET_L:   .res CHANNEL_COUNT
+;M_REF_RET_H:   .res CHANNEL_COUNT
+M_INSTRUMENT:  .res CHANNEL_COUNT
 
 COMMAND_COUNT: .res 1 ; Used for acknowledgement
 
 ;DSP registers write buffer located in the stack page, as it is not used for the most part
 ;first four bytes are reserved for shortest echo buffer
 
-D_BUFFER         = $0104
+M_REF_RET_L = $0104
+M_REF_RET_H = M_REF_RET_L + CHANNEL_COUNT
+D_BUFFER    = M_REF_RET_H + CHANNEL_COUNT
+
 streamBufSize    = 28		;how many BRR blocks in a buffer, max is 28 (28*9=252)
 streamSampleRate = 16000	;stream sample rate
 streamData       = $ffc0-(streamBufSize*9*9) ;fixed location for streaming data
@@ -263,13 +269,14 @@ cmdChannelVolume:
 	sty <D_CHNVOL,x
 @noVol:
 	inx
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bne @check
 	jsr updateAllChannelsVolume
 	bra commandDone
 
 cmdMusicPlay:
 	jsr setReady
+	jsr resetChannelMaskDspBase
 	ldx #0				;music always uses channels starting from 0
 	stx <D_PAUSE			;reset pause flag
 	jsr	startMusic
@@ -277,12 +284,14 @@ cmdMusicPlay:
 
 cmdStopAllSounds:
 	jsr setReady
-	lda #8
+	jsr resetChannelMaskDspBase
+	lda #CHANNEL_COUNT
 	sta <D_MUSIC_CHNS
 	bra stopChannels
 
 cmdMusicStop:
 	jsr setReady
+	jsr resetChannelMaskDspBase
 	lda <D_MUSIC_CHNS
 	bne stopChannels
 	jmp commandDone
@@ -631,7 +640,7 @@ startMusic:
 	plx
 
 	inx						;the song requires too many channels, skip those that don't fit
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bcs @done
 
 	iny
@@ -650,6 +659,20 @@ startSoundEffect:
 	sta <D_TEMP
 	iny
 @loop:
+	; Mute the original channel if it's a sound effect interrupt channel
+	cpx #FIRST_SFX_CHANNEL
+	bcc @NotInterrupt
+		phx
+		; Is it necesary to key off the original note here?
+		lda channelToInterruptForSfx,x
+		tax
+		lda #0
+		sta channelMask,x
+		dec a
+		sta channelDspBase,x
+		plx
+@NotInterrupt:
+
 	phx
 	txa
 	jsr setChannel
@@ -671,7 +694,7 @@ startSoundEffect:
 	plx
 
 	inx
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bcs @done
 
 	iny
@@ -742,7 +765,7 @@ updateMusicPlayer:
 @skipChannel:
 	pla
 	inc
-	cmp #8
+	cmp #CHANNEL_COUNT
 	bne @loop
 
 	jsr bufKeyOffApply
@@ -770,9 +793,9 @@ readChannelByte:
 	dec <M_REF_LEN,x		;decrement reference length
 	bne @done
 
-	lda <M_REF_RET_L,x		;restore original pointer
+	lda M_REF_RET_L,x		;restore original pointer
 	sta <D_PTR_L
-	lda <M_REF_RET_H,x
+	lda M_REF_RET_H,x
 	sta <D_PTR_H
 @done:
 	pla
@@ -971,6 +994,10 @@ updateChannel:
 	jmp @setInstrument
 
 @jumpLoop:	;255
+	cpx #FIRST_SFX_CHANNEL
+	bcc @NotInterrupt
+		jmp RestoreAfterSoundEffect
+@NotInterrupt:
 
 	jsr readChannelByte
 	pha
@@ -1017,7 +1044,7 @@ updateChannel:
 	jsr readChannelByte		;read pan value
 	sta <D_CHNPAN,x
 	jsr updateChannelVolume	;apply volume and pan
-	bra @readLoop
+	jmp @readLoop
 @setEffectDetune:
 	jsr readChannelByte		;read detune value
 	sta <M_DETUNE,x
@@ -1045,9 +1072,9 @@ updateChannel:
 	sta <M_REF_LEN,x
 
 	lda <D_PTR_L			;remember previous pointer as the return address
-	sta <M_REF_RET_L,x
+	sta M_REF_RET_L,x
 	lda <D_PTR_H
-	sta <M_REF_RET_H,x
+	sta M_REF_RET_H,x
 
 	pla						;set reference pointer
 	sta <D_PTR_H
@@ -1104,12 +1131,33 @@ initDSPAndVars:
 	sta <M_INSTRUMENT,x
 
 	inx
-	cpx #8
+	cpx #CHANNEL_COUNT
 	bne @initChannels
 .if BRR_STREAMING
 	jsr streamClearBuffers
 .endif
 	rts
+
+RestoreAfterSoundEffect:
+	; Stop reading bytes for the sound effect's channel
+	lda #0
+	sta <M_PTR_H,x
+
+	; Restore the original channel
+	lda channelToInterruptForSfx,x
+	sta <D_CH0x
+	tax
+	lda initialChannelDspBase,x
+	sta <D_CHx0
+	sta channelDspBase,x
+	lda initialChannelMask,x
+	sta channelMask,x
+
+	; Recalculate everything
+	jsr updateChannelVolume
+	jsr updatePitchForce
+	lda <M_INSTRUMENT,x
+	jmp setInstrument
 
 .if BRR_STREAMING
 ;updates play position for the BRR streamer
@@ -1144,10 +1192,10 @@ setReady:
 ;in: A=channel 0..7
 setChannel:
 	sta <D_CH0x
-	asl
-	asl
-	asl
-	asl
+	phx
+	tax
+	lda channelDspBase,x
+	plx
 	sta <D_CHx0
 	rts
 
@@ -1218,9 +1266,9 @@ setPitch:
 ;in: D_CHx0=channel if the pitch change flag is set
 updatePitch:
 	lda <D_PITCH_UPD
-	bne @update
+	bne updatePitchForce
 	rts
-@update:
+updatePitchForce:
 	ldx <D_CH0x
 
 	lda <M_PITCH_L,x
@@ -1355,7 +1403,7 @@ updateAllChannelsVolume:
 	jsr updateChannelVolume
 	pla
 	inc
-	cmp #8
+	cmp #CHANNEL_COUNT
 	bne @updVol
 	jsr bufApply
 	rts
@@ -1416,6 +1464,10 @@ bufClear:
 ;add register write in buffer
 ;in X=reg, A=value
 bufRegWrite:
+	cpx #255 ; Will be 255 when the channel has its output disabled for a sound effect
+	bne :+
+		rts
+	:
 	pha
 	txa
 	ldx <D_BUFPTR
@@ -1433,7 +1485,7 @@ bufRegWrite:
 bufKeyOn:
 	ldx <D_CH0x
 	lda channelMask,x
-	ora D_KON
+	ora <D_KON
 	sta <D_KON
 	rts
 
@@ -1442,7 +1494,7 @@ bufKeyOn:
 bufKeyOff:
 	ldx <D_CH0x
 	lda channelMask,x
-	ora D_KOF
+	ora <D_KOF
 	sta <D_KOF
 	rts
 
@@ -1551,7 +1603,33 @@ vibratoTable:
 	.byte $c1,$c5,$c8,$cc,$d0,$d4,$d8,$dc,$e0,$e4,$e8,$ec,$f0,$f4,$f8,$fc
 
 channelMask:
-	.byte $01,$02,$04,$08,$10,$20,$40,$80
+	.byte $01,$02,$04,$08,$10,$20,$40,$80 ; Music
+	.byte $80, $40, $20 ; Sound effects
+channelDspBase:
+	.byte $00,$10,$20,$30,$40,$50,$60,$70 ; Music
+	.byte $70, $60, $50 ; Sound effects
+
+channelToInterruptForSfx = * - FIRST_SFX_CHANNEL
+.byt 7, 6, 5
+
+.proc resetChannelMaskDspBase
+	ldx #end-mask-1
+:	lda mask,x
+	sta channelMask,x
+	dex
+	bpl :-
+	rts
+
+mask:
+	.byte $01,$02,$04,$08,$10,$20,$40,$80 ; Music
+	.byte $80, $40, $20 ; Sound effects
+dspBase:
+	.byte $00,$10,$20,$30,$40,$50,$60,$70 ; Music
+	.byte $70, $60, $50 ; Sound effects
+end:
+.endproc
+initialChannelDspBase = resetChannelMaskDspBase::dspBase
+initialChannelMask = resetChannelMaskDspBase::mask
 
 .if BRR_STREAMING
 streamBufferPtr:
@@ -1618,57 +1696,3 @@ BRRStreamInitData:
 
 ;------------------------------------------------------------------------------------------------------
 .include "../audio/gss_data.s"
-
-.import __SPCIMAGE_RUN__, __SPCIMAGE_LOAD__, __SPCIMAGE_SIZE__
-
-.segment "SPCFASTBOOT"
-.export fast_spc_entry
-.proc fast_spc_entry
-	clrp
-	mov <CPU0,#69
-	mov <CTRL, #%10010001 ; Reset latch for CPU0 and CPU1, enable timer and IPL
-
-	ldy #0
-:	lda <CPU0
-	cmp #1
-	bne :-
-	bra loop2
-
-loop1:
-	lda <CPU1
-	ldx <CPU2
-	mov <CPU0, #$01
-store1:
-	sta __SPCIMAGE_RUN__,y
-	iny
-	txa
-store2:
-	sta __SPCIMAGE_RUN__,y
-	iny
-	bne :+
-		inc <store1+2
-		inc <store2+2
-		inc <store3+2
-		inc <store4+2
-	:
-	;----------------------------------
-loop2:
-	lda <CPU1
-	ldx <CPU2
-	mov <CPU0, #$80
-store3:
-	sta __SPCIMAGE_RUN__,y
-	iny
-	txa
-store4:
-	sta __SPCIMAGE_RUN__,y
-	iny
-wait2:
-	lda <CPU0
-	bpl loop1
-
-exit:
-	mov <CPU0, #$65
-	mov <CPU1, #$ca
-	jmp spc_entry
-.endproc

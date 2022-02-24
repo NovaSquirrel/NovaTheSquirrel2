@@ -119,72 +119,20 @@ waitBBAA:
 
 .import spc_entry, fast_spc_entry, GSS_MusicUploadAddress, SongDirectory
 .import __SPCIMAGE_RUN__, __SPCIMAGE_LOAD__, __SPCIMAGE_SIZE__
-.import __SPCFASTBOOT_RUN__, __SPCFASTBOOT_LOAD__, __SPCFASTBOOT_SIZE__
 
 .proc spc_boot_apu
 	setxy16
 	jsr spc_wait_boot
 
-	; Upload the initial bootloader to the SPC
-	ldy #__SPCFASTBOOT_RUN__
+	ldy #__SPCIMAGE_RUN__
 	jsr spc_begin_upload
 :	tyx
-	lda f:__SPCFASTBOOT_LOAD__,x
+	lda f:__SPCIMAGE_LOAD__,x
 	jsr spc_upload_byte
-	cpy #__SPCFASTBOOT_SIZE__
-	bne :-
-	ldy #fast_spc_entry
-	jsr spc_execute
-
-	; Interface with the fast loader that was just loaded in
-:	lda APU0 ; Wait for it to be ready
-	cmp #69
-	bne :-
-
-	Pointer = 0
-    lda #<__SPCIMAGE_LOAD__
-    sta Pointer+0
-    lda #>__SPCIMAGE_LOAD__
-    sta Pointer+1
-    lda #^__SPCIMAGE_LOAD__
-    sta Pointer+2
-
-	ldy #0
-Upload:
-	lda [Pointer],y
-	sta APU1
-	iny
-	lda [Pointer],y
-	sta APU2
-	iny
-	lda #1
-	sta APU0
-:	lda APU0
-	bpl :-
-
-	lda [Pointer],y
-	sta APU1
-	iny
-	lda [Pointer],y
-	sta APU2
-	iny
 	cpy #__SPCIMAGE_SIZE__
-	bcs Exit
-	:	lda APU0
-		bmi :-
-		bra Upload
-	Exit:
-
-	; Finish up
-	lda #$80    ; Let the SPC know it's done
-	sta APU0
-	seta16
-:	lda APU0
-	cmp #$ca65  ; Signalled when spc700 side hits "exit"
 	bne :-
-:	lda APU0    ; spc700 clears APU0 and APU1 when it hits "setReady"
-	bne :-
-	seta8
+	ldy #spc_entry
+	jsr spc_execute
 	rtl
 .endproc
 
