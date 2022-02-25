@@ -112,7 +112,7 @@ IRIS_EFFECT_END = 30
   lda #GSS_Commands::ECHO_VOLUME_CHANNELS
   jsl GSS_SendCommandParamX
   ldx #0 | ($50<<8) ; FIR set, feedback
-  lda #GSS_Commands::ECHO_FEEDBACK_FIR
+  lda #GSS_Commands::ECHO_FIR_FEEDBACK
   jsl GSS_SendCommandParamX
 
   lda #GSS_Commands::MUSIC_START
