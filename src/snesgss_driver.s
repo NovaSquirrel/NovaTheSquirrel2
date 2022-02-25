@@ -559,9 +559,9 @@ streamStop:
 	lda #0
 	sta S_ENABLE
 	lda #DSP_KOF	;stop channels 6 and 7
-	sta ADDR
+	sta <ADDR
 	lda #$c0
-	sta DATA
+	sta <DATA
 	jsr updateAllChannelsVolume
 	rts
 
@@ -651,6 +651,7 @@ echo_off:
 	lda #DSP_EDL ; Echo delay (and buffer size) in 2KB chunks. or 0 is 4 bytes
 	sta <ADDR
 	lda <CPU3
+	jsr setReady
 	and #$0f ; Sanitize
 	sta <DATA
 	asl a ;2
@@ -679,7 +680,7 @@ loop2:
 	bne loop2
 	dey
 	bne loop2
-	jmp SetReadyAndDone
+	jmp commandDone
 .endproc
 
 .proc cmdFeedbackFir
