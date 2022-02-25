@@ -100,6 +100,13 @@ spc_wait_boot_without_clear = spc_wait_boot::without_clear
 @wait:
   cmp APU0
   bne @wait
+
+  ; Specific to this music engine:
+  ; There will be a BB left over in APU1 from the IPL - wait for it to go away, which signals the SPC is ready
+  seta16
+: lda APU0
+  bne :-
+  seta8
   rts
 .endproc
 
@@ -168,8 +175,6 @@ NoWrite:
 	rtl
 .endproc
 
-FAST_LOAD = 0
-
 .export GSS_LoadSong
 .proc GSS_LoadSong
 Pointer = 2
@@ -191,11 +196,11 @@ Length  = 0
 :   lda APU0
 	bne :-
 
+.if 1
+	.import GSS_MusicUploadAddress
 	lda #GSS_Commands::LOAD
 	sta APU0
 
-.if 1
-	.import GSS_MusicUploadAddress
 	setxy16
 	jsr spc_wait_boot_without_clear
 
