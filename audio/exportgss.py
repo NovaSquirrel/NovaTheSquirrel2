@@ -2,6 +2,8 @@ from encodesong import encode_song
 from encodebrr import encode_brr
 import sys
 LocalPrefix = "L_" # This prefix marks an instrument as using a local sample
+StreamingEnabled = False
+StreamingOffset = 9 if StreamingEnabled else 0
 
 if len(sys.argv) < 3:
 	print("Syntax: exportgss.py data.s enum.s List.gss Of.gss Songs.gss")
@@ -162,10 +164,10 @@ def export_files(outfile, outenum, files):
 			data = m.instruments[used]
 			for i, v in enumerate(combined_instruments):
 				if v.props == data.props:
-					m.instrument_remap[used] = i
+					m.instrument_remap[used] = i + StreamingOffset
 					break
 			else:
-				m.instrument_remap[used] = len(combined_instruments)
+				m.instrument_remap[used] = len(combined_instruments) + StreamingOffset
 				data.encode_as_brr() # Prepare
 				combined_instruments.append(data)
 
@@ -187,7 +189,7 @@ def export_files(outfile, outenum, files):
 		for local in s.local_instruments:
 			instrument_data = s.module.instruments[local]
 			instrument_data.encode_as_brr()
-			s.instrument_remap[local] = len(all_local_instruments) + len(combined_instruments)
+			s.instrument_remap[local] = len(all_local_instruments) + len(combined_instruments) + StreamingOffset
 			s.output_local_instruments.add(len(all_local_instruments)) 
 			all_local_instruments.append(instrument_data)
 	for s in combined_effects:
@@ -200,7 +202,7 @@ def export_files(outfile, outenum, files):
 
 	# Step 1. Directories
 	out.write('.include "snesgss.inc"\n')
-	out.write('GSS_SampleADSR:\n')
+	out.write('GSS_SampleADSR = * - %d\n' % (StreamingOffset*2))
 	for i in combined_instruments:
 		out.write('\t.byte %s\n' % i.adsr_string())
 	for i in all_local_instruments:
@@ -211,6 +213,10 @@ def export_files(outfile, outenum, files):
 	out.write('\tSOUND_EFFECT_COUNT = %d\n' % len(combined_effects))
 	out.write('.align 256\n')
 	out.write('GSS_SampleDirectory:\n')
+	if StreamingEnabled:
+		for i in range(1,9):
+			out.write('\t.addr streamData%d, streamData%d\n' % (i, i))
+		out.write('\t.addr streamSync, streamSync\n')
 	for i, data in enumerate(combined_instruments):
 		out.write('\t.addr instrument_addr_%d, instrument_addr_%d+%d\n' % (i, i, data.brr_loop))
 	for i, data in enumerate(all_local_instruments):
