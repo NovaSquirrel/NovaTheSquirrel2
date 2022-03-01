@@ -21,6 +21,10 @@
 
 CommonTileBase = $40
 
+; Synchronize with vblank.s
+AbilityGraphicsSource      = TouchTemp
+AbilityIconGraphicSource   = TouchTemp + 2
+
 .segment "C_Player"
 
 .a16
@@ -59,10 +63,8 @@ CommonTileBase = $40
   sta COPYSTART
 
   ; Bottom row -------------------
-  seta16
-  lda #(SpriteCHRBase+$200)>>1
-  sta PPUADDR
-  seta8
+  ldx #(SpriteCHRBase+$200)>>1
+  stx PPUADDR
   lda #%00000010
   sta COPYSTART
 
@@ -93,66 +95,39 @@ CommonTileBase = $40
     .import AbilityIcons
     lda #^AbilityIcons
     sta DMAADDRBANK+$00
-    sta DMAADDRBANK+$10
 
-    seta16
-    lda PlayerAbility
-    and #255
-    xba ; Multiply by 256
-    lsr ; Divide by 2 to get 128
-    add #.loword(AbilityIcons)
-    sta DMAADDR+$00
-    add #64
-    sta DMAADDR+$10
-
-    lda #32*2 ; 2 tiles for each DMA
-    sta DMALEN+$00
-    sta DMALEN+$10
+    ldx AbilityIconGraphicSource
+    stx DMAADDR+$00
+    ldy #32*2 ; 2 tiles for each DMA
+    sty DMALEN+$00
 
     ; Top row ----------------------
-    lda #(SpriteCHRBase+$100)>>1
-    sta PPUADDR
-    seta8
+    ldx #(SpriteCHRBase+$100)>>1
+    stx PPUADDR
     lda #%00000001
     sta COPYSTART
 
     ; Bottom row -------------------
-    seta16
-    lda #(SpriteCHRBase+$300)>>1
-    sta PPUADDR
-    seta8
-    lda #%00000010
+    sty DMALEN+$00
+    ldx #(SpriteCHRBase+$300)>>1
+    stx PPUADDR
     sta COPYSTART
 
     ; Ability graphics -------------
-    phk
-    plb
-    seta16
-    lda PlayerAbility
-    and #255
-    tay
-    .import AbilityTilesetForId
-    lda AbilityTilesetForId,y
-    and #255
-    xba
-    asl
-    asl
-    .import AbilityGraphics
-    adc #.loword(AbilityGraphics) ; assert((PS & 1) == 0) Carry always clear here
-    sta DMAADDR
+    ldx AbilityGraphicsSource
+    stx DMAADDR
 
-    lda #1024 ; Two rows of tiles
-    sta DMALEN
-    lda #(SpriteCHRBase+$400)>>1
-    sta PPUADDR
-    seta8
+    ldx #1024 ; Two rows of tiles
+    stx DMALEN
+    ldx #(SpriteCHRBase+$400)>>1
+    stx PPUADDR
     lda #%00000001
     sta COPYSTART
 
-    stz NeedAbilityChange
-    stz NeedAbilityChangeSilent
     stz TailAttackTimer
     stz AbilityMovementLock
+    stz NeedAbilityChange
+    stz NeedAbilityChangeSilent
   NoNeedAbilityChange:
 
   plp

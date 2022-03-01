@@ -18,9 +18,63 @@
 ; This file has Nova the Squirrel 2's vblank handling code,
 ; and is included by main.s
 
+; Synchronize with playerdraw.s
+AbilityGraphicsSource      = TouchTemp
+AbilityIconGraphicSource   = TouchTemp + 2
+PaletteRequestUploadIndex  = TouchTemp + 4
+PaletteRequestSource       = TouchTemp + 5
+
 VblankHandler:
+  seta16
+  ; Prepare for vblank
+  lda NeedAbilityChange
+  and #255
+  beq :+
+    .import AbilityTilesetForId, AbilityIcons, AbilityGraphics, PaletteList
+    lda PlayerAbility
+    and #255
+    tax
+    lda f:AbilityTilesetForId,x
+    and #255
+    xba
+    asl
+    asl
+    adc #.loword(AbilityGraphics) ; assert((PS & 1) == 0) Carry always clear here
+    sta AbilityGraphicsSource
+    ;---
+    lda PlayerAbility
+    and #255
+    xba ; Multiply by 256
+    lsr ; Divide by 2 to get 128
+    add #.loword(AbilityIcons)
+    sta AbilityIconGraphicSource
+  :
+  seta8
+  lda PaletteRequestIndex
+  beq :+
+    asl
+    asl
+    asl
+    sec
+    rol
+    sta PaletteRequestUploadIndex
+
+    seta16
+    lda PaletteRequestValue
+    and #255
+    sta 0
+    asl
+    asl
+    asl
+    asl
+    sub 0
+    asl
+    add #PaletteList & $ffff
+    sta PaletteRequestSource
+  :
+
   ; Pack the second OAM table together into the format the PPU expects
-  jsl ppu_pack_oamhi_partial
+  jsl ppu_pack_oamhi_partial ; does seta8
   ; And once that's out of the way, wait until vertical blank where
   ; I can actually copy all of the prepared OAM to the PPU
   jsl WaitVblank
@@ -238,10 +292,21 @@ SkipBlock:
   lda PaletteRequestIndex
   and #255
   beq :+
-    tay
-    lda PaletteRequestValue ; Do 16-bit read anyway because DoPaletteUpload will mask off the high byte
-    jsl DoPaletteUpload
-    stz PaletteRequestIndex ; Also clears the value since it's the next byte
+     lda PaletteRequestSource
+     sta DMAADDR
+     lda #DMAMODE_CGDATA
+     sta DMAMODE ; Upload to CGRAM
+     lda #15*2
+     sta DMALEN ; Size
+     seta8
+     lda #^PaletteList
+     sta DMAADDRBANK ; Source bank
+     lda PaletteRequestUploadIndex
+     sta CGADDR
+     ; Initiate the transfer
+     lda #%00000001
+     sta COPYSTART
+     stz PaletteRequestIndex
   :
 
   ; -----------------------------------

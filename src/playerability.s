@@ -1010,6 +1010,16 @@ QueueUpdate:
 ; 13 SWORD5 14 SWORD5
 ; 15 SWORD6 16 SWORD6 17 SWORD6
 ; 18 IDLE   19 IDLE 20 IDLE 21 IDLE 22 IDLE
+
+AttackSwordSequence:
+  .byt PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1
+  .byt PlayerFrame::SWORD2, PlayerFrame::SWORD2
+  .byt PlayerFrame::SWORD3, PlayerFrame::SWORD3, PlayerFrame::SWORD3
+  .byt PlayerFrame::SWORD4, PlayerFrame::SWORD4
+  .byt PlayerFrame::SWORD5, PlayerFrame::SWORD5
+  .byt PlayerFrame::SWORD6, PlayerFrame::SWORD6, PlayerFrame::SWORD6
+  .byt PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE
+AttackSwordSequenceEnd:
 .endproc
 
 .pushseg
@@ -1339,13 +1349,3 @@ AttackBelowAnimationSequence:
   .byt PlayerFrame::ATTACK8, PlayerFrame::ATTACK8
   .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
 AttackBelowAnimationSequenceEnd:
-
-AttackSwordSequence:
-  .byt PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1
-  .byt PlayerFrame::SWORD2, PlayerFrame::SWORD2
-  .byt PlayerFrame::SWORD3, PlayerFrame::SWORD3, PlayerFrame::SWORD3
-  .byt PlayerFrame::SWORD4, PlayerFrame::SWORD4
-  .byt PlayerFrame::SWORD5, PlayerFrame::SWORD5
-  .byt PlayerFrame::SWORD6, PlayerFrame::SWORD6, PlayerFrame::SWORD6
-  .byt PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE
-AttackSwordSequenceEnd:
