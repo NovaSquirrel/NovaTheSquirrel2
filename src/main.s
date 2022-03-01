@@ -225,13 +225,21 @@ DelayedBlockLoop:
   bpl DelayedBlockLoop
 
   ; Run stuff for this frame
-  stz OamPtr
-;  lda RunGameLogic
-;  lsr
-;  bcc :+
-    jsl RunPlayer
-;  :
+  stz HighPriorityOAMIndex
+  lda #4*(4)
+  sta PlayerOAMIndex
+  lda #4*(4+5)
+  sta OamPtr
+  seta8
+  ; Start out with the first four sprites offscreen
+  lda #$f0
+  sta OAM_YPOS+(4*0)
+  sta OAM_YPOS+(4*1)
+  sta OAM_YPOS+(4*2)
+  sta OAM_YPOS+(4*3)
+  seta16
 
+  jsl RunPlayer
   jsl AdjustCamera
 
   ; Calculate the scroll positions ahead of time so their integer values are ready
@@ -288,30 +296,8 @@ DelayedBlockLoop:
     jsl FG2TilemapUpdate
   @NotTwoLayer:
 
-  ; Make a 5 sprite hole to fill later
-  lda OamPtr
-  sta PlayerOAMIndex
-  add #4*5
-  sta OamPtr
-
-  ; If you're holding onto something, reserve a sprite slot above the player to draw it
-  lda PlayerHoldingSomething
-  lsr
-  bcc :+
-    lda PlayerOAMIndex
-    sta ActorHeldOAMIndex
-    add #4
-    sta PlayerOAMIndex
-    lda OamPtr
-    add #4
-    sta OamPtr
-  :
-
   jsl DrawPlayerStatus
 
-;  lda RunGameLogic
-;  lsr
-;  bcc SkipActors
   ; Move all of the actors that are standing on a second FG layer
   bit TwoLayerInteraction-1
   bpl @NotTwoLayerForActors
@@ -339,8 +325,7 @@ DelayedBlockLoop:
     bne @TwoLayerActorLoop
   @NotTwoLayerForActors:
 
-    jsl RunAllActors
-;  SkipActors:
+  jsl RunAllActors
   jsl DrawPlayer
   .a16
   .i16

@@ -17,4 +17,5 @@ PlayerGraphics:
 .incbin "../tilesetsX/NovaWalkHold.chr"
 .incbin "../tilesetsX/NovaJumpHold.chr"
 .incbin "../tilesetsX/NovaFallHold.chr"
+.incbin "../tilesetsX/NovaSword.chr"
 

@@ -338,6 +338,22 @@ HaveY:
   :
 
   seta8
+  ; Draw an ability too, if needed
+  lda OldTailAttackTimer
+  beq :+
+    tdc ; Clear A
+    lda PlayerAbility
+    asl
+    tax
+    php
+    phk
+    plb
+    .import AbilityDrawRoutineForId
+    assert_same_banks DrawPlayer, AbilityDrawRoutineForId
+    jsr (.loword(AbilityDrawRoutineForId),x)
+    plp
+  :
+
   lda TailAttackTimer
   beq NoTailAttack
     lda TailAttackFrame
@@ -366,6 +382,7 @@ HaveY:
     inx
     stx OamPtr
   DontOfferAPress:
+
 CalculateNextFrame:
   seta8
   stz PlayerFrame
@@ -470,7 +487,6 @@ CalculateNextFrame:
       inc PlayerFrameYFlip
   NoRoll:
 
-
 Exit:
   setaxy16
   rtl
@@ -494,7 +510,7 @@ CalculateNextPlayerFrame = DrawPlayer::CalculateNextFrame
 .proc DrawPlayerStatus
   ldx OamPtr
   ; -----------------------------------
-  ; But we still need to draw the health meter
+  ; Draw the health meter
   HealthCount = 0
   HealthX = 1
   seta8

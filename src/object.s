@@ -2818,7 +2818,7 @@ IsHolding:
   ply ; Save for later
   lda OamPtr
   pha
-  lda ActorHeldOAMIndex
+  lda HighPriorityOAMIndex
   sta OamPtr
   tya ; Get the tile number now
   jsl DispActor16x16

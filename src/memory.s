@@ -188,7 +188,7 @@
   PlayerDrawX: .res 1
   PlayerDrawY: .res 1
   PlayerOAMIndex: .res 2
-  ActorHeldOAMIndex: .res 2
+  HighPriorityOAMIndex: .res 2
 
   ; Mirrors, for effects
   FGScrollXPixels: .res 2
@@ -221,7 +221,6 @@ LevelZeroWhenLoad_Start:
   ForegroundLayerThree:   .res 1 ; The second foreground layer is on layer 3, not layer 2
   LevelFadeIn:            .res 1 ; Timer for fading the level in
   LevelIrisIn:            .res 1 ; Timer for doing the "iris in" effect
-  RunGameLogic:           .res 1 ; If nonzero, run all of the game logic
   FG2MovementRoutine:     .res 3 ; Pointer for a routine to call every frame
   ToggleSwitch1:          .res 1
   ToggleSwitch2:          .res 1
@@ -298,9 +297,11 @@ LevelZeroWhenLoad_Start:
   OfferAPress: .res 1 ; Pressing A will do something
 
   TailAttackTimer:     .res 1 ; How far we are into the animation
+  OldTailAttackTimer:  .res 1 ; Copy of TailAttackTimer
   TailAttackDirection: .res 1 ; What directional keys were pressed
   TailAttackFrame:     .res 1 ; Current frame to use for the player during the attack
   TailAttackCooldown:  .res 1 ; Frames before the attack button can be used again
+  TailAttackDynamicSlot: .res 1
   AbilityMovementLock: .res 1
   CopyingAnimationTimer: .res 1
 LevelZeroWhenLoad_End:

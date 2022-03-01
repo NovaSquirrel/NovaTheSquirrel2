@@ -86,7 +86,7 @@
 .global PlayerDrawX
 .global PlayerDrawY
 .global PlayerOAMIndex
-.global ActorHeldOAMIndex
+.global HighPriorityOAMIndex
 
 .global ColumnUpdateAddress, ColumnUpdateAddress2
 .global ColumnUpdateBuffer, ColumnUpdateBuffer2
@@ -247,7 +247,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
 .global GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, SecondFGTilemapPointer
-.global LevelFadeIn, LevelIrisIn, RunGameLogic, FG2MovementRoutine
+.global LevelFadeIn, LevelIrisIn, FG2MovementRoutine
 .global ToggleSwitch1, ToggleSwitch2, ToggleSwitch3
 
 .globalzp random1
@@ -264,7 +264,7 @@ SCREEN_BOUNDARY = 1 ; boundary on left side of screen
 .global LevelActorBuffer
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
-.global TailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable
+.global TailAttackTimer, OldTailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable, TailAttackDynamicSlot
 .global AbilityMovementLock
 .global CopyingAnimationTimer
 

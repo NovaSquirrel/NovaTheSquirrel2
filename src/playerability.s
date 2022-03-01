@@ -23,8 +23,9 @@
 .import ActorClearX, PlayerNegIfLeft, SpeedAngle2Offset256
 .import BlockRunInteractionBelow, CountProjectileAmount
 .import InitActorX, CalculateNextPlayerFrame
+.import AllocateDynamicSpriteSlot, FreeDynamicSpriteSlot, QueueDynamicSpriteUpdate
 
-.export AbilityIcons, AbilityGraphics, AbilityTilesetForId, AbilityRoutineForId
+.export AbilityIcons, AbilityGraphics, AbilityTilesetForId, AbilityRunRoutineForId, AbilityDrawRoutineForId
 
 .segment "AbilityGraphics"
 AbilityIcons:
@@ -39,6 +40,7 @@ AbilityGraphics:
   .incbin "../tilesets4/AbilityFire.chrsfc"
   .incbin "../tilesets4/AbilityIce.chrsfc"
   .incbin "../tilesets4/AbilityRocket.chrsfc"
+  .incbin "../tilesets4/AbilitySword.chrsfc"
 SetNone   = 0 ; Don't need anything
 .enum
 SetMisc
@@ -50,6 +52,7 @@ SetBurger
 SetFire
 SetIce
 SetRocket
+SetSword
 .endenum
 
 .segment "C_Player"
@@ -64,14 +67,14 @@ AbilityTilesetForId:
   .byt SetHammer ; Hammer
   .byt SetWater  ; Fishing
   .byt SetMisc   ; Yoyo
-  .byt SetNone   ; Sword
+  .byt SetSword  ; Sword
   .byt SetMirror ; Mirror
   .byt SetNone   ; Wing
   .byt SetRemote ; Remote
   .byt SetRocket ; Rocket
   .byt SetHammer ; Bubble
   .byt SetNone   ; Bounce
-AbilityRoutineForId:
+AbilityRunRoutineForId:
   .addr .loword(RunAbilityNone)
   .addr .loword(RunAbilityBurger)
   .addr .loword(RunAbilityGlider)
@@ -82,14 +85,34 @@ AbilityRoutineForId:
   .addr .loword(RunAbilityHammer)
   .addr .loword(RunAbilityFishing)
   .addr .loword(RunAbilityYoyo)
-  .addr .loword(RunAbilityWheel)
+  .addr .loword(RunAbilitySword)
   .addr .loword(RunAbilityMirror)
   .addr .loword(RunAbilityWing)
   .addr .loword(RunAbilityRemote)
   .addr .loword(RunAbilityRocket)
   .addr .loword(RunAbilityBubble)
-
+AbilityDrawRoutineForId:
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityBomb)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityFishing)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilityBubble)
 ; -----------------------------------------------------------------------------
+.a8
+.proc DrawAbilityNone
+  rts
+.endproc
 
 .a8
 .proc StepTailSwish
@@ -438,46 +461,6 @@ DoBurgerShared:
     sta TailAttackVariable+1
   :
 NoIncreaseAngle:
-
-  .import MathSinTable, MathCosTable
-  seta16
-  jsr GetAimAngle
-  lda f:MathCosTable,x
-  jsr Reduce
-  sta 0
-  lda f:MathSinTable,x
-  jsr Reduce
-  sta 2
-  seta8
-
-  ; Draw the angle
-  tdc ; Clear A
-  lda PlayerDir
-  tay
-  ldx OamPtr
-
-  lda PlayerDrawX
-  add 0
-  sub #4
-  sta OAM_XPOS+(4*0),x
-  lda PlayerDrawY
-  sub #16
-  add 2
-  sta OAM_YPOS+(4*0),x
-
-  seta16
-  lda #$6c|OAM_PRIORITY_2
-  sta OAM_TILE+(4*0),x
-  stz OAMHI+(4*0),x
-  txa
-  add #4
-  sta OamPtr
-  seta8
-  rts
-
-.a16
-Reduce:
-  asr_n 10
   rts
 
 .a16
@@ -567,6 +550,55 @@ BombBelow:
     seta16
     jsr AbilityPositionProjectile16x16
   NoBombBelow:
+  rts
+.endproc
+
+.a8
+.proc DrawAbilityBomb
+  lda TailAttackDirection
+  and #>KEY_DOWN
+  beq :+
+    rts
+  :
+  .import MathSinTable, MathCosTable
+  seta16
+  jsr RunAbilityBomb::GetAimAngle
+  lda f:MathCosTable,x
+  jsr Reduce
+  sta 0
+  lda f:MathSinTable,x
+  jsr Reduce
+  sta 2
+  seta8
+
+  ; Draw the angle
+  tdc ; Clear A
+  lda PlayerDir
+  tay
+  ldx HighPriorityOAMIndex
+
+  lda PlayerDrawX
+  add 0
+  sub #4
+  sta OAM_XPOS+(4*0),x
+  lda PlayerDrawY
+  sub #16
+  add 2
+  sta OAM_YPOS+(4*0),x
+
+  seta16
+  lda #$6c|OAM_PRIORITY_2
+  sta OAM_TILE+(4*0),x
+  stz OAMHI+(4*0),x
+  txa
+  add #4
+  sta HighPriorityOAMIndex
+  seta8
+  rts
+
+.a16
+Reduce:
+  asr_n 10
   rts
 .endproc
 
@@ -823,11 +855,23 @@ NoCreateHook:
 
   ; -----
 
+  ; Allow some measure of detecting how long the fishing rod has been out, for the
+  ; early cancel code.
+  lda TailAttackTimer
+  cmp #20
+  beq :+
+    inc TailAttackTimer
+  :
+  rts
+.endproc
+
+.a8
+.proc DrawAbilityFishing
   ; Display fishing rod
   tdc ; Clear A
   lda PlayerDir
   tay
-  ldx OamPtr
+  ldx HighPriorityOAMIndex
 
   lda PlayerDrawX
   add RodOffsetX,y
@@ -866,18 +910,8 @@ NoCreateHook:
   stz OAMHI+1+(4*3),x
   txa
   add #4*4
-  sta OamPtr
-  seta8
-
-  ; -----
-
-  ; Allow some measure of detecting how long the fishing rod has been out, for the
-  ; early cancel code.
-  lda TailAttackTimer
-  cmp #20
-  beq :+
-    inc TailAttackTimer
-  :
+  sta HighPriorityOAMIndex
+  ; sizes get restored after this
   rts
 RodOffsetX: .lobytes 0, -8
 RodOffsetX2: .lobytes 8, -8
@@ -890,6 +924,107 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
   rts
 .endproc
 
+.a8
+.proc RunAbilitySword
+; TODO: Make sure the dynamic sprite slot can get freed if the sword ability is interrupted!
+  lda TailAttackTimer
+  pha
+  tax ; <--- Make sure higher byte of A is clear
+  lda AttackSwordSequence-1,x
+  sta TailAttackFrame
+
+  inc TailAttackTimer
+  ; End the animation when it's done
+  pla
+
+  ; Allocate and queue frame A when the timer has just started
+  .a8
+  cmp #1
+  bne NotInit
+    jsl AllocateDynamicSpriteSlot
+    bcc AllocFail
+    sta TailAttackDynamicSlot
+
+    seta16
+    lda #.loword(DSSwordAbility)
+    jmp QueueUpdate
+  NotInit:
+
+  ; Frame B
+  .a8
+  cmp #11
+  bne NotB
+    seta16
+    lda #.loword(DSSwordAbility+512*1)
+    jmp QueueUpdate
+  NotB:
+
+  .a8
+  cmp #15
+  bne NotC
+    seta16
+    lda #.loword(DSSwordAbility+512*2)
+    jmp QueueUpdate
+  NotC:
+
+  .a8
+  cmp #(AttackSwordSequenceEnd-AttackSwordSequence-1)
+  bne :+
+    stz TailAttackTimer
+    lda TailAttackDynamicSlot
+    jsl FreeDynamicSpriteSlot
+    rts
+  :
+  rts
+
+; Bail out of the attack
+AllocFail:
+  stz TailAttackTimer
+  rts
+
+.a16
+.i16
+QueueUpdate:
+  pha
+  lda TailAttackDynamicSlot
+  and #7
+  tax
+  ldy #256
+  lda #^DSSwordAbility | $8000
+  sta 0
+  pla
+  jsl QueueDynamicSpriteUpdate
+  rts
+; SWORD1 - frame A
+; SWORD2 - frame A
+; SWORD3 - frame A
+; SWORD4 - frame B
+; SWORD5 - frame B
+; SWORD6 - frame C
+; IDLE   - frame C
+
+; 1 SWORD1, 2 SWORD1 3 SWORD1 4 SWORD1 5 SWORD1
+; 6 SWORD2  7 SWORD2
+; 8 SWORD3  9 SWORD3 10 SWORD3
+; 11 SWORD4 12 SWORD4
+; 13 SWORD5 14 SWORD5
+; 15 SWORD6 16 SWORD6 17 SWORD6
+; 18 IDLE   19 IDLE 20 IDLE 21 IDLE 22 IDLE
+.endproc
+
+.pushseg
+.segment "PlayerSwordSwing"
+DSSwordAbility:
+.incbin "../tilesetsX/DSSwordAbility.chr"
+.popseg
+
+.a8
+.proc DrawAbilitySword
+  rts
+.endproc
+
+
+.if 0
 .a8
 .proc RunAbilityWheel
   lda #1
@@ -910,6 +1045,7 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
   :
   rts
 .endproc
+.endif
 
 .a8
 .proc RunAbilityMirror
@@ -1021,30 +1157,6 @@ ChargeUp:
   :
   jsr UpdateAttackFrameWithHoldFrame
 
-  ; Display bubble wand
-  tdc ; Clear A
-  lda PlayerDir
-  tay
-  ldx OamPtr
-  lda PlayerDrawX
-  add WandOffsetX,y
-  sta OAM_XPOS,x
-  lda PlayerDrawY
-  sub #26
-  sta OAM_YPOS,x
-  lda #$2a
-  sta OAM_TILE,x
-  lda WandAttrib,y
-  sta OAM_ATTR,x
-  stz OAMHI+0,x
-  lda #$02
-  sta OAMHI+1,x
-  inx
-  inx
-  inx
-  inx
-  stx OamPtr
-
   lda keydown ; Cancel the charging
   and #AttackKeys
   bne :+
@@ -1099,8 +1211,6 @@ ForceBubble:
   NoBubble:
 
   rts
-WandOffsetX: .lobytes 1, -16-1
-WandAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 
 ; Bubbles are floating if their timer is zero
 HaveFloatingBubbles:
@@ -1125,6 +1235,37 @@ HaveFloatingBubbles:
   tdc ; Clear accumulator
   seta8
   rts
+.endproc
+
+.a8
+.i16
+.proc DrawAbilityBubble
+  ; Display bubble wand
+  tdc ; Clear A
+  lda PlayerDir
+  tay
+  ldx HighPriorityOAMIndex
+  lda PlayerDrawX
+  add WandOffsetX,y
+  sta OAM_XPOS,x
+  lda PlayerDrawY
+  sub #26
+  sta OAM_YPOS,x
+  lda #$2a
+  sta OAM_TILE,x
+  lda WandAttrib,y
+  sta OAM_ATTR,x
+  stz OAMHI+0,x
+  lda #$02
+  sta OAMHI+1,x
+  inx
+  inx
+  inx
+  inx
+  stx HighPriorityOAMIndex
+  rts
+WandOffsetX: .lobytes 1, -16-1
+WandAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .endproc
 
 .a16
@@ -1198,3 +1339,13 @@ AttackBelowAnimationSequence:
   .byt PlayerFrame::ATTACK8, PlayerFrame::ATTACK8
   .byt PlayerFrame::ATTACK9, PlayerFrame::ATTACK9
 AttackBelowAnimationSequenceEnd:
+
+AttackSwordSequence:
+  .byt PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1, PlayerFrame::SWORD1
+  .byt PlayerFrame::SWORD2, PlayerFrame::SWORD2
+  .byt PlayerFrame::SWORD3, PlayerFrame::SWORD3, PlayerFrame::SWORD3
+  .byt PlayerFrame::SWORD4, PlayerFrame::SWORD4
+  .byt PlayerFrame::SWORD5, PlayerFrame::SWORD5
+  .byt PlayerFrame::SWORD6, PlayerFrame::SWORD6, PlayerFrame::SWORD6
+  .byt PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE, PlayerFrame::IDLE
+AttackSwordSequenceEnd:

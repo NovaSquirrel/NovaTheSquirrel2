@@ -152,11 +152,16 @@ MaxSpeedRight = 12
   lda NeedAbilityChangeSilent ; Unless the change is silenced, because that would indicate something like unpausing
   bne DontClearProjectiles
     seta16
-    lda #ProjectileStart
-  : tax
-    stz ActorType,x
+    ldx #ProjectileStart
+  : lda ActorType,x
+    beq @Empty
+    .import ActorSafeRemoveX
+    jsl ActorSafeRemoveX
+@Empty:
+    txa
     add #ActorSize
-    cmp #ProjectileEnd
+    tax
+    cpx #ProjectileEnd
     bcc :-
     seta8
   DontClearProjectiles:
@@ -190,15 +195,16 @@ CantAttack:
 
   ; Continue an attack that was started
   lda TailAttackTimer
+  sta OldTailAttackTimer
   beq :+
     tdc ; Clear A
     lda PlayerAbility
     asl
     tax
     php
-    .import AbilityRoutineForId
-    assert_same_banks RunPlayer, AbilityRoutineForId
-    jsr (.loword(AbilityRoutineForId),x)
+    .import AbilityRunRoutineForId
+    assert_same_banks RunPlayer, AbilityRunRoutineForId
+    jsr (.loword(AbilityRunRoutineForId),x)
     plp
   :
 
