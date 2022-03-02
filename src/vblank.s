@@ -319,7 +319,7 @@ SkipBlock:
   bit PPUSTATUS2 ; Resets the flip flop for GETXY
   bit GETXY
   lda YCOORD
-  cmp #261-(8+1) ; Should measure how many scanlines are needed - there's less overhead than the ability tile update
+  cmp #261-(7+1) ; Seems to take about 7 scanlines - add one for safety
   bcs @DontUploadSpriteTiles
   ; Read YCOORD a second time - if the high bit of the Y position is set, there is definitely not enough time
   lda YCOORD

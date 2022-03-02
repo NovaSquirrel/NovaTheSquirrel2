@@ -225,6 +225,7 @@ DelayedBlockLoop:
   bpl DelayedBlockLoop
 
   ; Run stuff for this frame
+  stz GenericUpdateByteTotal
   stz HighPriorityOAMIndex
   lda #4*(4)
   sta PlayerOAMIndex

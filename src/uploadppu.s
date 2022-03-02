@@ -839,7 +839,22 @@ Length = 6
   stx Destination
   sty Length
 Already:
+  ; Keep track of how many bytes have been queued up so far
+  lda GenericUpdateByteTotal
+  add Length
+  bit BankAndFlags
+  bpl :+
+    adc Length ; Just assume carry is clear
+  :
+  sta GenericUpdateByteTotal
+  cmp #2800
+  bcc :+
+    ; This probably shouldn't happen - assert(0) 
+    clc
+    rtl
+  :
 
+  ; Otherwise, go find a free slot
   ldx #(GENERIC_UPDATE_COUNT-1)*2
 FindFree:
   lda GenericUpdateLength,x

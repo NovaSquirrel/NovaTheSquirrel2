@@ -112,6 +112,9 @@ GENERIC_UPDATE_COUNT = 5
 .global GenericUpdateSource, GenericUpdateSource2
 .global GenericUpdateFlags
 
+; Not indexed like the above
+.global GenericUpdateByteTotal
+
 DYNAMIC_SPRITE_SLOTS = 8
 .global DynamicSpriteSlotUsed
 

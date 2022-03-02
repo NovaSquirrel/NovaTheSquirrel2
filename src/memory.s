@@ -306,6 +306,7 @@ LevelZeroWhenLoad_Start:
   CopyingAnimationTimer: .res 1
 LevelZeroWhenLoad_End:
   TailAttackVariable:  .res 2 ; Zero'd when an attack starts
+  GenericUpdateByteTotal: .res 2 ; How many bytes are queued up this frame
 
   ; For speeding up actor spawning
   ; (keeps track of which actor index is the first one on a particular screen)
