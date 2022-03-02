@@ -23,7 +23,7 @@
 .import ActorClearX, PlayerNegIfLeft, SpeedAngle2Offset256
 .import BlockRunInteractionBelow, CountProjectileAmount
 .import InitActorX, CalculateNextPlayerFrame
-.import AllocateDynamicSpriteSlot, FreeDynamicSpriteSlot, QueueDynamicSpriteUpdate
+.import AllocateDynamicSpriteSlot, FreeDynamicSpriteSlot, QueueDynamicSpriteUpdate, GetDynamicSpriteTileNumber
 
 .export AbilityIcons, AbilityGraphics, AbilityTilesetForId, AbilityRunRoutineForId, AbilityDrawRoutineForId
 
@@ -102,7 +102,7 @@ AbilityDrawRoutineForId:
   .addr .loword(DrawAbilityNone)
   .addr .loword(DrawAbilityFishing)
   .addr .loword(DrawAbilityNone)
-  .addr .loword(DrawAbilityNone)
+  .addr .loword(DrawAbilitySword)
   .addr .loword(DrawAbilityNone)
   .addr .loword(DrawAbilityNone)
   .addr .loword(DrawAbilityNone)
@@ -955,17 +955,45 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
   cmp #11
   bne NotB
     seta16
+    lda PlayerPY
+    sub #17*16
+    tay
+    lda #16*16
+    jsl PlayerNegIfLeft
+    add PlayerPX
+    jsl GetLevelPtrXY
+    jsl GetBlockFlag
+    jsl BlockRunInteractionBelow
+
     lda #.loword(DSSwordAbility+512*1)
     jmp QueueUpdate
   NotB:
 
   .a8
-  cmp #15
+  cmp #13
   bne NotC
     seta16
+    lda PlayerPY
+    sub #8*16
+    tay
+    lda #9*16
+    jsl PlayerNegIfLeft
+    add PlayerPX
+    jsl GetLevelPtrXY
+    jsl GetBlockFlag
+    jsl BlockRunInteractionBelow
+
     lda #.loword(DSSwordAbility+512*2)
     jmp QueueUpdate
   NotC:
+
+  .a8
+  cmp #15
+  bne NotD
+    seta16
+    lda #.loword(DSSwordAbility+512*3)
+    jmp QueueUpdate
+  NotD:
 
   .a8
   cmp #(AttackSwordSequenceEnd-AttackSwordSequence-1)
@@ -999,9 +1027,9 @@ QueueUpdate:
 ; SWORD2 - frame A
 ; SWORD3 - frame A
 ; SWORD4 - frame B
-; SWORD5 - frame B
-; SWORD6 - frame C
-; IDLE   - frame C
+; SWORD5 - frame C
+; SWORD6 - frame D
+; IDLE   - frame D
 
 ; 1 SWORD1, 2 SWORD1 3 SWORD1 4 SWORD1 5 SWORD1
 ; 6 SWORD2  7 SWORD2
@@ -1030,9 +1058,125 @@ DSSwordAbility:
 
 .a8
 .proc DrawAbilitySword
+  seta16
+  lda TailAttackDynamicSlot
+  and #255
+  jsl GetDynamicSpriteTileNumber
+  sta SpriteTileBase
+  seta8
+
+  tdc ; Clear top byte of A
+  lda OldTailAttackTimer
+  dea
+  tax
+  lda RunAbilitySword::AttackSwordSequence,x
+  cmp #PlayerFrame::IDLE
+  bne :+
+    lda #PlayerFrame::SWORD6+1
+  :
+  sub #PlayerFrame::SWORD1
+  asl
+  tax
+  ldy Frames,x
+  jsr DrawAbilityFrame
   rts
+
+Frames:
+  .addr Frame1, Frame2, Frame3, Frame4, Frame5, Frame6, Frame7
+
+BH = 4   ; "Bottom half"
+BR = $10 ; "Bottom row"
+S16 = $02
+S8  = $00
+Frame1:
+  ; Size, Tile, Y, +X, -X
+  .lobytes S16, $00,    -35, -15,    0-(-15)-16
+  .byt $80
+Frame2:
+  .lobytes S8,  BH+3,   -39,  -5,    0-(-5)-8
+  .lobytes S8,  BH+3+BR,-39+8,-5,    0-(-5)-8
+  .byt $80
+Frame3:
+  .lobytes S16, BH,    -30, -6,      0-(-6)-16
+  .lobytes S16, BH+1,  -30, -6+8,    0-(-6+8)-16
+  .byt $80
+Frame4:
+  .lobytes S16, 0,     -29,    2,    0-(2)-16
+  .lobytes S16, BH,    -29+16, 2,    0-(2)-16
+  .lobytes S8,  2,     -20,    2+16, 0-(2+16)-8
+  .byt $80
+Frame5:
+  .lobytes S16, BH,    -16,   -4,    0-(-4)-16
+  .lobytes S16, BH+1,  -16,   -4+8,  0-(-4+8)-16
+  .lobytes S8,  BR+2,  -16-8, -4+16, 0-(-4+16)-8
+  .byt $80
+Frame6:
+  .lobytes S16, 0,     -9-8,  -7,    0-(-7)-16
+  .lobytes S16, 1,     -9-8,  -7+8,  0-(-7+8)-16
+  .byt $80
+Frame7:
+  .lobytes S16, BH,    -11,   -16,   0-(-16)-16
+  .byt $80
 .endproc
 
+; Displays a an ability metasprite above the player
+; Y = pointer to frame data to draw
+; Format:
+; Size, Tile, Y, X, -X
+; 255
+.a8
+.proc DrawAbilityFrame
+Pointer = 0
+  sty Pointer
+  ldx HighPriorityOAMIndex
+
+  ldy #0
+Loop:
+  lda (Pointer),y ; Size
+  bmi Exit
+  sta OAMHI+1,x
+
+  iny
+  lda (Pointer),y ; Tile
+  ora SpriteTileBase
+  sta OAM_TILE,x
+
+  iny
+  lda (Pointer),y ; Y pos
+  add PlayerDrawY
+  sta OAM_YPOS,x
+
+  iny
+  lda PlayerDir
+  bne Left
+Right:
+  lda PlayerDrawX
+  add (Pointer),y
+  sta OAM_XPOS,x
+  lda #>(OAM_PRIORITY_2)
+  sta OAM_ATTR,x
+  iny ; Skip over -X
+Next:
+  iny
+  inx
+  inx
+  inx
+  inx
+  bra Loop
+
+Left:
+  iny ; Skip over +X
+  lda PlayerDrawX
+  add (Pointer),y
+  sta OAM_XPOS,x
+  lda #>(OAM_XFLIP|OAM_PRIORITY_2)
+  sta OAM_ATTR,x
+  bra Next
+
+Exit:
+  stx HighPriorityOAMIndex
+  rts
+.endproc
 
 .if 0
 .a8

@@ -316,6 +316,8 @@ HaveY:
   ; Draw an ability too, if needed
   lda OldTailAttackTimer
   beq :+
+  lda CopyingAnimationTimer
+  bne :+
     tdc ; Clear A
     lda PlayerAbility
     asl
