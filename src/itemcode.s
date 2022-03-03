@@ -210,6 +210,8 @@ NoRoutine:
   sta PlayerAbility
   lda #1
   sta NeedAbilityChange
+  stz TailAttackTimer
+  stz OldTailAttackTimer
   seta16
   lda #ProjectileStart
 : tax

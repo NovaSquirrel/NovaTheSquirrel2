@@ -166,6 +166,8 @@ MaxSpeedRight = 12
     seta8
   DontClearProjectiles:
 
+  lda CopyingAnimationTimer
+  bne :+
   lda NeedAbilityChange
   bne :+
   lda keynew
@@ -196,7 +198,14 @@ CantAttack:
   ; Continue an attack that was started
   lda TailAttackTimer
   sta OldTailAttackTimer
-  beq :+
+  beq @NoAbilityRun
+    lda CopyingAnimationTimer ; Finish up the swish
+    beq :+
+      .import StepTailSwish
+      jsr StepTailSwish
+      bra @NoAbilityRun
+    :
+
     tdc ; Clear A
     lda PlayerAbility
     asl
@@ -206,7 +215,7 @@ CantAttack:
     assert_same_banks RunPlayer, AbilityRunRoutineForId
     jsr (.loword(AbilityRunRoutineForId),x)
     plp
-  :
+  @NoAbilityRun:
 
 
   lda ForceControllerTime

@@ -115,6 +115,7 @@ AbilityDrawRoutineForId:
 .endproc
 
 .a8
+.export StepTailSwish
 .proc StepTailSwish
   lda TailAttackTimer
   pha

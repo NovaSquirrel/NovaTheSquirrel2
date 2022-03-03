@@ -124,7 +124,7 @@ AbilityIconGraphicSource   = TouchTemp + 2
     lda #%00000001
     sta COPYSTART
 
-    stz TailAttackTimer
+    ;stz TailAttackTimer
     stz AbilityMovementLock
     stz NeedAbilityChange
     stz NeedAbilityChangeSilent
