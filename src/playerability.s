@@ -943,7 +943,11 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
   cmp #1
   bne NotInit
     jsl AllocateDynamicSpriteSlot
-    bcc AllocFail
+    bcs :+
+		; Bail out of the attack
+		stz TailAttackTimer
+		rts
+	:
     sta TailAttackDynamicSlot
 
     seta16
@@ -965,6 +969,30 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
     jsl GetLevelPtrXY
     jsl GetBlockFlag
     jsl BlockRunInteractionBelow
+
+    ; Try making the projectile
+    jsl FindFreeProjectileX
+    bcc :+
+      lda #Actor::PlayerProjectile*2
+      sta ActorType,x
+      jsl InitActorX
+      lda #PlayerProjectileType::SwordSwipe
+      sta ActorProjectileType,x
+
+      seta8
+      lda PlayerDir
+      sta ActorDirection,x
+      seta16
+      lda PlayerPY
+      sub #11*16
+      sta ActorPY,x
+      lda #16*16
+      jsl PlayerNegIfLeft
+      add PlayerPX
+      sta ActorPX,x
+      lda #16
+      sta ActorTimer,x
+    :
 
     lda #.loword(DSSwordAbility+512*1)
     jmp QueueUpdate
@@ -1004,11 +1032,6 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
     jsl FreeDynamicSpriteSlot
     rts
   :
-  rts
-
-; Bail out of the attack
-AllocFail:
-  stz TailAttackTimer
   rts
 
 .a16

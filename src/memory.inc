@@ -190,6 +190,8 @@ ProjectileLen = 8
   CopyAnimation
   BubbleHeld
   CopyFailAnimation
+  SwordSwipe
+  SwordThrown
 .endenum
 
 ParticleLen = 32
