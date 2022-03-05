@@ -191,6 +191,7 @@ ProjectileLen = 8
   BubbleHeld
   CopyFailAnimation
   SwordSwipe
+  SwordSwipeNearby
   SwordThrown
 .endenum
 

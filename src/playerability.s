@@ -958,7 +958,7 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
   ; Frame B
   .a8
   cmp #11
-  bne NotB
+  jne NotB
     seta16
     lda PlayerPY
     sub #17*16
@@ -970,7 +970,7 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
     jsl GetBlockFlag
     jsl BlockRunInteractionBelow
 
-    ; Try making the projectile
+    ; Try making the small projectile
     jsl FindFreeProjectileX
     bcc :+
       lda #Actor::PlayerProjectile*2
@@ -991,6 +991,29 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
       add PlayerPX
       sta ActorPX,x
       lda #16
+      sta ActorTimer,x
+    :
+
+    ; Make a bigger hitbox directly in front of the swipe
+    jsl FindFreeProjectileX
+    bcc :+
+      lda #Actor::PlayerProjectile*2
+      sta ActorType,x
+      jsl InitActorX
+      lda #22*16
+      sta ActorWidth,x
+      lda #PlayerHeight
+      sta ActorHeight,x
+      lda #PlayerProjectileType::SwordSwipeNearby
+      sta ActorProjectileType,x
+
+      lda PlayerPY
+      sta ActorPY,x
+      lda #10*16
+      jsl PlayerNegIfLeft
+      add PlayerPX
+      sta ActorPX,x
+      lda #3
       sta ActorTimer,x
     :
 

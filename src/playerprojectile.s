@@ -67,6 +67,7 @@ RunPlayerProjectileTable:
   .word .loword(RunProjectileBubbleHeld-1)
   .word .loword(RunProjectileCopyFailAnimation-1)
   .word .loword(RunProjectileSwordSwipe-1)
+  .word .loword(RunProjectileSwordSwipeNearby-1)
 
 .a16
 .i16
@@ -103,6 +104,7 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileBubble-1)
   .word .loword(DrawProjectileCopyFailAnimation-1)
   .word .loword(DrawProjectileSwordSwipe-1)
+  .word .loword(DrawProjectileSwordSwipeNearby-1)
 
 .a16
 .i16
@@ -954,9 +956,13 @@ Divide:
 .proc RunProjectileSwordSwipe
   lda #12
   jsl ActorWalk
+Expire:
   jsr ActorExpire
+Return:
   rtl
 .endproc
+RunProjectileSwordSwipeNearby = RunProjectileSwordSwipe::Expire
+DrawProjectileSwordSwipeNearby = RunProjectileSwordSwipe::Return
 
 .a16
 .i16
@@ -1754,6 +1760,7 @@ HitProjectileResponse:
   .word .loword(DamageALittleLess-1) ; Bubble (Held)
   .word .loword(Nothing-1) ; Copy fail animation
   .word .loword(Damage-1) ; Sword swipe
+  .word .loword(Damage-1) ; Sword swipe (nearby)
   .word .loword(Damage-1) ; Thrown sword
 
 ; Hook an enemy and pull them to the player
