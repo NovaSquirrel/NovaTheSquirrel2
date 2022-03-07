@@ -928,6 +928,29 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .a8
 .proc RunAbilitySword
 ; TODO: Make sure the dynamic sprite slot can get freed if the sword ability is interrupted!
+  lda TailAttackVariable
+  beq NotCharge
+    lda keydown
+    and #AttackKeys
+    bne NotChargeRelease
+      stz TailAttackTimer
+      stz TailAttackVariable
+      lda TailAttackDynamicSlot
+      jsl FreeDynamicSpriteSlot
+    NotChargeRelease:
+
+    lda TailAttackVariable+1
+    cmp #40
+    bcs :+
+      inc TailAttackVariable+1
+    :
+
+    lda #PlayerFrame::SWORD1
+    sta TailAttackFrame
+    rts
+  NotCharge:
+
+
   lda TailAttackTimer
   pha
   tax ; <--- Make sure higher byte of A is clear
@@ -944,10 +967,10 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
   bne NotInit
     jsl AllocateDynamicSpriteSlot
     bcs :+
-		; Bail out of the attack
-		stz TailAttackTimer
-		rts
-	:
+      ; Bail out of the attack
+      stz TailAttackTimer
+      rts
+    :
     sta TailAttackDynamicSlot
 
     seta16
@@ -1049,12 +1072,24 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 
   .a8
   cmp #(AttackSwordSequenceEnd-AttackSwordSequence-1)
-  bne :+
+  bne NotEnd
+    lda keydown ; Keep going?
+    and #AttackKeys
+    beq :+
+      lda #2
+      sta TailAttackTimer
+      sta TailAttackVariable
+      seta16
+      lda #.loword(DSSwordAbility)
+      jmp QueueUpdate
+    :
+    .a8
+
     stz TailAttackTimer
     lda TailAttackDynamicSlot
     jsl FreeDynamicSpriteSlot
     rts
-  :
+  NotEnd:
   rts
 
 .a16

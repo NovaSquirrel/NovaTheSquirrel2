@@ -1776,8 +1776,15 @@ CustomOffset:
   lda ActorDirection,x ; Ignore high byte
   lsr
   bcc :+
-    lda #OAM_XFLIP
-    tsb 4
+    lda 4
+    eor #OAM_XFLIP
+    sta 4
+    seta8 ; Flip X offset
+    lda SpriteXYOffset
+    eor #255
+    ina
+    sta SpriteXYOffset
+    seta16
   :
 
   jsr ActorDrawPositionWithOffset8x8

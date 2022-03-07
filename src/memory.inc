@@ -192,7 +192,7 @@ ProjectileLen = 8
   CopyFailAnimation
   SwordSwipe
   SwordSwipeNearby
-  SwordThrown
+  ThrownSword
 .endenum
 
 ParticleLen = 32

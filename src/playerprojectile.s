@@ -68,7 +68,7 @@ RunPlayerProjectileTable:
   .word .loword(RunProjectileCopyFailAnimation-1)
   .word .loword(RunProjectileSwordSwipe-1)
   .word .loword(RunProjectileSwordSwipeNearby-1)
-
+  .word .loword(RunProjectileThrownSword-1)
 .a16
 .i16
 .export DrawPlayerProjectile
@@ -105,7 +105,7 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileCopyFailAnimation-1)
   .word .loword(DrawProjectileSwordSwipe-1)
   .word .loword(DrawProjectileSwordSwipeNearby-1)
-
+  .word .loword(DrawProjectileThrownSword-1)
 .a16
 .i16
 .proc RunProjectileStun
@@ -973,14 +973,125 @@ DrawProjectileSwordSwipeNearby = RunProjectileSwordSwipe::Return
   cmp #8
   bcc Frame1
 
-  lda #$3f|OAM_PRIORITY_2
+  lda #$30|11|OAM_PRIORITY_2
   jml DispActor8x8
 Frame1:
-  lda #$3e|OAM_PRIORITY_2
+  lda #$30|10|OAM_PRIORITY_2
   jml DispActor8x8
 Frame2:
-  lda #$3d|OAM_PRIORITY_2
+  lda #$30|9|OAM_PRIORITY_2
   jml DispActor8x8
+.endproc
+
+.a16
+.i16
+.proc RunProjectileThrownSword
+  rtl
+.endproc
+
+.a16
+.i16
+.proc DrawProjectileThrownSword
+; DispActor8x8WithOffset uses 0,1,2,3,4,5 and Y
+  lda #OAM_PRIORITY_2|$20
+  sta SpriteTileBase
+
+;  lda #.loword(-4*256)
+;  sta SpriteXYOffset
+;  lda #$4e
+;  jsl DispActor8x8WithOffset
+
+  lda framecount
+  and #%11110
+  tay
+  ; Is it a diagonal frame?
+  and #%00110
+  cmp #%00100
+  bne :+
+    lda #16*16
+    sta ActorHeight,x
+    tya
+    lsr
+    lsr
+    and #%110
+    tay
+    lda Diagonals,y
+    jml DispActor16x16Flipped
+  :
+
+  lda Offset1,y
+  sta SpriteXYOffset
+  lda Tile1,y
+  phy
+  jsl DispActor8x8WithOffset
+  ply
+
+  lda #.loword(-Raise*256)
+  sta SpriteXYOffset
+  lda Tile2,y
+  phy
+  jsl DispActor8x8WithOffset
+  ply
+
+  lda Offset3,y
+  sta SpriteXYOffset
+  lda Tile3,y
+  jml DispActor8x8WithOffset
+
+Flip = OAM_XFLIP|OAM_YFLIP
+
+Diagonals:
+	.word 12, 14, 12|Flip, 14|Flip
+
+Tile1:
+	.word      $00,      $11, $ff,      $03,      $14,      $06, $ff,      $17
+	.word Flip|$00, Flip|$11, $ff, Flip|$03, Flip|$14, Flip|$06, $ff, Flip|$17
+Tile2:
+	.word      $10,      $02, $ff,      $13,      $05,      $16, $ff,      $08
+	.word Flip|$10, Flip|$02, $ff, Flip|$13, Flip|$05, Flip|$16, $ff, Flip|$08
+Tile3:
+	.word      $01,      $12, $ff,      $04,      $15,      $07, $ff,      $18
+	.word Flip|$01, Flip|$12, $ff, Flip|$04, Flip|$15, Flip|$07, $ff, Flip|$18
+
+Raise = 4
+
+Offset1:
+	.lobytes 0,-8-Raise
+	.lobytes 1,-8-Raise
+    .word $ffff ; --------
+	.lobytes -8,0-Raise
+	.lobytes -8,0-Raise
+	.lobytes -8,0-Raise
+    .word $ffff ; --------
+	.lobytes 0,-8-Raise
+;---
+	.lobytes 0,8-Raise
+	.lobytes -1,8-Raise
+    .word $ffff ; --------
+	.lobytes 8,0-Raise
+	.lobytes 8,0-Raise
+	.lobytes 8,0-Raise
+    .word $ffff ; --------
+	.lobytes 0,8-Raise
+
+Offset3:
+	.lobytes  0,8-Raise
+	.lobytes  0,8-Raise
+    .word $ffff ; --------
+	.lobytes  8,-4-Raise
+	.lobytes  8,0-Raise
+	.lobytes  8,1-Raise
+    .word $ffff ; --------
+	.lobytes  1,8-Raise
+;---
+	.lobytes  0,-8-Raise
+	.lobytes  0,-8-Raise
+    .word $ffff ; --------
+	.lobytes  -8,4-Raise
+	.lobytes  -8,0-Raise
+	.lobytes  -8,-1-Raise
+    .word $ffff ; --------
+	.lobytes  -1,-8-Raise
 .endproc
 
 .proc HalfLongVelocity
