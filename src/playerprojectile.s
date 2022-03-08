@@ -988,15 +988,32 @@ Frame2:
 .proc RunProjectileThrownSword
   inc ActorTimer,x
 
+  lda ActorDirection,x
+  lsr
+  php
   lda ActorVarC,x
-  jsl ActorWalk
-  dec ActorVarC,x
+  plp
+  bcc :+
+    eor #$ffff
+    ina
+  :
+  add ActorPX,x
+  sta ActorPX,x
+
+  dec ActorVarC,x ; Slow down
 
   lda ActorVarC,x
   cmp #.loword(-$38)
   bne :+
     stz ActorType,x
   :
+
+  ; Move vertically, and then come back down
+  lda ActorVY,x
+  add ActorVarB,x
+  sta ActorVY,x
+  add ActorPY,x
+  sta ActorPY,x
   rtl
 .endproc
 
@@ -1019,8 +1036,6 @@ Frame2:
   and #%00110
   cmp #%00100
   bne :+
-    lda #16*16
-    sta ActorHeight,x
     tya
     lsr
     lsr
@@ -1976,7 +1991,7 @@ ThrownSword:
 .endif
   lda #Particle::EnemyDamagedParticle
   jsr ProjectileBecomesDamageParticle
-  lda #$08
+  lda #$10
   jmp AddDamage
 
 CopyEnemy:

@@ -967,20 +967,20 @@ ChargeTime = 20
       seta8
       lda TailAttackVariable+1
       cmp #ChargeTime
-      bcc :+
+      bcc @NoThrow
       seta16
       jsl FindFreeProjectileX
-      bcc :+
-        lda #Actor::PlayerProjectile*2
+      bcc @NoThrow
+        lda #Actor::PlayerProjectile16x16*2
         sta ActorType,x
         jsl InitActorX
         lda #PlayerProjectileType::ThrownSword
         sta ActorProjectileType,x
         stz ActorTimer,x ; Animation timer here
-        stz ActorVarA,x
-        stz ActorVarB,x
-        lda #$38 ; Speed
-        sta ActorVarC,x
+        stz ActorVarB,x  ; Vertical deceleration
+        stz ActorVY,x    ; Vertical speed
+        lda #$38
+        sta ActorVarC,x  ; Horizontal speed
         seta8
         lda PlayerDir
         sta ActorDirection,x
@@ -992,7 +992,24 @@ ChargeTime = 20
         jsl PlayerNegIfLeft
         add PlayerPX
         sta ActorPX,x
-      :
+
+        lda keydown
+        and #KEY_UP
+        beq :+
+           lda #.loword(1)
+           sta ActorVarB,x
+           lda #.loword(-$38)
+           sta ActorVY,x
+        :
+        lda keydown
+        and #KEY_DOWN
+        beq :+
+           lda #.loword(-1)
+           sta ActorVarB,x
+           lda #.loword($38)
+           sta ActorVY,x
+        :
+      @NoThrow:
       seta8
     NotChargeRelease:
 
