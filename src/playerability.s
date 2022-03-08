@@ -203,6 +203,29 @@ AbilityDrawRoutineForId:
 .endproc
 
 .a8
+.proc AllowChangingDirectionDuringAbility
+  lda keydown+1
+  and #>KEY_LEFT
+  beq NotLeft
+  lda ForceControllerBits+1
+  and #>KEY_RIGHT
+  bne NotLeft
+    lda #1
+    sta PlayerDir
+NotLeft:
+
+  lda keydown+1
+  and #>KEY_RIGHT
+  beq NotRight
+  lda ForceControllerBits+1
+  and #>KEY_LEFT
+  bne NotRight
+    stz PlayerDir
+NotRight:
+  rts
+.endproc
+
+.a8
 .proc UpdateAttackFrameWithHoldFrame
   inc PlayerHoldingSomething
   jsl CalculateNextPlayerFrame
@@ -928,8 +951,12 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .a8
 .proc RunAbilitySword
 ; TODO: Make sure the dynamic sprite slot can get freed if the sword ability is interrupted!
+ChargeTime = 20
+
   lda TailAttackVariable
-  beq NotCharge
+  jeq NotCharge
+    jsr AllowChangingDirectionDuringAbility
+
     lda keydown
     and #AttackKeys
     bne NotChargeRelease
@@ -937,16 +964,55 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
       stz TailAttackVariable
       lda TailAttackDynamicSlot
       jsl FreeDynamicSpriteSlot
+      seta8
+      lda TailAttackVariable+1
+      cmp #ChargeTime
+      bcc :+
+      seta16
+      jsl FindFreeProjectileX
+      bcc :+
+        lda #Actor::PlayerProjectile*2
+        sta ActorType,x
+        jsl InitActorX
+        lda #PlayerProjectileType::ThrownSword
+        sta ActorProjectileType,x
+        stz ActorTimer,x ; Animation timer here
+        stz ActorVarA,x
+        stz ActorVarB,x
+        lda #$38 ; Speed
+        sta ActorVarC,x
+        seta8
+        lda PlayerDir
+        sta ActorDirection,x
+        seta16
+        lda PlayerPY
+        sub #11*16
+        sta ActorPY,x
+        lda #12*16
+        jsl PlayerNegIfLeft
+        add PlayerPX
+        sta ActorPX,x
+      :
+      seta8
     NotChargeRelease:
 
     lda TailAttackVariable+1
-    cmp #40
+    cmp #ChargeTime
     bcs :+
       inc TailAttackVariable+1
     :
 
     lda #PlayerFrame::SWORD1
     sta TailAttackFrame
+
+    lda keydown+1
+    and #>(KEY_LEFT|KEY_RIGHT)
+    beq :+
+      jsl CalculateNextPlayerFrame
+      seta8
+      lda PlayerFrame
+      sta TailAttackFrame
+    :
     rts
   NotCharge:
 
@@ -1140,12 +1206,27 @@ DSSwordAbility:
 
 .a8
 .proc DrawAbilitySword
+  lda TailAttackVariable
+  beq :+
+  lda PlayerFrame
+  cmp #PlayerFrame::SWORD1
+  beq :+
+    rts
+  :
+
   seta16
   lda TailAttackDynamicSlot
   and #255
   jsl GetDynamicSpriteTileNumber
   sta SpriteTileBase
   seta8
+
+  lda TailAttackVariable+1
+  cmp #RunAbilitySword::ChargeTime
+  bcc :+
+    ldy #.loword(Frame1Charged)
+    jmp DrawAbilityFrame
+  :
 
   tdc ; Clear top byte of A
   lda OldTailAttackTimer
@@ -1198,6 +1279,11 @@ Frame6:
   .byt $80
 Frame7:
   .lobytes S16, BH,    -11,   -16,   0-(-16)-16
+  .byt $80
+
+Frame1Charged:
+  ; Size, Tile, Y, +X, -X
+  .lobytes S16, $02,    -35, -15,    0-(-15)-16
   .byt $80
 .endproc
 
@@ -1368,6 +1454,8 @@ NoCreateRocket:
 .a8
 .i16
 .proc RunAbilityBubble
+  jsr AllowChangingDirectionDuringAbility
+
   lda TailAttackVariable
   bne InitializedWithCount
     inc TailAttackVariable

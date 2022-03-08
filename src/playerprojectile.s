@@ -986,6 +986,17 @@ Frame2:
 .a16
 .i16
 .proc RunProjectileThrownSword
+  inc ActorTimer,x
+
+  lda ActorVarC,x
+  jsl ActorWalk
+  dec ActorVarC,x
+
+  lda ActorVarC,x
+  cmp #.loword(-$38)
+  bne :+
+    stz ActorType,x
+  :
   rtl
 .endproc
 
@@ -1001,7 +1012,7 @@ Frame2:
 ;  lda #$4e
 ;  jsl DispActor8x8WithOffset
 
-  lda framecount
+  lda ActorTimer,x
   and #%11110
   tay
   ; Is it a diagonal frame?
@@ -1872,7 +1883,7 @@ HitProjectileResponse:
   .word .loword(Nothing-1) ; Copy fail animation
   .word .loword(Damage-1) ; Sword swipe
   .word .loword(Damage-1) ; Sword swipe (nearby)
-  .word .loword(Damage-1) ; Thrown sword
+  .word .loword(ThrownSword-1) ; Thrown sword
 
 ; Hook an enemy and pull them to the player
 Hook:
@@ -1953,6 +1964,21 @@ NoCopy:
     sta ParticleVX,y
   :
   rtl
+
+ThrownSword:
+.if 0
+  lda #$8000 ; Marker for "stop flying"
+  cmp ActorVarC,x
+  bne :+
+    rtl ; Ignore
+  :
+  sta ActorVarC,x
+.endif
+  lda #Particle::EnemyDamagedParticle
+  jsr ProjectileBecomesDamageParticle
+  lda #$08
+  jmp AddDamage
+
 CopyEnemy:
   .word Actor::FireWalk*2
   .word Actor::FireJump*2

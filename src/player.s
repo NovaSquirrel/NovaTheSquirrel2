@@ -284,9 +284,11 @@ NotWalkSpeed:
   and #KEY_RIGHT
   bne NotLeft
     seta8
-    lda PlayerAbility
-    cmp #Ability::Bubble
-    beq @Force
+;    lda PlayerAbility
+;    cmp #Ability::Sword
+;    beq @Force
+;    cmp #Ability::Bubble
+;    beq @Force
     lda TailAttackTimer
     bne :+
 @Force:
@@ -311,9 +313,11 @@ NotLeft:
   and #KEY_LEFT
   bne NotRight
     seta8
-    lda PlayerAbility
-    cmp #Ability::Bubble
-    beq @Force
+;    lda PlayerAbility
+;    cmp #Ability::Sword
+;    beq @Force
+;    cmp #Ability::Bubble
+;    beq @Force
     lda TailAttackTimer
     bne :+
 @Force:
