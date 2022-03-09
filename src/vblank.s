@@ -292,21 +292,21 @@ SkipBlock:
   lda PaletteRequestIndex
   and #255
   beq :+
-     lda PaletteRequestSource
-     sta DMAADDR
-     lda #DMAMODE_CGDATA
-     sta DMAMODE ; Upload to CGRAM
-     lda #15*2
-     sta DMALEN ; Size
-     seta8
-     lda #^PaletteList
-     sta DMAADDRBANK ; Source bank
-     lda PaletteRequestUploadIndex
-     sta CGADDR
-     ; Initiate the transfer
-     lda #%00000001
-     sta COPYSTART
-     stz PaletteRequestIndex
+    lda PaletteRequestSource
+    sta DMAADDR
+    lda #DMAMODE_CGDATA
+    sta DMAMODE ; Upload to CGRAM
+    lda #15*2
+    sta DMALEN ; Size
+    stz PaletteRequestIndex ; Also clears PaletteRequestValue
+    seta8
+    lda #^PaletteList
+    sta DMAADDRBANK ; Source bank
+    lda PaletteRequestUploadIndex
+    sta CGADDR
+    ; Initiate the transfer
+    lda #%00000001
+    sta COPYSTART
   :
 
   ; -----------------------------------

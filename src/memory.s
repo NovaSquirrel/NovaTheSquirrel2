@@ -236,7 +236,7 @@ LevelZeroWhenLoad_Start:
 
   ; Dynamically uploading sprite palettes
   PaletteRequestIndex: .res 1 ; 8-15, 0 if unused
-  PaletteRequestValue: .res 1
+  PaletteRequestValue: .res 1 ; must also be zero to allow detecting that the game is free to upload a palette
 
   ; And sprite tiles
   SpriteTilesRequestDestination: .res 2 ; VRAM address
