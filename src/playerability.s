@@ -951,23 +951,36 @@ RodAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .a8
 .proc RunAbilitySword
 ; TODO: Make sure the dynamic sprite slot can get freed if the sword ability is interrupted!
+; TailAttackVariable+0: 0=Normal, 2=Charging, 3=Throwing animation
+; TailAttackVariable+1: Charging time
 ChargeTime = 20
 
-  lda TailAttackVariable
-  jeq NotCharge
+  lda TailAttackTimer
+  cmp #2 ; When the charging happens it's set to 2 because 1 allocates stuff
+  beq :+
+SkipCharge:
+  jmp NotCharge
+: lda TailAttackVariable
+  beq SkipCharge
     jsr AllowChangingDirectionDuringAbility
 
     lda keydown
     and #AttackKeys
-    bne NotChargeRelease
+    jne NotChargeRelease
       stz TailAttackTimer
       stz TailAttackVariable
+
       lda TailAttackDynamicSlot
       jsl FreeDynamicSpriteSlot
       seta8
       lda TailAttackVariable+1
       cmp #ChargeTime
       bcc @NoThrow
+      ; Animate
+      lda #9 ; Skip ahead
+      sta TailAttackTimer
+      lda #3 ; Do not draw the sword while doing the attack animation
+      sta TailAttackVariable
       seta16
       jsl FindFreeProjectileX
       bcc @NoThrow
@@ -993,6 +1006,7 @@ ChargeTime = 20
         add PlayerPX
         sta ActorPX,x
 
+        ; Diagonal throws
         lda keydown
         and #KEY_UP
         beq :+
@@ -1013,15 +1027,18 @@ ChargeTime = 20
       seta8
     NotChargeRelease:
 
+    ; Build up toward the charge
     lda TailAttackVariable+1
     cmp #ChargeTime
     bcs :+
       inc TailAttackVariable+1
     :
 
+    ; Hold the sword
     lda #PlayerFrame::SWORD1
     sta TailAttackFrame
 
+    ; If you're moving left or right then use a walk animation (and it will draw the sword differently)
     lda keydown+1
     and #>(KEY_LEFT|KEY_RIGHT)
     beq :+
@@ -1035,7 +1052,26 @@ ChargeTime = 20
     rts
   NotCharge:
 
+  ; Throw animation if = 3, so skip a lot of stuff
+  lda TailAttackVariable
+  cmp #3
+  bne :++
+    inc TailAttackTimer
 
+    lda TailAttackTimer
+    tax ; <--- Make sure higher byte of A is clear
+    lda AttackSwordSequence-1,x
+    sta TailAttackFrame
+
+    lda TailAttackTimer
+    cmp #(AttackSwordSequenceEnd-AttackSwordSequence-1)
+    bne :+
+      stz TailAttackTimer
+    :
+    rts
+  :
+
+  ; Show the right frame in the animation
   lda TailAttackTimer
   pha
   tax ; <--- Make sure higher byte of A is clear
@@ -1154,7 +1190,7 @@ ChargeTime = 20
     lda #.loword(DSSwordAbility+512*3)
     jmp QueueUpdate
   NotD:
-
+:
   .a8
   cmp #(AttackSwordSequenceEnd-AttackSwordSequence-1)
   bne NotEnd
@@ -1232,8 +1268,12 @@ DSSwordAbility:
   sta SpriteTileBase
   seta8
 
-  lda TailAttackVariable ; Charging
-  cmp #2
+  lda TailAttackVariable
+  cmp #3 ; Throwing
+  bne :+
+    rts
+  :
+  cmp #2 ; Charging
   bne NotCharging
   lda PlayerFrame
   cmp #PlayerFrame::SWORD1
