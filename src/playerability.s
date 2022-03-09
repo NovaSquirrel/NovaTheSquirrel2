@@ -1025,8 +1025,10 @@ ChargeTime = 20
     lda keydown+1
     and #>(KEY_LEFT|KEY_RIGHT)
     beq :+
+      inc PlayerHoldingSomething
       jsl CalculateNextPlayerFrame
       seta8
+      dec PlayerHoldingSomething
       lda PlayerFrame
       sta TailAttackFrame
     :
@@ -1223,20 +1225,35 @@ DSSwordAbility:
 
 .a8
 .proc DrawAbilitySword
-  lda TailAttackVariable
-  beq :+
-  lda PlayerFrame
-  cmp #PlayerFrame::SWORD1
-  beq :+
-    rts
-  :
-
   seta16
   lda TailAttackDynamicSlot
   and #255
   jsl GetDynamicSpriteTileNumber
   sta SpriteTileBase
   seta8
+
+  lda TailAttackVariable ; Charging
+  cmp #2
+  bne NotCharging
+  lda PlayerFrame
+  cmp #PlayerFrame::SWORD1
+  beq NotCharging
+    ldy #.loword(Frame1Holding)
+    lda TailAttackVariable+1
+    cmp #RunAbilitySword::ChargeTime
+    bcc :+
+      ldy #.loword(Frame1HoldingCharged)
+    :
+
+    lda PlayerDir
+    pha
+    eor #1
+    sta PlayerDir
+    jsr DrawAbilityFrame
+    pla
+    sta PlayerDir
+    rts
+  NotCharging:
 
   lda TailAttackVariable+1
   cmp #RunAbilitySword::ChargeTime
@@ -1299,8 +1316,13 @@ Frame7:
   .byt $80
 
 Frame1Charged:
-  ; Size, Tile, Y, +X, -X
   .lobytes S16, $02,    -35, -15,    0-(-15)-16
+  .byt $80
+Frame1Holding:
+  .lobytes S16, $00,    -27, -9,    0-(-9)-16
+  .byt $80
+Frame1HoldingCharged:
+  .lobytes S16, $02,    -27, -9,    0-(-9)-16
   .byt $80
 .endproc
 
