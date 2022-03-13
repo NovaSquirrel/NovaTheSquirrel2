@@ -743,21 +743,18 @@ Left:
   rtl
 .endproc
 
-.export ActorApplyVelocity
+.export ActorApplyVelocity, ActorApplyXVelocity, ActorApplyYVelocity
 .proc ActorApplyVelocity
   lda ActorPX,x
   add ActorVX,x
   sta ActorPX,x
-YOnly:
+::ActorApplyYVelocity:
   lda ActorPY,x
   add ActorVY,x
   sta ActorPY,x
   rtl
 .endproc
-ActorApplyYVelocity = ActorApplyVelocity::YOnly
 
-.export ActorApplyXVelocity
-.export ActorApplyYVelocity
 .proc ActorApplyXVelocity
   lda ActorPX,x
   add ActorVX,x
@@ -948,7 +945,7 @@ WalkDistance = 0
     rtl
   :
 
-SkipCheck:
+::ActorWalkSkipCheck:
   ; Look up if the wall is solid
   lda ActorPY,x
   sub #1<<7
@@ -968,7 +965,7 @@ SkipCheck:
   sta ActorPX,x
   ; Fall into ActorDownhillFix
 .endproc
-ActorWalkSkipCheck = ActorWalk::SkipCheck
+
 .a16
 .proc ActorDownhillFix
 
@@ -1019,10 +1016,10 @@ Skip:
 ; input: X (Actor pointer)
 ; output: carry (standing on platform)
 .a16
-.export ActorFall
+.export ActorFall, ActorFallOnlyGroundCheck
 .proc ActorFall
   jsl ActorGravity
-OnlyGroundCheck:
+::ActorFallOnlyGroundCheck:
   ; Remove if too far off the bottom
   lda ActorPY,x
   bmi :+
@@ -1035,8 +1032,6 @@ OnlyGroundCheck:
 
   jmp ActorCheckStandingOnSolid
 .endproc
-ActorFallOnlyGroundCheck = ActorFall::OnlyGroundCheck
-.export ActorFallOnlyGroundCheck
 
 .a16
 .export ActorBumpAgainstCeiling

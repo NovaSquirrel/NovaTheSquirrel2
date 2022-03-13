@@ -211,7 +211,7 @@ ExpandWith:
 .proc AutotileExpandDirt
   ; 0 = Block to store
   lda #Block::LedgeMiddle
-ExpandOther:
+::AutotileExpandOther:
   sta 0
 
   ; 2 = Mask to determine if at the first row of a column
@@ -256,7 +256,6 @@ No:
   dey
   rts
 .endproc
-AutotileExpandOther = AutotileExpandDirt::ExpandOther
 
 .export AutotileLedgeSolidLeft
 .proc AutotileLedgeSolidLeft

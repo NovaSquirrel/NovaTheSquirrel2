@@ -601,7 +601,7 @@ NoShoot:
 ; Hover the cannon and control logic relating to when to shoot
 .proc ActorCannonCommon1
   jsl ActorHover
-NoHover:
+::ActorCannonCommon1NoHover:
   ; Initialize the timer if object is initializing
   lda ActorState,x
   cmp #ActorStateValue::Init
@@ -624,7 +624,6 @@ NotFire:
   clc ; Clear carry, don't fire
   rts
 .endproc
-ActorCannonCommon1NoHover = ActorCannonCommon1::NoHover
 
 ; Display an indicator when the cannon is about to fire
 .proc DrawCannonIndicator
@@ -3887,7 +3886,7 @@ WalkFrames:
   jsl QueueDynamicSpriteUpdate
   plx
 
-DisplayOnly:
+::Draw32x32DynamicFrame:
   lda ActorDynamicSlot,x
   and #7
   .import GetDynamicSpriteTileNumber
@@ -3906,8 +3905,6 @@ Frame: ; Should have the program bank = data bank here!
 ;  Row16x16 -8,  8,  $04, $06
   EndMetasprite
 .endproc
-Draw32x32DynamicFrame = DrawUpdate32x32DynamicFrame::DisplayOnly
-
 
   .byt 0 ; Because the collision is one frame behind
 StrifeCloudSwordFrames:

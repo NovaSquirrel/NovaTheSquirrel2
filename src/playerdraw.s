@@ -360,7 +360,7 @@ HaveY:
     stx OamPtr
   DontOfferAPress:
 
-CalculateNextFrame:
+::CalculateNextPlayerFrame:
   seta8
   stz PlayerFrame
   stz PlayerFrameXFlip
@@ -481,7 +481,6 @@ XToPixels:
 .endproc
 
 .export CalculateNextPlayerFrame
-CalculateNextPlayerFrame = DrawPlayer::CalculateNextFrame
 
 .export DrawPlayerStatus
 .proc DrawPlayerStatus

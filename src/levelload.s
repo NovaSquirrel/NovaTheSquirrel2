@@ -29,12 +29,12 @@
 ; Accumulator = level number
 .a16
 .i16
-.export StartLevel
+.export StartLevel, StartLevelFromDoor
 .proc StartLevel
   setaxy16
   ; Taken from the overworld and used for level-specific flags
   sta StartedLevelNumber
-FromDoor:
+::StartLevelFromDoor:
   ldx #$1ff
   txs ; Reset the stack pointer so no cleanup is needed
   jsr StartLevelCommon
@@ -42,8 +42,6 @@ FromDoor:
   jsl MakeCheckpoint
   jml GameMainLoop
 .endproc
-StartLevelFromDoor = StartLevel::FromDoor
-.export StartLevelFromDoor
 
 ; Called both when starting a level normally and when making a checkpoint through other means
 .export MakeCheckpoint

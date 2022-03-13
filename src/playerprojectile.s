@@ -153,12 +153,12 @@ DrawPlayerProjectileTable:
 CustomRadius:
   ; Remove the subpixels
   lda 0
-  jsr Reduce
+  jsr DrawProjectileCopyReduce
   pha
   sta 0
 
   lda 2
-  jsr Reduce
+  jsr DrawProjectileCopyReduce
   pha
   sta 2
 
@@ -195,11 +195,10 @@ CustomRadius:
 
 ; DispActor8x8WithOffset takes pixels, which is a problem.
 ; Shift the subpixels off.
-Reduce:
+::DrawProjectileCopyReduce:
   asr_n 4
   rts
 .endproc
-DrawProjectileCopyReduce = DrawProjectileCopy::Reduce
 .export DrawProjectileCopyReduce
 
 .if 0

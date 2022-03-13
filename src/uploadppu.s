@@ -339,7 +339,7 @@ KeepOffset:
   plx
   rtl
 
-WithOffset: ; Alternate entrance for using destination address offsets
+::DoGraphicUploadWithOffset: ; Alternate entrance for using destination address offsets
   phx
   php
   setaxy16
@@ -362,7 +362,7 @@ Compressed:
   plx
   rtl
 .endproc
-DoGraphicUploadWithOffset = DoGraphicUpload::WithOffset
+
 ;;
 ; Uploads a specific palette asset to CGRAM
 ; locals: 0, 1

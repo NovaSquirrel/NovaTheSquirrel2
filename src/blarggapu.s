@@ -26,7 +26,7 @@
   ; Clear command port in case it already has $CC at reset
   seta8
   stz APU0
-without_clear:
+::spc_wait_boot_without_clear:
   ; Wait for the SPC to signal it's ready with APU0=$AA, APU1=$BB
   seta16
   lda #$BBAA
@@ -36,7 +36,6 @@ waitBBAA:
   seta8
   rts
 .endproc
-spc_wait_boot_without_clear = spc_wait_boot::without_clear
 
 ; Starts upload to SPC addr Y and sets Y to
 ; 0 for use as index with spc_upload_byte.
@@ -126,7 +125,7 @@ spc_wait_boot_without_clear = spc_wait_boot::without_clear
   rtl
 .endproc
 
-.import spc_entry, fast_spc_entry, GSS_MusicUploadAddress, SongDirectory
+.import spc_entry, GSS_MusicUploadAddress, SongDirectory
 .import __SPCIMAGE_RUN__, __SPCIMAGE_LOAD__, __SPCIMAGE_SIZE__
 
 .proc spc_boot_apu
