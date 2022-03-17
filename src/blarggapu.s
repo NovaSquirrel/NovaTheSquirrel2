@@ -153,9 +153,9 @@ GSS_SendCommandParamX:
 .proc GSS_SendCommand
 	sta 0
 NoWrite:
-    lda APU3
-    pha
-:   lda APU0
+	lda APU3
+	pha
+:	lda APU0
 	bne :-
 	seta16
 	lda 2
@@ -168,7 +168,7 @@ NoWrite:
 	sta APU0
 
 	; Wait for acknowledgement
-    pla
+	pla
 :	cmp APU3
 	beq :-
 	rtl
@@ -179,20 +179,20 @@ NoWrite:
 Pointer = 2
 Length  = 0
 	setaxy16
-    and #$00ff
-    asl
-    asl
-    tax
-    lda f:SongDirectory+0,x
+	and #$00ff
+	asl
+	asl
+	tax
+	lda f:SongDirectory+0,x
 	sta Pointer
-    lda f:SongDirectory+2,x
+	lda f:SongDirectory+2,x
 	sta Length
-    seta8
-    lda #^SongDirectory
-    sta Pointer+2
+	seta8
+	lda #^SongDirectory
+	sta Pointer+2
 
 	; Wait for SPC to be ready
-:   lda APU0
+:	lda APU0
 	bne :-
 
 .if 1
@@ -227,8 +227,8 @@ Length  = 0
 	php
 	sei
 
-    ldy #0
-    jsr TransferLoop
+	ldy #0
+	jsr TransferLoop
 
 	; Reenable interrupts
 	plp
@@ -237,8 +237,8 @@ Length  = 0
 
 	lda #$80
 	sta APU0
-:   lda APU0
-    bne :-
+:	lda APU0
+	bne :-
 .endif
 	rtl
 .endproc
@@ -246,7 +246,7 @@ Length  = 0
 .if 0
 .proc TransferLoop
 	Pointer = 2
-	Length = 0
+	Length  = 0
 Upload:
 	lda [Pointer],y
 	sta APU1
