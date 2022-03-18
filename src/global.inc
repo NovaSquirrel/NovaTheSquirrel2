@@ -152,6 +152,10 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
 	; APU2 = Effect number
 	; APU3 = Pan
 
+	STREAM_START
+	STREAM_STOP
+	STREAM_SEND
+
 	INITIALIZE      = SUBCOMMAND + (GSS_SubCommands::INITIALIZE << 4)
 	; No parameters
 
