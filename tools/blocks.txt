@@ -3,13 +3,13 @@
 
 alias common $0000
 alias terrain $1000
-alias terrain_rocks $1c00
-alias wood $2000
+alias terrain_rocks $2400
+alias wood $1c00
 alias small_trees $2800
 alias common_pal_flowertops $2e00
 alias colorfulflower $3000
 alias colored_locks $5c00
-alias special_push $5800
+alias special_push $5000
 alias fg_water $3400
 alias common_pal_sand $3800
 alias treehouse $3800
@@ -1468,7 +1468,7 @@ editor_hide
 #######################################
 # Arrow blocks
 #######################################
-base $5000
+base $5400
 palette global_palette
 tileset FGHannah
 editor_category Puzzle
