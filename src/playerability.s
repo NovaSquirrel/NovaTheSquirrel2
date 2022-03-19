@@ -1533,8 +1533,12 @@ NoCreateRocket:
 .a8
 .i16
 .proc RunAbilityBubble
+; TailAttackVariable+0: Nonzero = Have already checked if there were bubbles when the ability started
+; TailAttackVariable+1: Were there bubbles when the ability started?
+; This is used to decide between tailswishing when sending out stored bubbles or to do the style where it fires it off after releasing the button
   jsr AllowChangingDirectionDuringAbility
 
+  ; At the start of the ability, check if there are bubbles
   lda TailAttackVariable
   bne InitializedWithCount
     inc TailAttackVariable
@@ -1616,6 +1620,7 @@ ForceBubble:
   rts
 
 ; Bubbles are floating if their timer is zero
+; Returns answer in Z flag and accumulator (1 if true, 0 if false)
 HaveFloatingBubbles:
   seta16
   ldy #ProjectileStart
@@ -1643,6 +1648,14 @@ HaveFloatingBubbles:
 .a8
 .i16
 .proc DrawAbilityBubble
+  lda TailAttackVariable+1
+  beq ChargeUp
+  lda TailAttackDirection
+  and #>(KEY_DOWN|KEY_UP)
+  bne ChargeUp
+  rts
+ChargeUp:
+
   ; Display bubble wand
   tdc ; Clear A
   lda PlayerDir
