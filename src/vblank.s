@@ -103,16 +103,18 @@ VblankHandler:
   ; And also do background updates:
   setaxy16
 
+  ; Set up faster access to DMA registers
   lda #DMAMODE
   tcd
+  ; Most DMAs here are DMAMODE_PPUDATA so set it up
+  lda #DMAMODE_PPUDATA
+  sta <DMAMODE
 
   ; Do row/column updates if required
   lda ColumnUpdateAddress
   beq :+
     stz ColumnUpdateAddress
     sta PPUADDR
-    lda #DMAMODE_PPUDATA
-    sta <DMAMODE
     lda #ColumnUpdateBuffer
     sta <DMAADDR
     lda #32*2
@@ -134,8 +136,6 @@ VblankHandler:
     ; --- First screen
     ; Set DMA parameters  
     stx PPUADDR
-    lda #DMAMODE_PPUDATA
-    sta <DMAMODE
     lda #RowUpdateBuffer
     sta <DMAADDR
     ldy #32*2
@@ -166,8 +166,6 @@ VblankHandler:
   beq :+
     stz ColumnUpdateAddress2
     sta PPUADDR
-    lda #DMAMODE_PPUDATA
-    sta <DMAMODE
     lda #ColumnUpdateBuffer2
     sta <DMAADDR
     lda #32*2
@@ -190,8 +188,6 @@ VblankHandler:
     ; Set DMA parameters  
     tax
     sta PPUADDR
-    lda #DMAMODE_PPUDATA
-    sta <DMAMODE
     lda #RowUpdateBuffer2
     sta <DMAADDR
     ldy #32*2
@@ -224,19 +220,17 @@ GenericUpdateLoop:
   ldy GenericUpdateLength,x
   beq SkipGeneric
   ; Y used for safe-keeping in case it's needed, since it will get zero'd
-  sty DMALEN
+  sty <DMALEN
   stz GenericUpdateLength,x ; Mark the update slot as free
   lda GenericUpdateSource,x
-  sta DMAADDR
+  sta <DMAADDR
   lda GenericUpdateDestination,x ; >=8000 indicates it's a palette upload
   bmi WasPalette                 ; because only 32K words of VRAM are installed
   ; ---------------
   sta PPUADDR
-  lda #DMAMODE_PPUDATA
-  sta DMAMODE
   seta8
   lda GenericUpdateFlags,x   ; First byte is the bank
-  sta DMAADDRBANK
+  sta <DMAADDRBANK
   lda #1
   sta COPYSTART
   lda GenericUpdateFlags+1,x ; Second byte is flags.
@@ -245,9 +239,9 @@ GenericUpdateLoop:
   ; +------- Do a second DMA with the same length, coming from GenericUpdateSource2
   bpl @NoSecondRow
     seta16
-    sty DMALEN ; Length stored from earlier
+    sty <DMALEN ; Length stored from earlier
     lda GenericUpdateSource2,x
-    sta DMAADDR
+    sta <DMAADDR
     ; Leave the bank the same - the data will not straddle two banks
     lda GenericUpdateDestination2,x
     sta PPUADDR
@@ -262,14 +256,17 @@ GenericUpdateLoop:
 WasPalette:
   seta8
   sta CGADDR
-  stz DMAMODE   ; Linear, increasing DMA
+  stz <DMAMODE   ; Linear, increasing DMA
   lda #<CGDATA
-  sta DMAPPUREG
+  sta <DMAPPUREG
   lda GenericUpdateFlags,x
-  sta DMAADDRBANK
+  sta <DMAADDRBANK
   lda #1
   sta COPYSTART
   seta16
+  ; Restore it to a PPUDATA copy 
+  lda #DMAMODE_PPUDATA
+  sta <DMAMODE
 SkipGeneric:
   dex
   dex
