@@ -150,7 +150,7 @@ Temp = BlockTemp
   ; Find a free index in the block update queue
   ldy #(BLOCK_UPDATE_COUNT-1)*2
 FindIndex:
-  ldx BlockUpdateAddress,y ; Test for zero (exact value not used)
+  ldx BlockUpdateAddressTop,y ; Test for zero (exact value not used)
   beq Found
   dey                      ; Next index
   dey
@@ -247,7 +247,7 @@ Found:
   asl
   asl
   ora #ForegroundBG>>1
-  sta BlockUpdateAddress,y
+  sta BlockUpdateAddressTop,y
 
 CalculateRestOfAddress:
   ; Add in X
@@ -257,17 +257,22 @@ CalculateRestOfAddress:
   xba
   and #15
   asl
-  ora BlockUpdateAddress,y
-  sta BlockUpdateAddress,y
+  ora BlockUpdateAddressTop,y
+  sta BlockUpdateAddressTop,y
 
   ; Choose second screen if needed
   lda LevelBlockPtr
   and #%0000010000000000
   beq :+
-    lda BlockUpdateAddress,y
+    lda BlockUpdateAddressTop,y
     ora #2048>>1
-    sta BlockUpdateAddress,y
+    sta BlockUpdateAddressTop,y
   :
+
+  ; Precalculate the bottom row
+  lda BlockUpdateAddressTop,y
+  add #(32*2)>>1
+  sta BlockUpdateAddressBottom,y
 
   ; Restore registers
 Exit:
@@ -363,7 +368,7 @@ InRange:
   asl
   asl
   ora SecondFGTilemapPointer
-  sta BlockUpdateAddress,y
+  sta BlockUpdateAddressTop,y
   jmp ChangeBlock::CalculateRestOfAddress
 .endproc
 

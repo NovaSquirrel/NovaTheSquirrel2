@@ -438,6 +438,14 @@ ReturnFromTwoLayer:
 
   lda HDMASTART_Mirror
   sta HDMASTART
+
+  ; Now that we're done with vblank tasks, clean up after vblank
+  seta16
+  .repeat ::BLOCK_UPDATE_COUNT, I
+    stz BlockUpdateAddressTop+(I*2)
+  .endrep
+
+  ; Go on with game logic again
   jmp forever
 
 ; ---------------------------------------------------------

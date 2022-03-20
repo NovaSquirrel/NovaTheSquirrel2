@@ -23,10 +23,14 @@ AbilityGraphicsSource      = TouchTemp
 AbilityIconGraphicSource   = TouchTemp + 2
 PaletteRequestUploadIndex  = TouchTemp + 4
 PaletteRequestSource       = TouchTemp + 5
+; For ppu_copy_oam_partial
+OamPartialCopy512Sub        = DecodePointer ; has 3 bytes and then 3 bytes for ScriptPointer
+OamPartialCopyDivide16      = DecodePointer + 2
+OamPartialCopyDivide16Rsb32 = DecodePointer + 4
 
 VblankHandler:
   seta16
-  ; Prepare for vblank
+  ; Prepare for vblank - try and do actual computation here to save time inside vblank
   lda NeedAbilityChange
   and #255
   beq :+
@@ -74,10 +78,27 @@ VblankHandler:
   :
 
   ; Pack the second OAM table together into the format the PPU expects
-  jsl ppu_pack_oamhi_partial ; does seta8
-  ; And once that's out of the way, wait until vertical blank where
-  ; I can actually copy all of the prepared OAM to the PPU
+  jsl ppu_pack_oamhi_partial
+  .a8 ; (does seta8)
+  ; And then prepare the DMA values we'll use in ppu_copy_oam_partial
+  ; which we can call once we're in vblank
+
+  seta16
+  lda #512
+  sub OamPtr
+  sta OamPartialCopy512Sub
+  lda OamPtr
+  lsr
+  lsr
+  lsr
+  lsr
+  sta OamPartialCopyDivide16
+  rsb #32
+  sta OamPartialCopyDivide16Rsb32
+
+  seta8
   jsl WaitVblank
+  ; AXY size preserved, so still .a8 .i16
   jsl ppu_copy_oam_partial
   ; And also do background updates:
   setaxy16
@@ -259,6 +280,8 @@ SkipGeneric:
 
   ; -----------------------------------
   ; Do block updates
+  lda BlockUpdateAddressTop+((BLOCK_UPDATE_COUNT-1)*2)
+  jeq CancelBlockUpdates
   .repeat ::BLOCK_UPDATE_COUNT, I
   lda BlockUpdateAddressTop+(I*2)
   beq :+
@@ -274,10 +297,9 @@ SkipGeneric:
     sta <PPUDATA
     lda BlockUpdateDataBR+(I*2)
     sta <PPUDATA
-
-    stz BlockUpdateAddressTop+(I*2) ; Cancel out the block now that it's been written
   :
   .endrep
+CancelBlockUpdates:
 
   lda #0
   tcd

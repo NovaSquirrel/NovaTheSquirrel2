@@ -196,28 +196,31 @@ packloop:
 ; Copies packed OAM data to the S-PPU using DMA channel 0
 ; and hides unused sprites using DMA channel 1
 .proc ppu_copy_oam_partial
-  setaxy16
-  lda OamPtr                     ; If OAM is actually completely full (somehow),
-  cmp #512                       ; then don't use this routine because it'll break
+; From ppu_copy_oam_partial
+OamPartialCopy512Sub        = DecodePointer ; has 3 bytes and then 3 bytes for ScriptPointer
+OamPartialCopyDivide16      = DecodePointer + 2
+OamPartialCopyDivide16Rsb32 = DecodePointer + 4
+  .a8
+  .i16
+  ldx OamPtr                     ; If OAM is actually completely full (somehow),
+  cpx #512                       ; then don't use this routine because it'll break
   bcs ppu_copy_oam               ; (because a DMA length of "zero" is actually 64KB)
 
-  lda #DMAMODE_OAMDATA           ; Actually copy in OAM
-  sta DMAMODE+$00
-  lda #DMAMODE_OAMDATA|DMA_CONST ; Copy in a fixed source byte
-  sta DMAMODE+$10
+  ldx #DMAMODE_OAMDATA           ; Actually copy in OAM
+  stx DMAMODE+$00
+  ldx #DMAMODE_OAMDATA|DMA_CONST ; Copy in a fixed source byte
+  stx DMAMODE+$10
 
-  lda OamPtr                     ; Copy in the used part of the OAM buffer
-  sta DMALEN+$00
-  lda #512                       ; And the rest should be ignored
-  sub OamPtr
-  sta DMALEN+$10
+  ldx OamPtr                     ; Copy in the used part of the OAM buffer
+  stx DMALEN+$00
+  ldx OamPartialCopy512Sub
+  stx DMALEN+$10
 
-  lda #OAM
-  sta DMAADDR+$00
-  lda #.loword(oam_source)
-  sta DMAADDR+$10
+  ldx #OAM
+  stx DMAADDR+$00
+  ldx #.loword(oam_source)
+  stx DMAADDR+$10
 
-  seta8
   lda #^oam_source
   sta DMAADDRBANK+$00
   sta DMAADDRBANK+$10
@@ -225,24 +228,17 @@ packloop:
   lda #3
   sta COPYSTART
   ; ---------------------------
-  seta16
 
-  lda OamPtr                     ; Divide by 16 for high OAM
-  lsr ; 256
-  lsr ; 128
-  lsr ; 64
-  lsr ; 32
-  sta DMALEN+$00
-  rsb #32
-  sta DMALEN+$10
-  lda #OAMHI
-  sta DMAADDR+$00
-  lda #.loword(hi_source)
-  sta DMAADDR+$10
-  seta8
+  ldx OamPartialCopyDivide16
+  stx DMALEN+$00
+  ldx OamPartialCopyDivide16Rsb32
+  stx DMALEN+$10
+  ldx #OAMHI
+  stx DMAADDR+$00
+  ldx #.loword(hi_source)
+  stx DMAADDR+$10
   lda #3
   sta COPYSTART
-  setaxy16
   rtl
 oam_source:
   .byt $f0
