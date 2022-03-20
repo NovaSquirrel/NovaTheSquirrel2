@@ -259,29 +259,25 @@ SkipGeneric:
 
   ; -----------------------------------
   ; Do block updates
-  ldx #(BLOCK_UPDATE_COUNT-1)*2
-BlockUpdateLoop:
-  lda BlockUpdateAddress,x
-  beq SkipBlock
-  sta <PPUADDR
-  lda BlockUpdateDataTL,x
-  sta <PPUDATA
-  lda BlockUpdateDataTR,x
-  sta <PPUDATA
+  .repeat ::BLOCK_UPDATE_COUNT, I
+  lda BlockUpdateAddressTop+(I*2)
+  beq :+
+    sta <PPUADDR
+    lda BlockUpdateDataTL+(I*2)
+    sta <PPUDATA
+    lda BlockUpdateDataTR+(I*2)
+    sta <PPUDATA
 
-  lda BlockUpdateAddress,x ; Move down a row
-  add #(32*2)>>1
-  sta <PPUADDR
-  lda BlockUpdateDataBL,x
-  sta <PPUDATA
-  lda BlockUpdateDataBR,x
-  sta <PPUDATA
+    lda BlockUpdateAddressBottom+(I*2)
+    sta <PPUADDR
+    lda BlockUpdateDataBL+(I*2)
+    sta <PPUDATA
+    lda BlockUpdateDataBR+(I*2)
+    sta <PPUDATA
 
-  stz BlockUpdateAddress,x ; Cancel out the block now that it's been written
-SkipBlock:
-  dex
-  dex
-  bpl BlockUpdateLoop
+    stz BlockUpdateAddressTop+(I*2) ; Cancel out the block now that it's been written
+  :
+  .endrep
 
   lda #0
   tcd

@@ -263,7 +263,8 @@ LevelZeroWhenLoad_Start:
   RowUpdateBuffer2:     .res 64*2  ; 64 tiles horizontally
 
   ; For ChangeBlock
-  BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateAddressTop:    .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateAddressBottom: .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2

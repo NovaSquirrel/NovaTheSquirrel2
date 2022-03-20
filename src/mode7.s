@@ -27,6 +27,7 @@
 TURN_ANGLES = 64
 DrawCenterX = 128
 DrawCenterY = 192
+BlockUpdateAddress = BlockUpdateAddressTop
 
 ; Synchronize with the list on mode7actors.s
 .enum Mode7ActorType

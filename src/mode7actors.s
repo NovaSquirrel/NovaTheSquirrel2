@@ -26,6 +26,7 @@
 ActorM7DynamicSlot = ActorIndexInLevel ; Reuse this
 ActorM7LastDrawX = ActorState    ; and ActorOnGround
 ActorM7LastDrawY = ActorOnScreen ; and ActorDamage
+BlockUpdateAddress = BlockUpdateAddressTop
 
 NUM_M7_ACTORS = 8
 
