@@ -23,6 +23,7 @@
 .globalzp PlayerVX
 .globalzp PlayerVY
 .globalzp PlayerFrame
+.global PlayerFrameLast
 .globalzp PlayerFrameXFlip
 .globalzp PlayerFrameYFlip
 .globalzp PlayerDir

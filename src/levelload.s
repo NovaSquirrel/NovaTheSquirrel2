@@ -143,6 +143,7 @@
   sta LevelColumnSize
 
   seta8
+  ; ------------ Initialize variables ------------
   ; Clear a bunch of stuff in one go that's in contiguous space in memory
   ldx #LevelZeroWhenLoad_Start
   ldy #LevelZeroWhenLoad_End-LevelZeroWhenLoad_Start
@@ -155,6 +156,7 @@
   ; Clear FirstActorOnScreen list too
   ldy #15
   lda #255
+  sta PlayerFrameLast ; Force a load
 : sta FirstActorOnScreen,y
   dey
   bpl :-

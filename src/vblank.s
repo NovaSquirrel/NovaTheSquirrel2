@@ -23,6 +23,7 @@ AbilityGraphicsSource      = TouchTemp
 AbilityIconGraphicSource   = TouchTemp + 2
 PaletteRequestUploadIndex  = TouchTemp + 4
 PaletteRequestSource       = TouchTemp + 5
+PlayerFrameSource          = TempVal
 ; For ppu_copy_oam_partial
 OamPartialCopy512Sub        = DecodePointer ; has 3 bytes and then 3 bytes for ScriptPointer
 OamPartialCopyDivide16      = DecodePointer + 2
@@ -53,6 +54,7 @@ VblankHandler:
     add #.loword(AbilityIcons)
     sta AbilityIconGraphicSource
   :
+
   seta8
   lda PaletteRequestIndex
   beq :+
@@ -75,7 +77,24 @@ VblankHandler:
     asl
     add #PaletteList & $ffff
     sta PaletteRequestSource
+    seta8
   :
+
+  ; Player frame, if it's needed
+  ldx #$ffff
+  stx PlayerFrameSource
+  tdc ; Clear top byte of accumulator
+  lda PlayerFrame
+  cmp PlayerFrameLast
+  sta PlayerFrameLast
+  beq PlayerFramesMatch
+    seta16
+    xba              ; *256
+    asl              ; *512
+    ;ora #$8000      <-- For LoROM
+    sta PlayerFrameSource
+    seta8
+  PlayerFramesMatch:
 
   ; Pack the second OAM table together into the format the PPU expects
   jsl ppu_pack_oamhi_partial
@@ -100,7 +119,6 @@ VblankHandler:
   jsl WaitVblank
   ; AXY size preserved, so still .a8 .i16
   jsl ppu_copy_oam_partial
-  ; And also do background updates:
   setaxy16
 
   ; Set up faster access to DMA registers
@@ -108,7 +126,39 @@ VblankHandler:
   tcd
   ; Most DMAs here are DMAMODE_PPUDATA so set it up
   lda #DMAMODE_PPUDATA
-  sta <DMAMODE
+  sta <DMAMODE+$00
+  sta <DMAMODE+$10
+
+  ; Player frame
+  lda a:PlayerFrameSource
+  cmp #$ffff
+  beq NoPlayerUpload
+    sta <DMAADDR+$00
+    ora #256
+    sta <DMAADDR+$10
+
+    lda #32*8 ; 8 tiles for each DMA
+    sta <DMALEN+$00
+    sta <DMALEN+$10
+
+    lda #(SpriteCHRBase+$000)>>1
+    sta PPUADDR
+    seta8
+    .import PlayerGraphics
+    lda #^PlayerGraphics
+    sta <DMAADDRBANK+$00
+    sta <DMAADDRBANK+$10
+
+    lda #%00000001
+    sta COPYSTART
+
+    ; Bottom row -------------------
+    ldx #(SpriteCHRBase+$200)>>1
+    stx PPUADDR
+    lda #%00000010
+    sta COPYSTART
+    seta16
+  NoPlayerUpload:
 
   ; Do row/column updates if required
   lda ColumnUpdateAddress
@@ -324,11 +374,77 @@ CancelBlockUpdates:
     sta COPYSTART
   :
 
-  ; -----------------------------------
-  jsl PlayerFrameUpload
+  ;----------------------------------------------------------------------------
+  ;- Ability tileset upload
+  ;----------------------------------------------------------------------------
 
-  ; Lowest priority is loading in new sprite tilesets
+  ; Hold on, is there enough time to upload new ability graphics, if that's needed?
+  ; It's 1KB plus four tiles. We can check to make sure it wouldn't cause vblank to be overrun
+  ; by checking the current Y position.
   seta8
+  bit PPUSTATUS2 ; Resets the flip flop for GETXY
+  bit GETXY
+  lda YCOORD
+  cmp #261-(8+1) ; The following code takes about 8 scanlines, add 1 for security
+  bcc :+
+@TimeUp:
+    ; There's not enough time to copy the ability graphics, so delay that until next frame
+    jmp EndOfVblank ; Don't even bother to do the sprite tileset
+  :
+  ; Read YCOORD a second time - if the high bit of the Y position is set, there is definitely not enough time
+  lda YCOORD
+  lsr
+  bcs @TimeUp
+  bit VBLSTATUS ; Need to be in vblank
+  bpl @TimeUp
+  ; -----------------------------------
+  ; Is there actually an ability to copy in?
+  lda NeedAbilityChange
+  beq NoNeedAbilityChange
+    ldx #DMAMODE_PPUDATA
+    stx DMAMODE
+
+    .import AbilityIcons
+    lda #^AbilityIcons
+    sta DMAADDRBANK+$00
+
+    ldx AbilityIconGraphicSource
+    stx DMAADDR+$00
+    ldy #32*2 ; 2 tiles for each DMA
+    sty DMALEN+$00
+
+    ; Top row ----------------------
+    ldx #(SpriteCHRBase+$100)>>1
+    stx PPUADDR
+    lda #%00000001
+    sta COPYSTART
+
+    ; Bottom row -------------------
+    sty DMALEN+$00
+    ldx #(SpriteCHRBase+$300)>>1
+    stx PPUADDR
+    sta COPYSTART
+
+    ; Ability graphics -------------
+    ldx AbilityGraphicsSource
+    stx DMAADDR
+
+    ldx #1024 ; Two rows of tiles
+    stx DMALEN
+    ldx #(SpriteCHRBase+$400)>>1
+    stx PPUADDR
+    lda #%00000001
+    sta COPYSTART
+
+    stz AbilityMovementLock
+    stz NeedAbilityChange
+    stz NeedAbilityChangeSilent
+  NoNeedAbilityChange:
+
+  ;----------------------------------------------------------------------------
+  ;- Lowest priority is loading in new sprite tilesets
+  ;----------------------------------------------------------------------------
+  .a8 ; Still seta8
   lda SpriteTilesRequestSource+2 ; Won't have sources with a zero bank
   beq @DontUploadSpriteTiles
   bit PPUSTATUS2 ; Resets the flip flop for GETXY
@@ -360,4 +476,6 @@ CancelBlockUpdates:
 
     stz SpriteTilesRequestSource+2 ; Bank
   @DontUploadSpriteTiles:
-  seta16
+EndOfVblank:
+
+  ; Will seta8 afterward

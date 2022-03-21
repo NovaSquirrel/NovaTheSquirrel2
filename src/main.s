@@ -194,6 +194,9 @@ forever:
     jsl OpenInventory
     phk
     plb
+    seta8
+    lda #255
+    sta PlayerFrameLast ; Force an update
   :
 
   seta16
