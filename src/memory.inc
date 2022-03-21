@@ -118,7 +118,9 @@ GENERIC_UPDATE_COUNT = 5
 
 DYNAMIC_SPRITE_SLOTS = 8
 .global DynamicSpriteSlotUsed
-
+.global DynamicSpriteAddress ;\ For checking if the frame is already uploaded
+.global DynamicSpriteBank    ;/
+ACTOR_DYNAMIC_SLOT_MASK = 7*2 ; For getting it from ActorDynamicSlot with 16-bit accumulator
 
 .globalzp LevelColumnSize
 .global GetLevelPtrXY_Ptr

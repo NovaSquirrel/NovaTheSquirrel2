@@ -281,8 +281,11 @@ LevelZeroWhenLoad_Start:
   ; Second byte of GenericUpdateFlags has some other metadata:
   ; For VRAM updates, if bit 7 is set, there is a second DMA to Destination2 from Source2
 
-  DynamicSpriteSlotUsed: .res DYNAMIC_SPRITE_SLOTS
-  ; Every slot is nonzero if used, zero if not
+  ; Dynamic sprite slots, for dynamically allocating/freeing 32x32 frames
+  DynamicSpriteSlotUsed: .res DYNAMIC_SPRITE_SLOTS ; Every slot is nonzero if used, zero if not
+  ; For detecting if the sprite is already in the slot
+  DynamicSpriteAddress: .res DYNAMIC_SPRITE_SLOTS*2 ; Address of the source data
+  DynamicSpriteBank:    .res DYNAMIC_SPRITE_SLOTS*2 ; Contains flag byte too
 
   ; Delayed ChangeBlock updates
   DelayedBlockEditType: .res MaxDelayedBlockEdits*2 ; Block type to put in

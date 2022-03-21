@@ -843,7 +843,7 @@ Already:
     adc Length ; Just assume carry is clear
   :
   sta GenericUpdateByteTotal
-  cmp #2800
+  cmp #3000
   bcc :+
     ; This probably shouldn't happen - assert(0) 
     clc
@@ -921,6 +921,7 @@ Found:
   inc DynamicSpriteSlotUsed,x ; Mark it as used
   seta16
   txa
+  asl ; Store it as slot*2
   plx
   sec ; Success
   rtl
@@ -930,6 +931,7 @@ Found:
 .export FreeDynamicSpriteSlot
 .proc FreeDynamicSpriteSlot
   phx
+  lsr ; It's stored as slot*2, so fix that
   tax
   seta8
   stz DynamicSpriteSlotUsed,x
@@ -942,7 +944,6 @@ Found:
 .export GetDynamicSpriteTileNumber
 .proc GetDynamicSpriteTileNumber
   phx
-  asl
   tax
   lda f:TileNumbers,x
   plx
@@ -960,12 +961,12 @@ TileNumbers:
 
 .export GetDynamicSpriteVRAMAddress
 .proc GetDynamicSpriteVRAMAddress
-  phx
-  asl
-  tax
-  lda f:Addresses,x
-  plx
-  rtl
+; Actual code not used yet, because QueueDynamicSpriteUpdate can do it instead
+;  phx
+;  tax
+;  lda f:Addresses,x
+;  plx
+;  rtl
 Addresses:
   .word (SpriteCHRBase+$1000)>>1
   .word (SpriteCHRBase+$1100)>>1
@@ -987,16 +988,25 @@ Addresses:
 .a16
 .export QueueDynamicSpriteUpdate
 .proc QueueDynamicSpriteUpdate
+BankAndFlags = QueueGenericUpdate::BankAndFlags
+Source = QueueGenericUpdate::Source
+Slot = 8
   pha
-  txa
-  asl
-  tax
+  ; Is this frame already uploaded?
+  cmp DynamicSpriteAddress,x
+  bne :+
+    lda 0
+    cmp DynamicSpriteBank,x
+    beq AlreadyPresent
+  :
+  stx Slot
+
   lda f:GetDynamicSpriteVRAMAddress::Addresses,x
   tax
   pla
   jsl QueueGenericUpdate ; A=source, 0=source bank, X=destination, Y=bytes
   bcc Fail
-  ; X = the slot, still
+  ; X = the generic update slot, still
   ; Y is preserved, so it's still the length
   tya
   add QueueGenericUpdate::Source
@@ -1004,7 +1014,19 @@ Addresses:
   lda QueueGenericUpdate::Destination
   ora #$0200 >> 1
   sta GenericUpdateDestination2,x
-  ; Carry is still set
+
+  ldx Slot
+  lda BankAndFlags
+  sta DynamicSpriteBank,x
+  lda Source
+  sta DynamicSpriteAddress,x
+
+  sec
 Fail:
+  rtl
+
+AlreadyPresent:
+  pla ; Clean up
+  sec ; Say it's already loaded
   rtl
 .endproc

@@ -1190,7 +1190,7 @@ SkipCharge:
     lda #.loword(DSSwordAbility+512*3)
     jmp QueueUpdate
   NotD:
-:
+
   .a8
   cmp #(AttackSwordSequenceEnd-AttackSwordSequence-1)
   bne NotEnd
@@ -1218,7 +1218,7 @@ SkipCharge:
 QueueUpdate:
   pha
   lda TailAttackDynamicSlot
-  and #7
+  and #ACTOR_DYNAMIC_SLOT_MASK
   tax
   ldy #256
   lda #^DSSwordAbility | $8000
@@ -1263,7 +1263,7 @@ DSSwordAbility:
 .proc DrawAbilitySword
   seta16
   lda TailAttackDynamicSlot
-  and #255
+  and #ACTOR_DYNAMIC_SLOT_MASK
   jsl GetDynamicSpriteTileNumber
   sta SpriteTileBase
   seta8

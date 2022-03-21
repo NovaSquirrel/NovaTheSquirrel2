@@ -3878,7 +3878,7 @@ WalkFrames:
   phx
   pha
   lda ActorDynamicSlot,x
-  and #7
+  and #ACTOR_DYNAMIC_SLOT_MASK
   tax      ; X = Sprite number
   ldy #256 ; Y = Number of bytes
   pla      ; A = Source address
@@ -3888,7 +3888,7 @@ WalkFrames:
 
 ::Draw32x32DynamicFrame:
   lda ActorDynamicSlot,x
-  and #7
+  and #ACTOR_DYNAMIC_SLOT_MASK
   .import GetDynamicSpriteTileNumber
   jsl GetDynamicSpriteTileNumber
   ora #OAM_PRIORITY_2

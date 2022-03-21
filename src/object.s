@@ -2571,6 +2571,7 @@ Loop:
   lda ActorDynamicSlot,x  ; 255 is used to mark an empty slot, so >=128 empty
   bmi NoAllocation
     phx
+    lsr ; It's stored as slot*2, so fix that
     tax
     dec DynamicSpriteSlotUsed,x
     bpl :+ ; If it rolls over to -1, just reset to zero

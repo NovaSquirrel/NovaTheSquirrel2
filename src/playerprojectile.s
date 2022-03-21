@@ -1578,7 +1578,7 @@ DSExplosion:
 ;    add #.loword(DSExplosion)
     pha
     lda ActorDynamicSlot,x
-    and #7
+    and #ACTOR_DYNAMIC_SLOT_MASK
     tax
     ldy #256
     lda #^DSExplosion | $8000
@@ -1590,7 +1590,7 @@ DSExplosion:
   :
 
   lda ActorDynamicSlot,x
-  and #7
+  and #ACTOR_DYNAMIC_SLOT_MASK
   .import GetDynamicSpriteTileNumber
   jsl GetDynamicSpriteTileNumber
   ora #OAM_PRIORITY_2
