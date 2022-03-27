@@ -520,18 +520,22 @@ FoundEmpty:
 .a16
 .i16
 .proc FindFreeActorX
-  ldx #ActorStart
+  phy
+  lda #ActorStart
+  clc
 Loop:
-  lda ActorType,x
-  beq Found
-  txa
-  add #ActorSize
   tax
-  cpx #ActorEnd
-  bne Loop
+  ldy ActorType,x ; Don't care what gets loaded into X, but it will set flags
+  beq Found
+  adc #ActorSize
+  cmp #ActorEnd   ; Carry should always be clear at this point
+  bcc Loop
+NotFound:
+  ply
   clc
   rtl
 Found:
+  ply
   lda #$ffff
   sta ActorIndexInLevel,x
   seta8
@@ -546,18 +550,22 @@ Found:
 .a16
 .i16
 .proc FindFreeActorY
-  ldy #ActorStart
+  phx
+  lda #ActorStart
+  clc
 Loop:
-  lda ActorType,y
-  beq Found
-  tya
-  add #ActorSize
   tay
-  cpy #ActorEnd
-  bne Loop
+  ldx ActorType,y ; Don't care what gets loaded into X, but it will set flags
+  beq Found
+  adc #ActorSize  ; Carry should always be clear at this point
+  cmp #ActorEnd
+  bcc Loop
+NotFound:
+  plx
   clc
   rtl
 Found:
+  plx
   lda #$ffff
   sta ActorIndexInLevel,y
   seta8
@@ -574,18 +582,22 @@ Found:
 .a16
 .i16
 .proc FindFreeParticleY
-  ldy #ParticleStart
+  phx
+  lda #ParticleStart
+  clc
 Loop:
-  lda ParticleType,y
-  beq Found
-  tya
-  add #ParticleSize
   tay
-  cpy #ParticleEnd
-  bne Loop
+  ldx ParticleType,y ; Don't care what gets loaded into X, but it will set flags
+  beq Found
+  adc #ParticleSize  ; Carry should always be clear at this point
+  cmp #ParticleEnd
+  bcc Loop
+NotFound:
+  plx
   clc
   rtl
 Found:
+  plx
   lda #0
   sta ParticleTimer,y
   sta ParticleVX,y
