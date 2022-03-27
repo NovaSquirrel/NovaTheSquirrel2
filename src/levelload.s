@@ -166,6 +166,12 @@
   lda #^LevelBuf
   sta LevelBlockPtr+2
 
+  ; Initialize variables related to optimizations
+  seta16
+  lda #ParticleEnd
+  sta ParticleIterationLimit
+  seta8
+
   ; -----------------------------------
 
   ; Parse the level header

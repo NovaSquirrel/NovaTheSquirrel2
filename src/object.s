@@ -392,13 +392,16 @@ Good:
 assert_same_banks RunAllParticles, ParticleRun
 assert_same_banks RunAllParticles, ParticleDraw
 .proc RunAllParticles
+LastNonEmpty = DecodePointer
   phk
   plb
 
   ldx #ParticleStart
+  stx LastNonEmpty
 Loop:
   lda ParticleType,x
   beq SkipEntity   ; Skip if empty
+  stx LastNonEmpty
 
   ; Call the run and draw routines
   asl
@@ -421,8 +424,13 @@ SkipEntity:
   txa
   add #ParticleSize
   tax
-  cpx #ParticleEnd
-  bne Loop
+  cpx ParticleIterationLimit
+  bcc Loop
+
+  ; Decrease the limit if needed
+  lda LastNonEmpty
+  adc #ParticleSize-1 ; Carry set here
+  sta ParticleIterationLimit
   rtl
 .endproc
 .popseg
@@ -598,6 +606,13 @@ NotFound:
   rtl
 Found:
   plx
+
+  ; Increase the portion of the particle list that should be iterated
+  adc #ParticleSize ; Should still be carry clear here since it was clear in loop
+  cmp ParticleIterationLimit
+  bcc :+
+    sta ParticleIterationLimit
+  :
   lda #0
   sta ParticleTimer,y
   sta ParticleVX,y

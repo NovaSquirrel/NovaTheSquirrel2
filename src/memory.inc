@@ -199,7 +199,7 @@ ProjectileLen = 8
   ThrownSword
 .endenum
 
-ParticleLen = 32
+ParticleLen = 20
 .global ParticleStart
 .globalzp ParticleSize
 .global ParticleEnd
@@ -210,6 +210,8 @@ ParticleLen = 32
 .globalzp ParticleVY
 .globalzp ParticleTimer
 .globalzp ParticleVariable
+; Not part of the above
+.globalzp ParticleIterationLimit
 
 ; Actors that other actors might be interested in
 ActorAdvertiseLen = 5
