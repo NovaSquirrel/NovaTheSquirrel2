@@ -20,7 +20,7 @@ Room for more flags
 gggrrrrr .bbbbbgg
 RGB Level background color
 
-6       7
+6        7
 BBBBBBBB ........
 B = Background ID (or 255 for no background)
 Room for more flags
@@ -62,7 +62,7 @@ L = High byte of level data pointer
 TWvvvhhh ........
 T = If 1, background is two screens tall
 W = If 1, background is two screens wide
-v = Vertical speed of background (index into same, but also controls )
+v = Vertical speed of background (index into same as horizontal)
 h = Horizontal speed of background (index into 1:1, 1:2, 1:4, 1:8, 1:16, 1:32 or 1:64)
 Room for some more flags
 
