@@ -91,6 +91,7 @@
   ScriptPointer:    .res 3 ; multipurpose 24-bit pointer
   LevelActorPointer: .res 3 ; actor pointer for this level
 
+  ActorIterationLimit:    .res 2 ; Ending point for RunAllActors
   ParticleIterationLimit: .res 2 ; Ending point for RunAllParticles
 
 .segment "BSS" ; First 8KB of RAM

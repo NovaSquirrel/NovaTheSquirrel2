@@ -168,6 +168,8 @@
 
   ; Initialize variables related to optimizations
   seta16
+  lda #ActorEnd
+  sta ActorIterationLimit
   lda #ParticleEnd
   sta ParticleIterationLimit
   seta8

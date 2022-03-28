@@ -86,7 +86,7 @@ for b in all_actors:
 outfile.write('.endproc\n\n')
 
 # no-operation routine
-outfile.write(".proc ActorNothing\n  rtl\n.endproc\n\n")
+outfile.write(".pushseg\n.segment \"C_ActorCommon\"\n.proc ActorNothing\n  rtl\n.endproc\n.popseg\n\n")
 
 # Actors
 outfile.write('.proc ActorDraw\n  .addr .loword(ActorNothing)\n')

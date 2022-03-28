@@ -210,7 +210,8 @@ ParticleLen = 20
 .globalzp ParticleVY
 .globalzp ParticleTimer
 .globalzp ParticleVariable
-; Not part of the above
+
+.globalzp ActorIterationLimit
 .globalzp ParticleIterationLimit
 
 ; Actors that other actors might be interested in

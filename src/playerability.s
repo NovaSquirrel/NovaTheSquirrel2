@@ -1688,18 +1688,22 @@ WandAttrib: .byt >(OAM_PRIORITY_2), >(OAM_XFLIP|OAM_PRIORITY_2)
 .i16
 .export FindFreeProjectileX
 .proc FindFreeProjectileX
-  ldx #ProjectileStart
+  phy
+  lda #ProjectileStart
+  clc
 Loop:
-  lda ActorType,x
-  beq Found
-  txa
-  add #ActorSize
   tax
-  cpx #ProjectileEnd
-  bne Loop
+  ldy ActorType,x ; Don't care what gets loaded into Y, but it will set flags
+  beq Found
+  adc #ActorSize
+  cmp #ProjectileEnd ; Carry should always be clear at this point
+  bcc Loop
+NotFound:
+  ply
   clc
   rtl
 Found:
+  ply
   seta8
   lda #255
   sta ActorDynamicSlot,x
@@ -1708,6 +1712,7 @@ Found:
   rtl
 .endproc
 
+; Used by ChangeToExplosion
 .a16
 .i16
 .export FindFreeProjectileY

@@ -68,17 +68,55 @@ SlopeY = 2
   stz SpriteTilesInUse+4
   stz SpriteTilesInUse+6
 
-  ; Load X with the actual pointer
+  ;------------------------------------
+  ; Load X with the actual pointer instead of a starting index
+.import Mode7ScrollX
+LastNonEmpty = Mode7ScrollX
+
   ldx #ActorStart
-Loop:
+  stx LastNonEmpty
+ActorLoop:
   ; Don't do anything if it's an empty slot
   lda ActorType,x
-  bne :+
-@JmpSkipEntity:
-    jmp SkipEntity 
-  :
+  beq @SkipEntity
+    stx LastNonEmpty
+    jsr ProcessOneActor
+@SkipEntity:
+  ; Next actor
+  txa
+  add #ActorSize
+  tax
+  cpx ActorIterationLimit
+  bcc ActorLoop
 
+  ; Decrease the limit if needed
+  ; Data bank should point at a LoROM bank currently - can use f: if it doesn't though
+  lda LastNonEmpty
+  adc #ActorSize-1 ; Carry set here
+  sta ActorIterationLimit
 
+  ;------------------------------------
+
+  ldx #ProjectileStart
+ProjectileLoop:
+  ; Don't do anything if it's an empty slot
+  lda ActorType,x
+  beq @SkipEntity
+    jsr ProcessOneActor
+@SkipEntity:
+  ; Next actor
+  txa
+  add #ActorSize
+  tax
+  cpx #ProjectileEnd
+  bcc ProjectileLoop
+
+  ;------------------------------------
+
+  jml RunAllParticles
+
+; Call the Run and Draw routines on an actor
+ProcessOneActor:
   lda ActorState,x
   cmp #ActorStateValue::Override
   bne NotOverride
@@ -98,7 +136,7 @@ Loop:
     jsl CallDraw
 
     ; Don't run the common routines
-    bra @JmpSkipEntity
+    rts
   NotOverride:
 
   ; Call the run and draw routines
@@ -109,7 +147,7 @@ Loop:
 
   ; Call the shared routine the actor uses (or call a stub if there isn't one)
   lda ActorType,x
-  beq SkipEntity
+  beq @SkipEntity
   phx
   tax
   lda f:ActorAfterRun,x
@@ -127,16 +165,8 @@ Loop:
     stz ActorState,x
   :
   seta16
-SkipEntity:
-
-  ; Next entity
-  txa
-  add #ActorSize
-  tax
-  cpx #ProjectileEnd ; NOT ActorEnd, go and run the projectiles too
-  jne Loop
-
-  jml RunAllParticles
+@SkipEntity:
+  rts
 
 ; Call the Actor run code
 .a16
@@ -392,7 +422,7 @@ Good:
 assert_same_banks RunAllParticles, ParticleRun
 assert_same_banks RunAllParticles, ParticleDraw
 .proc RunAllParticles
-LastNonEmpty = DecodePointer
+LastNonEmpty = DecodePointer ; Will conflict with DispActorMeta - change if that matters
   phk
   plb
 
@@ -533,7 +563,7 @@ FoundEmpty:
   clc
 Loop:
   tax
-  ldy ActorType,x ; Don't care what gets loaded into X, but it will set flags
+  ldy ActorType,x ; Don't care what gets loaded into Y, but it will set flags
   beq Found
   adc #ActorSize
   cmp #ActorEnd   ; Carry should always be clear at this point
@@ -544,6 +574,14 @@ NotFound:
   rtl
 Found:
   ply
+  ; Increase the portion of the actor list that should be iterated
+  adc #ActorSize ; Should still be carry clear here since it was clear in loop
+  cmp ActorIterationLimit
+  bcc :+
+    sta ActorIterationLimit
+  :
+
+  ; Initialize certain variables on newly claimed actors to avoid causing problems
   lda #$ffff
   sta ActorIndexInLevel,x
   seta8
@@ -574,6 +612,14 @@ NotFound:
   rtl
 Found:
   plx
+  ; Increase the portion of the actor list that should be iterated
+  adc #ActorSize ; Should still be carry clear here since it was clear in loop
+  cmp ActorIterationLimit
+  bcc :+
+    sta ActorIterationLimit
+  :
+
+  ; Initialize certain variables on newly claimed actors to avoid causing problems
   lda #$ffff
   sta ActorIndexInLevel,y
   seta8
