@@ -250,16 +250,16 @@ $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
 # Try generating it in the folder it's for
 $(imgdir2)/%.chrgb: $(imgdir2)/%.png
 	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
-#$(imgdir2)/lz4/%.chrgb: $(imgdir2)/lz4/%.png
-#	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
+$(imgdir2)/lz4/%.chrgb: $(imgdir2)/lz4/%.png
+	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
 $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
 
 $(imgdirX)/%.chr: $(imgdirX)/%.txt $(imgdirX)/%.png
 	$(PY) tools/pilbmp2nes.py "--flag-file" $^ $@
 
-#$(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
-#	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+$(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
+	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
 
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
