@@ -23,6 +23,7 @@
 .import GameMainLoop, AutotileLevel, UploadLevelGraphics
 .import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
 .import GetBlockX_Horizontal, GetBlockY_Horizontal, GetBlockXCoord_Horizontal, GetBlockYCoord_Horizontal
+.import GetBlockX_Vertical, GetBlockY_Vertical, GetBlockXCoord_Vertical, GetBlockYCoord_Vertical
 
 .segment "C_LevelDecompress"
 
@@ -214,10 +215,20 @@
     pla
     sta PlayerPX+1
 
-    lda #<GetLevelPtrXY_Vertical
-    sta GetLevelPtrXY_Ptr+0
-    lda #>GetLevelPtrXY_Vertical
-    sta GetLevelPtrXY_Ptr+1
+    seta16
+    lda #.loword(GetLevelPtrXY_Vertical)
+    sta GetLevelPtrXY_Ptr
+    lda #.loword(GetBlockX_Vertical)
+    sta GetBlockX_Ptr
+    lda #.loword(GetBlockY_Vertical)
+    sta GetBlockY_Ptr
+    lda #.loword(GetBlockXCoord_Vertical)
+    sta GetBlockXCoord_Ptr
+    lda #.loword(GetBlockYCoord_Vertical)
+    sta GetBlockYCoord_Ptr
+    lda #256*2 ; 256 blocks tall
+    sta LevelColumnSize
+    seta8
 
     ; In vertical levels, columns are 256 blocks tall, multiplied by 2 bytes
     stz LevelColumnSize+0
@@ -257,7 +268,7 @@
   and #$04
   beq :+
     dec ForegroundLayerThree
-    lda #>($f000>>1)
+    lda #>(ExtraBGWide>>1)
     sta SecondFGTilemapPointer+1
   :
   ; (TODO: use the other flags)

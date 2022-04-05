@@ -424,6 +424,17 @@ Exit:
 .endproc
 
 .a16
+.export GetBlockX_Vertical
+.proc GetBlockX_Vertical
+  lda LevelBlockPtr ; Get level column
+  lsr
+  xba
+  and #31
+  rtl
+.endproc
+
+; Set accumulator to X coordinate of LevelBlockPtr
+.a16
 .proc GetBlockXCoord
   jmp (GetBlockXCoord_Ptr)
 .endproc
@@ -448,6 +459,24 @@ SecondLayer:
   rtl
 .endproc
 
+.a16
+.export GetBlockXCoord_Vertical
+.proc GetBlockXCoord_Vertical
+  lda LevelBlockPtr ; Get level column
+  bit #$4000
+  bne SecondLayer
+  lsr
+  and #$ff00
+  rtl
+
+SecondLayer:
+  and #$3fff
+  lsr
+  and #$ff00
+  sub FG2OffsetX
+  rtl
+.endproc
+
 ; Get the row number of LevelBlockPtr
 .a16
 .proc GetBlockY
@@ -463,7 +492,16 @@ SecondLayer:
   rtl
 .endproc
 
+.a16
+.export GetBlockY_Vertical
+.proc GetBlockY_Vertical
+  lda LevelBlockPtr ; Get level row
+  lsr
+  and #255
+  rtl
+.endproc
 
+; Set accumulator to Y coordinate of LevelBlockPtr
 .a16
 .proc GetBlockYCoord
   jmp (GetBlockYCoord_Ptr)
@@ -481,7 +519,7 @@ SecondLayer:
   rtl
 
 SecondLayer:
-  and #$3fff
+;  and #$3fff
   lsr
   and #31
   xba
@@ -489,6 +527,25 @@ SecondLayer:
   rtl
 .endproc
 
+.a16
+.export GetBlockYCoord_Vertical
+.proc GetBlockYCoord_Vertical
+  lda LevelBlockPtr ; Get level row
+  bit #$4000
+  bne SecondLayer
+  lsr
+  xba
+  and #255
+  rtl
+
+SecondLayer:
+;  and #$3fff
+  lsr
+  xba
+  and #255
+  sub FG2OffsetY
+  rtl
+.endproc
 
 ; Random number generator
 ; From http://wiki.nesdev.com/w/index.php/Random_number_generator/Linear_feedback_shift_register_(advanced)#Overlapped_24_and_32_bit_LFSR

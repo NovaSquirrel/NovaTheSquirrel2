@@ -551,7 +551,7 @@ SpriteLoop:
   lda TwoLayerLevel ; Force two screens wide on two-layer levels
   beq :+
     lda #1 | (BackgroundBG >> 9)
-    sta NTADDR+1   ; plane 0 nametable at $d000, 2 screens wide
+    sta NTADDR+1   ; plane 0 nametable at $a000, 2 screens wide
     lda ForegroundLayerThree
     bne :+
      stz BGCHRADDR ; First two planes both at $0000
@@ -572,10 +572,9 @@ SpriteLoop:
 
   lda ForegroundLayerThree
   beq :+
-    ; TODO
-    lda #1 | ($f000 >> 9)
-    sta NTADDR+2    ; plane 2 nametable at $f000, 2 screens wide
-    ; Tiles go on $e000 still
+    lda #1 | (ExtraBGWide >> 9)
+    sta NTADDR+2    ; plane 2 nametable at $9000, 2 screens wide
+    ; Tiles go on $4000 still - can use some space in $A800-$B000 for tiles if layer 2 is one screen
     lda #BG3_PRIORITY | 1
     sta BGMODE
     lda #%00010111  ; enable layer 3 because it's being used now

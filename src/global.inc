@@ -5,7 +5,8 @@ LEVEL_TILE_SIZE = 2
 
 ForegroundBG = $B000
 BackgroundBG = $A000
-ExtraBG = $9800
+ExtraBG      = $9800 ; Used for layer 3
+ExtraBGWide  = $9000 ; Used for map when ForegroundLayerThree is on (or for a bigger layer 3 background)
 SpriteCHRBase = $C000
 BG1CHRBase = $0000
 BG2CHRBase = $4000
