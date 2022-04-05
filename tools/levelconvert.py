@@ -289,7 +289,7 @@ for f in glob.glob("levels/*.json"):
 				boundaries = set_boundary_at(screen, boundaries);
 		if r.type == 'LEVEL_EFFECT':
 			control_commands.append('.byt LSpecialCmd, LevelSpecialConfig::%s' % r.extra)
-			total_level_size += 2
+			total_level_size += 2 + r.extra.count(',')
 			if r.extra == 'ActorListInRAM':
 				control_commands.append('.byt %d' % len(actors))
 				total_level_size += 1
