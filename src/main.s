@@ -274,9 +274,10 @@ DelayedBlockLoop:
   sta OldFG2OffsetY
 
   .a16
-  lda FG2MovementRoutine
+  ; Hook is primarily meant for controlling foreground layer 2 movement, but can be whatever
+  lda GameplayHook
   beq :+
-    jsl CallFG2MovementRoutine
+    jsl CallGameplayHook
   :
 
   ; Update foreground layer 2
@@ -502,6 +503,6 @@ SetScrollForTwoLayerLevel:
 .endproc
 
 .a16
-.proc CallFG2MovementRoutine
-  jml [FG2MovementRoutine]
+.proc CallGameplayHook
+  jml [GameplayHook]
 .endproc
