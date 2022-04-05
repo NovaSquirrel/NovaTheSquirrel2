@@ -224,10 +224,11 @@ LevelZeroWhenLoad_Start:
   ForegroundLayerThree:   .res 1 ; The second foreground layer is on layer 3, not layer 2
   LevelFadeIn:            .res 1 ; Timer for fading the level in
   LevelIrisIn:            .res 1 ; Timer for doing the "iris in" effect
-  FG2MovementRoutine:     .res 3 ; Pointer for a routine to call every frame
+  GameplayHook:           .res 3 ; Pointer for a routine to call every frame - meant for foreground layer 2 movement
   ToggleSwitch1:          .res 1
   ToggleSwitch2:          .res 1
   ToggleSwitch3:          .res 1
+  UploadLevelGraphicsHook: .res 3 ; Called whenever UploadLevelGraphics is called - see also BGEffectInit in bgeffectcode.s
 
   ; How many Actors use each of the four palette slots, for detecting when one is free
   PaletteInUse:        .res 4

@@ -620,7 +620,14 @@ SpriteLoop:
   .import BGEffectInit
   jsl BGEffectInit
   setaxy16
-  jml RenderLevelScreens
+  jsl RenderLevelScreens
+
+  ; Finish up with the hook, if present
+  lda UploadLevelGraphicsHook
+  beq :+
+    jml [UploadLevelGraphicsHook]
+  :
+  rtl
 
 .a8
 ToggleSwitchDMA:
