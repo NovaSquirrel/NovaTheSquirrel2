@@ -208,10 +208,10 @@
   bpl :+
     ; (Is a vertical level)
     ; Swap starting X and Y positions
-    lda PlayerPX+1
-    pha
     lda PlayerPY+1
-    sta PlayerPX+1
+    pha
+    lda PlayerPX+1
+    sta PlayerPY+1
     pla
     sta PlayerPX+1
 

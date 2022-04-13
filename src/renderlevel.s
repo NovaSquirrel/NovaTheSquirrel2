@@ -194,7 +194,7 @@ Loop:
 
   ; Move onto the next block
   lda LevelBlockPtr
-  add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
+  add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
   sta LevelBlockPtr
   inc BlockNum

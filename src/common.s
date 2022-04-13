@@ -141,6 +141,7 @@ loop2:
 .i16
 .proc ChangeBlock
 Temp = BlockTemp
+; Could reserve a second variable to avoid calling GetBlockX twice
   phx
   phy
   php
@@ -168,16 +169,12 @@ Found:
   ; Now the accumulator is free to do other things
 
   ; Use the second routine if it's on the second foreground layer
-  lda LevelBlockPtr
-  and #$4000
-  jne ChangeBlockFG2
+  bit LevelBlockPtr
+  jvs ChangeBlockFG2
   ; -----------------------------------
 
   ; First, make sure the block is actually onscreen (Horizontally)
-  lda LevelBlockPtr ; Get level column
-  asl
-  asl
-  xba
+  jsl GetBlockX
   seta8
   sta Temp ; Store column so it can be compared against
 
@@ -201,9 +198,7 @@ Found:
   ; -----------------------------------
 
   ; Second, make sure the block is actually onscreen (Vertically)
-  lda LevelBlockPtr ; Get level row
-  lsr
-  and #31
+  jsl GetBlockY
   seta8
   sta Temp ; Store row so it can be compared against
 
@@ -237,9 +232,10 @@ Found:
   sta BlockUpdateDataBR,y
 
   ; Now calculate the PPU address
-  ; LevelBlockPtr is 00xxxxxxxxyyyyy0
+  ; LevelBlockPtr is 00xxxxxxxxyyyyy0 (for horizontal levels)
   ; Needs to become  0....pyyyyyxxxxx
-  lda LevelBlockPtr
+  lda Temp ; still GetBlockY's result
+  asl
   and #%11110 ; Grab Y & 15
   asl
   asl
@@ -251,18 +247,16 @@ Found:
 
 CalculateRestOfAddress:
   ; Add in X
-  lda LevelBlockPtr
-  asl
-  asl
-  xba
+  jsl GetBlockX
+  pha
   and #15
   asl
   ora BlockUpdateAddressTop,y
   sta BlockUpdateAddressTop,y
 
   ; Choose second screen if needed
-  lda LevelBlockPtr
-  and #%0000010000000000
+  pla
+  and #16
   beq :+
     lda BlockUpdateAddressTop,y
     ora #2048>>1
@@ -358,9 +352,10 @@ InRange:
   sta BlockUpdateDataBR,y
 
   ; Now calculate the PPU address
-  ; LevelBlockPtr is 00xxxxxxxxyyyyy0
+  ; LevelBlockPtr is 00xxxxxxxxyyyyy0 (for horizontal levels)
   ; Needs to become  0....pyyyyyxxxxx
-  lda LevelBlockPtr
+  jsl GetBlockY
+  asl
   and #%11110 ; Grab Y & 15
   asl
   asl
@@ -462,17 +457,17 @@ SecondLayer:
 .a16
 .export GetBlockXCoord_Vertical
 .proc GetBlockXCoord_Vertical
+  ; 00xxxxxyyyyyyyy0
   lda LevelBlockPtr ; Get level column
   bit #$4000
   bne SecondLayer
   lsr
-  and #$ff00
+  and #%11111 * 256
   rtl
 
 SecondLayer:
-  and #$3fff
   lsr
-  and #$ff00
+  and #%11111 * 256
   sub FG2OffsetX
   rtl
 .endproc
@@ -519,7 +514,6 @@ SecondLayer:
   rtl
 
 SecondLayer:
-;  and #$3fff
   lsr
   and #31
   xba
@@ -530,19 +524,19 @@ SecondLayer:
 .a16
 .export GetBlockYCoord_Vertical
 .proc GetBlockYCoord_Vertical
+  ; 00xxxxxyyyyyyyy0
   lda LevelBlockPtr ; Get level row
   bit #$4000
   bne SecondLayer
   lsr
-  xba
   and #255
+  xba
   rtl
 
 SecondLayer:
-;  and #$3fff
   lsr
-  xba
   and #255
+  xba
   sub FG2OffsetY
   rtl
 .endproc
