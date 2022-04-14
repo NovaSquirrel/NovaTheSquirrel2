@@ -297,7 +297,7 @@ YPos = 6
   ; Use the Y scroll position in blocks
   lda ScrollY
   xba
-  and #LEVEL_HEIGHT-1
+  and #MAX_LEVEL_HEIGHT-1
   asl
   tay
 

@@ -163,7 +163,7 @@ YPos = 4
 
   lda ScrollY
   xba
-  and #LEVEL_HEIGHT-1
+  and #MAX_LEVEL_HEIGHT-1
   asl
   sta YPos
 

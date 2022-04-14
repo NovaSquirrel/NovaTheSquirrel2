@@ -1065,9 +1065,15 @@ Loop:
 Vertical:
   ; Use "Y" position as column instead
   seta16
-  jsl GetLevelColumnPtr
+  and #255
+  ; jsl GetLevelColumnPtr
+  xba ; * 256
+  asl ; * 512
+  sta LevelBlockPtr
+
   ; Y is the current row times two
   lda DecodeColumn
+  and #255
 Common:
   asl
   tay

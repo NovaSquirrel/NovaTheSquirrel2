@@ -72,7 +72,7 @@ After this is a compressed tilemap. Tileset is listed in the per-level tileset.
 | Level data
 '---------------------------------------
 Level data:
-TTTTTTTY YYYYXXXX [SSSSSSSS]
+TTTTTTTY XXXXYYYY [SSSSSSSS]
 T - Object type (0-119)
 Y - Y position absolute (0-31)
 X - X position relative (0-15)

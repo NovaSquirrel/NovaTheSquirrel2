@@ -19,6 +19,7 @@ has_metadata = {} # Uses a Python function to insert metadata
 # Per-level global state
 teleport_destinations = {}
 door_level_teleport_list = [] # List of levels, for doors that lead to other levels
+vertical_level = False
 
 for line in define_lines:
 	if not len(line): # Skip empty lines
@@ -136,8 +137,10 @@ has_metadata['DoorTwoWay'] = encode_door
 has_metadata['DoorTop'] = encode_door
 
 def convert_layer(layer):
-	# Sort by X coordinate
-	layer = sorted(layer, key=lambda r: r.x)
+	if vertical_level: # Sort by Y coordinate
+		layer = sorted(layer, key=lambda r: r.y)
+	else:              # Sort by X coordinate
+		layer = sorted(layer, key=lambda r: r.x)
 
 	# Check if any reordering needs to happen
 	for i, r1 in enumerate(layer):
@@ -145,6 +148,11 @@ def convert_layer(layer):
 			r2 = layer[j]
 			if r1.overlaps(r2) and r1.z < r2.z:
 				layer[i], layer[j] = layer[j], layer[i]
+
+	# Swap X and Y for vertical levels
+	if vertical_level:
+		for r in layer:
+			r.x, r.y = r.y, r.x
 
 	byte_count, column, output = 0, 0, []
 
@@ -237,6 +245,7 @@ for f in glob.glob("levels/*.json"):
 	level_json = json.loads(level_text)
 
 	num_layers = len(level_json["Layers"])
+	vertical_level = level_json["Meta"]["Width"] == 32 and level_json["Meta"]["Height"] > 32
 
 	foreground = []
 	secondary = []
@@ -296,9 +305,9 @@ for f in glob.glob("levels/*.json"):
 
     # Write the header
 	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction
-	outfile.write('  .byt %d\n' % player_x)
-	outfile.write('  .byt %d\n' % player_y)
-	flags = 0
+	outfile.write('  .byt %d\n' % (player_y if vertical_level else player_x))
+	outfile.write('  .byt %d\n' % (player_x if vertical_level else player_y))
+	flags = 0x80 if vertical_level else 0
 	for flag in level_json["Header"]["Flags"]:
 		if flag == "VerticalScrolling":
 			flags |= 0x40
