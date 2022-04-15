@@ -308,8 +308,8 @@ YPos = 6
   ; Use the Y scroll position in blocks
   lda ScrollY
   xba
-  and #MAX_LEVEL_HEIGHT-1
   asl
+  and LevelColumnMask
   tay
 
   ; Generate the left or right as needed

@@ -87,6 +87,7 @@
   TouchTemp:        .res 8
 
   LevelColumnSize:  .res 2 ; for moving left and right in a level buffer
+  LevelColumnMask:  .res 2 ; LevelColumnSize-1
   DecodePointer:    .res 3 ; multipurpose 24-bit pointer
   ScriptPointer:    .res 3 ; multipurpose 24-bit pointer
   LevelActorPointer: .res 3 ; actor pointer for this level

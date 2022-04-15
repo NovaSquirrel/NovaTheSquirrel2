@@ -158,7 +158,7 @@ YPos = 6
   ; Take the Y position, rounded to blocks,
   ; as the column of level data to read
   lda Temp
-  and #(31*2) ; 32 blocks tall
+  and #(MAX_LEVEL_HEIGHT*2) ; 32 blocks tall
   tay
 
   ; Generate the top or the bottom as needed
@@ -378,7 +378,7 @@ Loop:
   tax
   stx TempVal
 : tya
-  and #31*2 ; Keep Y in range - 32 blocks tall?32 blocks tall?
+  and LevelColumnMask ; Keep Y in range
   tay
   lda [LevelBlockPtr],y ; Get the next level tile
   iny
@@ -425,7 +425,7 @@ Loop:
   tax
   stx TempVal
 : tya
-  and #31*2 ; Keep Y in range - 32 blocks tall?
+  and LevelColumnMask ; Keep Y in range
   tay
   lda [LevelBlockPtr],y ; Get the next level tile
   iny
