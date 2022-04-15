@@ -123,7 +123,6 @@ DYNAMIC_SPRITE_SLOTS = 8
 .global DynamicSpriteBank    ;/
 ACTOR_DYNAMIC_SLOT_MASK = 7*2 ; For getting it from ActorDynamicSlot with 16-bit accumulator
 
-.globalzp LevelColumnSize
 .globalzp LevelColumnSize, LevelColumnMask
 .global GetLevelPtrXY_Ptr
 .global GetBlockX_Ptr

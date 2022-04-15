@@ -142,6 +142,12 @@
   sta GetBlockYCoord_Ptr
   lda #32*2 ; 32 blocks tall
   sta LevelColumnSize
+  dea
+  sta LevelColumnMask
+
+  stz ScrollXLimit
+  lda #(256+32)*16
+  sta ScrollYLimit
 
   seta8
   ; ------------ Initialize variables ------------
@@ -228,6 +234,8 @@
     sta GetBlockYCoord_Ptr
     lda #256*2 ; 256 blocks tall
     sta LevelColumnSize
+    dea
+    sta LevelColumnMask
     seta8
 
     ; In vertical levels, columns are 256 blocks tall, multiplied by 2 bytes
