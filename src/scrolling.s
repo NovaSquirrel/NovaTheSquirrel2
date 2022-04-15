@@ -222,6 +222,7 @@ SpeedLimit:
   rts
 .endproc
 
+.a16
 .proc UpdateRow
 Temp = 4
 YPos = 6
@@ -267,10 +268,20 @@ YPos = 6
   bcs :+
   jsl RenderLevelRowTop
   rts
-: jsl RenderLevelRowBottom
+:
+  
+  ; If it's the left column, also scan for actors to introduce into the level
+  lda Temp
+  pha ; Don't rely on this routine not overwriting this variable
+  jsl RenderLevelRowBottom
+  pla
+
+  bit VerticalLevelFlag-1
+  jmi ScanForActorsToMake
   rts
 .endproc
 
+.a16
 .proc UpdateColumn
 Temp = 4
 YPos = 6
@@ -314,7 +325,9 @@ YPos = 6
   pha ; Don't rely on this routine not overwriting this variable
   jsl RenderLevelColumnLeft
   pla
-ScanForActors:
+  bit VerticalLevelFlag-1
+  bmi Exit
+::ScanForActorsToMake:
 CheckColumn = Temp + 0
 CheckScreen = Temp + 1
   lsr
@@ -424,9 +437,23 @@ CheckExistsLoop:
   sta ActorPY+1,x
   lda #$ff
   sta ActorPY+0,x
+
+  ; Swap X and Y if it's a vertical level
+  lda VerticalLevelFlag
+  beq @Horizontal
+  seta16
+  lda ActorPX,x
+  pha
+  lda ActorPY,x
+  sta ActorPX,x
+  pla
+  sta ActorPY,x
+@Horizontal:
+
   ; Copy the most significant bit of the Y position to the least significant bit of the direction
   plp
-  lda #0
+  .a8 ; plp restores it to 8-bit accumulator
+  tdc ; Clear accumulator
   rol
   sta ActorDirection,x
   iny

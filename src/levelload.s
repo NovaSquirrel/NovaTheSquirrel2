@@ -363,15 +363,6 @@
   sta DecodePointer+0
 
   ; -----------------------------------
-  seta8
-  ; set up plane 0's scroll
-  stz BGSCROLLX+0
-  stz BGSCROLLX+0
-  lda #$FF
-  sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
-  sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
-
-  ; -----------------------------------
   jsr IndexActorList
 
   ; Now use the new DecodePointer to decompress the level data

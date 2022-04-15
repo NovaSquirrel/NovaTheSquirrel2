@@ -109,7 +109,7 @@ def EncodeTextbox(scene, text):
 				scene.bytes.append(str(ord(c)))
 			i += 1
 
-class DialogScene(object):
+class DialogScene:
 	def __init__(self, name):
 		self.name = name
 		self.bytes = []

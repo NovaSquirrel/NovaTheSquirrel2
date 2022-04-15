@@ -371,6 +371,8 @@ for f in glob.glob("levels/*.json"):
 	actors = sorted(actors, key=lambda r: r.x)
 	outfile.write("level_%s_sp:\n" % plain_name)
 	for actor in actors:
+		if vertical_level:
+			actor.x, actor.y = actor.y, actor.x
 		if len(actor.extra):
 			outfile.write("  LSpr Actor::%s, %d, %d, %d, %s\n" % (actor.type, (1 if actor.xflip else 0), actor.x, actor.y, actor.extra))
 		else:

@@ -55,6 +55,7 @@
 
   ; -------------------
 
+  ; Try to spawn all actors that would be found on this screen, if this flag is set
   lda RerenderInitEntities
   and #255
   jeq NoInitEntities
@@ -99,7 +100,7 @@ DidPreserveEntities:
   stz RerenderInitEntities
   seta16
 
-  ; Init particles
+  ; Init particles by clearing them out
   ldx #ParticleStart
   ldy #ParticleEnd-ParticleStart
   jsl MemClear
@@ -109,14 +110,22 @@ DidPreserveEntities:
   High = 5
   ; Try to spawn actors.
   ; First find the minimum and maximum columns to check.
+  lda VerticalLevelFlag
+  bpl @Horizontal
+@Vertical:
+  lda ScrollY+1
+  .byt $2c ; Skip over "lda ScrollX+1"
+  .assert ScrollX < 256, error, "ScrollX must be in zeropage"
+@Horizontal:
   lda ScrollX+1
+  pha
   sub #4
   bcs :+
-    lda #0
+    tdc ; Clear accumulator
   :
   sta Low
   ; - get high column
-  lda ScrollX+1
+  pla
   add #25
   bcc :+
     lda #255
