@@ -259,7 +259,7 @@ YPos = 6
   ; Take the Y position, rounded to blocks,
   ; as the column of level data to read
   lda Temp
-  and #<~1
+  and #.loword(~1)
   tay
 
   ; Generate the top or the bottom as needed
