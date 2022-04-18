@@ -4413,9 +4413,11 @@ DoQuarter:
   sta ParticleVY,x
   add ParticlePY,x
   sta ParticlePY,x
+  bit VerticalLevelFlag-1
+  bmi :+
   cmp #256*32
   bcs Erase
-
+:
   dec ParticleTimer,x
   bne :+
 Erase:

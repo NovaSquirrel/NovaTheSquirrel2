@@ -1094,6 +1094,8 @@ Skip:
   jsl ActorGravity
 ::ActorFallOnlyGroundCheck:
   ; Remove if too far off the bottom
+  bit VerticalLevelFlag-1
+  bmi :+
   lda ActorPY,x
   bmi :+
     cmp #32*256
