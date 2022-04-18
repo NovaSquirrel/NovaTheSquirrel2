@@ -720,6 +720,12 @@ Create:
 .proc BlockSpring
   lda #.loword(-$70)
   sta PlayerVY
+  lda PlayerPY
+  sub #4*256
+  cmp PlayerCameraTargetY
+  bcs :+
+    sta PlayerCameraTargetY
+  :
 
   seta8
   lda #30

@@ -28,11 +28,42 @@ ScrollOldY = OldScrollY
 TargetX = 4
 TargetY = 6
 
+  ; If the player is below the target, player Y position is the new target
+  lda PlayerPY
+  cmp PlayerCameraTargetY
+  bcc :+
+    sta PlayerCameraTargetY
+  :
+
+  ; Allow disabling the feature ahead
+  lda CameraDisableNudgeAbove
+  lsr
+  bcs :+
+  ; Start adjusting the camera target up if the player is too high up on the screen
+  ; (which will happen if they use a spring)
+  lda PlayerDrawY
+  and #255
+  cmp #64
+  bcs :+
+    lda PlayerCameraTargetY
+    sub #64
+    sta PlayerCameraTargetY
+  :
+
   ; Save the old scroll positions
   lda ScrollX
   sta ScrollOldX
   lda ScrollY
   sta ScrollOldY
+
+  ; Try to push the camera back if the player is going faster?
+;  lda PlayerVX
+;  asl ; *2
+;  asl ; *4
+;  asl ; *8
+;  add PlayerVX ; *9
+;  asl ; *18
+;  add PlayerPX
 
   ; Find the target scroll positions
   lda PlayerPX
@@ -41,7 +72,7 @@ TargetY = 6
     lda #0
 : sta TargetX
 
-  lda PlayerPY
+  lda PlayerCameraTargetY
   sub #8*256  ; Pull back to center vertically
   bcs :+
     lda #0
@@ -50,22 +81,72 @@ TargetY = 6
   lda #(256+32)*16
 : sta TargetY
 
+
   ; Move only a fraction of that
+  lda TargetY
+  sub ScrollY
+  php
+  bpl :+
+    neg
+  :
+
+  ; Calculate how fast to scroll vertically
+  pha
+  lsr ; / 128
+  lsr
+  lsr
+  lsr
+  lsr
+  lsr
+  lsr
+  and #255
+  rsb #20
+  beq @DontDivideByZero
+  bpl :+
+@DontDivideByZero:
+    lda #1
+  :
+  tay
+@DoDivision:
+  pla
+  sta CPUNUM
+  seta8
+  tya
+  sta CPUDEN
+  ; Wait 16 clock cycles
+  seta16
+  ; ---
+  ; Do the X calculation while I'm waiting
   lda TargetX
   sub ScrollX
   cmp #$8000
   ror
   cmp #$8000
   ror
+  cmp #$8000
+  ror
   sta TargetX
-
-  lda TargetY
-  sub ScrollY
-  cmp #$8000
-  ror
-  cmp #$8000
-  ror
+  ; ---
+  lda CPUQUOT
+  plp
+  bpl :+
+    neg
+  :
   sta TargetY
+
+
+  .if 0
+  cmp #$8000
+  ror
+  cmp #$8000
+  ror
+  cmp #$8000
+  ror
+  cmp #$8000
+  ror
+  adc #0
+  sta TargetY
+  .endif
 
   ; Apply the scroll distance
   lda TargetX

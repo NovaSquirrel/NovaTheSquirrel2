@@ -541,6 +541,8 @@ HandleLadder:
     add #$20
     sta PlayerPY
   :
+  lda PlayerPY
+  sta PlayerCameraTargetY
 PlayerIsntOnLadder:
 
 
@@ -608,6 +610,7 @@ LadderDropThroughFix:
     bcs NoSlopeInteraction
     
     sta PlayerPY
+    sta PlayerCameraTargetY
     stz PlayerVY
 
     ; Some unnecessary shifting, since this was previously shifted left
@@ -821,6 +824,8 @@ TryAboveInteraction:
     trb PlayerPY
 HasGroundAfterAll:
     stz PlayerVY
+    lda PlayerPY
+    sta PlayerCameraTargetY
 
     seta8
     inc PlayerOnGround
@@ -1157,7 +1162,8 @@ TryAboveInteraction:
     and #$ff00
     sub 0
     sta PlayerPY
-    
+    sta PlayerCameraTargetY
+
     sta PlayerPY
     stz PlayerVY
 

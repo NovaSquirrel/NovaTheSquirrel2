@@ -255,6 +255,9 @@ LevelZeroWhenLoad_Start:
   PlayerSlopeType:     .res 2 ; Type of slope the player is on, if they are on one
   PlayerRolling:       .res 1 ; Nonzero if the player is rolling down a slope
 
+  PlayerCameraTargetY: .res 2 ; Y position to target with the camera
+  CameraDisableNudgeAbove: .res 1 ; Set to 1 to disable drifting the camera up a bit when the player touches the top
+
   ; Video updates from scrolling
   ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
   ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically

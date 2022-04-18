@@ -32,6 +32,7 @@
 .global PlayerOnSlope
 .global PlayerSlopeType
 .global PlayerRolling
+.global PlayerCameraTargetY, CameraDisableNudgeAbove
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
