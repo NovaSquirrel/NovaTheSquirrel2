@@ -720,6 +720,7 @@ Create:
 .proc BlockSpring
   lda #.loword(-$70)
   sta PlayerVY
+
   lda PlayerPY
   sub #4*256
   cmp PlayerCameraTargetY
@@ -736,21 +737,12 @@ Create:
 
   ; Animate the spring changing
   ; but only if the spring isn't scheduled to disappear before it'd pop back up
-  ldx #(MaxDelayedBlockEdits-1)*2
-DelayedBlockLoop:
-  ; Count down the timer, if there is a timer
-  lda DelayedBlockEditTime,x
-  beq :+
-    ; Is it this block?
-    lda DelayedBlockEditAddr,x
-    cmp LevelBlockPtr
-    bne :+
+  jsr FindDelayedEditForBlock
+  bcc :+
     lda DelayedBlockEditTime,x
     cmp #6
     bcc DontSpringUp
-: dex
-  dex
-  bpl DelayedBlockLoop
+  :
 
   ; No problems? Go ahead and schedule it
   lda #5
@@ -1154,7 +1146,7 @@ AlreadyDown:
 .proc FindDelayedEditForBlock
   ldx #(MaxDelayedBlockEdits-1)*2
 DelayedBlockLoop:
-  ; Count down the timer, if there is a timer
+  ; Only delayed blocks with nonzero timers are valid slots
   lda DelayedBlockEditTime,x
   beq :+
     ; Is it this block?
@@ -1291,3 +1283,23 @@ Melt:
 Exit:
   rts
 .endproc
+
+.a16
+.export BlockCameraEnableNudgeUp
+.proc BlockCameraEnableNudgeUp
+  seta8
+  stz CameraDisableNudgeAbove
+  seta16
+  rts
+.endproc
+
+.a16
+.export BlockCameraDisableNudgeUp
+.proc BlockCameraDisableNudgeUp
+  seta8
+  lda #1
+  sta CameraDisableNudgeAbove
+  seta16
+  rts
+.endproc
+

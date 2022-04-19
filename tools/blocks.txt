@@ -1633,10 +1633,27 @@ when SolidCheck, BlockToggleSolid
 t 4,1 5,1
 t 6,1 7,1
 
+#######################################
+# Invisible control blocks
+#######################################
+base common
+palette global_palette
+tileset FGCommon
+editor_category Main
+
++CameraEnableNudgeUp
+when Inside, BlockCameraEnableNudgeUp
+t 0,0 0,0
+t 0,0 0,0
+
++CameraDisableNudgeUp
+when Inside, BlockCameraDisableNudgeUp
+t 0,0 0,0
+t 0,0 0,0
+
 +EnemyBarrier
 t 0:0 0:0
 t 0:0 0:0
-
 
 
 #################
