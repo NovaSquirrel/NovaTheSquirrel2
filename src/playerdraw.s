@@ -49,13 +49,17 @@ AbilityIconGraphicSource   = TouchTemp + 2
     jsr XToPixels
   :
   lda 0
-  cmp #$f0
+  cmp #$f0+1
   bcc :+
     stz PlayerVX
-    seta8
-    dec PlayerPX+1
-    lda #$ff
-    sta PlayerPX+0
+    ; Push back exactly as many pixels as needed to stop being over the limit
+    sub #$f0+1
+    asl
+    asl
+    asl
+    asl
+    rsb PlayerPX
+    sta PlayerPX
     seta16
     jsr XToPixels
   :
