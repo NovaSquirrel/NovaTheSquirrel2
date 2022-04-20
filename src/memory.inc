@@ -246,14 +246,21 @@ RERENDER_INIT_ENTITIES_TELEPORT = $80
 .global RerenderInitEntities
 
 
-; ScreenFlags stores flags for each screen in the level; so far there's just one flag:
-SCREEN_BOUNDARY = 1 ; boundary on left side of screen
+; ScreenFlags stores flags for each screen in the level - which mostly means scrolling boundaries
+.global ScreenFlags
+SF_V_BARRIER_LEFT   = %10000000
+SF_V_BARRIER_MIDDLE = %01000000
+SF_H_BARRIER_LEFT   = %00100000 ; Top left
+SF_H_BARRIER_RIGHT  = %00010000 ; Top right
+SF_SPECIAL_MASK     = %00001111
+.enum SF_SPECIAL
+  NONE
+  DEADLY_PIT ; Passing through the vertical barrier is harmful
+.endenum
 
 .global LevelZeroWhenLoad_Start
 .global LevelZeroWhenLoad_End
 
-.global ScreenFlags
-.global ScreenFlagsDummy
 .global LevelBackgroundColor
 .global LevelBackgroundId
 .global FGScrollXPixels, FGScrollYPixels, BGScrollXPixels, BGScrollYPixels, BGEffectRAM

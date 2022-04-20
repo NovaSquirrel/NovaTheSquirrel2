@@ -326,7 +326,7 @@ for f in glob.glob("levels/*.json"):
 	else:
 		outfile.write('  .word $0000\n')
 	outfile.write('  .addr .loword(level_%s_sp)\n' % plain_name)
-	outfile.write('  .dbyt %d\n\n' % boundaries)
+	#outfile.write('  .dbyt %d\n\n' % boundaries)
 	for i in range(8):
 		if (len(level_json["Header"]["SpriteGFX"]) > i) and level_json["Header"]["SpriteGFX"][i]:
 			outfile.write('  .byt GraphicsUpload::%s\n' % level_json["Header"]["SpriteGFX"][i])

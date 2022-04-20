@@ -145,7 +145,8 @@
   dea
   sta LevelColumnMask
 
-  stz ScrollXLimit
+  lda #$ffff
+  sta ScrollXLimit
   lda #(256+32)*16
   sta ScrollYLimit
 
@@ -236,6 +237,11 @@
     sta LevelColumnSize
     dea
     sta LevelColumnMask
+
+    lda #$ffff
+    sta ScrollYLimit
+    lda #(256)*16
+    sta ScrollXLimit
     seta8
 
     ; In vertical levels, columns are 256 blocks tall, multiplied by 2 bytes
@@ -309,13 +315,14 @@
   sta LevelActorPointer+1
   lda DecodePointer+2
   sta LevelActorPointer+2
+  iny ; Y = 10
 
+.if 0
   ; Scroll barriers
   ; Convert from bit array to byte array for easier access
   lda #1
   sta ScreenFlags+0    ; first screen has left boundary
   sta ScreenFlagsDummy ; last screen has right boundary
-  iny ; Y = 10
   ldx #0
   lda [DecodePointer],y
 : asl
@@ -332,6 +339,8 @@
 :
 
   iny ; Y = 12
+.endif
+
   ; Sprite graphic slots
   ldx #0
 : lda [DecodePointer],y

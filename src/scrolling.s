@@ -70,15 +70,18 @@ TargetY = 6
   sub #8*256
   bcs :+
     lda #0
+: cmp ScrollXLimit
+  bcc :+
+  lda ScrollXLimit
 : sta TargetX
 
   lda PlayerCameraTargetY
   sub #8*256  ; Pull back to center vertically
   bcs :+
     lda #0
-: cmp #(256+32)*16 ; Limit to two screens of vertical scrolling
+: cmp ScrollYLimit
   bcc :+
-  lda #(256+32)*16
+  lda ScrollYLimit
 : sta TargetY
 
 
@@ -163,7 +166,7 @@ TargetY = 6
   lda VerticalScrollEnabled
   lsr
   bcs :+
-    lda #(256+32)*16
+    lda ScrollYLimit
     sta ScrollY
   :
 

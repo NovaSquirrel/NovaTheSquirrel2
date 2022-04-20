@@ -33,15 +33,19 @@
   sub #(8*256)
   bcs :+
     lda #0
-: sta ScrollX
+: cmp ScrollXLimit
+  bcc :+
+    lda ScrollXLimit
+  :
+  sta ScrollX
 
   lda PlayerPY
   sub #(8*256)
   bcs :+
     lda #0
-: cmp #((32-14)*256)
+: cmp ScrollYLimit
   bcc :+
-    lda #((32-14)*256)
+    lda ScrollYLimit
   :
   sta ScrollY
 

@@ -177,6 +177,8 @@
   GetBlockY_Ptr: .res 2     ; Pointer for how to get the Y position (in blocks) from a level pointer
   GetBlockXCoord_Ptr: .res 2     ; Pointer for how to get the X position (coordinate) from a level pointer
   GetBlockYCoord_Ptr: .res 2     ; Pointer for how to get the Y position (coordinate) from a level pointer
+  ScrollXLimit: .res 2
+  ScrollYLimit: .res 2
 
   PlayerAccelSpeed: .res 2
   PlayerDecelSpeed: .res 2
@@ -215,8 +217,8 @@
 
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:
-  ScreenFlags:            .res 16
-  ScreenFlagsDummy:       .res 1
+  ScreenFlags:            .res (16)*(16+1) ; 256*256
+
   VerticalLevelFlag:      .res 1 ; Level is vertical instead of horizontal
   VerticalScrollEnabled:  .res 1 ; Enable vertical scrolling
   GlassForegroundEffect:  .res 1
