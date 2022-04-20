@@ -1,15 +1,34 @@
 #!/usr/bin/env python3
-# Automatically packs ca65 segments into banks, for a HiROM cartridge
+# Automatically packs ca65 segments into banks
 import glob, os, subprocess, operator, sys
-bank_count    = 16
-bank_max_size = 0x8000 * 2
-code_bank_max_size = 0x8000
+
+# Configuration
 reserve_banks = 1 # Do not do anything with the first N banks
 code_segment_prefix = "C_"
 
-if len(sys.argv) < 4:
-	print("Syntax: uncle_fill.py New.cfg Old.cfg List.o Of.o Objects.o")
+# Read configuration from the command line
+def helpText():
+	print("Syntax: uncle_fill.py board:banks New.cfg Old.cfg List.o Of.o Objects.o")
+	print("Board can be lorom or hirom")
 	sys.exit(-1)
+
+if len(sys.argv) < 5:
+	helpText()
+board = sys.argv[1].split(':')
+if len(board) < 2:
+	helpText()
+if board[0].lower() == 'lorom':
+	hirom = False
+	bank_max_size  = 0x8000
+elif board[0].lower() == 'hirom':
+	hirom = True
+	bank_max_size  = 0x8000 * 2
+else:
+	helpText()
+bank_count = int(board[1])
+code_bank_max_size = 0x8000
+
+# -------------------------------------
 
 def isCodeSegment(name):
 	return name.lower() == "code" or name.startswith(code_segment_prefix)
@@ -29,7 +48,7 @@ original_config_before_memory = None
 original_config_middle = None
 original_config_after_segments = None
 
-with open(sys.argv[2]) as f:
+with open(sys.argv[3]) as f:
 	original_config = f.read()
 
 	# Get segments from ld65 config, so they can be parsed
@@ -79,7 +98,7 @@ with open(sys.argv[2]) as f:
 		ignore_segments.add(name)
 
 # Count up the sizes of all segments using od65
-process = subprocess.Popen(["od65", "--dump-segsize"] + sys.argv[3:], stdout=subprocess.PIPE)
+process = subprocess.Popen(["od65", "--dump-segsize"] + sys.argv[4:], stdout=subprocess.PIPE)
 (od65_output, err) = process.communicate()
 exit_code = process.wait()
 od65_output = [x for x in od65_output.decode("utf-8").splitlines() if x.startswith("    ")]
@@ -121,7 +140,7 @@ for key,value in dynamic_segments.items():
 ###############################################################################
 # Pack the code segments into banks
 ###############################################################################
-def fitSegments(which, bankSize):
+def fitSegments(which, bankSize, allowedBankCount):
 	while bool(which):
 		# Find biggest segment
 		biggest = max(which.items(), key=operator.itemgetter(1))[0]
@@ -129,17 +148,18 @@ def fitSegments(which, bankSize):
 
 		# Put it in the first bank it can go in, if it's not empty
 		if size:
-			for i in range(reserve_banks, bank_count): # Skip bank zero until I figure out what's causing bank overflows
+			for i in range(reserve_banks, allowedBankCount):
 				if bank_sizes[i]+size <= bankSize:
 					bank_sizes[i] += size
 					bank_segments[i].append(biggest)
 					break
 			else:
 				print("Can't fit bank "+biggest+"!")
+				sys.exit(-1)
 		del which[biggest]
 
-fitSegments(code_segments, code_bank_max_size)
-fitSegments(data_segments, bank_max_size)
+fitSegments(code_segments, code_bank_max_size, bank_count if hirom else min(64, bank_count))
+fitSegments(data_segments, bank_max_size, bank_count)
 
 #for i in range(bank_count):
 #	print(i)
@@ -149,7 +169,7 @@ fitSegments(data_segments, bank_max_size)
 ###############################################################################
 # Write out the spliced linker config file
 ###############################################################################
-with open(sys.argv[1], 'w') as f:
+with open(sys.argv[2], 'w') as f:
 	f.write(original_config_before_memory)
 
 	f.write('\n  # Automatically placed memory\n')
@@ -158,16 +178,19 @@ with open(sys.argv[1], 'w') as f:
 		data_size = sum([all_segments[name] for name in bank_segments[bank] if not isCodeSegment(name)])
 
 		start = 0x800000 + (bank * 0x10000)
-		f.write("  ROM%d: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x400000, bank_max_size - code_size))
-		if code_size:
-			f.write("  ROM%d_code: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x10000 - code_size, code_size))
+		if hirom:
+			f.write("  ROM%d: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x400000, bank_max_size - code_size))
+			if code_size:
+				f.write("  ROM%d_code: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x10000 - code_size, code_size))
+		else:
+			f.write("  ROM%d: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start, bank_max_size))
 
 	f.write(original_config_middle)
 
 	f.write('\n  # Automatically placed segments\n')
 	for bank in range(bank_count):
 		for segment in bank_segments[bank]:
-			f.write("  %s: load = ROM%d%s, type = ro;\n" % (segment, bank, "_code" if isCodeSegment(segment) else ""))
+			f.write("  %s: load = ROM%d%s, type = ro;\n" % (segment, bank, "_code" if (isCodeSegment(segment) and hirom) else ""))
 
 	f.write(original_config_after_segments)
 
