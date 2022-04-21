@@ -1,16 +1,31 @@
 #!/usr/bin/env python3
-# Automatically packs ca65 segments into banks
+# Automatic ca65 bank picker
+# Copyright 2020 NovaSquirrel
+#
+# Copying and distribution of this file, with or without
+# modification, are permitted in any medium without royalty provided
+# the copyright notice and this notice are preserved in all source
+# code copies.  This file is offered as-is, without any warranty.
+#
 import glob, os, subprocess, operator, sys
 
 # Configuration
-reserve_banks = 1 # Do not do anything with the first N banks
+reserve_banks = 1     # Do not do anything with the first N banks
+reserve_banks_end = 0 # Do not do anything with the last N banks
 code_segment_prefix = "C_"
 
 # Read configuration from the command line
 def helpText():
 	print("Syntax: uncle_fill.py board:banks New.cfg Old.cfg List.o Of.o Objects.o")
-	print("Board can be lorom or hirom")
+	print("Board can be lorom, hirom or unrom")
 	sys.exit(-1)
+
+# Defaults configuration
+code_bank_max_size = 0x8000
+hirom = False
+snes = False
+nes = False
+unrom = False
 
 if len(sys.argv) < 5:
 	helpText()
@@ -19,14 +34,22 @@ if len(board) < 2:
 	helpText()
 if board[0].lower() == 'lorom':
 	hirom = False
+	snes = True
 	bank_max_size  = 0x8000
 elif board[0].lower() == 'hirom':
 	hirom = True
+	snes = True
 	bank_max_size  = 0x8000 * 2
+elif board[0].lower() == 'unrom':
+	unrom = True
+	nes = True
+	bank_max_size = 0x4000
+	code_bank_max_size = 0x4000
+	reserve_banks = 0
+	reserve_banks_end = 1
 else:
 	helpText()
 bank_count = int(board[1])
-code_bank_max_size = 0x8000
 
 # -------------------------------------
 
@@ -173,18 +196,22 @@ with open(sys.argv[2], 'w') as f:
 	f.write(original_config_before_memory)
 
 	f.write('\n  # Automatically placed memory\n')
-	for bank in range(reserve_banks, bank_count):
-		code_size = sum([all_segments[name] for name in bank_segments[bank] if isCodeSegment(name)])
-		data_size = sum([all_segments[name] for name in bank_segments[bank] if not isCodeSegment(name)])
+	for bank in range(reserve_banks, bank_count-reserve_banks_end):
 
-		start = 0x800000 + (bank * 0x10000)
-		if hirom:
-			f.write("  ROM%d: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x400000, bank_max_size - code_size))
-			if code_size:
-				f.write("  ROM%d_code: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x10000 - code_size, code_size))
-		else:
-			f.write("  ROM%d: start =  $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start, bank_max_size))
+		if snes:
+			start = 0x800000 + (bank * 0x10000)
+			if hirom:
+				code_size = sum([all_segments[name] for name in bank_segments[bank] if isCodeSegment(name)])
+				data_size = sum([all_segments[name] for name in bank_segments[bank] if not isCodeSegment(name)])
 
+				f.write("  ROM%d: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x400000, bank_max_size - code_size))
+				if code_size:
+					f.write("  ROM%d_code: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x10000 - code_size, code_size))
+			else:
+				f.write("  ROM%d: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start, bank_max_size))
+		elif nes:
+			f.write("  ROM%d: start = $8000, type = ro, size = $%x, fill = yes, bank=%d;\n" % (bank, bank_max_size, bank))
+		
 	f.write(original_config_middle)
 
 	f.write('\n  # Automatically placed segments\n')
