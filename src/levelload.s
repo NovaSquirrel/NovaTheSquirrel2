@@ -474,7 +474,7 @@ SpecialCommandTable:
   .addr SpecialSetX
   .addr SpecialWrite1Byte
   .addr SpecialWrite2Byte
-  .addr SpecialWrite3Byte
+  .addr SpecialWriteNByte
   .addr SpecialXMinus16
   .addr SpecialXPlus16
   .addr SpecialConfig
@@ -502,11 +502,13 @@ ColumnWriteOne:
   sta f:ColumnWords,x
   inx
   rts
-SpecialWrite3Byte:
+SpecialWriteNByte:
   jsr ColumnWriteIndex
-  jsr ColumnWriteOne
-  jsr ColumnWriteOne
-  jsr ColumnWriteOne
+  jsr NextLevelByte
+  sta 0
+: jsr ColumnWriteOne
+  dec 0
+  bne :-
   rts
 SpecialWrite2Byte:
   jsr ColumnWriteIndex

@@ -110,24 +110,32 @@ def add_import(s):
 		return
 	all_imports.add(s)
 	outfile.write('.import %s\n' % s)
-	
+
+def write_column_data(data):
+	b = data.count(',')
+	data = "LWriteCol "+data
+	if b < 3:
+		return data, b
+	else:
+		return data, b+1 # One more byte for the byte count
+
 def encode_sign(r, extra):
 	symbol = 'DialogScene_' + extra
 	add_import(symbol)
-	return ("LWriteCol <%s, >%s, ^%s" % (symbol, symbol, symbol)), 4
+	return write_column_data("<%s, >%s, ^%s" % (symbol, symbol, symbol))
 
 def encode_door(r, extra):
 	dashes = extra.split('-')
 	if len(dashes) == 2: # A-B two-way door
 		if dashes[1] in teleport_destinations:
 			d = teleport_destinations[dashes[1]]
-			return ("LWriteCol %d, %d" % (d[1], d[0])), 3 # Y and then X
+			return write_column_data("%d, %d" % (d[1], d[0])) # Y and then X
 		else:
 			sys.exit("Teleport destination "+dashes[1]+" not found")
 	elif len(dashes) == 1: # Level door
 		if extra not in door_level_teleport_list:
 			door_level_teleport_list.append(extra)
-		return ("LWriteCol $20, %d ;%s" % (door_level_teleport_list.index(extra), extra)), 3 # level number
+		return write_column_data("$20, %d ;%s" % (door_level_teleport_list.index(extra), extra)) # level number
 	sys.exit("Invalid door: "+extra)
 	return (""), 0
 

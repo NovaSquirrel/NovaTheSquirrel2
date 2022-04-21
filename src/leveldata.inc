@@ -173,18 +173,43 @@
   .byt $f1, NewX
 .endmacro
 
-.macro LWriteCol Col1, Col2, Col3
+.macro LWriteCol Col1, Col2, Col3, Col4, Col5, Col6, Col7, Col8
+  .ifnblank Col8
+    .byt $f4
+    .byt 8, Col1, Col2, Col3, Col4, Col5, Col6, Col7, Col8
+  .else
+  .ifnblank Col7
+    .byt $f4
+    .byt 7, Col1, Col2, Col3, Col4, Col5, Col6, Col7
+  .else
+  .ifnblank Col6
+    .byt $f4
+    .byt 6, Col1, Col2, Col3, Col4, Col5, Col6
+  .else
+  .ifnblank Col5
+    .byt $f4
+    .byt 5, Col1, Col2, Col3, Col4, Col5
+  .else
+  .ifnblank Col4
+    .byt $f4
+    .byt 4, Col1, Col2, Col3, Col4
+  .else
   .ifnblank Col3
     .byt $f4
-    .byt Col1, Col2, Col3
+    .byt 3, Col1, Col2, Col3
   .else
-    .ifnblank Col2
-      .byt $f3
-      .byt Col1, Col2
-    .else
-      .byt $f2
-      .byt Col1
-    .endif
+  .ifnblank Col2
+    .byt $f3
+    .byt Col1, Col2
+  .else
+    .byt $f2
+    .byt Col1
+  .endif
+  .endif
+  .endif
+  .endif
+  .endif
+  .endif
   .endif
 .endmacro
 
