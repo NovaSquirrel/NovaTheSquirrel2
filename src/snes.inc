@@ -40,7 +40,7 @@ PPURES = $2133
 ; ||  |+--- 0: show lines 1-224; 1: show lines 1-239
 ; ||  +---- Show subscreen in left half of each pixel
 ; ||        (modes 012347; forced on in modes 56)
-; |+------- In mode 7, use bit 7 as priority
+; |+------- In mode 7, use bit 7 of pixel color as priority
 ; +-------- External genlock, intended for SFC Titler. Use 0 on SNES.
 INTERLACE    = $01
 INTERLACEOBJ = $02
@@ -58,9 +58,9 @@ PPUSTATUS1 = $213E
 PPUSTATUS2 = $213F
 ; 76543210  PPU compositor status
 ; || |++++- PPU2 version (1-3, not counting minor versions of 3)
-; || +----- 1: PAL
+; || +----- 1: PPU is configured for 50 Hz (PAL)
 ; |+------- 1: GETXY has happened since last PPUSTATUS2 read
-; +-------- Toggles every vblank
+; +-------- Toggles every vblank; reflects top/bottom interlace field
 
 ; S-PPU sprites ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -68,7 +68,7 @@ OBSEL = $2101
 ; 76543210
 ; ||||| ++- Sprite main pattern table (0=$0000, 1=$4000, 2=$8000, 3=$C000)
 ; |||++---- Alt pattern table offset (0=$1000, 1=$2000, 2=$3000, 3=$4000)
-; +++------ 0: 8/16; 1: 8/32; 2: 8/64; 3: 16/64; 4: 32/64; 5: 64/64
+; +++------ 0: 8/16; 1: 8/32; 2: 8/64; 3: 16/32; 4: 16/32; 5: 32/64
 ;           (all sprites are square and 2D-mapped)
 OBSIZE_8_16  = $00
 OBSIZE_8_32  = $20
