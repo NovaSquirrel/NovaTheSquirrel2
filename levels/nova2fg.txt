@@ -9,6 +9,7 @@ import_nova2 ../tools/blocks.txt
 0010 EnemyBarrier
 0011 CameraEnableNudgeUp
 0012 CameraDisableNudgeUp
+0013 InvisiblePrize
 #0001 Bricks
 #0003 Prize
 #0004 UsedPrize

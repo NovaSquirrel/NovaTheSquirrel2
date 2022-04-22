@@ -1534,11 +1534,13 @@ ExpireThen:
   rtl
 
 InteractWithBlock:
+  inc InteractionByProjectile
   phx
   jsl GetLevelPtrXY
   jsl GetBlockFlag
   jsl BlockRunInteractionBelow
   plx
+  dec InteractionByProjectile
   ; Insert additional types the Below interaction doesn't do
   cmp #Block::Ice
   beq ExplodeBlock

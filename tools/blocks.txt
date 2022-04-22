@@ -60,6 +60,11 @@ solid
 t 2,2 2,2h
 t 2,3 2,3h
 
++InvisiblePrize
+when Below, BlockInvisiblePrize
+t 0,0 0,0
+t 0,0 0,0
+
 +PrizeAnimation1
 solid
 t 8,1 8,1h

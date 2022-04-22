@@ -563,6 +563,14 @@ Nevermind:
   rts
 .endproc
 
+.export BlockInvisiblePrize
+BlockInvisiblePrize:
+  lda InteractionByProjectile
+  and #255
+  bne BlockPrize
+  lda PlayerVY
+  bmi BlockPrize
+  rts
 .a16
 .proc BlockPrize
   jsl GetOneCoin

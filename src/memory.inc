@@ -290,6 +290,7 @@ SF_SPECIAL_MASK     = %00001111
 .global TailAttackTimer, OldTailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable, TailAttackDynamicSlot
 .global AbilityMovementLock
 .global CopyingAnimationTimer
+.global InteractionByProjectile
 
 ; Save stuff
 .global MoneyAmount

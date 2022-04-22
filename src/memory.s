@@ -318,6 +318,7 @@ LevelZeroWhenLoad_Start:
   TailAttackDynamicSlot: .res 1
   AbilityMovementLock: .res 1
   CopyingAnimationTimer: .res 1
+  InteractionByProjectile: .res 1 ; Block is being interacted with by projectile instead of the player 
 LevelZeroWhenLoad_End:
   TailAttackVariable:  .res 2 ; Zero'd when an attack starts
   GenericUpdateByteTotal: .res 2 ; How many bytes are queued up this frame
