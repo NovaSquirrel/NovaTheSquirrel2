@@ -147,9 +147,9 @@
 				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	24,
-					"Y":	10,
+					"Y":	11,
 					"W":	1,
-					"H":	2
+					"H":	1
 				}, {
 					"Id":	"LedgeSolidRight",
 					"X":	37,
@@ -158,9 +158,9 @@
 					"H":	2
 				}, {
 					"Id":	"Ledge",
-					"X":	25,
+					"X":	27,
 					"Y":	10,
-					"W":	12,
+					"W":	10,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
@@ -260,7 +260,7 @@
 					"H":	1
 				}, {
 					"Id":	"RedFlowerSpiral",
-					"X":	26,
+					"X":	27,
 					"Y":	8,
 					"W":	1,
 					"H":	1
@@ -356,9 +356,9 @@
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	25,
-					"Y":	7,
-					"W":	3,
+					"X":	22,
+					"Y":	8,
+					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
@@ -1794,6 +1794,108 @@
 					"Y":	27,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"LedgeSlope",
+					"X":	25,
+					"Y":	10,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Bricks",
+					"X":	102,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"InvisiblePrize",
+					"X":	174,
+					"Y":	11,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"InvisiblePrize",
+					"X":	175,
+					"Y":	8,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"InvisiblePrize",
+					"X":	176,
+					"Y":	5,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	177,
+					"Y":	5,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	176,
+					"Y":	15,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	178,
+					"Y":	3,
+					"W":	3,
+					"H":	2
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	183,
+					"Y":	7,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	185,
+					"Y":	9,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"InvisiblePrize",
+					"X":	63,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"InvisiblePrize",
+					"X":	21,
+					"Y":	22,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"InvisiblePrize",
+					"X":	21,
+					"Y":	3,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	187,
+					"Y":	9,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	185,
+					"Y":	7,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Money",
+					"X":	183,
+					"Y":	5,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	187,
+					"Y":	16,
+					"W":	1,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",
@@ -1803,13 +1905,6 @@
 					"Id":	"Sneaker",
 					"X":	38,
 					"Y":	19,
-					"W":	1,
-					"H":	1,
-					"XFlip":	true
-				}, {
-					"Id":	"FireWalk",
-					"X":	18,
-					"Y":	25,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true

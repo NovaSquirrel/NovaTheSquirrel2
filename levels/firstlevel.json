@@ -1350,6 +1350,78 @@
 					"Y":	23,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	143,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	228,
+					"Y":	18,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Bricks",
+					"X":	105,
+					"Y":	22,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Bricks",
+					"X":	187,
+					"Y":	25,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	216,
+					"Y":	28,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	216,
+					"Y":	27,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Spring",
+					"X":	219,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"SolidBlock",
+					"X":	219,
+					"Y":	27,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	219,
+					"Y":	24,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	213,
+					"Y":	28,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	22,
+					"Y":	23,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"BricksPrize",
+					"X":	123,
+					"Y":	24,
+					"W":	1,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",
@@ -1387,13 +1459,6 @@
 					"Id":	"SlowSneaker",
 					"X":	72,
 					"Y":	28,
-					"W":	1,
-					"H":	1,
-					"XFlip":	true
-				}, {
-					"Id":	"SlowSneaker",
-					"X":	86,
-					"Y":	25,
 					"W":	1,
 					"H":	1,
 					"XFlip":	true
@@ -1494,6 +1559,34 @@
 					"Y":	22,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"FireJump",
+					"X":	32,
+					"Y":	23,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireWalk",
+					"X":	86,
+					"Y":	25,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireWalk",
+					"X":	152,
+					"Y":	21,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
+				}, {
+					"Id":	"FireWalk",
+					"X":	230,
+					"Y":	20,
+					"W":	1,
+					"H":	1,
+					"XFlip":	true
 				}]
 		}, {
 			"Name":	"Control",
