@@ -145,9 +145,9 @@
   dea
   sta LevelColumnMask
 
-  lda #$ffff
+  lda #(15*16)*256 ; 15 screens of 16 tiles, each containing 256 subpixels
   sta ScrollXLimit
-  lda #(256+32)*16
+  lda #(16+2)*256  ; 1 screen of 16 tiles, each containing 256 subpixels. Add 2 tiles because (224 - 256) = 32 pixels.
   sta ScrollYLimit
 
   seta8
@@ -238,9 +238,9 @@
     dea
     sta LevelColumnMask
 
-    lda #$ffff
+    lda #(15*16+2)*256 ; 15 screens of 16 tiles, each containing 256 subpixels. Add 2 tiles because (224 - 256) = 32 pixels.
     sta ScrollYLimit
-    lda #(256)*16
+    lda #16*256        ; 1 screen of 16 tiles, each containing 256 subpixels. 
     sta ScrollXLimit
     seta8
 
