@@ -75,6 +75,14 @@ TargetY = 6
   lda ScrollXLimit
 : sta TargetX
 
+  ; For a horizontal level, going off of the top of the screen should not target upward
+  bit VerticalLevelFlag-1
+  bmi :+
+  lda PlayerCameraTargetY
+  bpl :+
+    stz PlayerCameraTargetY
+  :
+
   lda PlayerCameraTargetY
   sub #8*256  ; Pull back to center vertically
   bcs :+
