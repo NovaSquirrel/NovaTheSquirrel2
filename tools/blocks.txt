@@ -15,6 +15,7 @@ alias common_pal_sand $3800
 alias treehouse $3800
 alias common_pal_indoor_decor $3A00
 alias toggleblocks $4A00
+alias linefollowing $4800
 
 alias global_palette 1
 alias terrain_palette 2
@@ -1637,6 +1638,54 @@ solid
 when SolidCheck, BlockToggleSolid
 t 4,1 5,1
 t 6,1 7,1
+
+#######################################
+# Line following blocks
+#######################################
+base linefollowing
+palette global_palette
+tileset FGLineFollowing
+editor_category Main
+
++LineFollowHorizontal
+t 6,0 6,0
+t 7,0 7,0
+
++LineFollowVertical
+t 8,0 9,0
+t 8,0 9,0
+
++LineFollowCornerUL
+t 0,0 6,0
+t 8,0 2,0
+
++LineFollowCornerUR
+t 6,0 0,0h
+t 3,0 9,0
+
++LineFollowCornerDL
+t 8,0 4,0
+t 0,0v 7,0
+
++LineFollowCornerDR
+t 5,0 9,0
+t 7,0 1,0
+
++LineFollowCapTop
+t 12,0 11,0v
+t 0:0 0:0
+
++LineFollowCapLeft
+t 0:0 13,0
+t 0:0 15,0h
+
++LineFollowCapRight
+t 14,0 0:0
+t 15,0 0:0
+
++LineFollowCapBottom
+t 0:0 0:0
+t 10,0 11,0
 
 #######################################
 # Invisible control blocks

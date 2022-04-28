@@ -62,3 +62,4 @@ E000 SPPumpkinBoat
 E000 SPStrider
 E000 SPSwordSlime
 E000 SPStrifeCloud
+4800 FGLineFollowing
