@@ -1557,8 +1557,9 @@ Invalid:
     sta 2
 
     ; Use Y flip
-    lda #OAM_YFLIP
-    tsb 4
+    lda 4
+    eor #OAM_YFLIP
+    sta 4
   :
 
   lda 4
