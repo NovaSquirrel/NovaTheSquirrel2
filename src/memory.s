@@ -262,15 +262,16 @@ LevelZeroWhenLoad_Start:
 
   ; Video updates from scrolling
   ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
-  ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
   RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
-  RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
+  ; Found in bank 7F:
+  ; ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
+  ; RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
+  ; ColumnUpdateBuffer2:  .res 32*2  ; 32 tiles vertically
+  ; RowUpdateBuffer2:     .res 64*2  ; 64 tiles horizontally
 
   ; Second layer
   ColumnUpdateAddress2: .res 2     ; Address to upload to, or zero for none
-  ColumnUpdateBuffer2:  .res 32*2  ; 32 tiles vertically
   RowUpdateAddress2:    .res 2     ; Address to upload to, or zero for none
-  RowUpdateBuffer2:     .res 64*2  ; 64 tiles horizontally
 
   ; For ChangeBlock
   BlockUpdateAddressTop:    .res BLOCK_UPDATE_COUNT*2
@@ -401,3 +402,8 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   HDMA_Buffer2: .res 2048    ; for double buffering the previous
 
   DecompressBuffer: .res 8192 ; Not used by LZ4_DecompressToMode7Tiles, though that's also currently unused
+
+  ColumnUpdateBuffer:   .res 32*2  ; 32 tiles vertically
+  RowUpdateBuffer:      .res 64*2  ; 64 tiles horizontally
+  ColumnUpdateBuffer2:  .res 32*2  ; 32 tiles vertically
+  RowUpdateBuffer2:     .res 64*2  ; 64 tiles horizontally

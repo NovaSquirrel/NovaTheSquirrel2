@@ -346,13 +346,14 @@ YPos = 6
   asl
   asl
   and #(64*2)-1
-  tax
+  tay
 
   ; Take the Y position, rounded to blocks,
   ; as the column of level data to read
   lda Temp
   and #.loword(~1)
-  tay
+  ora LevelBlockPtr
+  tax
 
   ; Generate the top or the bottom as needed
   lda Temp
@@ -402,7 +403,8 @@ YPos = 6
   xba
   asl
   and LevelColumnMask
-  tay
+  ora LevelBlockPtr
+  tax
 
   ; Generate the left or right as needed
   lda Temp

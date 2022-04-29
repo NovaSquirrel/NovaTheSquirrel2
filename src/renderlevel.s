@@ -178,6 +178,7 @@ YPos = 4
   xba
   and LevelColumnMask
   asl
+  ora LevelBlockPtr
   sta YPos
 
 Loop:
@@ -197,19 +198,19 @@ Loop:
   :
 
   ; Upload two columns
-  ldy YPos
+  ldx YPos
   jsl RenderLevelColumnLeft
   jsl RenderLevelColumnUpload
   inc ColumnUpdateAddress
-  ldy YPos
+  ldx YPos
   jsl RenderLevelColumnRight
   jsl RenderLevelColumnUpload
 
   ; Move onto the next block
-  lda LevelBlockPtr
+  lda YPos
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
-  sta LevelBlockPtr
+  sta YPos
   inc BlockNum
 
   dec BlocksLeft
@@ -234,13 +235,14 @@ Loop:
   sta PPUADDR
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  lda #ColumnUpdateBuffer
+  lda #.loword(ColumnUpdateBuffer)
   sta DMAADDR
   lda #32*2
   sta DMALEN
 
   seta8
-  stz DMAADDRBANK
+  lda #^ColumnUpdateBuffer
+  sta DMAADDRBANK
 
   lda #INC_DATAHI|VRAM_DOWN
   sta PPUCTRL
@@ -267,13 +269,14 @@ Loop:
   sta PPUADDR
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  lda #RowUpdateBuffer
+  lda #.loword(RowUpdateBuffer)
   sta DMAADDR
   lda #32*2
   sta DMALEN
 
   seta8
-  stz DMAADDRBANK
+  lda #^RowUpdateBuffer
+  sta DMAADDRBANK
 
   lda #%00000001
   sta COPYSTART
@@ -287,13 +290,12 @@ Loop:
   lda RowUpdateAddress
   ora #2048>>1
   sta PPUADDR
-  lda #RowUpdateBuffer+32*2
+  lda #.loword(RowUpdateBuffer+32*2)
   sta DMAADDR
   lda #32*2
   sta DMALEN
 
   seta8
-  stz DMAADDRBANK
 
   lda #%00000001
   sta COPYSTART
@@ -310,37 +312,38 @@ Loop:
 .i16
 .proc RenderLevelColumnLeft
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
-  tya
+  txa
   asl
   and #(32*2)-1
-  tax
-  stx TempVal
-: lda [LevelBlockPtr],y ; Get the next level tile
-  iny
-  iny
-  phy
   tay
+  sty TempVal
+: lda a:LevelBuf,x ; Get the next level tile
+  inx
+  inx
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockTopLeft,y
-  sta f:ColumnUpdateBuffer,x
-  inx
-  inx
-  lda BlockBottomLeft,y
-  sta f:ColumnUpdateBuffer,x
-  inx
-  inx
-  ply
+  lda f:BlockTopLeft,x
+  sta ColumnUpdateBuffer,y
+  iny
+  iny
+  lda f:BlockBottomLeft,x
+  sta ColumnUpdateBuffer,y
+  iny
+  iny
+  plx
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(32*2)-1
-  tax
+  tay
 
   ; Stop after 32 tiles vertically
-  cpx TempVal
+  cpy TempVal
   bne :-
 
   plb
@@ -354,37 +357,38 @@ Loop:
 .i16
 .proc RenderLevelColumnRight
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
-  tya
+  txa
   asl
   and #(32*2)-1
-  tax
-  stx TempVal
-: lda [LevelBlockPtr],y ; Get the next level tile
-  iny
-  iny
-  phy
   tay
+  sty TempVal
+: lda a:LevelBuf,x ; Get the next level tile
+  inx
+  inx
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockTopRight,y
-  sta f:ColumnUpdateBuffer,x
-  inx
-  inx
-  lda BlockBottomRight,y
-  sta f:ColumnUpdateBuffer,x
-  inx
-  inx
-  ply
+  lda f:BlockTopRight,x
+  sta ColumnUpdateBuffer,y
+  iny
+  iny
+  lda f:BlockBottomRight,x
+  sta ColumnUpdateBuffer,y
+  iny
+  iny
+  plx
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(32*2)-1
-  tax
+  tay
 
   ; Stop after 32 tiles vertically
-  cpx TempVal
+  cpy TempVal
   bne :-
 
   plb
@@ -400,36 +404,36 @@ Loop:
 .i16
 .proc RenderLevelRowTop
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
   lda #20
   sta TempVal
 
-: lda [LevelBlockPtr],y ; Get the next level tile
-  phy
-  tay
+: lda a:LevelBuf,x ; Get the next level tile
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockTopLeft,y
-  sta f:RowUpdateBuffer,x
-  inx
-  inx
-  lda BlockTopRight,y
-  sta f:RowUpdateBuffer,x
-  inx
-  inx
-  ply
+  lda f:BlockTopLeft,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  lda f:BlockTopRight,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  pla
 
   ; Next column
-  lda LevelBlockPtr
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
-  sta LevelBlockPtr
+  tax
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(64*2)-1
-  tax
+  tay
 
   ; Stop after 64 tiles horizontally
   dec TempVal
@@ -447,36 +451,36 @@ Loop:
 .i16
 .proc RenderLevelRowBottom
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
   lda #20
   sta TempVal
 
-: lda [LevelBlockPtr],y ; Get the next level tile
-  phy
-  tay
+: lda a:LevelBuf,x ; Get the next level tile
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockBottomLeft,y
-  sta f:RowUpdateBuffer,x
-  inx
-  inx
-  lda BlockBottomRight,y
-  sta f:RowUpdateBuffer,x
-  inx
-  inx
-  ply
+  lda f:BlockBottomLeft,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  lda f:BlockBottomRight,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  pla
 
   ; Next column
-  lda LevelBlockPtr
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
-  sta LevelBlockPtr
+  tax
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(64*2)-1
-  tax
+  tay
 
   ; Stop after 64 tiles horizontally
   dec TempVal

@@ -293,13 +293,14 @@ Loop:
   sta PPUADDR
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  lda #ColumnUpdateBuffer2
+  lda #.loword(ColumnUpdateBuffer2)
   sta DMAADDR
   lda #32*2
   sta DMALEN
 
   seta8
-  stz DMAADDRBANK
+  lda #^ColumnUpdateBuffer2
+  sta DMAADDRBANK
 
   lda #INC_DATAHI|VRAM_DOWN
   sta PPUCTRL
@@ -326,13 +327,14 @@ Loop:
   sta PPUADDR
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  lda #RowUpdateBuffer2
+  lda #.loword(RowUpdateBuffer2)
   sta DMAADDR
   lda #32*2
   sta DMALEN
 
   seta8
-  stz DMAADDRBANK
+  lda #^ColumnUpdateBuffer2
+  sta DMAADDRBANK
 
   lda #%00000001
   sta COPYSTART
@@ -346,13 +348,13 @@ Loop:
   lda RowUpdateAddress2
   ora #2048>>1
   sta PPUADDR
-  lda #RowUpdateBuffer2+32*2
+  lda #.loword(RowUpdateBuffer2+32*2)
   sta DMAADDR
   lda #32*2
   sta DMALEN
 
   seta8
-  stz DMAADDRBANK
+  ;stz DMAADDRBANK
 
   lda #%00000001
   sta COPYSTART

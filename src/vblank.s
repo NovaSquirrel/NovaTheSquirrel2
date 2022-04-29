@@ -165,12 +165,13 @@ VblankHandler:
   beq :+
     stz ColumnUpdateAddress
     sta PPUADDR
-    lda #ColumnUpdateBuffer
+    lda #.loword(ColumnUpdateBuffer)
     sta <DMAADDR
     lda #32*2
     sta <DMALEN
     seta8
-    stz <DMAADDRBANK
+    lda #^ColumnUpdateBuffer
+    sta <DMAADDRBANK
     lda #INC_DATAHI|VRAM_DOWN
     sta PPUCTRL
     lda #%00000001
@@ -186,12 +187,13 @@ VblankHandler:
     ; --- First screen
     ; Set DMA parameters  
     stx PPUADDR
-    lda #RowUpdateBuffer
+    lda #.loword(RowUpdateBuffer)
     sta <DMAADDR
     ldy #32*2
     sty <DMALEN
     seta8
-    stz <DMAADDRBANK
+    lda #^RowUpdateBuffer
+    sta <DMAADDRBANK
     lda #%00000001
     sta COPYSTART
     seta16
@@ -200,12 +202,11 @@ VblankHandler:
     txa
     ora #2048>>1
     sta PPUADDR
-    lda #RowUpdateBuffer+32*2
+    lda #.loword(RowUpdateBuffer+32*2)
     sta <DMAADDR
     sty <DMALEN
 
     seta8
-    stz <DMAADDRBANK
     lda #%00000001
     sta COPYSTART
     seta16
@@ -216,12 +217,13 @@ VblankHandler:
   beq :+
     stz ColumnUpdateAddress2
     sta PPUADDR
-    lda #ColumnUpdateBuffer2
+    lda #.loword(ColumnUpdateBuffer2)
     sta <DMAADDR
     lda #32*2
     sta <DMALEN
     seta8
-    stz <DMAADDRBANK
+    lda #^ColumnUpdateBuffer2
+    sta <DMAADDRBANK
     lda #INC_DATAHI|VRAM_DOWN
     sta PPUCTRL
     lda #%00000001
@@ -238,12 +240,13 @@ VblankHandler:
     ; Set DMA parameters  
     tax
     sta PPUADDR
-    lda #RowUpdateBuffer2
+    lda #.loword(RowUpdateBuffer2)
     sta <DMAADDR
     ldy #32*2
     sty <DMALEN
     seta8
-    stz <DMAADDRBANK
+    lda #^RowUpdateBuffer2
+    sta <DMAADDRBANK
     lda #%00000001
     sta COPYSTART
     seta16
@@ -252,12 +255,11 @@ VblankHandler:
     txa
     ora #2048>>1
     sta PPUADDR
-    lda #RowUpdateBuffer2+32*2
+    lda #.loword(RowUpdateBuffer2+32*2)
     sta <DMAADDR
     sty <DMALEN
 
     seta8
-    stz <DMAADDRBANK
     lda #%00000001
     sta COPYSTART
     seta16
