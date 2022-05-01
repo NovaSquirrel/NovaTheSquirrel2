@@ -476,7 +476,8 @@ StepToTarget:
     asl ActorVarB,x
   NoInit:
 
-  ; 
+  ; Change direction if you're aligned in the middle of a block
+  ; that you might want to change direction on
   lda ActorPX,x
   and #$ff
   cmp #$80
