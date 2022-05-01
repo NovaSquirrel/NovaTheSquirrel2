@@ -41,9 +41,9 @@ draw DrawLedgeWalker
 after SharedEnemyNormal
 size 16x14
 
-+MovingPlatformHoriz
++MovingPlatformHorizontal
 essential
-run RunMovingPlatformH
+run RunMovingPlatformHorizontal
 draw DrawMovingPlatform
 after SharedRemoveIfFarther
 size 32x8
@@ -58,6 +58,27 @@ size 32x8
 +MovingPlatformPush
 essential
 run RunMovingPlatformPush
+draw DrawMovingPlatform
+after SharedRemoveIfFarther
+size 32x8
+
++MovingPlatformDiagonalUp
+essential
+run RunMovingPlatformDiagonalUp
+draw DrawMovingPlatform
+after SharedRemoveIfFarther
+size 32x8
+
++MovingPlatformDiagonalDown
+essential
+run RunMovingPlatformDiagonalDown
+draw DrawMovingPlatform
+after SharedRemoveIfFarther
+size 32x8
+
++MovingPlatformVertical
+essential
+run RunMovingPlatformVertical
 draw DrawMovingPlatform
 after SharedRemoveIfFarther
 size 32x8

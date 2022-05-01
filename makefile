@@ -168,6 +168,7 @@ $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcd
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/playerprojectile.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(objdir)/playerability.o: $(srcdir)/actorenum.s
 $(srcdir)/itemdata.s: $(srcdir)/itemenum.s $(srcdir)/vwf.inc
 $(objdir)/itemcode.o: $(srcdir)/itemenum.s
 $(objdir)/dialog.o: $(srcdir)/vwf.inc $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s

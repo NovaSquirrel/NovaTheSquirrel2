@@ -1672,20 +1672,28 @@ t 5,0 9,0
 t 7,0 1,0
 
 +LineFollowCapTop
+#t 12,0 11,0v
+#t 0:0 0:0
+t 8,0 9,0
 t 12,0 11,0v
-t 0:0 0:0
-
-+LineFollowCapLeft
-t 0:0 13,0
-t 0:0 15,0h
 
 +LineFollowCapRight
-t 14,0 0:0
-t 15,0 0:0
+#t 0:0 13,0
+#t 0:0 15,0h
+t 13,0 6,0
+t 15,0h 7,0
+
++LineFollowCapLeft
+#t 14,0 0:0
+#t 15,0 0:0
+t 6,0 14,0
+t 7,0 15,0
 
 +LineFollowCapBottom
-t 0:0 0:0
+#t 0:0 0:0
+#t 10,0 11,0
 t 10,0 11,0
+t 8,0 9,0
 
 #######################################
 # Invisible control blocks

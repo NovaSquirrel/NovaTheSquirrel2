@@ -305,26 +305,246 @@ UpsideDown:
   jml DispActorMetaRight
 
 Platform:
-  Row8x8   -16,0,  $00, $10, $10, $01
+  Row8x8   -12,0,  $00, $10, $10, $01
   EndMetasprite
 .endproc
 
+; Move a moving platform back and forth (or at least move ActorVX back and forth)
+; with a smoothed turnaround at the end.
 .a16
-.i16
-.export RunMovingPlatformH
-.proc RunMovingPlatformH
+.proc MovingPlatformBackAndForth
+  lda ActorDirection,x
+  and #1
+  asl
+  tay
+
+  ; Accelerate toward the desired speed if not already there
+  lda ActorVX,x
+  cmp Target,y
+  beq Already
+    add StepToTarget,y
+    sta ActorVX,x
+    rts
+Already:
+  ; Keep track of how many pixels have been traveled
+  inc ActorTimer,x
+
+  ; VarA = amount of blocks to travel before turning around
+  lda ActorVarA,x
+  ina
+  asl
+  asl
+  asl
+  asl
+  cmp ActorTimer,x
+  bne :+
+    stz ActorTimer,x      ; Reset the timer
+    lda ActorDirection,x  ; Flip around
+    eor #1
+    sta ActorDirection,x
+  :
+  rts
+
+Target:
+  .word $10, .loword(-$10)
+StepToTarget:
+  .word 1, .loword(-1)
+.endproc
+
+; Move a moving platform forward with a given offset (A=horizontal, Y=vertical)
+.a16
+.proc MoveMovingPlatform
+  sta 0
+  sty 2
+
+  ; Calculate the new Y ahead of time
+  lda ActorPY,x
+  add 2
+  sta 4
+
+  ; Only move the player with the platform if they're standing on it
+  lda PlayerPY
+  cmp ActorPY,x
+  bcs NoRide
+  jsl CollideRide
+  bcc NoRide
+    lda PlayerPX
+    add 0
+    sta PlayerPX
+
+    ; Put player on top and zero out vertical movement
+    lda 4
+    sub #$70
+    sta PlayerPY
+    stz PlayerVY
+
+    seta8
+    lda #1
+    sta PlayerRidingSomething
+    stz PlayerNeedsGround
+    seta16
+  NoRide:
+
+  ; Always move the platform
+  lda ActorPX,x
+  add 0
+  sta ActorPX,x
+  ;---
+  lda 4
+  sta ActorPY,x
+  rts
+.endproc
+
+.a16
+.export RunMovingPlatformHorizontal
+.proc RunMovingPlatformHorizontal
+  jsr MovingPlatformBackAndForth
+  lda ActorVX,x
+  ldy #0
+  jsr MoveMovingPlatform
   rtl
 .endproc
 
 .a16
-.i16
+.export RunMovingPlatformVertical
+.proc RunMovingPlatformVertical
+  jsr MovingPlatformBackAndForth
+  tdc ; Clear accumulator
+  ldy ActorVX,x
+  jsr MoveMovingPlatform
+  rtl
+.endproc
+
+.a16
+.export RunMovingPlatformDiagonalDown
+.proc RunMovingPlatformDiagonalDown
+  jsr MovingPlatformBackAndForth
+
+  lda ActorVX,x
+  tay
+  lda ActorVX,x
+  jsr MoveMovingPlatform
+  rtl
+.endproc
+
+.a16
+.export RunMovingPlatformDiagonalUp
+.proc RunMovingPlatformDiagonalUp
+  jsr MovingPlatformBackAndForth
+
+  lda ActorVX,x
+  neg
+  tay
+  lda ActorVX,x
+  jsr MoveMovingPlatform
+  rtl
+.endproc
+
+.a16
 .export RunMovingPlatformLine
 .proc RunMovingPlatformLine
+; VarA:
+; 0: Automatically start moving
+; 1: Start moving when you step on it
+; 2: Only move when you step on it
+; 3: Only move when you're *not* stepping on it
+; VarB: Direction
+
+  lda ActorState,x
+  cmp #ActorStateValue::Init
+  bne NoInit
+    lda ActorPY,x
+    sub #$40
+    sta ActorPY,x
+    ldy ActorPX,x
+
+    ; Pick a starting direction
+    lda ActorDirection,x
+    and #1
+    asl
+    sta ActorVarB,x
+
+    ; Starting on a vertical line rotates it 90 degrees
+    lda ActorPX,x
+    ldy ActorPY,x
+    jsl GetLevelPtrXY
+    cmp #Block::LineFollowVertical
+    bne :+
+      inc ActorVarB,x
+    :
+
+    asl ActorVarB,x
+  NoInit:
+
+  ; 
+  lda ActorPX,x
+  and #$ff
+  cmp #$80
+  bne NotAligned
+  lda ActorPY,x
+  and #$ff
+  cmp #$ff - $40
+  bne NotAligned
+    lda ActorPX,x
+    ldy ActorPY,x
+    jsl GetLevelPtrXY
+    sub #Block::LineFollowCornerUL
+    bcc NotOnLine
+    cmp #Block::LineFollowCapBottom-Block::LineFollowCornerUL+1
+    bcs NotOnLine
+        ; * 2
+    asl ; * 4
+    sta 0
+    lda ActorVarB,x
+    lsr
+    ora 0
+    tay
+    lda NewDirectionTable,y
+    and #255
+    sta ActorVarB,x
+  NotOnLine:
+  NotAligned:
+
+  ; Actually move now
+  ldy ActorVarB,x
+  lda DXList,y
+  pha
+  lda DYList,y
+  tay
+  pla
+  jsr MoveMovingPlatform
   rtl
+
+DXList:
+  .word .loword($10), .loword($00), .loword(-$10), .loword($00)
+DYList:
+  .word .loword($00), .loword($10), .loword($00), .loword(-$10)
+
+RIGHT = 0
+DOWN  = 2
+LEFT  = 4
+UP    = 6
+
+NewDirectionTable: ; R D L U
+;LineFollowCornerUL (down and right)
+  .byt 0, 0, DOWN, RIGHT
+;LineFollowCornerUR (down and left)
+  .byt DOWN, 0, 0, LEFT
+;LineFollowCornerDL (up and right)
+  .byt 0, RIGHT, UP, 0
+;LineFollowCornerDR (up and left)
+  .byt UP, LEFT, 0, 0
+;LineFollowCapTop (up)
+  .byt UP, UP, UP, UP
+;LineFollowCapRight (right)
+  .byt RIGHT, RIGHT, RIGHT, RIGHT
+;LineFollowCapLeft (left)
+  .byt LEFT, LEFT, LEFT, LEFT
+;LineFollowCapBottom (down)
+  .byt DOWN, DOWN, DOWN, DOWN
 .endproc
 
 .a16
-.i16
 .export RunMovingPlatformPush
 .proc RunMovingPlatformPush
   lda PlayerPY
