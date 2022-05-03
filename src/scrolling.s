@@ -535,13 +535,12 @@ CheckExistsLoop:
   ; Swap X and Y if it's a vertical level
   lda VerticalLevelFlag
   beq @Horizontal
-  seta16
-  lda ActorPX,x
+  lda ActorPX+1,x
   pha
-  lda ActorPY,x
-  sta ActorPX,x
+  lda ActorPY+1,x
+  sta ActorPX+1,x
   pla
-  sta ActorPY,x
+  sta ActorPY+1,x
 @Horizontal:
 
   ; Copy the most significant bit of the Y position to the least significant bit of the direction
