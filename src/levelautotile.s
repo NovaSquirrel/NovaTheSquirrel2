@@ -264,7 +264,16 @@ No:
   dey
   lda [MidPointer],y
   cmp #Block::LedgeMiddle
-  bne :+
+  bne NotLedgeAbove
+    lda [RightPointer],y
+    cmp #Block::LedgeSolidBottom
+    beq :+
+      iny
+      iny
+      lda #Block::LedgeSolidLeft_Dirt
+      sta [MidPointer],y
+      bra Loop
+    :
     lda #Block::LedgeSolidLeftSideCornerBottom
     sta [MidPointer],y
 
@@ -275,7 +284,7 @@ No:
     lda #Block::LedgeSolidBottom
     sta [LeftPointer],y
     bra Loop
-  :
+  NotLedgeAbove:
   iny
   iny
 
@@ -316,11 +325,20 @@ Yup:
   dey
   lda [MidPointer],y
   cmp #Block::LedgeMiddle
-  bne :+
+  bne NotLedgeAbove
+    lda [LeftPointer],y
+    cmp #Block::LedgeSolidBottom
+    beq :+
+      iny
+      iny
+      lda #Block::LedgeSolidRight_Dirt
+      sta [MidPointer],y
+      bra Loop
+    :
     lda #Block::LedgeSolidRightSideCornerBottom
     sta [MidPointer],y
     bra Loop
-  :
+  NotLedgeAbove:
   iny
   iny
 
