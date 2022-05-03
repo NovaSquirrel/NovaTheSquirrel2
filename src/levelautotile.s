@@ -263,11 +263,16 @@ No:
   dey
   dey
   lda [MidPointer],y
+  cmp #Block::LedgeLeftSide
+  beq WithDirt
+  cmp #Block::LedgeRightSide
+  beq WithDirt
   cmp #Block::LedgeMiddle
   bne NotLedgeAbove
     lda [RightPointer],y
     cmp #Block::LedgeSolidBottom
     beq :+
+WithDirt:
       iny
       iny
       lda #Block::LedgeSolidLeft_Dirt
@@ -324,11 +329,16 @@ Yup:
   dey
   dey
   lda [MidPointer],y
+  cmp #Block::LedgeLeftSide
+  beq WithDirt
+  cmp #Block::LedgeRightSide
+  beq WithDirt
   cmp #Block::LedgeMiddle
   bne NotLedgeAbove
     lda [LeftPointer],y
     cmp #Block::LedgeSolidBottom
     beq :+
+WithDirt:
       iny
       iny
       lda #Block::LedgeSolidRight_Dirt

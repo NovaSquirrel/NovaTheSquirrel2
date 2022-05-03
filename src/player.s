@@ -819,10 +819,10 @@ TryAboveInteraction:
   ; Solid?
   lda BlockFlag
   cmp BottomCmp
-  bcc :+
+  bcc @NotSolidOnTop
     lda #$00ff
     trb PlayerPY
-HasGroundAfterAll:
+@HasGroundAfterAll:
     stz PlayerVY
 
     lda PlayerRidingSomething
@@ -837,17 +837,17 @@ HasGroundAfterAll:
     inc PlayerOnGround
     stz PlayerOnLadder
     lda PlayerRidingSomething
-    bne DoesntCount
+    bne @DoesntCount
       stz PlayerNeedsGround
-    DoesntCount:
+    @DoesntCount:
     seta16
     rts
-  :
+  @NotSolidOnTop:
 
   ; Riding on something forces it to act like you are standing on solid ground
   lda PlayerRidingSomething
   and #255
-  bne HasGroundAfterAll
+  bne @HasGroundAfterAll
   rts
 
 TryLeftInteraction:
