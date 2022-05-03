@@ -379,7 +379,7 @@ StepToTarget:
     stz PlayerVY
 
     seta8
-    lda #1
+    lda #RIDING_NO_PLATFORM_SNAP
     sta PlayerRidingSomething
     stz PlayerNeedsGround
     seta16
@@ -456,7 +456,6 @@ StepToTarget:
     lda ActorPY,x
     sub #$40
     sta ActorPY,x
-    ldy ActorPX,x
 
     ; Pick a starting direction
     lda ActorDirection,x

@@ -824,8 +824,14 @@ TryAboveInteraction:
     trb PlayerPY
 HasGroundAfterAll:
     stz PlayerVY
-    lda PlayerPY
-    sta PlayerCameraTargetY
+
+    lda PlayerRidingSomething
+    and #255
+    cmp #RIDING_NO_PLATFORM_SNAP
+    bne :+
+      lda PlayerPY
+      sta PlayerCameraTargetY
+    :
 
     seta8
     inc PlayerOnGround

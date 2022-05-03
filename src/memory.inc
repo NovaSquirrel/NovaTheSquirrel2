@@ -85,6 +85,9 @@
 .global PlayerDecelSpeed
 .global JumpGracePeriod
 .global PlayerRidingSomething, PlayerRidingFG2
+; 1 = Riding something normally, 2 = Don't update the PlayerCameraTargetY 
+RIDING_NO_PLATFORM_SNAP = 2
+
 .global PlayerDrawX
 .global PlayerDrawY
 .global PlayerOAMIndex
