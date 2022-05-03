@@ -221,7 +221,7 @@
 					"H":	1,
 					"XFlip":	true
 				}, {
-					"Id":	"MovingPlatformHoriz",
+					"Id":	"MovingPlatformHorizontal",
 					"X":	26,
 					"Y":	16,
 					"W":	1,

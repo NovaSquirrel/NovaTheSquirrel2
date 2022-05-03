@@ -527,7 +527,7 @@ SpriteLoop:
   ; | Set up PPU registers for level use |
   ; '------------------------------------'
   .a8 ; Side effect of ppu_clear_nt
-  lda #1
+  lda #%11110000|5
   sta BGMODE       ; mode 1
 
   lda #($4>>1)<<4
@@ -559,10 +559,13 @@ SpriteLoop:
   lda #0 | (ExtraBG >> 9)
   sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
 
-  stz PPURES
+;  stz PPURES
+  lda #1
+  sta PPURES
+
   lda #%00010011  ; enable sprites, plane 0 and 1
   sta BLENDMAIN
-  stz BLENDSUB
+  sta BLENDSUB
   lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
   sta PPUNMI
   stz CGWSEL

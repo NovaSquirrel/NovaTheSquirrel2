@@ -93,6 +93,7 @@ IRIS_EFFECT_END = 30
   ; the sound CPU is running the IPL (initial program load), which is
   ; designed to receive data from the main CPU through communication
   ; ports at $2140-$2143.  Load a program and start it running.
+.if 0
   jsl spc_boot_apu
   seta8
   .import GSS_SendCommand, GSS_SendCommandParamX, GSS_LoadSong
@@ -117,7 +118,7 @@ IRIS_EFFECT_END = 30
 
   lda #GSS_Commands::MUSIC_START
   jsl GSS_SendCommand
-
+.endif
 
   ; Clear three screens
   ldx #$c000 >> 1
@@ -405,8 +406,10 @@ padwait:
   lda FGScrollXPixels+1
   sta BGSCROLLX
   lda FGScrollYPixels+0
+  asl
   sta BGSCROLLY
   lda FGScrollYPixels+1
+  rol
   sta BGSCROLLY
 
   lda TwoLayerLevel
