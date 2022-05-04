@@ -46,20 +46,20 @@ t 0,0 4,1v
 +Bricks
 when Below, BlockBricks
 solid
-t 0,2 1,2
-t 0,3 1,3
+t 0,2 0,2
+t 0,2 0,2
 
 +BricksPrize
 when Below, BlockPrize
 solid
-t 0,2 1,2
-t 0,3 1,3
+t 0,2 0,2
+t 0,2 0,2
 
 +Prize
 when Below, BlockPrize
 solid
-t 2,2 2,2h
-t 2,3 2,3h
+t 2,2 2,2
+t 2,2 2,2
 
 +InvisiblePrize
 when Below, BlockInvisiblePrize
@@ -68,24 +68,25 @@ t 0,0 0,0
 
 +PrizeAnimation1
 solid
-t 8,1 8,1h
-t 8,2 8,2h
+t 4,2 4,2
+t 4,2 4,2
 editor_hide
 
 +PrizeAnimation2
 solid
-t 9,1 9,1h
-t 9,2 9,2h
+t 6,2 6,2
+t 6,2 6,2
 editor_hide
 
 +UsedPrize
 solid
-t 3,2 3,2h
-t 3,3 3,3h
+t 8,2 8,2
+t 8,2 8,2
 
 +SolidBlock
 solid
-q 4,2
+t 10,0 10,0
+t 10,0 10,0
 
 +PickupBlock
 when Above, BlockPickupBlock
@@ -101,12 +102,14 @@ t 8,3 9,3
 +Heart
 when Touch, BlockHeart
 class Collectible
-q 10,2
+t 10,0 0,0
+t 0,0 0,0
 
 +SmallHeart
 when Touch, BlockSmallHeart
 class Collectible
-q 12,2
+t 12,0 0,0
+t 0,0 0,0
 
 +Sign
 when InsideBody, BlockSign
@@ -119,7 +122,8 @@ q 10,4
 +Money
 when Touch, BlockMoney
 class Collectible
-q 0,4
+t 0,4 0,4
+t 0,4 0,4
 
 +InventoryItem
 when Touch, BlockInventoryItem
@@ -136,20 +140,21 @@ t 4,5 5,5
 +SpikesUp
 when Above, BlockSpikes
 solid
-t 6,4 6,4
-t 6,5 6,5
+t 12,0 12,0
+t 12,0 12,0
 
 +SpikesDown
 when Below, BlockSpikes
 solid
-t 7,4 7,4
-t 7,5 7,5
+t 14,0 14,0
+t 14,0 14,0
 
 +Ice
 when ActorSide, BlockIceMelt
 when ActorTopBottom, BlockIceMelt
 solid
-q 8,4
+t 8,4 8,4
+t 8,4 8,4
 
 +Rope
 t 6,1 7,1
@@ -158,11 +163,11 @@ t 6,1 7,1
 +Spring
 when InsideBody, BlockSpring
 t 0,0 0,0
-t 2,4 3,4
+t 4,6 4,6
 
 +SpringPressed
 t 0,0 0,0
-t 4,4 4,4h
+t 6,6 6,6
 editor_hide
 
 +DoorTop
@@ -187,21 +192,24 @@ t 1,0 1,0
 editor_hide
 
 # Wood stuff
-base wood
+base common
 tileset FGTropicalWood
 
 +LadderTop
 solid_top
 when InsideBody, BlockLadder
 when Above, BlockLadderTop
-q 0,0
+t 14,2 14,2
+t 14,3 14,3
 editor_hide
 
 +Ladder
 autotile AutotileLadder
 when InsideBody, BlockLadder
-t 0,1 1,1
-t 0,1 1,1
+t 14,3 14,3
+t 14,3 14,3
+
+base wood
 
 +RopeLadderTop
 solid_top
@@ -228,27 +236,29 @@ q 8,2
 solid
 q 10,2
 
+base common
+
 +FloatingPlatform
 autotile AutotileFloatingPlatform
 solid_top
-t 0,2 2,2
+t 4,5 6,5
 t 0:0 0:0
 
 +FloatingPlatformLeft
 solid_top
-t 0,2 1,2
+t 4,5 5,5
 t 0:0 0:0
 editor_hide
 
 +FloatingPlatformRight
 solid_top
-t 1,2 2,2
+t 5,5 6,5
 t 0:0 0:0
 editor_hide
 
 +FloatingPlatformMiddle
 solid_top
-t 1,2 1,2
+t 5,5 5,5
 t 0:0 0:0
 editor_hide
 
@@ -256,29 +266,31 @@ editor_hide
 autotile AutotileFloatingPlatformFallthrough
 when Above, BlockFallthrough
 solid_top
-t 0,3 2,3
+t 8,6 10,6
 t 0:0 0:0
 
 +FloatingPlatformLeftFallthrough
 when Above, BlockFallthrough
 solid_top
-t 0,3 1,3
+t 8,6 9,6
 t 0:0 0:0
 editor_hide
 
 +FloatingPlatformRightFallthrough
 when Above, BlockFallthrough
 solid_top
-t 1,3 2,3
+t 9,6 10,6
 t 0:0 0:0
 editor_hide
 
 +FloatingPlatformMiddleFallthrough
 when Above, BlockFallthrough
 solid_top
-t 1,3 1,3
+t 9,6 9,6
 t 0:0 0:0
 editor_hide
+
+base wood
 
 +Bridge
 autotile AutotileBridge
@@ -344,29 +356,33 @@ editor_hide
 t 2,1 3,1
 t 2,1 3,1
 
+base common
+
 +Fence
 priority
 autotile AutotileFence
-t 12,0 14,0
-t 12,1 14,1
+t 0:0 0:0
+t 11,4 11,4
 
 +FenceLeft
 priority
-t 12,0 13,0
-t 12,1 13,1
+t 0:0 0:0
+t 10,4 11,4
 editor_hide
 
 +FenceRight
 priority
-t 13,0 14,0
-t 13,1 14,1
+t 0:0 0:0
+t 11,4 12,4
 editor_hide
 
 +FenceMiddle
 priority
-t 13,0 13,0
-t 13,1 13,1
+t 0:0 0:0
+t 11,4 11,4
 editor_hide
+
+base wood
 
 +Pier
 autotile AutotilePier
@@ -422,91 +438,96 @@ tileset FGGrassy
 +Ledge
 autotile AutotileLedge
 solid_top
-q 0,2
+t 2,0 2,0
+t 2,2 2,2
 
 +LedgeLeft
 solid_top
-t 2,2 1,2
-t 2,3 1,3
+t 0,0 2,0
+t 0,2 2,2
 editor_hide
 
 +LedgeRight
 solid_top
-t 0,2 3,2
-t 0,3 3,3
+t 2,0 4,0
+t 2,2 4,2
 editor_hide
 
 +LedgeSolidLeft
 autotile AutotileLedgeSolidLeft
 solid
-t 4,2 1,2
-t 8,3 5,3
+t 6,0 2,0
+t 6,2 2,2
 
 +LedgeSolidRight
 autotile AutotileLedgeSolidRight
 solid
-t 0,2 7,2
-t 6,3 11,3
+t 2,0 8,0
+t 2,2 8,2
 
 +LedgeLeft_Dirt
 solid_top
-t 3,5 1,2
-t 2,3 1,3
+t 0,0 2,0
+t 0,2 2,2
 editor_hide
 
 +LedgeRight_Dirt
 solid_top
-t 0,2 4,5
-t 0,3 3,3
+t 2,0 4,0
+t 2,2 4,2
 editor_hide
 
 +LedgeSolidLeft_Dirt
 autotile AutotileLedgeSolidLeft
 solid
-t 9,5 1,2
-t 8,3 5,3
+t 6,0 2,0
+t 6,2 2,2
 editor_hide
 
 +LedgeSolidRight_Dirt
 autotile AutotileLedgeSolidRight
 solid
-t 0,2 10,5
-t 6,3 11,3
+t 2,0 8,0
+t 2,2 8,2
 editor_hide
 
 +LedgeMiddle
 autotile AutotileExpandDirt
-t 5,2 6,2
-t 5,2 6,2
+t 2,2 2,2
+t 2,2 2,2
 
 +LedgeLeftSide
-t 4,3 6,2
-t 4,3 6,2
+t 0,2 2,2
+t 0,2 2,2
 editor_hide
 
 +LedgeRightSide
-t 5,2 7,3
-t 5,2 7,3
+t 2,2 4,2
+t 2,2 4,2
 editor_hide
 
 +LedgeSolidLeftSide
 solid
-q 8,2
+t 6,2 2,2
+t 6,2 2,2
 editor_hide
 
 +LedgeSolidRightSide
 solid
-q 10,2
+t 2,2 8,2
+t 2,2 8,2
 editor_hide
 
 +LedgeSolidLeftSideCorner
 solid
-q 14,2
+t 14,0 2,2
+t 2,2 2,2
 editor_hide
 
 +LedgeSolidRightSideCorner
 solid
-q 12,2
+t 2,2 12,0
+t 2,2 2,2
 editor_hide
 
 +LedgeSolidLeftSideCornerBottom
@@ -524,19 +545,19 @@ editor_hide
 +LedgeSolidBottom
 autotile AutotileLedgeSolidBottom
 solid
-t 5,2 6,2
-t 15,0 14,1
+t 2,2 2,2
+t 12,2 12,2
 
 +LedgeSolidBottomLeft
 solid
-t 8,2 9,2
-t 14,4 15,4
+t 6,2 2,2
+t 10,2 12,2
 editor_hide
 
 +LedgeSolidBottomRight
 solid
-t 10,2 11,2
-t 14,5 15,5
+t 2,2 8,2
+t 12,2 14,2
 editor_hide
 
 #######################################
