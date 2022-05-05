@@ -381,6 +381,7 @@ StepToTarget:
     seta8
     lda #RIDING_NO_PLATFORM_SNAP
     sta PlayerRidingSomething
+    sta ActorVY,x ; Store something nonzero here to indicate the player has touched the platform
     stz PlayerNeedsGround
     seta16
   NoRide:
@@ -505,6 +506,27 @@ StepToTarget:
   NotOnLine:
   NotAligned:
 
+  ; Handle different settings for when to move or not
+  lda ActorVarA,x
+  beq NotWaiting
+    ldy ActorVY,x ; Load to check if it's nonzero
+    php
+    ; If VarA = 1, wait for player touch to start moving, and keep going
+    ; If VarA = 2, only move when standing on it
+    lsr
+    bcs :+
+      stz ActorVY,x
+    :
+    plp
+    bne :+
+DontMove:
+      ; Run the routine without any offset
+      lda #0
+      tay
+      bra Move
+    :
+  NotWaiting:
+
   ; Actually move now
   ldy ActorVarB,x
   lda DXList,y
@@ -512,6 +534,7 @@ StepToTarget:
   lda DYList,y
   tay
   pla
+Move:
   jsr MoveMovingPlatform
   rtl
 
@@ -527,13 +550,13 @@ UP    = 6
 
 NewDirectionTable: ; R D L U
 ;LineFollowCornerUL (down and right)
-  .byt 0, 0, DOWN, RIGHT
+  .byt RIGHT, DOWN, DOWN, RIGHT
 ;LineFollowCornerUR (down and left)
-  .byt DOWN, 0, 0, LEFT
+  .byt DOWN, DOWN, LEFT, LEFT
 ;LineFollowCornerDL (up and right)
-  .byt 0, RIGHT, UP, 0
+  .byt RIGHT, RIGHT, UP, UP
 ;LineFollowCornerDR (up and left)
-  .byt UP, LEFT, 0, 0
+  .byt UP, LEFT, LEFT, UP
 ;LineFollowCapTop (up)
   .byt UP, UP, UP, UP
 ;LineFollowCapRight (right)
