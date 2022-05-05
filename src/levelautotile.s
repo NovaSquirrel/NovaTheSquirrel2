@@ -309,12 +309,15 @@ Nope:
   dey
   dey
   lda [LeftPointer],y
-  cmp #Block::LedgeLeft
-  beq Yup
-  cmp #Block::LedgeSolidLeft
-  beq Yup
-  cmp #Block::Ledge
-  bne :+
+  jsr IsLedgeTile
+  bcc :+
+;  lda [LeftPointer],y
+;  cmp #Block::LedgeLeft
+;  beq Yup
+;  cmp #Block::LedgeSolidLeft
+;  beq Yup
+;  cmp #Block::Ledge
+;  bne :+
 Yup:
     lda #Block::LedgeSolidLeftSideCorner
     sta [MidPointer],y
@@ -368,12 +371,15 @@ Nope:
   dey
   dey
   lda [RightPointer],y
-  cmp #Block::LedgeRight
-  beq Yup
-  cmp #Block::LedgeSolidRight
-  beq Yup
-  cmp #Block::Ledge
-  bne :+
+  jsr IsLedgeTile
+  bcc :+
+;  lda [RightPointer],y
+;  cmp #Block::LedgeRight
+;  beq Yup
+;  cmp #Block::LedgeSolidRight
+;  beq Yup
+;  cmp #Block::Ledge
+;  bne :+
 Yup:
     lda #Block::LedgeSolidRightSideCorner
     sta [MidPointer],y
