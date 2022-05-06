@@ -363,7 +363,7 @@ YPos = 6
   rts
 :
   
-  ; If it's the left column, also scan for actors to introduce into the level
+  ; If it's the bottom row, also scan for actors to introduce into the level
   lda Temp
   pha ; Don't rely on this routine not overwriting this variable
   jsl RenderLevelRowBottom

@@ -92,7 +92,6 @@ def encode_slope(r, offset):
 	lr = 'R'
 	if not r.xflip:
 		lr = 'L'
-		y += r.h - 1
 
 	# Currently do not encode a height
 	if ratio == 1:
@@ -157,7 +156,13 @@ def convert_layer(layer):
 			if r1.overlaps(r2) and r1.z < r2.z:
 				layer[i], layer[j] = layer[j], layer[i]
 
-	# Swap X and Y for vertical levels
+	# Adjust slopes here, because adjusting them in encode_slope wouldn't play nice with vertical levels
+	for r in layer:
+		if r.type == 'LedgeSlope':
+			if not r.xflip:
+				r.y += r.h - 1
+
+	# Vertical levels swap the meaning of X and Y
 	if vertical_level:
 		for r in layer:
 			r.x, r.y = r.y, r.x
@@ -375,12 +380,15 @@ for f in glob.glob("levels/*.json"):
 			outfile.write("  %s\n" % line)
 	outfile.write("  LFinished\n\n")
 
+	# Vertical levels swap the X and Y fields
+	if vertical_level:
+		for actor in actors:
+			actor.x, actor.y = actor.y, actor.x
+
 	# Write the actor data
 	actors = sorted(actors, key=lambda r: r.x)
 	outfile.write("level_%s_sp:\n" % plain_name)
 	for actor in actors:
-		if vertical_level:
-			actor.x, actor.y = actor.y, actor.x
 		if len(actor.extra):
 			outfile.write("  LSpr Actor::%s, %d, %d, %d, %s\n" % (actor.type, (1 if actor.xflip else 0), actor.x, actor.y, actor.extra))
 		else:
