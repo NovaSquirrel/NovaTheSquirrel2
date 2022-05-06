@@ -672,7 +672,7 @@ editor_hide
 
 # Goes up every 2
 +MedSlopeL_UL_Dirt
-t 3,3 3,3
+t 5,2 6,2
 t 2,4 3,4
 editor_hide
 
@@ -687,29 +687,29 @@ t 4,1 5,1
 editor_hide
 
 +MedSlopeR_UR_Dirt
-t 3,3 3,3
+t 5,2 6,2
 t 4,4 5,4
 editor_hide
 
 # Goes up every 1
 +SteepSlopeL_U_Dirt
-t 3,3 0,4
+t 5,2 0,4
 t 0,4 0,1
 editor_hide
 
 +SteepSlopeR_U_Dirt
-t 1,4 3,3
+t 1,4 6,2
 t 1,1 1,4
 editor_hide
 
 # Goes up every 4
 +GradualSlopeL_U1_Dirt
-t 3,3 3,3
+t 5,2 6,2
 t 6,4 7,4
 editor_hide
 
 +GradualSlopeL_U2_Dirt
-t 3,3 3,3
+t 5,2 6,2
 t 8,4 9,4
 editor_hide
 
@@ -734,12 +734,12 @@ t 12,1 13,1
 editor_hide
 
 +GradualSlopeR_U3_Dirt
-t 3,3 3,3
+t 5,2 6,2
 t 10,4 11,4
 editor_hide
 
 +GradualSlopeR_U4_Dirt
-t 3,3 3,3
+t 5,2 6,2
 t 12,4 13,4
 editor_hide
 
