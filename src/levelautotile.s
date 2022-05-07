@@ -259,33 +259,31 @@ No:
 
 .export AutotileLedgeSolidLeft
 .proc AutotileLedgeSolidLeft
-;  jsr AdjustLedgeForDirt
+  ; Check the block above
   dey
   dey
+  ; Connect to LedgeSolidBottom if it's there (it will have turned into LedgeSolidBottomRight)
+  lda [LeftPointer],y
+  cmp #Block::LedgeSolidBottomRight
+  beq ConnectToBottom
   lda [MidPointer],y
+  ; There's dirt behind if there's these three types:
   cmp #Block::LedgeLeftSide
   beq WithDirt
   cmp #Block::LedgeRightSide
   beq WithDirt
   cmp #Block::LedgeMiddle
   bne NotLedgeAbove
-    lda [RightPointer],y
-    cmp #Block::LedgeSolidBottom
-    beq :+
 WithDirt:
-      iny
-      iny
-      lda #Block::LedgeSolidLeft_Dirt
-      sta [MidPointer],y
-      bra Loop
-    :
+    iny
+    iny
+    lda #Block::LedgeSolidLeft_Dirt
+    sta [MidPointer],y
+    bra Loop
+ConnectToBottom:
     lda #Block::LedgeSolidLeftSideCornerBottom
     sta [MidPointer],y
-
-    ; Correct a bottom ledge on the left
-    lda [LeftPointer],y
-    cmp #Block::LedgeSolidBottomRight
-    bne Loop
+    ; Change the LedgeSolidBottomRight so it actually continues into this block
     lda #Block::LedgeSolidBottom
     sta [LeftPointer],y
     bra Loop
@@ -328,26 +326,28 @@ Yup:
 
 .export AutotileLedgeSolidRight
 .proc AutotileLedgeSolidRight
-;  jsr AdjustLedgeForDirt
+  ; Check the block above
   dey
   dey
+  ; Connect to LedgeSolidBottom if it's there
+  lda [RightPointer],y
+  cmp #Block::LedgeSolidBottom
+  beq ConnectToBottom
   lda [MidPointer],y
+  ; There's dirt behind if there's these three types:
   cmp #Block::LedgeLeftSide
   beq WithDirt
   cmp #Block::LedgeRightSide
   beq WithDirt
   cmp #Block::LedgeMiddle
   bne NotLedgeAbove
-    lda [LeftPointer],y
-    cmp #Block::LedgeSolidBottom
-    beq :+
 WithDirt:
-      iny
-      iny
-      lda #Block::LedgeSolidRight_Dirt
-      sta [MidPointer],y
-      bra Loop
-    :
+    iny
+    iny
+    lda #Block::LedgeSolidRight_Dirt
+    sta [MidPointer],y
+    bra Loop
+ConnectToBottom:
     lda #Block::LedgeSolidRightSideCornerBottom
     sta [MidPointer],y
     bra Loop
