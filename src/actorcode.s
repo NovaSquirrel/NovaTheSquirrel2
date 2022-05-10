@@ -758,6 +758,11 @@ SlowBackDown:
 .proc RunBurgerCannonH
   jsr ActorCannonCommon1
   bcc NoShoot
+    lda ActorVarA,x
+    asl
+    tay
+    lda Lengths,y
+    sta 0
     jsl FindFreeActorY
     bcc NoShoot
       jsl ActorClearY
@@ -769,7 +774,7 @@ SlowBackDown:
       lda #0
       sta ActorTimer,y
       sta ActorVY,y
-      lda #25*4
+      lda 0 ; Use the length from earlier
       sta ActorVarB,y ; Expiration timer
       lda #$38
       jsl ActorNegIfLeft
@@ -789,6 +794,8 @@ SlowBackDown:
       jsl ActorMakePoofAtOffset
 NoShoot:
   rtl
+Lengths:
+  .word 20*4, 10*4
 .endproc
 
 .a16
@@ -4264,6 +4271,107 @@ Frames:
   .word .loword(DSSordSwing+(512*2))
   .word .loword(DSSordSwing+(512*3))
   .word .loword(DSSordSwing+(512*4))
+.endproc
+
+.export RunLoadActorsAhead
+.a16
+.proc RunLoadActorsAhead
+Start = 0
+End = 2
+; Pick the right axis for the level shape
+  bit VerticalLevelFlag-1
+  bmi Vertical
+Horizontal:
+  lda ActorPX,x
+  bra Common
+Vertical:
+  lda ActorPY,x
+
+; -----------------------------------
+; Get the range that will be used
+; -----------------------------------
+
+Common:
+  xba
+  and #255
+  sta Start
+
+  lda ActorVarA,x
+  ina
+  lsr ActorDirection,x ; Will affect ActorState but that's ok since this actor deletes itself
+  bcc :+
+    ldy Start
+    iny
+    sty End
+    ; Start = Start - A
+    eor #$ffff
+    ;sec <-- Guaranteed to be set
+    adc Start
+    sta Start
+    bra WasLeft
+  :
+  ; Carry is guaranteed to be clear
+  sec ; But add 1 anyway
+  adc Start
+  sta End
+WasLeft:
+
+; -----------------------------------
+; Actually start trying to spawn in actors
+; -----------------------------------
+
+  lda Start
+  lsr
+  lsr
+  lsr
+  lsr ; Screen number
+  tay
+  lda FirstActorOnScreen,y
+  and #255
+  cmp #255 ; No actors on screen
+  beq Exit
+  asl
+  asl
+  tay
+
+  seta8
+Loop:
+  lda [LevelActorPointer],y
+  cmp #255
+  beq Exit ; Exit since the actor data is over
+  cmp End
+  bcs Exit ; Exit since the actor is after the end column
+  cmp Start
+  bcc :+
+    ; Check the type of the actor first before attempting to make it
+    seta16
+    iny
+    iny
+    lda [LevelActorPointer],y
+    dey
+    dey
+    and #$0fff                    ; Discard parameter bits
+    cmp #Actor::LoadActorsAhead*2 ; Don't allow this actor to create more of the same type
+    seta8                         ; Later: have some sort of list of allowed/disallowed actor types?
+    beq :+
+
+    ; Probably OK to make the actor then
+    phx
+    .import TryMakeActor
+    jsl TryMakeActor
+    plx
+  :
+  ; Next actor
+  iny
+  iny
+  iny
+  iny
+  bra Loop
+
+Exit:
+  seta16
+  stz ActorType,x
+  rtl
 .endproc
 
 ; -------------------------------------

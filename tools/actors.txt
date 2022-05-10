@@ -516,6 +516,12 @@ draw DrawBurgerRiderJumper
 after SharedEnemyNormal
 size 16x40
 
+# ---------- actors that are really commands ----------
++LoadActorsAhead
+essential
+run RunLoadActorsAhead
+size 32x8
+
 # ---------- particles ----------
 +Poof
 particle
