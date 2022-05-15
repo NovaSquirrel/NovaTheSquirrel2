@@ -392,6 +392,11 @@ SharedEnemyNoReset:
 SharedRemoveIfFar:
   lda ActorPX,x
   sub ScrollX
+  bit VerticalLevelFlag-1
+  bpl :+
+    lda ActorPY,x
+    sub ScrollY
+  :
   cmp #.loword(-24*256)
   bcs @Good
   cmp #(16+24)*256
@@ -405,6 +410,11 @@ SharedRemoveIfFar:
 .proc SharedRemoveIfFarther
   lda ActorPX,x
   sub ScrollX
+  bit VerticalLevelFlag-1
+  bpl :+
+    lda ActorPY,x
+    sub ScrollY
+  :
   cmp #.loword(-40*256)
   bcs Good
   cmp #(16+40)*256
