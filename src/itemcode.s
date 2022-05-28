@@ -295,3 +295,11 @@ NoRoutine:
   lda #Ability::Bomb
   bra ChangeAbilityFromItem
 .endproc
+
+.a8
+.i16
+.export ItemAbilitySword
+.proc ItemAbilitySword
+  lda #Ability::Sword
+  bra ChangeAbilityFromItem
+.endproc

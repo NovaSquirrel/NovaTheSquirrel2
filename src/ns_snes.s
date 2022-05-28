@@ -397,3 +397,20 @@ DJ_Label:
 .macro assert_same_banks symbol1, symbol2
   .assert ^symbol1 = ^symbol2, error, .sprintf("%s must be in the same bank as %s", .string(symbol1), .string(symbol2))
 .endmacro
+
+.macro bit8 var
+  .if .asize = 8
+    bit var
+  .else
+    bit var-1
+  .endif
+.endmacro
+
+.macro lda8 var
+  .if .asize = 8
+    lda var
+  .else
+    lda var
+    and #255
+  .endif
+.endmacro

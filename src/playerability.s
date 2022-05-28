@@ -725,9 +725,13 @@ DoIceShared:
     ; Horizontal speed
     lda #$20
     sta ActorVarA,x
+    lda PlayerDownRecently
+    and #255
+    bne DownUp
     lda TailAttackDirection
     and #>KEY_DOWN
     beq :+
+DownUp:
        stz ActorVarA,x
     :
 

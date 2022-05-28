@@ -47,6 +47,7 @@ PlayerCollideWidth = 8*16
 .global PlayerFrameUpload
 .global FadeIn, FadeOut, WaitKeysReady
 .global MemClear, MemClear7F
+.global Unsigned16x16Multiply, Unsigned16x16Multiply_16
 
 .global RunPlayer, DrawPlayer, DrawPlayerStatus, AdjustCamera
 .global BlockFlags

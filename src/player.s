@@ -629,6 +629,7 @@ LadderDropThroughFix:
     inc PlayerOnGround
     stz PlayerNeedsGround
 
+    .if 0
     ; Start rolling
     lda PlayerDownTimer
     cmp #6
@@ -641,6 +642,7 @@ LadderDropThroughFix:
           lda #1
           sta PlayerRolling
     :
+    .endif
     seta16
 
     ; Perform rolling

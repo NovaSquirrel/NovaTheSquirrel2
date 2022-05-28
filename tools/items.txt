@@ -162,3 +162,11 @@ run ItemAbilityBombs
 i Bombs
 i Demo item that gives you the
 i Bomb ability.
+
++AbilitySword
+name Sword
+pic 2,2
+run ItemAbilitySword
+i Sword
+i Demo item that gives you the
+i Sword ability.
