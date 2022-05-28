@@ -28,7 +28,7 @@ FIRST_SFX_CHANNEL = 8
 ;65816 <--- SPC
 ; CPU0 = Zero if busy, command number if processing that command
 ; CPU1 = Unused
-; CPU2 = Used for streaming
+; CPU2 = Used for streaming and fast loading
 ; CPU3 = Command count
 
 ;I/O registers
@@ -371,66 +371,49 @@ cmdSfxPlay:
 .endproc
 
 .proc cmdFastLoad
-	lda #>GSS_MusicUploadAddress
-	sta store1+2
-	sta store2+2
-	sta store3+2
-	sta store4+2
+	; Adapted from https://github.com/Optiroc/libSFX/blob/master/include/CPU/SMP.s
+	ldx <CPU3      ; Number of pages
+	mov <CPU2,#$80 ; Tell the 65c816 to start sending the data
 
-	mov <CPU0,#69
-	mov <CTRL, #%10010001 ; Reset latch for CPU0 and CPU1, enable timer and IPL
+	; Re-initialize the addresses for the self-modifying code
+	; (Will result in multiple loads with the same value)
+	lda #>(GSS_MusicUploadAddress+$00)
+	sta mA+2
+	lda #>(GSS_MusicUploadAddress+$40)
+	sta mB+2
+	lda #>(GSS_MusicUploadAddress+$80)
+	sta mC+2
+	lda #>(GSS_MusicUploadAddress+$C0)
+	sta mD+2
 
-	ldy #0
-:	lda <CPU0
-	cmp #1
-	bne :-
-	bra loop2
-
-loop1:
-	lda <CPU1
-	ldx <CPU2
-	mov <CPU0, #$01
-store1:
-	sta GSS_MusicUploadAddress,y
-	iny
-	txa
-store2:
-	sta GSS_MusicUploadAddress,y
-	iny
-	bne :+
-		inc store1+2
-		inc store2+2
-		inc store3+2
-		inc store4+2
-	:
-
-;wait1:
-;	lda <CPU0
-;	cmp #1
-;	bne wait1
-
-	;----------------------------------
-
-loop2:
-	lda <CPU1
-	ldx <CPU2
-	mov <CPU0, #$80
-store3:
-	sta GSS_MusicUploadAddress,y
-	iny
-	txa
-store4:
-	sta GSS_MusicUploadAddress,y
-	iny
-wait2:
+	; ---------------------------------
+	; Transfer four-byte chunks
+	; ---------------------------------
+page:
+	ldy #$3f
+quad:
 	lda <CPU0
-	bpl loop1
-;   bmi exit
-;	cmp #2
-;   bne wait2
-;	bra loop1
+mA:	sta GSS_MusicUploadAddress+$00,y
+	lda <CPU1
+mB:	sta GSS_MusicUploadAddress+$40,y
+	lda <CPU2
+mC: sta GSS_MusicUploadAddress+$80,y
+	lda <CPU3
+	sty <CPU2 ; Tell 65c816 we're ready for more
+mD: sta GSS_MusicUploadAddress+$C0,y
+	dey
+	bpl quad
 
-exit:
+	inc mA+2  ;Increment MSBs of addresses
+	inc mB+2
+	inc mC+2
+	inc mD+2
+	dex
+	bne page
+
+	mov <CPU2,#$00 ; Reset CPU2 so it's ready for the next time this command is called
+
+	; Get ready for more commands
 	jsr setReady
 	jmp commandDone
 .endproc
@@ -1208,6 +1191,7 @@ updateChannel:
 ;initialize DSP registers and driver variables
 initDSPAndVars:
 	ldx #0
+	stx <CPU2					;init CPU2 since it's used for synchronization
 	stx <D_KON					;no keys pressed
 	stx <D_KOF					;no keys released
 	stx <D_STEREO				;mono by default

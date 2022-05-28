@@ -38,4 +38,6 @@ All game and tool code is available under GPL version 3.
 
 This project uses a modified version of SNESGSS which [appears to be licensed under Apache License 2.0](https://code.google.com/archive/p/snesgss/). These modifications and the new exporter are licensed under the same.
 
+This project also uses LZ4 and SPC700 loading code from [libSFX](https://github.com/Optiroc/libSFX) which is under the MIT license.
+
 Assets (such as art, levels, story) are not licensed to be used outside of this game. You may not use them without permission. After the game is complete I may make a version with free-to-use assets if there's interest.

@@ -175,6 +175,7 @@ NoWrite:
 .endproc
 
 .export GSS_LoadSong
+.if 0 ; Normal version
 .proc GSS_LoadSong
 Pointer = 2
 Length  = 0
@@ -195,7 +196,6 @@ Length  = 0
 :	lda APU0
 	bne :-
 
-.if 1
 	.import GSS_MusicUploadAddress
 	lda #GSS_Commands::LOAD
 	sta APU0
@@ -211,66 +211,156 @@ Length  = 0
 	bne :-
 	ldy #spc_entry
 	jsr spc_execute
+	rtl
+.endproc
 .endif
 
-.if 0
-	lda #GSS_Commands::FAST_LOAD
-	sta APU0
+.if 1 ;FAST version
+.proc GSS_LoadSong
+	; Adapted from https://github.com/Optiroc/libSFX/blob/master/include/CPU/SMP.s
+	Pointer   = LevelBlockPtr
+	PageCount = TempVal
+	StopAtX   = <M7PRODLO
+	phb
 
-	; Wait for SPC to be ready
-:	lda APU0
-	cmp #69
-	bne :-
+; -------------------------------------------
+; Fetch from the song directory first
+; -------------------------------------------
+	setaxy16
+	and #$00ff
+	asl
+	asl
+	tax
+	lda f:SongDirectory+0,x ; Pointer
+	sta Pointer
+	lda f:SongDirectory+2,x ; Length
+	xba
+	bit #$ff00 ; If it's not an 
+	beq :+
+		ina
+	:
+	sta f:PageCount
+	seta8
+	lda #^SongDirectory
+	pha
+	plb
 
 	; Disable interrupts
 	stz PPUNMI
 	php
 	sei
 
-	ldy #0
-	jsr TransferLoop
+; -------------------------------------------
+; Copy transfer routine to RAM and patch it
+; -------------------------------------------
+	seta16
+	ldx #0
+:	lda f:TransferRoutine,x
+	sta 0,x
+	inx
+	inx
+	cpx #TransferRoutineSize
+	bcc :-
+	lda Pointer
+	sta z:TransferByte1+1
+	clc
+	adc #$40   
+	sta z:TransferByte2+1
+	adc #$40   
+	sta z:TransferByte3+1
+	adc #$40   
+	sta z:TransferByte4+1
+
+	; ---
+
+	lda #$2100 ; Allow direct page access to APU0-APU3
+	tcd
+
+	seta8
+	setxy16
+
+	; Wait for SPC700 to be free for a new command
+:	lda <APU0+0
+    bne :-
+
+	; Put the compare value in the PPU multiplier result
+	lda #$3f
+	sta <M7MCAND
+	lda f:PageCount
+	sta <APU3
+	sta <M7MCAND
+
+	lda #1		; Multiply by 1
+	sta <M7MUL
+    
+	lda #GSS_Commands::FAST_LOAD
+	sta <APU0
+
+	; Wait for SPC700 to signal it's ready for fast transfer
+:	bit <APU2+0 ; Silence "Suspicious address expression"
+    bpl :-
+
+; -------------------------------------------
+; Do the actual transfer now that it's ready
+; -------------------------------------------
+	ldx #$003f ; Index (through the file)
+Page:
+	ldy #$003f ; Index (through the page)
+Quad:
+	jmp 0
+ReturnFromTransfer:
+	tya
+
+	; Wait for SPC700 to signal it's ready
+:	cmp <APU2+0 ; Silence "Suspicious address expression"
+	bne :-
+	dex
+	dey
+	bpl Quad
+
+	; Move file index forward through the file
+	seta16_clc
+	txa
+	adc #$0140
+	tax
+	seta8
+	lda StopAtX+0
+	lda StopAtX+1
+
+	cpx StopAtX
+	bne Page
 
 	; Reenable interrupts
 	plp
 	lda #VBLANK_NMI|AUTOREAD
 	sta PPUNMI
 
-	lda #$80
-	sta APU0
-:	lda APU0
-	bne :-
-.endif
+	setaxy16
+	; Set direct page back to zero
+	lda #0
+	tcd
+	plb
 	rtl
-.endproc
 
-.if 0
-.proc TransferLoop
-	Pointer = 2
-	Length  = 0
-Upload:
-	lda [Pointer],y
-	sta APU1
-	iny
-	lda [Pointer],y
-	sta APU2
-	iny
-	lda #1
-	sta APU0
-:	lda APU0
-	bpl :-
-
-	lda [Pointer],y
-	sta APU1
-	iny
-	lda [Pointer],y
-	sta APU2
-	iny
-	cpy Length
-	bcs Exit
-	:	lda APU0
-		bmi :-
-		bra Upload
-	Exit:
-	rts
+; -------------------------------------------
+; Routine that gets copied to RAM and patched
+; -------------------------------------------
+TransferRoutine:
+.org 0
+TransferByte1:
+	lda $abcd,x
+	sta <APU0
+TransferByte2:
+	lda $abcd,x
+	sta <APU1
+TransferByte3:
+	lda $abcd,x
+	sta <APU2
+TransferByte4:
+	lda $abcd,x
+	sta <APU3
+	jmp ReturnFromTransfer
+.reloc
+TransferRoutineSize = * - TransferRoutine
 .endproc
 .endif

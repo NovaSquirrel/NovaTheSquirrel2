@@ -177,7 +177,7 @@ DirectionKeys = KEY_LEFT|KEY_DOWN|KEY_UP|KEY_RIGHT
 	; No parameters
 
 	FAST_LOAD       = SUBCOMMAND + (GSS_SubCommands::FAST_LOAD << 4)
-	; No parameters
+	; APU2 = Number of pages to transfer
 
 	LOAD            = SUBCOMMAND + (GSS_SubCommands::LOAD << 4)
 	; No parameters
