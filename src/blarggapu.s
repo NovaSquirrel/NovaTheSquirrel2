@@ -324,9 +324,6 @@ ReturnFromTransfer:
 	adc #$0140
 	tax
 	seta8
-	lda StopAtX+0
-	lda StopAtX+1
-
 	cpx StopAtX
 	bne Page
 
