@@ -235,7 +235,7 @@ Length  = 0
 	sta Pointer
 	lda f:SongDirectory+2,x ; Length
 	xba
-	bit #$ff00 ; If it's not an 
+	bit #$ff00 ; If it's not an even multiple of 256, round up
 	beq :+
 		ina
 	:
@@ -335,10 +335,9 @@ ReturnFromTransfer:
 	lda #VBLANK_NMI|AUTOREAD
 	sta PPUNMI
 
-	setaxy16
-	; Set direct page back to zero
-	lda #0
-	tcd
+	; Set direct page back to zero; restore data bank
+	pea 0
+	pld
 	plb
 	rtl
 
