@@ -362,10 +362,14 @@ DelayedBlockLoop:
 NoIris:
   setaxy16
 
+
+  bit VerticalLevelFlag-1
+  bmi OnlyCheckHealth
   ; Going past the bottom of the screen results in dying
   lda PlayerPY
   cmp #(512+32)*16
   bcs Die
+OnlyCheckHealth:
     ; So does running out of health
     lda PlayerHealth
     and #255
