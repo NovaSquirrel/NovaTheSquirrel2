@@ -682,7 +682,7 @@ UseHighHalf:
   stx WMADDL ; WRAM address, bottom 16 bits
   sty DMALEN
 
-  ldx #DMA_CONST|DMA_LINEAR|(<WMDATA << 8)
+  ldx #DMAMODE_RAMFILL
 ZeroSource:
   stx DMAMODE
 
