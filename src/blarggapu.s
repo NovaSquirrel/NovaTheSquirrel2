@@ -264,11 +264,11 @@ Length  = 0
 	lda Pointer
 	sta z:TransferByte1+1
 	clc
-	adc #$40   
+	adc #$40
 	sta z:TransferByte2+1
-	adc #$40   
+	adc #$40
 	sta z:TransferByte3+1
-	adc #$40   
+	adc #$40
 	sta z:TransferByte4+1
 
 	; ---
@@ -281,7 +281,7 @@ Length  = 0
 
 	; Wait for SPC700 to be free for a new command
 :	lda <APU0+0
-    bne :-
+	bne :-
 
 	; Put the compare value in the PPU multiplier result
 	lda #$3f
@@ -290,15 +290,15 @@ Length  = 0
 	sta <APU3
 	sta <M7MCAND
 
-	lda #1		; Multiply by 1
+	lda #1     ; Multiply by 1
 	sta <M7MUL
-    
+
 	lda #GSS_Commands::FAST_LOAD
 	sta <APU0
 
 	; Wait for SPC700 to signal it's ready for fast transfer
 :	bit <APU2+0 ; Silence "Suspicious address expression"
-    bpl :-
+	bpl :-
 
 ; -------------------------------------------
 ; Do the actual transfer now that it's ready
