@@ -1159,12 +1159,6 @@
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"DoorExit",
-					"X":	252,
-					"Y":	22,
-					"W":	1,
-					"H":	1
-				}, {
 					"Id":	"ColorfulFlower1",
 					"X":	7,
 					"Y":	29,
@@ -1422,6 +1416,13 @@
 					"Y":	24,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"DoorTop",
+					"X":	252,
+					"Y":	22,
+					"W":	1,
+					"H":	1,
+					"Extra":	"thirdlevel"
 				}]
 		}, {
 			"Name":	"Sprites",
