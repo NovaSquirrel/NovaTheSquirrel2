@@ -594,12 +594,12 @@ Found:
   ; Initialize certain variables on newly claimed actors to avoid causing problems
   lda #$ffff
   sta ActorIndexInLevel,x
-  seta8
+  seta8_sec
   sta ActorDynamicSlot,x
   seta16
   stz ActorState,x
   sta ActorOnGround,x ; Also zeros ActorOnScreen
-  sec
+  ;sec - SEC above
   rtl
 .endproc
 
@@ -632,13 +632,13 @@ Found:
   ; Initialize certain variables on newly claimed actors to avoid causing problems
   lda #$ffff
   sta ActorIndexInLevel,y
-  seta8
+  seta8_sec
   sta ActorDynamicSlot,y
   seta16
   tdc ; A = 0
   sta ActorState,y
   sta ActorOnGround,y ; Also zeros ActorOnScreen
-  sec
+  ;sec - SEC above
   rtl
 .endproc
 
@@ -1073,11 +1073,11 @@ WalkDistance = 0
     sta ActorPY,x
     stz ActorVY,x
   NoSlopeDown:
-  seta16
+  seta16_clc
 
   ; Reset carry to indicate not bumping into something
   ; because ActorWalk falls into this
-  clc
+  ;clc
   rtl
 .endproc
 
@@ -1166,11 +1166,11 @@ Skip:
     sta ActorPY,x
     stz ActorVY,x
 
-    seta8
+    seta8_sec
     inc ActorOnGround,x
     seta16
     ; Don't do the normal ground check
-    sec
+    ;sec - SEC above
     rtl
   :
 
@@ -1203,21 +1203,21 @@ Skip:
     lda #128
     ora ActorOnGround,x
     sta ActorOnGround,x
-    seta16
+    seta16_clc
 
     lda FG2OffsetY
     and #$00ff
     sta 0
     lda ActorPY,x
-    add 0
+    adc 0 ; Carry cleared above
     and #$ff00
     sub 0
     sta ActorPY,x
     sec
     rtl
   NotSnapToGround:
-  seta16
-  clc
+  seta16_clc
+  ;clc
   rtl
 .endproc
 
@@ -1589,10 +1589,10 @@ Invalid:
   sta ActorOnScreen,x
   rol
   sta OAMHI+1,y
-  seta16
+  seta16_clc
 
   tya
-  add #4
+  adc #4 ; Carry cleared above
   sta OamPtr
   rtl
 .endproc
@@ -1704,11 +1704,11 @@ Custom:
   ora SpriteTileBase
   sta OAM_TILE+(4*3),y
 
-  seta8
+  seta8_sec
   lda 0
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
-  add #8
+  adc #8-1 ; SEC above
   sta OAM_XPOS+(4*1),y
   sta OAM_XPOS+(4*3),y
   lda 2
@@ -1727,10 +1727,10 @@ Custom:
   sta OAMHI+1+(4*1),y
   sta OAMHI+1+(4*2),y
   sta OAMHI+1+(4*3),y
-  seta16
+  seta16_clc
 
   tya
-  add #4*4
+  adc #4*4 ; CLC above
   sta OamPtr
   rtl
 .endproc
@@ -1839,10 +1839,10 @@ CustomOffset:
   lda #0 ; 8x8 sprites
   rol
   sta OAMHI+1,y
-  seta16
+  seta16_clc
 
   tya
-  add #4
+  adc #4 ; CLC above
   sta OamPtr
   rtl
 .endproc

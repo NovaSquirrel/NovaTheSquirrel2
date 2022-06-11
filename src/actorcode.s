@@ -905,11 +905,11 @@ NotFire:
   pha
   sta 2
 
-  seta8
+  seta8_sec
   lda 0
   sta SpriteXYOffset+0
   lda 2
-  sub #4
+  sbc #4 ; SEC above
   sta SpriteXYOffset+1
   seta16
 
@@ -924,13 +924,13 @@ NotFire:
   sta 0
 
   ; Negate the offset
-  seta8
+  seta8_sec
   lda 0
   neg
   sta SpriteXYOffset+0
   lda 2
   neg
-  sub #4
+  sbc #4 ; SEC above
   sta SpriteXYOffset+1
   seta16
 
