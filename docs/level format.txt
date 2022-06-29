@@ -27,8 +27,8 @@ Room for more flags
 
 8        9       
 ssssssss SSSSSSSS
-s = Low byte of sprite list pointer
-S = High byte of sprite list pointer
+s = Low byte of actor list pointer
+S = High byte of actor list pointer
 
 10       11
 abcdefgh ijklmno.
@@ -37,7 +37,7 @@ Bits:     a b c d e f g h i j k l m n o
 Screens: 0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F
 
 12 13 14 15 16 17 18 19
-Eight 8-bit sprite graphic slot values
+Eight 8-bit actor graphic slot values
 
 20 21 22 23 24 25 26 27
 Eight 8-bit background palette values

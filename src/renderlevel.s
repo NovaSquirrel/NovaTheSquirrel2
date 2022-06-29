@@ -53,7 +53,7 @@
   lda VerticalScrollEnabled
   lsr
   bcs :+
-    lda #((32-14)*256)
+    lda ScrollYLimit
     sta ScrollY
   :
 

@@ -155,3 +155,69 @@ AtanTable:
   .byt $38,$38,$38,$38,$38,$39,$39,$39,$39,$39,$39,$3A,$3A,$3A,$3A,$3A
   .byt $3B,$3B,$3B,$3B,$3B,$3B,$3C,$3C,$3C,$3C,$3C,$3D,$3D,$3D,$3D,$3D
   .byt $3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$3F,$3F,$3F,$3F,$3F,$40,$40,$40
+
+.a16
+.i16
+.proc Unsigned16x16Multiply
+; Adapted from https://wiki.superfamicom.org/16-bit-multiplication-and-division
+MultiplyA  = 0
+MultiplyB  = 2
+ResultLow  = 4
+ResultHigh = 6
+  stz ResultHigh    ; high word of product needs to be cleared
+  setxy8
+  ldx MultiplyA
+  stx CPUMCAND
+  ldy MultiplyB
+  sty CPUMUL        ; set up 1st multiply
+  ldx MultiplyB+1
+  clc
+  lda CPUPROD       ; load CPUPROD for 1st multiply
+  stx CPUMUL        ; start 2nd multiply
+  sta a:ResultLow
+  lda CPUPROD       ; read CPUPROD from 2nd multiply
+  ldx MultiplyA+1
+  stx CPUMCAND      ; set up 3rd multiply
+  sty CPUMUL        ; y still contains MultiplyB
+  adc a:ResultLow+1
+  adc CPUPROD       ; add 3rd product
+  sta ResultLow+1
+  ldy MultiplyB+1
+  sty CPUMUL        ; set up 4th multiply
+  lda ResultHigh    ; carry bit to last byte of product
+  bcc :+
+    adc #$100 - 1
+  :
+  adc CPUPROD       ; add 4th product
+  sta ResultHigh    ; final store
+  setxy16
+  rtl
+.endproc
+
+.a16
+.i16
+.proc Unsigned16x16Multiply_16
+; Adapted from https://wiki.superfamicom.org/16-bit-multiplication-and-division
+MultiplyA  = 0
+MultiplyB  = 2
+ResultLow  = 4
+  setxy8
+  ldx MultiplyA
+  stx CPUMCAND
+  ldy MultiplyB
+  sty CPUMUL        ; set up 1st multiply
+  ldx MultiplyB+1
+  clc
+  lda CPUPROD       ; load CPUPROD for 1st multiply
+  stx CPUMUL        ; start 2nd multiply
+  sta a:ResultLow
+  lda CPUPROD       ; read CPUPROD from 2nd multiply
+  ldx MultiplyA+1
+  stx CPUMCAND      ; set up 3rd multiply
+  sty CPUMUL        ; y still contains MultiplyB
+  adc a:ResultLow+1
+  adc CPUPROD       ; add 3rd product
+  sta ResultLow+1
+  setxy16
+  rtl
+.endproc

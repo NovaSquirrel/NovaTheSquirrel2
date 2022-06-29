@@ -1,6 +1,7 @@
 import subprocess
 
 def encode_brr(instrument):
+	source_data = instrument.props['SourceData']
 	p = subprocess.Popen(
 		[
 			"audio/brr/gssbrr",
@@ -17,9 +18,9 @@ def encode_brr(instrument):
 			str(instrument.props['ResampleType']),
 			str(instrument.props['DownsampleFactor']),
 			str(instrument.props['RampEnable']),
-			str(instrument.props['SourceData']),
+			str(len(source_data))
 		],
-		stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-	output, errors = p.communicate()
+		stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+	output, errors = p.communicate(input=source_data)
 	output = output.splitlines()
 	return output

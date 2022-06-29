@@ -260,8 +260,7 @@ int gss_hex_to_byte(char n) {
 	return -1;
 }
 
-short *hex_to_source(const char *hex) {
-	int length = strlen(hex);
+short *hex_to_source(const char *hex, int length) {
 	short *out = malloc(length/2);
 	for(int i=0; i<length/4; i++) {
 		out[i]  = gss_hex_to_byte(*(hex++)) << 12;
@@ -274,7 +273,7 @@ short *hex_to_source(const char *hex) {
 
 int main(int argc, char *argv[]) {
 	if (argc != 15) {
-		puts("Syntax: gssbrr length loop_start loop_end loop_enable loop_unroll souce_rate source_volume eq_low eq_mid eq_high resample_type downsample_factor ramp_enable source");
+		puts("Syntax: gssbrr length loop_start loop_end loop_enable loop_unroll souce_rate source_volume eq_low eq_mid eq_high resample_type downsample_factor ramp_enable source_string_length");
 		return -1;
 	}
 	struct instrumentStruct instrument;
@@ -291,7 +290,15 @@ int main(int argc, char *argv[]) {
 	instrument.resample_type     = strtol(argv[11], NULL, 10);
 	instrument.downsample_factor = strtol(argv[12], NULL, 10);
 	instrument.ramp_enable       = strtol(argv[13], NULL, 10);
-	instrument.source            = hex_to_source(argv[14]);
+	int source_length            = strtol(argv[14], NULL, 10);
+
+	// Read out all of the characters of the sample
+	unsigned char sample_source[source_length];
+	for(int i=0; i<source_length; i++) {
+		sample_source[i] = getchar();
+	}
+	// Convert it
+	instrument.source            = hex_to_source(sample_source, source_length);
 	BRREncode(&instrument);
 
 	printf("%d\n%d\n", BRRTempSize, (BRRTempLoop>0?(BRRTempLoop*9):BRRTempLoop));

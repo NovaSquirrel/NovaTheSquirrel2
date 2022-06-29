@@ -2634,10 +2634,8 @@ Loop:
 .a16
 .i16
 .proc ActorCopyPosXY
-  seta8
   lda #0
   sta ActorState,y
-  seta16
   lda ActorPX,x
   sta ActorPX,y
   lda ActorPY,x
