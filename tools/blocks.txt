@@ -1345,52 +1345,52 @@ solid
 q 14,0
 
 +HeartsLockTop
-when Touch, BlockLockTop
 solid
 autotile AutotileBottomLock
 t 0:0 0:0
 t 8,0 9,0
 
 +ClubsLockTop
-when Touch, BlockLockTop
 solid
 autotile AutotileBottomLock
 t 0:0 0:0
 t 10,0 11,0
 
 +DiamondsLockTop
-when Touch, BlockLockTop
 solid
 autotile AutotileBottomLock
 t 0:0 0:0
 t 12,0 13,0
 
 +SpadesLockTop
-when Touch, BlockLockTop
 solid
 autotile AutotileBottomLock
 t 0:0 0:0
 t 14,0 15,0
 
 +HeartsLockBottom
+when Touch, BlockLockBottom
 solid
 t 8,1 9,1
 t 0:0 0:0
 editor_hide
 
 +ClubsLockBottom
+when Touch, BlockLockBottom
 solid
 t 10,1 11,1
 t 0:0 0:0
 editor_hide
 
 +DiamondsLockBottom
+when Touch, BlockLockBottom
 solid
 t 12,1 13,1
 t 0:0 0:0
 editor_hide
 
 +SpadesLockBottom
+when Touch, BlockLockBottom
 solid
 t 14,1 15,1
 t 0:0 0:0

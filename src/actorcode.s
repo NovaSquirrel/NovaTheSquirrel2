@@ -4797,7 +4797,7 @@ Erase:
 .popseg
 
 
-; Check for collision with a rideable 16x16 thing
+; Check for collision with a rideable actor
 .a16
 .i16
 .export CollideRide

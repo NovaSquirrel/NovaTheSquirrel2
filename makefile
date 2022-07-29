@@ -19,7 +19,7 @@ objlist = \
   snesheader init main player memory common renderlevel renderlevel2 \
   uploadppu graphics blockdata snesgss_driver \
   scrolling playergraphics blockinteraction palettedata \
-  levelload levelautotile leveldata actordata actorcode object \
+  levelload levelautotile leveldata actordata actorcode actorshared \
   mode7 perspective_data sincos_data inventory vwf \
   overworldblockdata overworlddata overworldcode m7leveldata \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
@@ -155,7 +155,7 @@ $(objdir)/m7blockdata.o: $(srcdir)/m7blockenum.s
 $(objdir)/mode7actors.o: $(srcdir)/m7blockenum.s tilesetsX/M7SoftSprites.chr
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
-$(objdir)/object.o: $(srcdir)/blockenum.s
+$(objdir)/actorshared.o: $(srcdir)/blockenum.s
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/blockenum.s
 $(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/backgroundenum.s
 $(objdir)/overworldcode.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/pathenum.s

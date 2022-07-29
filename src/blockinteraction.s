@@ -1015,22 +1015,24 @@ FadeOut:
 
 .a16
 .i16
-.export BlockLockTop
-.proc BlockLockTop
+.export BlockLockBottom
+.proc BlockLockBottom
   lda [LevelBlockPtr]
-  sub #Block::HeartsLockTop
+  sub #Block::HeartsLockBottom
   lsr
   add #InventoryItem::HeartsKey
   jsl InventoryTakeItem
   bcc :+
+    stz BlockFlag ; Act like air
+
     lda #Block::Empty
     jsl ChangeBlock
-    inc LevelBlockPtr
-    inc LevelBlockPtr
-    lda #Block::Empty
-    jsl ChangeBlock
-    dec LevelBlockPtr ; Maybe not required?
     dec LevelBlockPtr
+    dec LevelBlockPtr
+    lda #Block::Empty
+    jsl ChangeBlock
+    inc LevelBlockPtr ; Maybe not required?
+    inc LevelBlockPtr
   :
   rts
 .endproc
@@ -1045,6 +1047,8 @@ FadeOut:
   add #InventoryItem::HeartsKey
   jsl InventoryTakeItem
   bcc :+
+    stz BlockFlag ; Act like air
+
     lda #Block::Empty
     jsl ChangeBlock
 
