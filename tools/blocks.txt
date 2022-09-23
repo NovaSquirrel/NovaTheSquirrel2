@@ -542,6 +542,9 @@ editor_hide
 #######################################
 # Terrain (slopes) - fully solid
 #######################################
+
+marker SlopeStart
+
 +MedSlopeL_DL
 autotile AutotileExpandDirt
 solid
@@ -742,6 +745,8 @@ editor_hide
 t 5,2 6,2
 t 12,4 13,4
 editor_hide
+
+marker SlopeEnd
 
 #######################################
 # Sand I guess

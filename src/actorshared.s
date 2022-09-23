@@ -25,8 +25,8 @@
 .segment "C_ActorCommon"
 
 ; Two comparisons to make to determine if something is a slope
-SlopeBCC = Block::MedSlopeL_DL
-SlopeBCS = Block::GradualSlopeR_U4_Dirt+1
+SlopeBCC = BlockRangeMarker::SlopeStart
+SlopeBCS = BlockRangeMarker::SlopeEnd
 .export SlopeBCC, SlopeBCS
 SlopeY = 2
 

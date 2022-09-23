@@ -10,6 +10,7 @@ all_blocks = []
 all_classes = set()
 all_interaction_procs = set()
 all_interaction_sets = []
+all_markers = {}
 
 # Read and process the file
 with open("tools/blocks.txt") as f:
@@ -51,6 +52,8 @@ for line in text:
 	if word == "alias":
 		name, value = separateFirstWord(arg)
 		aliases[name] = value
+	elif word == "marker":
+		all_markers[arg] = len(all_blocks) + 1
 
 	# Tile info shared with several blocks
 	elif word == "base":
@@ -176,6 +179,12 @@ outfile.write('.enum BlockClass\n')
 outfile.write('  None\n')
 for b in all_classes:
 	outfile.write('  %s\n' % b)
+outfile.write('.endenum\n\n')
+
+# Generate the marker enum
+outfile.write('.enum BlockRangeMarker\n')
+for k, v in all_markers.items():
+	outfile.write('  %s = %d\n' % (k, v*2))
 outfile.write('.endenum\n\n')
 
 outfile.close()
