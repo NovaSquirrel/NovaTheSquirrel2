@@ -164,7 +164,7 @@ NoInitEntities:
 
 BlockNum = 0
 BlocksLeft = 2
-YPos = 4
+Pointer = 4
   ; Start rendering
   lda ScrollX+1 ; Get the column number in blocks
   and #$ff
@@ -179,7 +179,7 @@ YPos = 4
   and LevelColumnMask
   asl
   ora LevelBlockPtr
-  sta YPos
+  sta Pointer
 
 Loop:
   ; Calculate the column address
@@ -198,19 +198,19 @@ Loop:
   :
 
   ; Upload two columns
-  ldx YPos
+  ldx Pointer
   jsl RenderLevelColumnLeft
   jsl RenderLevelColumnUpload
   inc ColumnUpdateAddress
-  ldx YPos
+  ldx Pointer
   jsl RenderLevelColumnRight
   jsl RenderLevelColumnUpload
 
   ; Move onto the next block
-  lda YPos
+  lda Pointer
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
-  sta YPos
+  sta Pointer
   inc BlockNum
 
   dec BlocksLeft
@@ -306,7 +306,7 @@ Loop:
 
 .segment "BlockGraphicData"
 ; Render the left tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
+; (starting from index X within LevelBuf)
 ; 16-bit accumulator and index
 .a16
 .i16
@@ -316,11 +316,13 @@ Loop:
   plb
   plb
 
+  ; Calculate starting index for scrolling buffer
   txa
   asl
   and #(32*2)-1
   tay
   sty TempVal
+  ; Loop
 : lda a:LevelBuf,x ; Get the next level tile
   inx
   inx
@@ -351,7 +353,7 @@ Loop:
 .endproc
 
 ; Render the right tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
+; (starting from index X within LevelBuf)
 ; 16-bit accumulator and index
 .a16
 .i16
@@ -361,11 +363,13 @@ Loop:
   plb
   plb
 
+  ; Calculate starting index for scrolling buffer
   txa
   asl
   and #(32*2)-1
   tay
   sty TempVal
+  ; Loop
 : lda a:LevelBuf,x ; Get the next level tile
   inx
   inx
@@ -397,8 +401,8 @@ Loop:
 
 
 ; Render the left tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
-; Initialize X with buffer position before calling.
+; (starting from index X within LevelBuf)
+; Initialize Y with buffer position before calling.
 ; 16-bit accumulator and index
 .a16
 .i16
@@ -444,8 +448,8 @@ Loop:
 .endproc
 
 ; Render the right tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
-; Initialize X with buffer position before calling.
+; (starting from index X within LevelBuf)
+; Initialize Y with buffer position before calling.
 ; 16-bit accumulator and index
 .a16
 .i16

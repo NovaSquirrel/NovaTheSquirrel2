@@ -142,8 +142,6 @@ YPos = 6
   xba
   dec a
   jsl GetLevelColumnPtr
-  lda #$4000
-  tsb LevelBlockPtr
 
   ; Get index for the buffer
   lda ScrollX
@@ -153,13 +151,13 @@ YPos = 6
   asl
   asl
   and #(64*2)-1
-  tax
-
-  ; Take the Y position, rounded to blocks,
-  ; as the column of level data to read
-  lda Temp
-  and #(MAX_LEVEL_HEIGHT*2) ; 32 blocks tall
   tay
+
+  ; Calculate an index to read level data with
+  lda Temp
+  and #.loword(~1)
+  ora LevelBlockPtr
+  tax
 
   ; Generate the top or the bottom as needed
   lda Temp
@@ -193,16 +191,15 @@ YPos = 6
   lda Temp ; Get metatile count
   lsr
   jsl GetLevelColumnPtr
-  lda #$4000
-  tsb LevelBlockPtr
 
-  ; Use the Y scroll position in blocks
+  ; Calculate an index to read level data with
   lda ScrollY
   add FG2OffsetY
   xba
-  and #LEVEL_HEIGHT-1
   asl
-  tay
+  and LevelColumnMask
+  ora LevelBlockPtr
+  tax
 
   ; Generate the left or right as needed
   lda Temp
@@ -220,9 +217,10 @@ YPos = 6
 .i16
 .export RenderLevelScreens2
 .proc RenderLevelScreens2
-BlockNum = 0
-BlocksLeft = 2
-YPos = 4
+; 0 is used by RenderLevelColumnLeft2 and RenderLevelColumnRight2
+BlockNum = 2
+BlocksLeft = 4
+Pointer = 6
   ; Start rendering
   lda ScrollX+1 ; Get the column number in blocks
   add FG2OffsetX+1
@@ -230,18 +228,19 @@ YPos = 4
   sub #4   ; Render out past the left side a bit
   sta BlockNum
   jsl GetLevelColumnPtr
-  lda #$4000
-  tsb LevelBlockPtr
+  ; Don't OR in #$4000 because we'll index from LevelBufAlt instead of LevelBuf here
 
   lda #26  ; Go 26 blocks forward
   sta BlocksLeft
 
+  ; Calculate the starting pointer to read level data
   lda ScrollY
   add FG2OffsetY
   xba
-  and #LEVEL_HEIGHT-1
+  and LevelColumnMask
   asl
-  sta YPos
+  ora LevelBlockPtr
+  sta Pointer
 
 Loop:
   ; Calculate the column address
@@ -260,20 +259,19 @@ Loop:
   :
 
   ; Upload two columns
-  ldy YPos
+  ldx Pointer
   jsl RenderLevelColumnLeft2
   jsl RenderLevelColumnUpload2
   inc ColumnUpdateAddress2
-  ldy YPos
+  ldx Pointer
   jsl RenderLevelColumnRight2
   jsl RenderLevelColumnUpload2
 
   ; Move onto the next block
-  lda LevelBlockPtr
-  add #LEVEL_HEIGHT*LEVEL_TILE_SIZE
+  lda Pointer
+  add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1
-  ora #$4000
-  sta LevelBlockPtr
+  sta Pointer
   inc BlockNum
 
   dec BlocksLeft
@@ -365,46 +363,61 @@ Loop:
 
 .segment "BlockGraphicData"
 ; Render the left tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
+; (starting from index X within LevelBufAlt)
 ; 16-bit accumulator and index
 .a16
 .i16
 .proc RenderLevelColumnLeft2
+  ColumnBits = 0
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
-  tya
+  ; Get the bits that should stay constant for the current column
+  lda LevelColumnMask
+  eor #$ffff
+  sta ColumnBits
+  txa
+  and ColumnBits
+  sta ColumnBits
+
+  ; Calculate starting index for scrolling buffer
+  txa
   asl
   and #(32*2)-1
+  tay
+  sty TempVal
+  ; Loop
+:
+  txa ; Stay in this column
+  and LevelColumnMask
+  ora ColumnBits
   tax
-  stx TempVal
-: tya
-  and LevelColumnMask ; Keep Y in range
-  tay
-  lda [LevelBlockPtr],y ; Get the next level tile
-  iny
-  iny
-  phy
-  tay
+
+  lda a:LevelBufAlt,x ; Get the next level tile
+  inx
+  inx
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockTopLeft,y
-  sta f:ColumnUpdateBuffer2,x
-  inx
-  inx
-  lda BlockBottomLeft,y
-  sta f:ColumnUpdateBuffer2,x
-  inx
-  inx
-  ply
+  lda f:BlockTopLeft,x
+  sta ColumnUpdateBuffer2,y
+  iny
+  iny
+  lda f:BlockBottomLeft,x
+  sta ColumnUpdateBuffer2,y
+  iny
+  iny
+  plx
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(32*2)-1
-  tax
+  tay
 
   ; Stop after 32 tiles vertically
-  cpx TempVal
+  cpy TempVal
   bne :-
 
   plb
@@ -412,46 +425,61 @@ Loop:
 .endproc
 
 ; Render the right tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
+; (starting from index X within LevelBufAlt)
 ; 16-bit accumulator and index
 .a16
 .i16
 .proc RenderLevelColumnRight2
+  ColumnBits = 0
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
-  tya
+  ; Get the bits that should stay constant for the current column
+  lda LevelColumnMask
+  eor #$ffff
+  sta ColumnBits
+  txa
+  and ColumnBits
+  sta ColumnBits
+
+  ; Calculate starting index for scrolling buffer
+  txa
   asl
   and #(32*2)-1
+  tay
+  sty TempVal
+  ; Loop
+:
+  txa ; Stay in this column
+  and LevelColumnMask
+  ora ColumnBits
   tax
-  stx TempVal
-: tya
-  and LevelColumnMask ; Keep Y in range
-  tay
-  lda [LevelBlockPtr],y ; Get the next level tile
-  iny
-  iny
-  phy
-  tay
+
+  lda a:LevelBufAlt,x ; Get the next level tile
+  inx
+  inx
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockTopRight,y
-  sta f:ColumnUpdateBuffer2,x
-  inx
-  inx
-  lda BlockBottomRight,y
-  sta f:ColumnUpdateBuffer2,x
-  inx
-  inx
-  ply
+  lda f:BlockTopRight,x
+  sta ColumnUpdateBuffer2,y
+  iny
+  iny
+  lda f:BlockBottomRight,x
+  sta ColumnUpdateBuffer2,y
+  iny
+  iny
+  plx
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(32*2)-1
-  tax
+  tay
 
   ; Stop after 32 tiles vertically
-  cpx TempVal
+  cpy TempVal
   bne :-
 
   plb
@@ -460,44 +488,43 @@ Loop:
 
 
 ; Render the left tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
-; Initialize X with buffer position before calling.
+; (starting from index X within LevelBufAlt)
+; Initialize Y with buffer position before calling.
 ; 16-bit accumulator and index
 .a16
 .i16
 .proc RenderLevelRowTop2
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
   lda #20
   sta TempVal
 
-: lda [LevelBlockPtr],y ; Get the next level tile
-  phy
-  tay
+: lda a:LevelBufAlt,x ; Get the next level tile
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockTopLeft,y
-  sta f:RowUpdateBuffer2,x
-  inx
-  inx
-  lda BlockTopRight,y
-  sta f:RowUpdateBuffer2,x
-  inx
-  inx
-  ply
+  lda f:BlockTopLeft,x
+  sta RowUpdateBuffer2,y
+  iny
+  iny
+  lda f:BlockTopRight,x
+  sta RowUpdateBuffer2,y
+  iny
+  iny
+  pla
 
   ; Next column
-  lda LevelBlockPtr
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
-  ora #$4000
-  sta LevelBlockPtr
+  tax
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(64*2)-1
-  tax
+  tay
 
   ; Stop after 64 tiles horizontally
   dec TempVal
@@ -508,44 +535,43 @@ Loop:
 .endproc
 
 ; Render the right tile of a column of blocks
-; (at LevelBlockPtr starting from index Y)
-; Initialize X with buffer position before calling.
+; (starting from index X within LevelBufAlt)
+; Initialize Y with buffer position before calling.
 ; 16-bit accumulator and index
 .a16
 .i16
 .proc RenderLevelRowBottom2
   phb
-  phk
+  ph2banks LevelBuf, LevelBuf
+  plb
   plb
 
   lda #20
   sta TempVal
 
-: lda [LevelBlockPtr],y ; Get the next level tile
-  phy
-  tay
+: lda a:LevelBufAlt,x ; Get the next level tile
+  phx
+  tax
   ; Write the two tiles in
-  lda BlockBottomLeft,y
-  sta f:RowUpdateBuffer2,x
-  inx
-  inx
-  lda BlockBottomRight,y
-  sta f:RowUpdateBuffer2,x
-  inx
-  inx
-  ply
+  lda f:BlockBottomLeft,x
+  sta RowUpdateBuffer2,y
+  iny
+  iny
+  lda f:BlockBottomRight,x
+  sta RowUpdateBuffer2,y
+  iny
+  iny
+  pla
 
   ; Next column
-  lda LevelBlockPtr
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
-  ora #$4000
-  sta LevelBlockPtr
+  tax
 
   ; Wrap around in the buffer
-  txa
+  tya
   and #(64*2)-1
-  tax
+  tay
 
   ; Stop after 64 tiles horizontally
   dec TempVal

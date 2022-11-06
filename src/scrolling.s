@@ -348,8 +348,7 @@ YPos = 6
   and #(64*2)-1
   tay
 
-  ; Take the Y position, rounded to blocks,
-  ; as the column of level data to read
+  ; Calculate an index to read level data with
   lda Temp
   and #.loword(~1)
   ora LevelBlockPtr
@@ -398,7 +397,7 @@ YPos = 6
   lsr
   jsl GetLevelColumnPtr
 
-  ; Use the Y scroll position in blocks
+  ; Calculate an index to read level data with
   lda ScrollY
   xba
   asl
