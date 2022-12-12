@@ -34,6 +34,9 @@
 .export BlockRunInteractionInsideBody, BlockRunInteractionActorInside
 .export BlockRunInteractionActorTopBottom, BlockRunInteractionActorSide
 
+; Export other shared routines
+.export PoofAtBlockFar
+
 .import InventoryGiveItem, InventoryTakeItem, InventoryHasItem
 
 ; .-------------------------------------
@@ -363,6 +366,9 @@ WasPushRight:
   rts
 .endproc
 
+PoofAtBlockFar:
+  jsr PoofAtBlock
+  rtl
 .proc PoofAtBlock
   ; Need a free slot first
   jsl FindFreeParticleY

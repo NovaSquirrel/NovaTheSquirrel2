@@ -25,7 +25,7 @@
 .import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorWalk, ActorFall, ActorAutoBump
 .import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256, DispParticle8x8
-.import ActorSafeRemoveY, BlockRunInteractionBelow
+.import ActorSafeRemoveY, BlockRunInteractionBelow, PoofAtBlockFar
 
 .assert ^ChangeToExplosion = ^RunPlayerProjectile, error, "Player projectiles and other actors should share a bank"
 
@@ -1542,6 +1542,7 @@ InteractWithBlock:
   plx
   dec InteractionByProjectile
   ; Insert additional types the Below interaction doesn't do
+  lda [LevelBlockPtr]
   cmp #Block::Ice
   beq ExplodeBlock
   rts
@@ -1549,6 +1550,7 @@ ExplodeBlock:
   pla ; Pop the return address off
   tdc
   jsl ChangeBlock
+  jsl PoofAtBlockFar
   bra ExpireThen
 .endproc
 
