@@ -734,6 +734,8 @@ DoIceShared:
 DownUp:
        stz ActorVarA,x
     :
+    ; But zero the velocity so that the FireStill projectile doesn't move due to uninitialized memory
+    stz ActorVX,x
 
     ; Vertical speed
     stz ActorVY,x
