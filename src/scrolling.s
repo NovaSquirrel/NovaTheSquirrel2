@@ -300,6 +300,11 @@ SpeedLimit:
     eor #$ffff
     inc a
   :
+  ; Speed limit for being too small too! Helps avoid awkwardly moving a single pixel at the end
+  cmp #$0003
+  bcs :+
+    lda #$0000
+  :
   ; Cap it at 8 pixels
   cmp #$0080
   bcc :+
