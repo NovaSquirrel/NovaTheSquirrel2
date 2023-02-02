@@ -2100,7 +2100,7 @@ IceGoRight:
   ldx #.loword(Mode7LevelMap)
   ldy #.loword(Mode7LevelMapCheckpoint)
   lda #(64*64*2)-1
-  .byt $54, ^Mode7LevelMap,      ^Mode7LevelMapCheckpoint ;<--- this is MVN
+  mvn Mode7LevelMap, Mode7LevelMapCheckpoint
   plb
   rts
 .endproc
@@ -2140,7 +2140,7 @@ IceGoRight:
   ldx #.loword(Mode7LevelMapCheckpoint)
   ldy #.loword(Mode7LevelMap)
   lda #(64*64*2)-1
-  .byt $54, ^Mode7LevelMap,      ^Mode7LevelMapCheckpoint ;<--- this is MVN
+  mvn Mode7LevelMapCheckpoint, Mode7LevelMap
   plb
 
   jmp StartMode7Level::RestoredFromCheckpoint
