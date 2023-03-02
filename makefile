@@ -25,7 +25,8 @@ objlist = \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile m7blockdata mode7actors blarggapu
+  playerprojectile m7blockdata mode7actors blarggapu \
+  hubworld
 objlistspc = \
   spcheader spcimage musicseq
 
@@ -42,7 +43,7 @@ imgdir2 := tilesets2
 bgdir := backgrounds
 
 ifndef SNESEMU
-SNESEMU := ./mesen-s
+SNESEMU := ./mesen
 endif
 
 # game-music-emu by blargg et al.
@@ -236,8 +237,9 @@ $(srcdir)/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py
 $(objdir)/m7leveldata.o: $(m7levels_lz4) $(m7levels_bin) $(srcdir)/m7leveldata.s
 $(objdir)/backgrounddata.o: $(srcdir)/backgroundenum.s
-
-
+$(objdir)/hubworld.o: hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/palettes.bin hubworld/hubworld.chrsfc $(srcdir)/paletteenum.s
+hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/palettes.bin hubworld/hubworld.chrsfc: hubworld/fg.png hubworld/bg.png hubworld/palettes.png tools/hubworld.py
+	$(PY) tools/hubworld.py
 
 $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
 

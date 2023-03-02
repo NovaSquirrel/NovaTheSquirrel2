@@ -67,3 +67,5 @@ src/perspective_data.s
 audio/gss_enum.s
 audio/gss_data.s
 audio/brr/gssbrr.exe
+hubworld/*.bin
+hubworld/*.chrsfc

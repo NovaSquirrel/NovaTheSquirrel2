@@ -22,7 +22,7 @@ def tilestring_hflip(ts):
 def tilestring_vflip(ts):
 	out = []
 	for i in range(64):
-		out.append(ts[i^(7*8)])
+		out.append(ts[i^(7 << 3)])
 	return ''.join(out)
 
 def tilestring_bytes(ts):
