@@ -150,7 +150,7 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
   and keydown
   sta keynew
 
-  Speed = 0
+  Speed = 2
   lda #$0020
   sta Speed
 
@@ -170,6 +170,13 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
     lda #1
     sta PlayerDir
     seta16
+    jsr HubworldSolidUnderPlayer
+    beq :+
+      lda PlayerPX
+      add Speed
+      and #$ff80
+      add #3*8
+      sta PlayerPX
   :
   lda keydown
   and #KEY_RIGHT
@@ -180,6 +187,13 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
     seta8
     stz PlayerDir
     seta16
+    jsr HubworldSolidUnderPlayer
+    beq :+
+      lda PlayerPX
+      sub Speed
+      and #$ff80
+      add #12*8+12
+      sta PlayerPX
   :
   lda keydown
   and #KEY_UP
@@ -187,6 +201,13 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
     lda PlayerPY
     sub Speed
     sta PlayerPY
+    jsr HubworldSolidUnderPlayer
+    beq :+
+      lda PlayerPY
+      add Speed
+      and #$ff80
+      add #3*8
+      sta PlayerPY
   :
   lda keydown
   and #KEY_DOWN
@@ -194,8 +215,14 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
     lda PlayerPY
     add Speed
     sta PlayerPY
+    jsr HubworldSolidUnderPlayer
+    beq :+
+      lda PlayerPY
+      sub Speed
+      and #$ff80
+      add #12*8+12
+      sta PlayerPY
   :
-
   ; Dim the screen as a test for detecting solidity
   lda PlayerPX
   ldx PlayerPY
@@ -846,6 +873,14 @@ SpeedLimit:
     inc a
   :
   rts
+.endproc
+
+.a16
+.proc HubworldSolidUnderPlayer
+  lda PlayerPX
+  ldx PlayerPY
+  ; Fall through
+  ;jmp PlayerPos
 .endproc
 
 .a16
