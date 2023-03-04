@@ -46,10 +46,11 @@ def tile_bytes(ts): # Takes a list of palette indexes
 		b.append(plane_data[3][i])
 	return bytes(a+b)
 
-def convert_map(fg_filename, bg_filename, pal_filename, metatile_filename, chr_filename):
+def convert_map(fg_filename, bg_filename, attribute_filename, pal_filename, metatile_filename, solidmap_filename, chr_filename):
 	fg_image = Image.open(fg_filename).convert('RGBA')
 	bg_image = Image.open(bg_filename).convert('RGBA')
 	pal_image = Image.open(pal_filename).convert('RGBA')
+	attrib_image = Image.open(attribute_filename).convert('RGBA')
 
 	assert pal_image.width == 16
 	assert pal_image.height == 8
@@ -78,6 +79,12 @@ def convert_map(fg_filename, bg_filename, pal_filename, metatile_filename, chr_f
 		for tile_y in range(layer_height_in_tiles):
 			for tile_x in range(layer_width_in_tiles):
 				tile_pixels = tuple(layer.crop((tile_x*8, tile_y*8, tile_x*8+8, tile_y*8+8)).getdata())
+
+				tile_priority = False
+				if layer_num == 0:
+					attrib_r, attrib_g, attrib_b, attrib_a = attrib_image.getpixel((tile_x*8, tile_y*8))
+					if attrib_b == 255:
+						tile_priority = True
 
 				hflip = False
 				vflip = False
@@ -109,7 +116,7 @@ def convert_map(fg_filename, bg_filename, pal_filename, metatile_filename, chr_f
 					else:
 						print("Couldn't find palette for tile at %d, %d in %s" % (tile_x, tile_y, "BG" if layer_num else "FG"))
 						sys.exit()
-				tilemap_data[tile_x][tile_y] = which_tile | (hflip*0x4000) | (vflip*0x8000) | (tile_palette[which_tile]<<10)
+				tilemap_data[tile_x][tile_y] = which_tile | (tile_priority*0x2000) | (hflip*0x4000) | (vflip*0x8000) | (tile_palette[which_tile]<<10)
 
 		# Pack the tilemaps into metatiles
 		for metatile_x in range(layer_width_in_tiles // 2):
@@ -139,6 +146,20 @@ def convert_map(fg_filename, bg_filename, pal_filename, metatile_filename, chr_f
 			meta_out.write(bytes([metatile[i] & 255, metatile[i] >> 8]))
 	meta_out.close()
 
+	layer_width_in_tiles = fg_image.width // 8
+	layer_height_in_tiles = fg_image.height // 8
+	solid_out = open(solidmap_filename, 'wb')
+	for tile_y in range(layer_height_in_tiles):
+		for tile_x in range(layer_width_in_tiles // 8):
+			x_base = tile_x * 8
+			b = 0
+			for i in range(8):
+				attrib_r, attrib_g, attrib_b, attrib_a = attrib_image.getpixel(((x_base + i)*8, tile_y*8))
+				if attrib_r == 255:
+					b |= 1 << i
+			solid_out.write(bytes([b]))
+	solid_out.close()
+
 	pal_out = open(os.path.splitext(pal_filename)[0]+'.bin', 'wb')
 	for palette in palette_lists:
 		for color in palette:
@@ -161,8 +182,9 @@ def convert_map(fg_filename, bg_filename, pal_filename, metatile_filename, chr_f
 		chr_out.write(tile)
 	chr_out.close()
 
+	attrib_image.close()
 	pal_image.close()
 	bg_image.close()
 	fg_image.close()
 
-convert_map("hubworld/fg.png", "hubworld/bg.png", "hubworld/palettes.png", "hubworld/metatiles.bin", "hubworld/hubworld.chrsfc")
+convert_map("hubworld/fg.png", "hubworld/bg.png", "hubworld/attribute.png", "hubworld/palettes.png", "hubworld/metatiles.bin", "hubworld/solidmap.bin", "hubworld/hubworld.chrsfc")

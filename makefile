@@ -237,8 +237,8 @@ $(srcdir)/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py
 $(objdir)/m7leveldata.o: $(m7levels_lz4) $(m7levels_bin) $(srcdir)/m7leveldata.s
 $(objdir)/backgrounddata.o: $(srcdir)/backgroundenum.s
-$(objdir)/hubworld.o: hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/palettes.bin hubworld/hubworld.chrsfc $(srcdir)/paletteenum.s
-hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/palettes.bin hubworld/hubworld.chrsfc: hubworld/fg.png hubworld/bg.png hubworld/palettes.png tools/hubworld.py
+$(objdir)/hubworld.o: hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/palettes.bin hubworld/hubworld.chrsfc hubworld/solidmap.bin $(srcdir)/paletteenum.s
+hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/solidmap.bin hubworld/palettes.bin hubworld/hubworld.chrsfc: hubworld/fg.png hubworld/bg.png hubworld/palettes.png hubworld/attribute.png tools/hubworld.py
 	$(PY) tools/hubworld.py
 
 $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc

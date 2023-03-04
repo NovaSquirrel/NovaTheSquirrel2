@@ -52,15 +52,15 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
   sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
 
   ; set up plane 0's scroll
-  stz BGSCROLLX+0
-  stz BGSCROLLX+0
-  stz BGSCROLLX+2
-  stz BGSCROLLX+2
-  lda #$FF
-  sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
-  sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
-  sta BGSCROLLY+2
-  sta BGSCROLLY+2
+;  stz BGSCROLLX+0
+;  stz BGSCROLLX+0
+;  stz BGSCROLLX+2
+;  stz BGSCROLLX+2
+;  lda #$FF
+;  sta BGSCROLLY+0  ; The PPU displays lines 1-224, so set scroll to
+;  sta BGSCROLLY+0  ; $FF so that the first displayed line is line 0
+;  sta BGSCROLLY+2
+;  sta BGSCROLLY+2
 
   stz PPURES
   lda #%00010011  ; enable sprites, plane 0 and 1
@@ -150,11 +150,21 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
   and keydown
   sta keynew
 
+  Speed = 0
+  lda #$0020
+  sta Speed
+
+  lda keydown
+  and #KEY_Y
+  beq :+
+    asl Speed
+  :
+
   lda keydown
   and #KEY_LEFT
   beq :+
     lda PlayerPX
-    sub #$0010
+    sub Speed
     sta PlayerPX
     seta8
     lda #1
@@ -165,7 +175,7 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
   and #KEY_RIGHT
   beq :+
     lda PlayerPX
-    add #$0010
+    add Speed
     sta PlayerPX
     seta8
     stz PlayerDir
@@ -175,21 +185,39 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
   and #KEY_UP
   beq :+
     lda PlayerPY
-    sub #$0010
+    sub Speed
     sta PlayerPY
   :
   lda keydown
   and #KEY_DOWN
   beq :+
     lda PlayerPY
-    add #$0010
+    add Speed
     sta PlayerPY
+  :
+
+  ; Dim the screen as a test for detecting solidity
+  lda PlayerPX
+  ldx PlayerPY
+  jsr HubworldLookupSolidMap
+  beq :+
+    seta8
+    lda #$05
+    sta PPUBRIGHT
+    seta16
   :
 
   jsr HubworldAdjustCamera
 
+  ; Draw the player!
   stz OamPtr
   stz PlayerOAMIndex
+  lda keydown
+  and #KEY_UP | KEY_DOWN
+  beq :+
+    lda #KEY_LEFT | KEY_RIGHT ; Animate walking even if you press up/down instead of left/right
+    tsb keydown
+  :
   jsl DrawPlayer
   lda #4*4
   sta OamPtr
@@ -414,18 +442,16 @@ Pointer = 4
   sub #4   ; Render out past the left side a bit
   sta BlockNum
 
-;  jsl GetLevelColumnPtr
+  jsr HubworldMapColumnPtr
 
   lda #26  ; Go 26 blocks forward
   sta BlocksLeft
 
   lda ScrollY
   xba
-  and LevelColumnMask
+  and #HUBWORLD_MAP_COLUMN_SIZE-1
   asl
   ora LevelBlockPtr
-
-  lda #0
   sta Pointer
 
 Loop:
@@ -697,7 +723,8 @@ Loop:
   rts
 .endproc
 
-
+; Adjust the camera to target the player's new position
+; and detect if any scrolling updates need to happen
 .a16
 .i16
 .proc HubworldAdjustCamera
@@ -822,6 +849,46 @@ SpeedLimit:
 .endproc
 
 .a16
+; Checks if a specific X and Y position are over a solid tile
+; A = X position
+; X = Y position
+.proc HubworldLookupSolidMap
+Index = 0
+  ; Start with:
+  ;   A = ..xxxxxx x.......
+  ;   X = ..yyyyyy y.......
+  ; Goal: 00000yyy yyyyxxxx
+
+  asl ; .xxxxxxx ........
+  xba ; ........ .xxxxxxx
+  and           #%1111111
+  pha
+  lsr ; ........ ..xxxxxx
+  lsr ; ........ ...xxxxx
+  lsr ; ........ ....xxxx
+  sta Index
+  txa ; ..yyyyyy y.......
+  lsr ; ...yyyyy yy......
+  lsr ; ....yyyy yyy.....
+  lsr ; .....yyy yyyy....
+  and  #%0000011111110000
+  tsb Index ; <-- 00000yyy yyyyxxxx
+  pla
+  ; The solidity map packs the solidity for eight tiles into a byte to save space.
+  ; Use the bottom three bits to pick which bit to check instead of involving them in the index calculation.
+  and #%111
+  tax
+  seta8
+  lda Table,x
+  ldx Index
+  and f:HubWorldSolidMap,x
+  seta16
+  rts
+Table:
+  .byt 1, 2, 4, 8, 16, 32, 64, 128
+.endproc
+
+.a16
 .proc HubworldMapColumnPtr
   and #255
   asl ; * 2
@@ -941,9 +1008,13 @@ HubWorldGraphics:
   .incbin "../hubworld/hubworld.chrsfc"
 HubWorldGraphicsEnd:
 
-.segment "HubWorld_Data"
+.segment "HubWorld_Maps"
 HubWorldFG: .incbin "../hubworld/fg.bin"
 HubWorldBG: .incbin "../hubworld/bg.bin"
+
+.segment "HubWorld_Data"
+HubWorldSolidMap:
+  .incbin "../hubworld/solidmap.bin"
 
 HubWorldPalettes:
   .incbin "../hubworld/palettes.bin"
