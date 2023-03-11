@@ -863,7 +863,7 @@ TryLeftInteraction:
     lda PlayerPX
     sub PlayerVX ; Undo the horizontal movement
     and #$ff00   ; Snap to the block
-    add #4*16    ; Add to the offset to press against the block
+    ora #4*16    ; Add to the offset to press against the block
     sta PlayerPX
     stz PlayerVX ; Stop moving horizontally
   @NotSolid:
@@ -880,7 +880,7 @@ TryRightInteraction:
     lda PlayerPX
     sub PlayerVX  ; Undo the horizontal movement
     and #$ff00    ; Snap to the block
-    add #12*16+12 ; Add the offset to press against the block
+    ora #12*16+12 ; Add the offset to press against the block
     sta PlayerPX
     stz PlayerVX  ; Stop moving horizontally
   @NotSolid:
