@@ -154,10 +154,10 @@ DIRECTION_RIGHT = 3
   sta LevelBlockPtr+2
 
   ; The HUD goes on layer 2 and goes at $c000
-  lda #0 | ($c000 >> 9) ; Right after the sprite graphics
+  lda #0 | (($6000 >> 10)<<2) ; Right after the sprite graphics
   sta NTADDR+1
   ; Base for the tiles themselves are $c000 too
-  lda #$cc >> 1
+  lda #($6000>>12) | (($6000>>12)<<4)
   sta BGCHRADDR+0
 
 
@@ -201,25 +201,23 @@ DIRECTION_RIGHT = 3
 
   .import DoPortraitUpload
   lda #Portrait::Maffi
-  ldy #$9000 >> 1
+  ldy #$4800
   jsl DoPortraitUpload
   ina
-  ldy #$9100 >> 1
+  ldy #$4880
   jsl DoPortraitUpload
   ina
-  ldy #$9400 >> 1
+  ldy #$4a00
   jsl DoPortraitUpload
   ina
-  ldy #$9500 >> 1
+  ldy #$4a80
   jsl DoPortraitUpload
   ; Binoculars
   ina
   ina
-  ldy #$9800 >> 1
+  ldy #$4c00
   jsl DoPortraitUpload
  
-
-
   ; Put FGCommon in the last background palette for the HUD
   lda #Palette::FGCommon
   ldy #7
@@ -357,7 +355,7 @@ RestoredFromCheckpoint:
   jsl ppu_clear_oam
 
   ; Clear the HUD's nametable
-  ldx #$c000 >> 1
+  ldx #$6000
   ldy #64
   jsl ppu_clear_nt
   .a8
