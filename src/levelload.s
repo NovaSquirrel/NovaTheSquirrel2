@@ -275,14 +275,14 @@
   beq :+
     dec GlassForegroundEffect
   :
-  lda #>(BackgroundBG>>1)
+  lda #>(BackgroundBG)
   sta SecondFGTilemapPointer+1
   stz SecondFGTilemapPointer+0
   lda [DecodePointer],y
   and #$04
   beq :+
     dec ForegroundLayerThree
-    lda #>(ExtraBGWide>>1)
+    lda #>(ExtraBGWide)
     sta SecondFGTilemapPointer+1
   :
   ; (TODO: use the other flags)

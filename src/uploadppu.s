@@ -550,7 +550,7 @@ SpriteLoop:
     sta NTADDR+1   ; plane 0 nametable at $5000, 2 screens wide
     lda ForegroundLayerThree
     bne :+
-     stz BGCHRADDR ; First two planes both at $0000
+      stz BGCHRADDR ; First two planes both at $0000
   :
   lda #0 | ((ExtraBG >> 10)<<2)
   sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
