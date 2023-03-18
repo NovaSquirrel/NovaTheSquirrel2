@@ -278,7 +278,7 @@ def parseMetatileTile(tile, default_palette, default_base, priority=False):
 		split = tile.split(":")
 		value = parseNumber(split[0])
 		tile = split[1]
-	value = value//32      # Divide by the bytes per tile to get tile number
+	value = value//16      # Divide by the words per tile to get tile number
 
 	if tile.endswith("v"): # Vertical flip
 		value |= 0x8000
