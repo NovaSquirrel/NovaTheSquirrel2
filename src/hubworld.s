@@ -38,18 +38,18 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
   sta BGMODE       ; mode 1
 
   stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
-  lda #$4>>1
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $4000
+  lda #($3000>>12)
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $3000
 
-  lda #SpriteCHRBase >> 14
-  sta OBSEL      ; sprite CHR at $c000, sprites are 8x8 and 16x16
+  lda #SpriteCHRBase >> 13
+  sta OBSEL      ; sprite CHR at $6000, sprites are 8x8 and 16x16
 
-  lda #1 | (ForegroundBG >> 9)
-  sta NTADDR+0   ; plane 0 nametable at $b000, 2 screens wide
-  lda #1 | (BackgroundBG >> 9)
-  sta NTADDR+1   ; plane 1 nametable at $a000, 2 screens wide
-  lda #0 | (ExtraBG >> 9)
-  sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
+  lda #1 | ((ForegroundBG >> 10)<<2)
+  sta NTADDR+0   ; plane 0 nametable, 2 screens wide
+  lda #1 | ((BackgroundBG >> 10)<<2)
+  sta NTADDR+1   ; plane 1 nametable, 2 screens wide
+  lda #0 | ((ExtraBG >> 10)<<2)
+  sta NTADDR+2   ; plane 2 nametable, 1 screen
 
   ; set up plane 0's scroll
 ;  stz BGSCROLLX+0
@@ -280,7 +280,7 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
     sta <DMALEN+$00
     sta <DMALEN+$10
 
-    lda #(SpriteCHRBase+$000)>>1
+    lda #SpriteCHRBase+($000>>1)
     sta PPUADDR
     seta8
     .import PlayerGraphics
@@ -292,7 +292,7 @@ HUBWORLD_MAP_TOTAL_SIZE  = HUBWORLD_MAP_COLUMN_SIZE * 64
     sta COPYSTART
 
     ; Bottom row -------------------
-    ldx #(SpriteCHRBase+$200)>>1
+    ldx #SpriteCHRBase+($200>>1)
     stx PPUADDR
     lda #%00000010
     sta COPYSTART
@@ -487,10 +487,10 @@ Loop:
   and #15
   asl
   pha
-  ora #ForegroundBG>>1
+  ora #ForegroundBG
   sta ColumnUpdateAddress
   pla
-  ora #BackgroundBG>>1
+  ora #BackgroundBG
   sta ColumnUpdateAddress2
 
   ; Use the other nametable if necessary
@@ -953,10 +953,10 @@ YPos = 6
   asl
   asl
   pha
-  ora #ForegroundBG>>1
+  ora #ForegroundBG
   sta RowUpdateAddress
   pla
-  ora #BackgroundBG>>1
+  ora #BackgroundBG
   sta RowUpdateAddress2
 
   ; Get level pointer address
@@ -999,10 +999,10 @@ YPos = 6
   ; Calculate address of the column
   and #31
   pha
-  ora #ForegroundBG>>1
+  ora #ForegroundBG
   sta ColumnUpdateAddress
   pla
-  ora #BackgroundBG>>1
+  ora #BackgroundBG
   sta ColumnUpdateAddress2
 
   ; Use the second screen if required

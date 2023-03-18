@@ -334,7 +334,7 @@ YPos = 6
   asl
   asl
   asl
-  ora #ForegroundBG>>1
+  ora #ForegroundBG
   sta RowUpdateAddress
 
   ; Get level pointer address
@@ -386,7 +386,7 @@ YPos = 6
 
   ; Calculate address of the column
   and #31
-  ora #ForegroundBG>>1
+  ora #ForegroundBG
   sta ColumnUpdateAddress
 
   ; Use the second screen if required

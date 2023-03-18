@@ -120,7 +120,7 @@ MapPlayerMoving      = TouchTemp + 4 ; player is currently moving
   sta SpritePaletteSlots+2*3
   stz MapPlayerMoving
 
-  ldx #$c000 >> 1
+  ldx #$6000
   ldy #0
   jsl ppu_clear_nt
 
@@ -406,7 +406,7 @@ ExitPathLoop:
   sta PPUCTRL
   seta16
   ldx #0
-  lda #$d000>>1
+  lda #$6800
   sta PPUADDR
 RenderLoop:
   ; Top
@@ -451,7 +451,7 @@ RenderLoop:
   ; -----------------------------------------------------------------
   ; Render the path layer (oh boy)
   ldx #0
-  lda #$c000>>1
+  lda #$6000
   sta PPUADDR
 PathRenderLoop:
   ; Top
@@ -507,18 +507,18 @@ PathRenderLoop:
   sta BGMODE       ; mode 1
 
   stz BGCHRADDR+0  ; bg planes 0-1 CHR at $0000
-  lda #$e>>1
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $e000
+  lda #($7000>>12)
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $7000
 
-  lda #$8000 >> 14
-  sta OBSEL      ; sprite CHR at $8000, sprites are 8x8 and 16x16
+  lda #$4000 >> 13
+  sta OBSEL      ; sprite CHR at $4000, sprites are 8x8 and 16x16
 
-  lda #1 | ($c000 >> 9)
-  sta NTADDR+0   ; plane 0 nametable at $c000, 2 screens wide
-  lda #1 | ($d000 >> 9)
-  sta NTADDR+1   ; plane 1 nametable also at $d000, 2 screens wide
-  lda #0 | ($e000 >> 9)
-  sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
+  lda #1 | (($6000 >> 10)<<2)
+  sta NTADDR+0   ; plane 0 nametable at $6000, 2 screens wide
+  lda #1 | (($6800 >> 10)<<2)
+  sta NTADDR+1   ; plane 1 nametable also at $6800, 2 screens wide
+  lda #0 | (($7000 >> 10)<<2)
+  sta NTADDR+2   ; plane 2 nametable at $7000, 1 screen
 
   ; set up plane 0's scroll
   stz BGSCROLLX+0

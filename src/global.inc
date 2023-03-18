@@ -4,14 +4,14 @@ LEVEL_HEIGHT = 32
 MAX_LEVEL_HEIGHT = 256
 LEVEL_TILE_SIZE = 2
 
-ForegroundBG = $B000
-BackgroundBG = $A000
-ExtraBG      = $9800 ; Used for layer 3
-ExtraBGWide  = $9000 ; Used for map when ForegroundLayerThree is on (or for a bigger layer 3 background)
-SpriteCHRBase = $C000
+ForegroundBG = $5800
+BackgroundBG = $5000
+ExtraBG      = $4c00 ; Used for layer 3
+ExtraBGWide  = $4800 ; Used for map when ForegroundLayerThree is on (or for a bigger layer 3 background)
+SpriteCHRBase = $6000
 BG1CHRBase = $0000
-BG2CHRBase = $4000
-BG3CHRBase = $4000
+BG2CHRBase = $2000
+BG3CHRBase = $3000
 
 PlayerHeight = 16*16+14*16
 PlayerCollideWidth = 8*16

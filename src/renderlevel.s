@@ -186,7 +186,7 @@ Loop:
   lda BlockNum
   and #15
   asl
-  ora #ForegroundBG>>1
+  ora #ForegroundBG
   sta ColumnUpdateAddress
 
   ; Use the other nametable if necessary

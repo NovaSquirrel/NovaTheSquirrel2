@@ -1205,7 +1205,7 @@ Value = BlockTemp+2
   tya
   xba ; * 256
   lsr
-  add #$4A00>>1
+  add #$2500
   tax ; X = VRAM destination
   ldy #256 ; Copy 256 bytes
 

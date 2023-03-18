@@ -141,7 +141,7 @@ VblankHandler:
     sta <DMALEN+$00
     sta <DMALEN+$10
 
-    lda #(SpriteCHRBase+$000)>>1
+    lda #SpriteCHRBase+$000
     sta PPUADDR
     seta8
     .import PlayerGraphics
@@ -153,7 +153,7 @@ VblankHandler:
     sta COPYSTART
 
     ; Bottom row -------------------
-    ldx #(SpriteCHRBase+$200)>>1
+    ldx #SpriteCHRBase+$100
     stx PPUADDR
     lda #%00000010
     sta COPYSTART
@@ -416,14 +416,14 @@ CancelBlockUpdates:
     sty DMALEN+$00
 
     ; Top row ----------------------
-    ldx #(SpriteCHRBase+$100)>>1
+    ldx #SpriteCHRBase+($100>>1)
     stx PPUADDR
     lda #%00000001
     sta COPYSTART
 
     ; Bottom row -------------------
     sty DMALEN+$00
-    ldx #(SpriteCHRBase+$300)>>1
+    ldx #SpriteCHRBase+($300>>1)
     stx PPUADDR
     sta COPYSTART
 
@@ -433,7 +433,7 @@ CancelBlockUpdates:
 
     ldx #1024 ; Two rows of tiles
     stx DMALEN
-    ldx #(SpriteCHRBase+$400)>>1
+    ldx #SpriteCHRBase+($400>>1)
     stx PPUADDR
     lda #%00000001
     sta COPYSTART

@@ -514,14 +514,10 @@ SpriteLoop:
   lda ForegroundLayerThree
   bne :+
     ; Clear layer 3
-    ldx #ExtraBG >> 1
+    ldx #ExtraBG
     ldy #32*4
     jsl ppu_clear_nt
   :
-  ; Including the graphics?
-;  ldx #$e800 >> 1
-;  ldy #0
-;  jsl ppu_clear_nt
 
   ; .------------------------------------.
   ; | Set up PPU registers for level use |
@@ -530,33 +526,33 @@ SpriteLoop:
   lda #1
   sta BGMODE       ; mode 1
 
-  lda #($4>>1)<<4
-  sta BGCHRADDR+0  ; bg plane 0 CHR at $0000, plane 1 CHR at $4000
-  lda #$4>>1
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $4000
+  lda #(BG1CHRBase>>12)|((BG2CHRBase>>12)<<4)
+  sta BGCHRADDR+0  ; bg plane 0 CHR at $0000, plane 1 CHR at $2000
+  lda #(BG3CHRBase>>12)
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $3000
 
-  lda #SpriteCHRBase >> 14
-  sta OBSEL      ; sprite CHR at $c000, sprites are 8x8 and 16x16
+  lda #SpriteCHRBase >> 13
+  sta OBSEL      ; sprite CHR at $6000, sprites are 8x8 and 16x16
 
-  lda #1 | (ForegroundBG >> 9)
-  sta NTADDR+0   ; plane 0 nametable at $b000, 2 screens wide
+  lda #1 | ((ForegroundBG >> 10)<<2)
+  sta NTADDR+0   ; plane 0 nametable at $5800, 2 screens wide
   tdc
   lda LevelBackgroundId
   tax
   .import BackgroundFlags
   lda f:BackgroundFlags,x
   and #3
-  ora #BackgroundBG >> 9
-  sta NTADDR+1   ; plane 1 nametable at $a000, size specified by BackgroundFlags
+  ora #(BackgroundBG >> 10)<<2
+  sta NTADDR+1   ; plane 1 nametable at $5000, size specified by BackgroundFlags
   lda TwoLayerLevel ; Force two screens wide on two-layer levels
   beq :+
-    lda #1 | (BackgroundBG >> 9)
-    sta NTADDR+1   ; plane 0 nametable at $a000, 2 screens wide
+    lda #1 | ((BackgroundBG >> 10)<<2)
+    sta NTADDR+1   ; plane 0 nametable at $5000, 2 screens wide
     lda ForegroundLayerThree
     bne :+
      stz BGCHRADDR ; First two planes both at $0000
   :
-  lda #0 | (ExtraBG >> 9)
+  lda #0 | ((ExtraBG >> 10)<<2)
   sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
 
   stz PPURES
@@ -572,9 +568,9 @@ SpriteLoop:
 
   lda ForegroundLayerThree
   beq :+
-    lda #1 | (ExtraBGWide >> 9)
-    sta NTADDR+2    ; plane 2 nametable at $9000, 2 screens wide
-    ; Tiles go on $4000 still - can use some space in $A800-$B000 for tiles if layer 2 is one screen
+    lda #1 | ((ExtraBGWide >> 10)<<2)
+    sta NTADDR+2    ; plane 2 nametable at $4800, 2 screens wide
+    ; Tiles go on $3000 still
     lda #BG3_PRIORITY | 1
     sta BGMODE
     lda #%00010111  ; enable layer 3 because it's being used now
@@ -599,19 +595,19 @@ SpriteLoop:
   ; Make sure to synchronize these with wherever the toggle blocks are located!
   lda ToggleSwitch1
   beq :+
-    ldx #$4a00>>1
+    ldx #$2500
     ldy #.loword(File_FGToggleBlocksSwapped+256*0)
     jsr ToggleSwitchDMA
   :
   lda ToggleSwitch2
   beq :+
-    ldx #$4b00>>1
+    ldx #$2580
     ldy #.loword(File_FGToggleBlocksSwapped+256*1)
     jsr ToggleSwitchDMA
   :
   lda ToggleSwitch3
   beq :+
-    ldx #$4c00>>1
+    ldx #$2600
     ldy #.loword(File_FGToggleBlocksSwapped+256*2)
     jsr ToggleSwitchDMA
   :
@@ -974,14 +970,14 @@ TileNumbers:
 ;  plx
 ;  rtl
 Addresses:
-  .word (SpriteCHRBase+$1000)>>1
-  .word (SpriteCHRBase+$1100)>>1
-  .word (SpriteCHRBase+$1400)>>1
-  .word (SpriteCHRBase+$1500)>>1
-  .word (SpriteCHRBase+$1800)>>1
-  .word (SpriteCHRBase+$1900)>>1
-  .word (SpriteCHRBase+$1C00)>>1
-  .word (SpriteCHRBase+$1D00)>>1
+  .word SpriteCHRBase+($1000>>1)
+  .word SpriteCHRBase+($1100>>1)
+  .word SpriteCHRBase+($1400>>1)
+  .word SpriteCHRBase+($1500>>1)
+  .word SpriteCHRBase+($1800>>1)
+  .word SpriteCHRBase+($1900>>1)
+  .word SpriteCHRBase+($1C00>>1)
+  .word SpriteCHRBase+($1D00>>1)
 .endproc
 
 ; Queues a DMA to happen during the next vblank
