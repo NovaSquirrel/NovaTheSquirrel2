@@ -516,6 +516,39 @@ draw DrawBurgerRiderJumper
 after SharedEnemyNormal
 size 16x40
 
+# ---------- actors that pretend to be blocks ----------
++Spring
+essential
+gfx SPActorBlocks
+run RunActorSpring
+draw DrawActorSpring
+after SharedRemoveIfFar
+size 16x8
+
++Money
+essential
+gfx SPActorBlocks
+run RunActorMoney
+draw DrawActorMoney
+after SharedRemoveIfFar
+size 16x16
+
++Heart
+essential
+gfx SPActorBlocks
+run RunActorHeart
+draw DrawActorHeart
+after SharedRemoveIfFar
+size 16x16
+
++SmallHeart
+essential
+gfx SPActorBlocks
+run RunActorSmallHeart
+draw DrawActorSmallHeart
+after SharedRemoveIfFar
+size 16x16
+
 # ---------- actors that are really commands ----------
 +LoadActorsAhead
 essential

@@ -4273,6 +4273,119 @@ Frames:
   .word .loword(DSSordSwing+(512*4))
 .endproc
 
+.a16
+.i16
+.export RunActorSpring
+.proc RunActorSpring
+  ; Can't bounce on the spring if it's down already
+  lda ActorTimer,x
+  beq :+
+    dec ActorTimer,x
+    rtl
+  :
+
+  jsl PlayerActorCollision
+  bcc SpringNotTouched
+    ; Copied from BlockSpring
+    lda #.loword(-$70)
+    sta PlayerVY
+
+    lda PlayerPY
+    sub #4*256
+    cmp PlayerCameraTargetY
+    bcs :+
+      sta PlayerCameraTargetY
+    :
+
+    seta8
+    lda #30
+    sta PlayerJumpCancelLock
+    sta PlayerJumping
+    stz PlayerNeedsGround
+    seta16
+
+    ; For animation and cooldown
+    lda #5
+    sta ActorTimer,x
+SpringNotTouched:
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawActorSpring
+.proc DrawActorSpring
+  lda ActorTimer,x
+  bne :+
+  ; Spring not pressed
+  lda #<(-4)
+  sta SpriteXYOffset
+  lda #2|OAM_PRIORITY_2
+  jsl DispActor8x8WithOffset
+
+  lda #<(4)
+  sta SpriteXYOffset
+  lda #3|OAM_PRIORITY_2
+  jml DispActor8x8WithOffset
+
+: ; Spring pressed
+  lda #<(-4)
+  sta SpriteXYOffset
+  lda #4|OAM_PRIORITY_2
+  jsl DispActor8x8WithOffset
+
+  lda #<(4)
+  sta SpriteXYOffset
+  lda #4|OAM_XFLIP|OAM_PRIORITY_2
+  jml DispActor8x8WithOffset
+.endproc
+
+.a16
+.i16
+.export RunActorMoney
+.proc RunActorMoney
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawActorMoney
+.proc DrawActorMoney
+  lda #0|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunActorHeart
+.proc RunActorHeart
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawActorHeart
+.proc DrawActorHeart
+  lda #6|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+.a16
+.i16
+.export RunActorSmallHeart
+.proc RunActorSmallHeart
+  rtl
+.endproc
+
+.a16
+.i16
+.export DrawActorSmallHeart
+.proc DrawActorSmallHeart
+  lda #8|OAM_PRIORITY_2
+  jml DispActor16x16
+.endproc
+
+
 .export RunLoadActorsAhead
 .a16
 .proc RunLoadActorsAhead

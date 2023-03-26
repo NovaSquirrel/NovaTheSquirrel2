@@ -63,3 +63,4 @@
 7000 SPSwordSlime
 7000 SPStrifeCloud
 2400 FGLineFollowing
+7000 SPActorBlocks
