@@ -25,8 +25,6 @@
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 
 TURN_ANGLES = 64
-DrawCenterX = 128
-DrawCenterY = 192
 BlockUpdateAddress = BlockUpdateAddressTop
 
 ; Synchronize with the list on mode7actors.s
@@ -467,10 +465,6 @@ Loop:
   ; ---------------------------------------------
   ; - Mode 7 vblank tasks
   ; ---------------------------------------------
-  seta8
-  lda #$0f
-  sta PPUBRIGHT
-
   setaxy16
   .import nmi_hdma, new_hdma
   .importzp nmi_hdma_en, mode7_hdma_en
@@ -485,7 +479,6 @@ Loop:
   lda mode7_hdma_en
   sta HDMASTART
 
-  seta8
   ; Write to registers
   lda mode7_m7x+0
   sta M7X
@@ -525,8 +518,12 @@ Loop:
   jsl ppu_pack_oamhi_partial
   .a8 ; (does seta8)
 
+  lda #$0E
+  sta PPUBRIGHT
+
   jmp Loop
 .endproc
+
 
 .proc Mode7DrawPlayer
   setxy16
@@ -581,19 +578,21 @@ Loop:
   sta OAM_TILE+(4*7),y
 
   seta8
-  lda #DrawCenterX-16
+  lda #MODE_Y_SX-16
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
-  lda #DrawCenterY-12-16
+
+  lda #MODE_Y_SY - MODE_Y_mode7_height_BASE
+  sub mode7_height
+  sta OAM_YPOS+(4*2),y
+  sta OAM_YPOS+(4*3),y
+  sub #16
   sta OAM_YPOS+(4*0),y
   sta OAM_YPOS+(4*1),y
 
-  lda #DrawCenterX
+  lda #MODE_Y_SX
   sta OAM_XPOS+(4*1),y
   sta OAM_XPOS+(4*3),y
-  lda #DrawCenterY-12
-  sta OAM_YPOS+(4*2),y
-  sta OAM_YPOS+(4*3),y
 
   lda #10
   sta OAM_XPOS+(4*4),y
@@ -710,28 +709,6 @@ ForwardWallBitInside:
 
 ForwardPtrTile:
   .word .loword(-64), .loword(-1), .loword(64), .loword(1)
-
-; Not used?
-.proc CheckWallAhead
-  lda Mode7PlayerY
-  add ForwardYTile,x
-  cmp #64*16 ; Don't allow if this would make the player go out of bounds
-  bcs Block
-  tay
-  lda Mode7PlayerX
-  add ForwardXTile,x
-  cmp #64*16 ; Don't allow if this would make the player go out of bounds
-  bcs Block
-  jsr Mode7BlockAddress
-  tay
-  lda M7BlockFlags,y
-  and #15
-  cmp #1
-  rts
-Block:
-  sec
-  rts
-.endproc
 
 ; For the lookaround code above in the main loop
 .a16
@@ -1463,41 +1440,6 @@ GradientTable:     ;
    .byt $05, $80   ; 
    .byt $00        ; 
 
-M7A_M7B_Table1:
-  ; was 49 originally, but it looks like it has an incorrect scanline when I use 49 with indirect hdma?
-  .byt 48
-  .addr .loword(0)
-  .byt 128 | 127
-  .addr .loword(M7A_M7B_Buffer1Data)
-  .byt 128 | 49
-  .addr .loword(M7A_M7B_Buffer1Data+127*4)
-  .byt 0
-M7C_M7D_Table1:
-  .byt 48
-  .addr .loword(0)
-  .byt 128 | 127
-  .addr .loword(M7C_M7D_Buffer1Data)
-  .byt 128 | 49
-  .addr .loword(M7C_M7D_Buffer1Data+127*4)
-  .byt 0
-M7A_M7B_Table2:
-  .byt 48
-  .addr .loword(0)
-  .byt 128 | 127
-  .addr .loword(M7A_M7B_Buffer2Data)
-  .byt 128 | 49
-  .addr .loword(M7A_M7B_Buffer2Data+127*4)
-  .byt 0
-M7C_M7D_Table2:
-  .byt 48
-  .addr .loword(0)
-  .byt 128 | 127
-  .addr .loword(M7C_M7D_Buffer2Data)
-  .byt 128 | 49
-  .addr .loword(M7C_M7D_Buffer2Data+127*4)
-  .byt 0
-
-
 .segment "Mode7Tiles"
 .export Mode7Tiles
 Mode7Tiles:
@@ -1505,16 +1447,8 @@ Mode7Tiles:
 
 
 
-
-
-
-
-
-
-
-
 .segment "ZEROPAGE"
-height: .res 1
+mode7_height: .res 1
 
 .segment "C_Mode7Game"
 
@@ -1533,9 +1467,6 @@ height: .res 1
 .endproc
 
 
-
-
-
 ;
 ;
 ; =============================================================================
@@ -1552,20 +1483,20 @@ height: .res 1
 MODE_Y_SX = 128
 MODE_Y_SY = 168
 ; minimum height of bird above the ground (height is 0-128 + this)
-MODE_Y_HEIGHT_BASE = 16
+MODE_Y_mode7_height_BASE = 16
 
 set_mode_y:
 	seta16
 	setxy8
 	ldx #1
 	stx z:pv_wrap
-	ldy #64
-	sty z:height ; halfway up
+	ldy #0
+	sty mode7_height
 mode_y:
 	seta16
 	setxy8
 	; L/R = up/down
-	ldx z:height
+	ldx z:mode7_height
 	lda keydown
 	and #$0010 ; R for up
 	beq :+
@@ -1580,7 +1511,7 @@ mode_y:
 		bcc :+
 		dex
 	:
-	stx z:height
+	stx z:mode7_height
 	; rotate with left/right
 	ldx z:angle
 	lda keydown
@@ -1599,23 +1530,24 @@ mode_y:
 	; generate perspective
 	; --------------------
 	; set horizon
-	lda z:height
+	lda z:mode7_height
 	and #$00FF
 	lsr
 	clc
 	adc #32
 	tax
-	sta z:pv_l0 ; l0 = 32+(height/2)  [32-96]
+	sta z:pv_l0 ; First scanline. l0 = 32+(mode7_height/2)  [32-96]
 	ldx #224
-	stx z:pv_l1
+	stx z:pv_l1 ; Last scanline + 1
+
 	; set view scale
-	lda z:height
+	lda z:mode7_height
 	and #$00FF
 	asl
 	clc
 	adc #384
 	sta z:pv_s0 ; 384 + (height*2)    [384-640]
-	lda z:height
+	lda z:mode7_height
 	and #$00FF
 	lsr
 	adc #64
@@ -1660,7 +1592,6 @@ mode_y:
 	lda keydown
 	and #$0800 ; up
 	beq :+
-        wdm 0
 		; X -= B * 2
 		lda #0
 		sec
@@ -1709,55 +1640,6 @@ mode_y:
 	ldy #MODE_Y_SY ; place focus at centre of scanline SY
 	.import pv_set_origin
 	jsr pv_set_origin
-
-	.if 0
-	; animate and draw sprites and stats
-	; ----------------------------------
-	jsr oam_sprite_clear
-	; draw flying bird
-	lda #MODE_Y_SX
-	sta z:screenx
-	lda #MODE_Y_SY - MODE_Y_HEIGHT_BASE
-	sec
-	sbc z:height
-	and #$00FF
-	sta z:screeny
-	ldx #0
-	; animate bird 0,4,8,4 pattern
-	lda z:nmi_count
-	lsr
-	and #$000C ; +4 every 8 frames
-	cmp #$000C
-	bcc :+
-		lda #$0004
-	:
-	ora z:player_tile
-	and #$00FF
-	jsr oam_sprite
-
-	; demonstrate texel to screen mapping
-	lda #PIN_TX
-	sta z:texelx
-	lda #PIN_TY
-	sta z:texely
-	jsr pv_texel_to_screen
-	ldx #4
-	lda #$8C ; arrow
-	jsr oam_sprite
-	; shadow at focus
-	lda #MODE_Y_SX
-	sta z:screenx
-	lda #MODE_Y_SY
-	sta z:screeny
-	lda z:height
-	lsr
-	lsr
-	lsr
-	and #$000C
-	ora #$0100 ; shadow sprite selected by height
-	ldx #8
-	jsr oam_sprite
-	.endif
 
 	rts
 
