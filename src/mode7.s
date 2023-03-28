@@ -347,10 +347,6 @@ RestoredFromCheckpoint:
   ldy #BlockUpdateDataEnd-BlockUpdateAddress
   jsl MemClear
 
-  ; Initialize the HDMA table and mode 7 scroll
-  jsr BuildHDMATable
-  jsr CalculateScroll
-
   ldx #0
   jsl ppu_clear_oam
 
@@ -454,7 +450,7 @@ DontIncreaseChipCounter:
 
   jsr MakeCheckpoint
 .endproc
-
+; Falls through into DizworldMainLoop
 
 .proc DizworldMainLoop
   jsr set_mode_y
@@ -462,16 +458,22 @@ Loop:
   setaxy16
   inc framecount
 
+  jsl prepare_ppu_copy_oam_partial
+  seta8
   jsl WaitVblank
+  ; AXY size preserved, so still .a8 .i16
+  jsl ppu_copy_oam_partial
 
-
+  ; ---------------------------------------------
+  ; - Mode 7 vblank tasks
+  ; ---------------------------------------------
   seta8
   lda #$0f
   sta PPUBRIGHT
 
   setaxy16
   .import nmi_hdma, new_hdma
-  .importzp nmi_hdma_en, new_hdma_en
+  .importzp nmi_hdma_en, mode7_hdma_en
   phb
   ldx #.loword(new_hdma)
   ldy #$4300
@@ -480,675 +482,55 @@ Loop:
   plb
 
   seta8
-  lda new_hdma_en
-  sta a:$420C
-
-
-  ; -----------------------------------
-;  lda #.loword(M7A_M7B_Table1)
-;  sta DMAADDR+$20
-;  lda #.loword(M7C_M7D_Table1)
-;  sta DMAADDR+$30
-;  lda framecount
-;  lsr
-;  bcc :+
-;    lda #.loword(M7A_M7B_Table2)
-;    sta DMAADDR+$20
-;    lda #.loword(M7C_M7D_Table2)
-;    sta DMAADDR+$30
-;  :
-
-.if 0
-  .import pv_hdma_ab0
-  .import pv_hdma_abi0, pv_hdma_abi1, pv_hdma_cdi0, pv_hdma_cdi1
-  lda #.loword(pv_hdma_abi0)
-  sta DMAADDR+$20
-  lda #.loword(pv_hdma_cdi0)
-  sta DMAADDR+$30
-  lda framecount
-  lsr
-  bcc :+
-    lda #.loword(pv_hdma_abi1)
-    sta DMAADDR+$20
-    lda #.loword(pv_hdma_cdi1)
-    sta DMAADDR+$30
-  :
-
-  lda #.loword(GradientTable)
-  sta DMAADDR+$40
-  lda #(<M7A << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7a and m7b
-  sta DMAMODE+$20
-  lda #(<M7C << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7c and m7d
-  sta DMAMODE+$30
-  lda #(<COLDATA <<8) ; one byte to COLDATA
-  sta DMAMODE+$40
-.endif
-
-  lda #220
-  sta HTIME
-  lda #48
-  sta VTIME
+  lda mode7_hdma_en
+  sta HDMASTART
 
   seta8
-;  lda #^pv_hdma_abi0
-;  sta DMAADDRBANK+$20
-;  sta DMAADDRBANK+$30
-;  lda #^pv_hdma_ab0
-;  sta HDMAINDBANK+$20
-;  sta HDMAINDBANK+$30
-
-;  lda #^GradientTable
-;  sta DMAADDRBANK+$40
-
-;  lda #4|8|16
-;  sta HDMASTART
-
   ; Write to registers
-  lda nmi_m7x+0
+  lda mode7_m7x+0
   sta M7X
-  lda nmi_m7x+1
+  lda mode7_m7x+1
   sta M7X
-
-  lda nmi_m7y+0
+  ;---
+  lda mode7_m7y+0
   sta M7Y
-  lda nmi_m7y+1
+  lda mode7_m7y+1
   sta M7Y
-
-  lda nmi_hofs+0
+  ;---
+  lda mode7_hofs+0
   sta BG1HOFS
-  lda nmi_hofs+1
+  lda mode7_hofs+1
   sta BG1HOFS
-  lda nmi_vofs+0
+  lda mode7_vofs+0
   sta BG1VOFS
-  lda nmi_vofs+1
+  lda mode7_vofs+1
   sta BG1VOFS
-
+  ;---
   lda #$0F
-  sta PPUBRIGHT ; Turn on rendering
-  lda #%11100000 ; Reset COLDATA
-  sta COLDATA
+  sta PPUBRIGHT
 
-  lda #0          ; Color math is always enabled
-  sta CGWSEL
-  lda #%00100000  ; Color math when the background color is used
+  stz CGWSEL      ; Color math is always enabled
+  lda #$23        ; Enable additive blend on BG1 + BG2 + backdrop
   sta CGADSUB
 
-  jsl WaitKeysReady
+  ; ---------------------------------------------
+  ; - Calculate stuff for the next frame!
+  ; ---------------------------------------------
+  jsl WaitKeysReady ; Also clears OamPtr
   seta16
-
   jsr mode_y
 
-  seta8
-  lda #$0d
-  sta PPUBRIGHT
-  lda #7
-  sta BGMODE
+  jsr Mode7DrawPlayer
 
-  setaxy16
+  jsl ppu_pack_oamhi_partial
+  .a8 ; (does seta8)
+
   jmp Loop
 .endproc
 
-
-.proc Mode7MainLoop
-  jmp DizworldMainLoop
-Loop:
-  setaxy16
-  inc framecount
-
-  jsl WaitVblank
-  jsl ppu_copy_oam
-
-  ; Upload the dynamic tile area
-  seta8
-  ldy #DMAMODE_PPUHIDATA
-  sty DMAMODE
-  lda #INC_DATAHI
-  sta PPUCTRL
-  lda #^Mode7DynamicTileBuffer
-  sta DMAADDRBANK
-  ldy #.loword(Mode7DynamicTileBuffer)
-  sty DMAADDR
-  ldy #28*64
-  sty DMALEN
-  ldy #(14*16+4)*64
-  sty PPUADDR
-  lda #1
-  sta COPYSTART
+.proc Mode7DrawPlayer
+  setxy16
   seta16
-
-  ; -----------------------------------
-  seta8
-  stz PPUCTRL
-  seta16
-  ; Do block updates.
-  ; The second bytes of the tile numbers aren't normally used, because Mode 7 has 8-bit tile numbers,
-  ; so they're repurposed here.
-  ldx #(BLOCK_UPDATE_COUNT-1)*2
-BlockUpdateLoop:
-  lda BlockUpdateDataTL+1,x ; Repurposed to be an update size/shape
-  and #255
-  jeq SkipBlock
-  dea
-  beq @Square
-  dea
-  beq @Tall
-@Wide:
-  jsr Mode7DoBlockUpdateWide
-  bra SkipBlock
-@Tall:
-  jsr Mode7DoBlockUpdateTall
-  bra SkipBlock
-@Square: ; 2x2
-  .a16
-  lda BlockUpdateAddress,x
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataTL,x
-  sta PPUDATA
-  lda BlockUpdateDataTR,x
-  sta PPUDATA
-  seta16
-  lda BlockUpdateAddress,x ; Move down a row
-  add #128
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataBL,x
-  sta PPUDATA
-  lda BlockUpdateDataBR,x
-  sta PPUDATA
-  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
-SkipBlock:
-  seta16
-  dex
-  dex
-  jpl BlockUpdateLoop
-  seta8
-  lda #INC_DATAHI
-  sta PPUCTRL
-
-  seta16
-  ; -----------------------------------
-  ; Update the HUD
-  lda #($c000 >> 1) + NTXY(6, 2)
-  sta PPUADDR
-  HUD_Base = 64 + (7 << 10)
-  lda #12 | HUD_Base
-  sta PPUDATA
-  ina
-  sta PPUDATA
-  lda Mode7ChipsLeft
-  bne :+
-    lda #1|HUD_Base
-    sta PPUDATA
-    sta PPUDATA
-    bra @TopWasZero
-  :
-  lsr
-  lsr
-  lsr
-  lsr
-  add #2 | HUD_Base
-  sta PPUDATA
-  lda Mode7ChipsLeft
-  and #$0f
-  add #2 | HUD_Base
-  sta PPUDATA
-@TopWasZero:
-  ;--- (Bottom)
-  lda #($c000 >> 1) + NTXY(6, 3)
-  sta PPUADDR
-  lda #$10+12 | HUD_Base
-  sta PPUDATA
-  ina
-  sta PPUDATA
-  lda Mode7ChipsLeft
-  bne :+
-    lda #$11|HUD_Base
-    sta PPUDATA
-    sta PPUDATA
-    bra @BottomWasZero
-  :
-  lsr
-  lsr
-  lsr
-  lsr
-  add #$12 | HUD_Base
-  sta PPUDATA
-  lda Mode7ChipsLeft
-  and #$0f
-  add #$12 | HUD_Base
-  sta PPUDATA
-@BottomWasZero:
-
-  ; -----------------------------------
-  ; Start preparing the HDMA
-  lda Mode7RealAngle
-  asl
-  tax
-
-  ; Double buffering
-  lda #.loword(M7A_M7B_Table1)
-  sta DMAADDR+$20
-  lda #.loword(M7C_M7D_Table1)
-  sta DMAADDR+$30
-  lda framecount
-  lsr
-  bcc :+
-    lda #.loword(M7A_M7B_Table2)
-    sta DMAADDR+$20
-    lda #.loword(M7C_M7D_Table2)
-    sta DMAADDR+$30
-  :
-
-  lda #.loword(GradientTable)
-  sta DMAADDR+$40
-  lda #(<M7A << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7a and m7b
-  sta DMAMODE+$20
-  lda #(<M7C << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7c and m7d
-  sta DMAMODE+$30
-  lda #(<COLDATA <<8) ; one byte to COLDATA
-  sta DMAMODE+$40
-
-  lda #220
-  sta HTIME
-  lda #48
-  sta VTIME
-  seta8
-  lda #^M7A_M7B_Table1
-  sta DMAADDRBANK+$20
-  sta DMAADDRBANK+$30
-  lda #^HDMA_Buffer1
-  sta HDMAINDBANK+$20
-  sta HDMAINDBANK+$30
-
-  lda #^GradientTable
-  sta DMAADDRBANK+$40
-
-  lda #4|8|16
-  sta HDMASTART
-
-  lda #$0F
-  sta PPUBRIGHT ; Turn on rendering
-  lda #%11100000 ; Reset COLDATA
-  sta COLDATA
-
-  lda #0          ; Color math is always enabled
-  sta CGWSEL
-  lda #%00100000  ; Color math when the background color is used
-  sta CGADSUB
-
-  lda #VBLANK_NMI|AUTOREAD|HVTIME_IRQ ; enable HV IRQ
-  sta PPUNMI
-  cli
-
-  ; Initialize the scroll registers
-  seta8
-  lda Mode7ScrollX+0
-  sta BGSCROLLX
-  lda Mode7ScrollX+1
-  sta BGSCROLLX
-  lda Mode7ScrollY+0
-  sta BGSCROLLY
-  lda Mode7ScrollY+1
-  sta BGSCROLLY
-
-  ; Calculate the centers
-  seta16
-  lda Mode7ScrollX
-  add #DrawCenterX
-  seta8
-  sta M7X
-  xba
-  sta M7X
-  seta16
-  lda Mode7ScrollY
-  add #DrawCenterY
-  seta8
-  sta M7Y
-  xba
-  sta M7Y
-
-  jsl WaitKeysReady
-  seta16
-
-  ; ---------------
-
-  ; Save player X ORed with player Y so we can know if the player was moving last frame
-  lda Mode7PlayerX
-  ora Mode7PlayerY
-  pha ; Hold onto this for a long while
-
-  ; ---------------
-
-  lda Mode7Turning
-  bne :+
-  lda keynew
-  and #KEY_X
-  beq :+
-    lda Mode7DoLookAround
-    ina
-    sta Mode7DoLookAround
-  :
-
-  ; If you're currently looking around, allow using the d-pad to move the camera offset
-  lda Mode7DoLookAround
-  jeq DontLookAround
-    ; If snapping back, move back to the player
-    lda Mode7DoLookAround
-    cmp #1
-    beq AllowLookAround
-      ina
-      sta Mode7DoLookAround
-      cmp #20
-      bcc :+
-        stz Mode7DoLookAround
-        stz Mode7LookAroundOffsetX
-        stz Mode7LookAroundOffsetY
-      :
-
-      lda Mode7LookAroundOffsetX
-      pha
-      asr_n 2
-      rsb Mode7LookAroundOffsetX
-      sta Mode7LookAroundOffsetX
-      pla
-      cmp Mode7LookAroundOffsetX
-      bne :+
-        stz Mode7LookAroundOffsetX
-      :
-
-      lda Mode7LookAroundOffsetY
-      pha
-      asr_n 2
-      rsb Mode7LookAroundOffsetY
-      sta Mode7LookAroundOffsetY
-      pla
-      cmp Mode7LookAroundOffsetY
-      bne :+
-        stz Mode7LookAroundOffsetY
-      :
-
-      bra DontLookAround
-  AllowLookAround:
-    ; If not snapping back to the player, move around in response to the keys
-    lda keydown
-    and #KEY_LEFT
-    beq :+
-      lda Mode7Direction
-      ina
-      jsr AddLookAroundDirection
-    :
-    lda keydown
-    and #KEY_DOWN
-    beq :+
-      lda Mode7Direction
-      ina
-      ina
-      jsr AddLookAroundDirection
-    :
-    lda keydown
-    and #KEY_UP
-    beq :+
-      lda Mode7Direction
-      jsr AddLookAroundDirection
-    :
-    lda keydown
-    and #KEY_RIGHT
-    beq :+
-      lda Mode7Direction
-      dea
-      jsr AddLookAroundDirection
-    :
-  DontLookAround:
-
-  lda keydown
-  and #KEY_LEFT|KEY_A
-  cmp #KEY_LEFT|KEY_A
-  bne :+
-    trb keydown
-    lda #KEY_L
-    tsb keydown
-  :
-  lda keydown
-  and #KEY_RIGHT|KEY_A
-  cmp #KEY_RIGHT|KEY_A
-  bne :+
-    trb keydown
-    lda #KEY_R
-    tsb keydown
-  :
-
-  lda Mode7DoLookAround
-  ora Mode7Oops
-  jne DontMoveForward
-  lda Mode7Turning
-  jne AlreadyTurning
-    lda keydown
-    and #KEY_LEFT|KEY_RIGHT
-    tsb Mode7TurnWanted
-
-    ; Can't turn except directly on a tile
-    lda Mode7PlayerX
-    ora Mode7PlayerY
-    and #15
-    php
-
-    beq :+
-      ; But you set SidestepWanted while moving forward/backward and also pressing the sidestep key
-      lda Mode7Direction
-      eor Mode7MoveDirection
-      lsr
-      bcs :+
-
-      lda keydown
-      and #KEY_L|KEY_R
-      tsb Mode7SidestepWanted
-    :
-
-    plp
-    jne AlreadyTurning
-
-.if 0
-    lda keydown
-    and #KEY_B
-    beq NotStop
-      lda keydown
-      and #KEY_UP
-      beq :+
-        stz Mode7TurnWanted
-      :
-      jmp WasRotation
-    NotStop:
-.endif
-
-    lda Mode7TurnWanted
-    and #KEY_RIGHT
-    beq :+
-      dec Mode7Turning
-      lda Mode7Direction
-      dec
-      and #3
-      sta Mode7Direction
-      stz Mode7TurnWanted
-    :
-
-    lda Mode7TurnWanted
-    and #KEY_LEFT
-    beq :+
-      inc Mode7Turning
-      lda Mode7Direction
-      inc
-      and #3
-      sta Mode7Direction
-      stz Mode7TurnWanted
-    :
-  AlreadyTurning:
-
-  lda Mode7Turning
-  beq NoRotation
-    lda Mode7RealAngle
-    add Mode7Turning
-    and #TURN_ANGLES-1
-    sta Mode7RealAngle
-    and #(TURN_ANGLES/4)-1
-    bne NoRotation
-      stz Mode7Turning
-NoRotation:
-
-  ; If not rotating, allow moving forward
-  lda Mode7PlayerX
-  ora Mode7PlayerY
-  and #15
-  bne @NotAligned
-    lda keydown
-    ora Mode7SidestepWanted
-    and #KEY_L
-    beq :+
-      stz Mode7SidestepWanted
-      lda Mode7Direction
-      ina
-      and #3
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
-
-    lda keydown
-    ora Mode7SidestepWanted
-    and #KEY_R
-    beq :+
-      stz Mode7SidestepWanted
-      lda Mode7Direction
-      dec
-      and #3
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
-
-    lda keydown
-    and #KEY_UP
-    beq :+
-      lda Mode7Direction
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
-
-    lda keydown
-    and #KEY_DOWN
-    beq :+
-      lda Mode7Direction
-      eor #2
-      sta Mode7MoveDirection
-      bra @StartMoving
-    :
-
-    lda Mode7ForceMove
-    bpl :+
-    @DoForceMoveAnyway:
-      lda Mode7ForceMove
-      and #3
-      sta Mode7MoveDirection
-      stz Mode7ForceMove
-      bra @StartMoving
-    :
-
-    jmp WasRotation
-@NotAligned:
-@StartMoving:
-
-  ; If moving and not rotating, move forward
-  lda Mode7MoveDirection
-  asl
-  tax
-
-  ; Don't check for walls except when moving onto a new block
-  lda Mode7PlayerX
-  ora Mode7PlayerY
-  and #15
-  bne @NotWall
-
-  lda Mode7PlayerX
-  ldy Mode7PlayerY
-  jsr Mode7BlockAddress
-  tay
-  lda M7BlockFlags,y
-  and #15
-  cmp #15
-  beq @DontCheckSolidInside
-    and ForwardWallBitInside,x
-    bne DontMoveForward
-  @DontCheckSolidInside:
-
-  ; Is there a wall one block ahead?
-  lda Mode7PlayerY
-  add ForwardYTile,x
-  cmp #64*16 ; Don't allow if this would make the player go out of bounds
-  bcs DontMoveForward
-  tay
-  lda Mode7PlayerX
-  add ForwardXTile,x
-  cmp #64*16 ; Don't allow if this would make the player go out of bounds
-  bcs DontMoveForward
-  jsr Mode7BlockAddress
-  tay
-  lda M7BlockFlags,y
-  and ForwardWallBitOutside,x
-  beq @NotWall
-@IsWall:
-    lda [LevelBlockPtr]
-    and #255
-    jsr CallBlockBump
-    bra DontMoveForward
-  @NotWall:
-
-  ; Countering a force move by sidestepping?
-  ; Check at this point because a blocked move against a wall shouldn't cancel it
-  lda Mode7ForceMove
-  bpl @NoForceMove
-    bit #$4000 ; If it's ice, you can't 
-    bne @DoForceMoveAnyway
-    eor Mode7MoveDirection
-    lsr
-    bcc @DoForceMoveAnyway
-    stz Mode7ForceMove
-  @NoForceMove:
-
-  ; Save the direction for ice purposes
-  lda Mode7MoveDirection
-  sta Mode7IceDirection
-
-  ; Move forward after all
-  lda Mode7PlayerX
-  add ForwardX,x
-  sta Mode7PlayerX
-
-  lda Mode7PlayerY
-  add ForwardY,x
-  sta Mode7PlayerY
-DontMoveForward:
-WasRotation:
-
-  ; Make it so that 0,0 places the player on the top left corner of the map
-  jsr CalculateScroll
-
-; Star I was using to show the player position initially
-.if 0
-  ldy OamPtr
-  lda #$68|OAM_PRIORITY_2
-  sta OAM_TILE,y
-  seta8
-  lda #128-4
-  sta OAM_XPOS,y
-  lda #192-4
-  sta OAM_YPOS,y
-  lda #0
-  sta OAMHI+1,y
-  seta16
-  tya
-  add #4
-  sta OamPtr
-.endif
-
-  ; Decide which portrait to use
   lda #PORTRAIT_NORMAL
   sta Mode7Portrait
 
@@ -1165,62 +547,8 @@ WasRotation:
     lda #PORTRAIT_BLINK
     sta Mode7Portrait
   :
-  
 
-  lda Mode7HappyTimer
-  beq :+
-    lda #PORTRAIT_HAPPY
-    sta Mode7Portrait
-    dec Mode7HappyTimer
-  :
-  lda Mode7Oops
-  beq :+
-    lda #PORTRAIT_OOPS
-    sta Mode7Portrait
-    dec Mode7Oops
-    jeq Mode7Die
-  :
-
-  lda Mode7DoLookAround
-  beq DoDrawPlayer
-    ldy OamPtr
-    lda #PORTRAIT_LOOK
-    sta OAM_TILE+(4*0),y
-    ora #$02
-    sta OAM_TILE+(4*1),y
-    lda #PORTRAIT_LOOK
-    ora #$04
-    sta OAM_TILE+(4*2),y
-    ora #$02
-    sta OAM_TILE+(4*3),y
-
-    seta8
-    lda #10
-    sta OAM_XPOS+(4*0),y
-    sta OAM_XPOS+(4*2),y
-    sta OAM_YPOS+(4*0),y
-    sta OAM_YPOS+(4*1),y
-    lda #10+16
-    sta OAM_XPOS+(4*1),y
-    sta OAM_XPOS+(4*3),y
-    sta OAM_YPOS+(4*2),y
-    sta OAM_YPOS+(4*3),y
-
-    ; Portrait
-    lda #$02
-    sta OAMHI+1+(4*0),y
-    sta OAMHI+1+(4*1),y
-    sta OAMHI+1+(4*2),y
-    sta OAMHI+1+(4*3),y
-    seta16
-    tya
-    add #4*4
-    sta OamPtr
-
-    jmp DontDrawPlayer
-  DoDrawPlayer:
-
-  ; Draw a crappy temporary walk animation
+  ; Draw the player
   ldy OamPtr
   lda keydown
   and #KEY_UP|KEY_DOWN|KEY_L|KEY_R
@@ -1267,7 +595,6 @@ WasRotation:
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
 
-
   lda #10
   sta OAM_XPOS+(4*4),y
   sta OAM_XPOS+(4*6),y
@@ -1278,8 +605,6 @@ WasRotation:
   sta OAM_XPOS+(4*7),y
   sta OAM_YPOS+(4*6),y
   sta OAM_YPOS+(4*7),y
-
-
 
   lda #$02
   sta OAMHI+1+(4*0),y
@@ -1295,131 +620,6 @@ WasRotation:
   tya
   add #8*4
   sta OamPtr
-DontDrawPlayer:
-
-
-  ; Don't respond to special floors when you weren't moving last frame
-  pla ; Mode7PlayerX|Mode7PlayerY
-  and #15
-  beq DontRunSpecialFloor
-
-  ; Respond to special floors when you're in the middle of a block
-  lda Mode7PlayerX
-  ora Mode7PlayerY
-  and #15
-  bne DontRunSpecialFloor
-    lda Mode7LastPositionPtr
-    beq :+
-      sta LevelBlockPtr
-      lda [LevelBlockPtr]
-      and #255
-      jsr CallBlockExit
-    :
-
-    lda Mode7PlayerX
-    ldy Mode7PlayerY
-    jsr Mode7BlockAddress
-    pha
-    lda LevelBlockPtr
-    sta Mode7LastPositionPtr
-    pla
-    jsr CallBlockEnter
-  DontRunSpecialFloor:
-
-  setaxy16
-
-  jsr Mode7DrawInventory
-
-  ldx OamPtr
-  jsl ppu_clear_oam
-  jsl ppu_pack_oamhi
-
-  jsr BuildHDMATable
-
-  ; Test for the moving sprite system
-.if 0
-  lda keynew
-  and #KEY_B
-  beq :+
-    ldx Mode7PlayerX
-    ldy Mode7PlayerY
-    lda #2*2
-    .import Mode7CreateActor
-    jsr Mode7CreateActor
-  :
-.endif
-
-  ; Leave select as a way to reset to the checkpoint
-  lda keynew
-  and #KEY_SELECT
-  beq :+
-    jsr M7BlockHurt
-  :
-
-  .import Mode7RunActors
-  jsr Mode7RunActors
-
-  jmp Loop
-
-  rtl
-.endproc
-
-.proc Mode7DoBlockUpdateWide
-  ; 3x2, BL+1 and BR+1 go to the right
-  .a16
-  lda BlockUpdateAddress,x
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataTL,x
-  sta PPUDATA
-  lda BlockUpdateDataTR,x
-  sta PPUDATA
-  lda BlockUpdateDataBL+1,x
-  sta PPUDATA
-  seta16
-  lda BlockUpdateAddress,x ; Move down a row
-  add #128
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataBL,x
-  sta PPUDATA
-  lda BlockUpdateDataBR,x
-  sta PPUDATA
-  lda BlockUpdateDataBR+1,x
-  sta PPUDATA
-  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
-  rts
-.endproc
-
-.proc Mode7DoBlockUpdateTall
-  ; 2x3, BL+1 and BR+1 go below
-  .a16
-  lda BlockUpdateAddress,x
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataTL,x
-  sta PPUDATA
-  lda BlockUpdateDataTR,x
-  sta PPUDATA
-  seta16
-  lda BlockUpdateAddress,x ; Move down a row
-  add #128
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataBL,x
-  sta PPUDATA
-  lda BlockUpdateDataBR,x
-  sta PPUDATA
-  seta16
-  lda BlockUpdateAddress,x ; Move down two rows
-  add #256
-  sta PPUADDR
-  seta8
-  lda BlockUpdateDataBL+1,x
-  sta PPUDATA
-  lda BlockUpdateDataBR+1,x
-  sta PPUDATA
-  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
   rts
 .endproc
 
@@ -1491,56 +691,6 @@ AddOneSprite:
   lda CurrentXY
   add #16
   sta CurrentXY
-  rts
-.endproc
-
-.a16
-.i16
-.proc BuildHDMATable
-  ; Build the HDMA table for the matrix registers,
-  ; allowing them to be compressed significantly.
-  lda Mode7RealAngle
-  asl
-  tax
-  ldy m7a_m7b_list,x ; Should be the same bank as this one
-
-  ; Counter for how many rows are left
-  lda #224-48
-  sta 0
-
-  ; Switch the data bank.
-  ; Probably actually better than switching to 8-bit mode and back to do it.
-  ph2banks m7a_m7b_0, StartMode7Level
-  plb
-
-  ; Write index
-  ldx #0
-  lda framecount
-  lsr
-  bcs :+
-    ldx #0+2048
-  :
-BuildHDMALoop:
-  lda 2*176*(TURN_ANGLES/4),y ; M7A
-  sta f:M7A_M7B_Buffer1Data+0,x
-  sta f:M7C_M7D_Buffer1Data+2,x
-  lda 0,y ; M7B
-  sta f:M7A_M7B_Buffer1Data+2,x
-  eor #$ffff
-  ina
-  sta f:M7C_M7D_Buffer1Data+0,x
-
-  inx ; Next HDMA table entry
-  inx
-  inx
-  inx
-  iny ; Next perspective table entry
-  iny
-  dec 0
-  bne BuildHDMALoop
-
-  ; Set B back to this bank
-  plb
   rts
 .endproc
 
@@ -2395,7 +1545,7 @@ height: .res 1
 ; - L/R raises/lowers view
 ;
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp nmi_bgmode, nmi_hofs, nmi_vofs, nmi_m7t, nmi_m7x, nmi_m7y, nmi_cgwsel, nmi_cgadsub, nmi_bg2hofs, nmi_bg2vofs, nmi_tm, new_hdma_en, nmi_hdma_en
+.globalzp mode7_hofs, mode7_vofs, nmi_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
 .globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
 
 ; focus location on ground
@@ -2407,13 +1557,7 @@ MODE_Y_HEIGHT_BASE = 16
 set_mode_y:
 	seta16
 	setxy8
-	; colormath
-	ldx #$00
-	stx z:nmi_cgwsel ; fixed colour
-	ldx #$23
-	stx z:nmi_cgadsub ; enable additive blend on BG1 +BG2 + backdrop
 	ldx #1
-	stx z:nmi_bgmode
 	stx z:pv_wrap
 	ldy #64
 	sty z:height ; halfway up

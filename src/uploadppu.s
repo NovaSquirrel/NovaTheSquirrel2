@@ -192,11 +192,30 @@ packloop:
   rtl
 .endproc
 
+; Calculates some of the math ahead of time to use in ppu_copy_oam_partial
+.proc prepare_ppu_copy_oam_partial
+OamPartialCopy512Sub        = DecodePointer ; has 3 bytes and then 3 bytes for ScriptPointer
+OamPartialCopyDivide16      = DecodePointer + 2
+OamPartialCopyDivide16Rsb32 = DecodePointer + 4
+  seta16
+  lda #512
+  sub OamPtr
+  sta OamPartialCopy512Sub
+  lda OamPtr
+  lsr
+  lsr
+  lsr
+  lsr
+  sta OamPartialCopyDivide16
+  rsb #32
+  sta OamPartialCopyDivide16Rsb32
+  rtl
+.endproc
+
 ;;
 ; Copies packed OAM data to the S-PPU using DMA channel 0
 ; and hides unused sprites using DMA channel 1
 .proc ppu_copy_oam_partial
-; From ppu_copy_oam_partial
 OamPartialCopy512Sub        = DecodePointer ; has 3 bytes and then 3 bytes for ScriptPointer
 OamPartialCopyDivide16      = DecodePointer + 2
 OamPartialCopyDivide16Rsb32 = DecodePointer + 4

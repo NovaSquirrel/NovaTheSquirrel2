@@ -99,22 +99,10 @@ VblankHandler:
   ; Pack the second OAM table together into the format the PPU expects
   jsl ppu_pack_oamhi_partial
   .a8 ; (does seta8)
+
   ; And then prepare the DMA values we'll use in ppu_copy_oam_partial
   ; which we can call once we're in vblank
-
-  seta16
-  lda #512
-  sub OamPtr
-  sta OamPartialCopy512Sub
-  lda OamPtr
-  lsr
-  lsr
-  lsr
-  lsr
-  sta OamPartialCopyDivide16
-  rsb #32
-  sta OamPartialCopyDivide16Rsb32
-
+  jsl prepare_ppu_copy_oam_partial
   seta8
   jsl WaitVblank
   ; AXY size preserved, so still .a8 .i16

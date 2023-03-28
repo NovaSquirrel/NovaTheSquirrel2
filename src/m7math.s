@@ -14,7 +14,7 @@
 .segment "ZEROPAGE" ; < $100
 temp = 0
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp nmi_bgmode, nmi_hofs, nmi_vofs, nmi_m7t, nmi_m7x, nmi_m7y, nmi_cgwsel, nmi_cgadsub, nmi_bg2hofs, nmi_bg2vofs, nmi_tm, new_hdma_en, nmi_hdma_en
+.globalzp mode7_hofs, mode7_vofs, nmi_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
 .globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
 
 angle:        .res 1 ; for spinning modes
@@ -36,20 +36,15 @@ texely:       .res 2
 screenx:      .res 2
 screeny:      .res 2
 
-nmi_bgmode:   .res 1 ; hardware settings applied when nmi_ready
-nmi_hofs:     .res 2
-nmi_vofs:     .res 2
+mode7_hofs:     .res 2
+mode7_vofs:     .res 2
 nmi_m7t:      .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
-nmi_m7x:      .res 2
-nmi_m7y:      .res 2
-nmi_cgwsel:   .res 1
-nmi_cgadsub:  .res 1
-nmi_bg2hofs:  .res 2
-nmi_bg2vofs:  .res 2
-nmi_tm:       .res 1
+mode7_m7x:      .res 2
+mode7_m7y:      .res 2
+mode7_bg2hofs:  .res 2
+mode7_bg2vofs:  .res 2
 
-new_hdma_en:  .res 1 ; HDMA channel enable at next update
-nmi_hdma_en:  .res 1 ; HDMA channel enable currently
+mode7_hdma_en:  .res 1 ; HDMA channel enable at next update
 
 ; perspective
 ; inputs
@@ -61,6 +56,7 @@ pv_s1:        .res 2 ; horizontal texel distance at l1
 pv_sh:        .res 2 ; vertical texel distance from l0 to l1, sh=0 to copy s0 scale for efficiency: (s0*(l1-l0)/256)
 pv_interp:    .res 1 ; interpolate every X lines, 0,1=1x (no interpolation, 2=2x, 4=4x, other values invalid
 pv_wrap:      .res 1 ; 0 if no wrapping, 1 if wrapping (does not affect PPU wrapping)
+
 ; temporaries
 pv_zr:        .res 2 ; interpolated 1/Z
 pv_zr_inc:    .res 2 ; zr increment per line
@@ -71,9 +67,8 @@ pv_interps:   .res 2 ; interpolate * 4 for stride increment
 
 
 .segment "BSS7E"
-.export nmi_hdma, new_hdma
+.export new_hdma
 new_hdma:     .res 16 * 8 ; HDMA channel settings to apply at next update
-nmi_hdma:     .res 16 * 8 ; HDMA channel settings current
 
 ; HDMA double-buffer for perspective
 .export pv_hdma_ab0, pv_hdma_cd0, pv_hdma_bgm0, pv_hdma_tm0, pv_hdma_abi0, pv_hdma_cdi0, pv_hdma_col0
@@ -95,7 +90,6 @@ pv_hdma_abi1: .res 16
 pv_hdma_cdi1: .res 16
 pv_hdma_col1: .res 16
 PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
-
 
 .a8
 .i8
@@ -129,10 +123,10 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 
 ; unsigned 16-bit multiply, 32-bit result
 ; Written by 93143: https://forums.nesdev.org/viewtopic.php?p=280089#p280089
-umul16: ; math_a x math_b = math_p, clobbers A/X/Y
+.a16
+.i8
+.proc umul16 ; math_a x math_b = math_p, clobbers A/X/Y
 	; DB = 0
-	.a16
-	.i8
 	ldx z:math_a+0
 	stx a:CPUMCAND
 	ldy z:math_b+0
@@ -159,12 +153,13 @@ umul16: ; math_a x math_b = math_p, clobbers A/X/Y
 	adc a:CPUPROD
 	sta z:math_p+2    ; 00AA + 0BB0 + 0CC0 + DD00
 	rts
+.endproc
 
 ; signed 16-bit x 8-bit multiply, 24-bit result, returns high 16
-smul16_u8: ; math_a x math_b = math_p, clobbers A/X/Y
+.a16
+.i8
+.proc smul16_u8 ; math_a x math_b = math_p, clobbers A/X/Y
 	; DB = 0
-	.a16
-	.i8
 	ldx z:math_b
 	stx a:CPUMCAND
 	ldy z:math_a+0
@@ -189,12 +184,13 @@ smul16_u8: ; math_a x math_b = math_p, clobbers A/X/Y
 		lda z:math_p+1
 	:
 	rts
+.endproc
 
 ; signed 16-bit multiply, 32-bit result, clobbers A/X/Y
-smul16:
+.a16
+.i8
+.proc smul16
 	; DB = 0
-	.a16
-	.i8
 	jsr umul16
 	; A = math_p+2
 	; X = math_a+1
@@ -211,9 +207,10 @@ smul16:
 	:
 	sta z:math_p+2
 	rts
+.endproc
 
 ; 16-bit multiply, truncated 16-bit result (sign-agnostic), clobbers A/X/Y
-mul16t:
+.proc mul16t
 	; DB = 0
 	.a16
 	.i8
@@ -238,19 +235,21 @@ mul16t:
 	stx z:math_p+1
 	lda z:math_p+0
 	rts
+.endproc
 
-smul16f: ; smul16 but returning the middle 16-bit value as A (i.e. 8.8 fixed point multiply)
+.a16
+.i8
+.proc smul16f ; smul16 but returning the middle 16-bit value as A (i.e. 8.8 fixed point multiply)
 	; DB = 0
-	.a16
-	.i8
 	jsr smul16
 	lda z:math_p+1
 	rts
+.endproc
 
-smul32f_16f: ; a = 24.8 fixed, b = 8.8 fixed, result in A = 8.8, clobbers: math_a/math_b/math_r
+.a16
+.i8
+.proc smul32f_16f ; a = 24.8 fixed, b = 8.8 fixed, result in A = 8.8, clobbers: math_a/math_b/math_r
 	; DB = 0
-	.a16
-	.i8
 	lda z:math_a+0
 	sta z:math_p+4
 	lda z:math_a+2
@@ -289,11 +288,12 @@ smul32f_16f: ; a = 24.8 fixed, b = 8.8 fixed, result in A = 8.8, clobbers: math_
 	sta z:math_p+0
 	lda z:math_p+2 ; result in upper bits
 	rts
+.endproc
 
-smul32ft: ; a = 24.8 fixed, b = 16.16 fixed, 16.24 result in math_r, returns 8.8 in A, clobbers math_a/b/p, temp0-13
+.a16
+.i8
+.proc smul32ft ; a = 24.8 fixed, b = 16.16 fixed, 16.24 result in math_r, returns 8.8 in A, clobbers math_a/b/p, temp0-13
 	; DB = 0
-	.a16
-	.i8
 	; sign extend and copy to temp
 	lda z:math_a+0
 	sta z:temp+0
@@ -368,12 +368,13 @@ smul32ft: ; a = 24.8 fixed, b = 16.16 fixed, 16.24 result in math_r, returns 8.8
 	sta z:math_r+4
 	lda z:math_r+3 ; return top 16 bits
 	rts
+.endproc
 
 ; 32-bit / 32-bit division, 32 + 32 result
 ; math_a / math_b = math_p
 ; math_a % math_b = math_r
 ; clobbers A/X
-udiv32:
+.proc udiv32
 	; DB = any
 	.a16
 	.i8
@@ -413,8 +414,9 @@ udiv32:
 	;   We try to do it only a few times per frame, but it's still pretty hefty.
 	;   There is likely a way to decompose the operation to use the 16/8 hardware divider,
 	;   but I have not yet discovered one.
+.endproc
 
-sdiv32: ; 32-bit/32-bit signed division, 32+32 result, math_a / math_b = math_p & math_r, clobbers A/X/Y
+.proc sdiv32 ; 32-bit/32-bit signed division, 32+32 result, math_a / math_b = math_p & math_r, clobbers A/X/Y
 	ldy #0 ; y=1 marks an inverted result
 	lda z:math_a+2
 	bpl :+
@@ -456,9 +458,10 @@ sdiv32: ; 32-bit/32-bit signed division, 32+32 result, math_a / math_b = math_p 
 		sta z:math_b+2
 	:
 	rts
+.endproc
 
 ; fixed point reciprocal, clobbers A/X/Y/math_a/math_b/math_p/math_r
-recip16f: ; A = fixed point number, result in A
+.proc recip16f ; A = fixed point number, result in A
 	; DB = any
 	sta z:math_b+0
 	stz z:math_b+2
@@ -494,13 +497,13 @@ recip16f: ; A = fixed point number, result in A
 	;   See udiv32 notes above.
 	;   If not using the p+0 byte, this could be done a little faster with a udiv24,
 	;   but this demo needs p+0 for all uses.
+.endproc
 
-sincos: ; A = angle 0-255, result in cosa/sina, clobbers A/X
-	.a16
+.a16
+.proc sincos ; A = angle 0-255, result in cosa/sina, clobbers A/X
 	;.i any
 	php
 	setxy16
-	.i16
 	asl
 	tax
 	lda f:sincos_table, X
@@ -514,6 +517,7 @@ sincos: ; A = angle 0-255, result in cosa/sina, clobbers A/X
 	sta z:sina
 	plp
 	rts
+.endproc
 
 sincos_table:
 .word $0100,$0100,$0100,$00FF,$00FF,$00FE,$00FD,$00FC,$00FB,$00FA,$00F8,$00F7,$00F5,$00F3,$00F1,$00EF
@@ -600,7 +604,7 @@ DETR40 = 1
 
 ; recalculate det_r = 1 / (AD-BC) = 1 / (Mx * My)
 ; used by texel_to_screen
-calc_det_r:
+.proc calc_det_r
 	lda z:scale2+0 ; Mx 8.8f
 	sta z:math_a
 	lda z:scale2+2 ; My 8.8f
@@ -612,11 +616,12 @@ calc_det_r:
 	lda z:math_p+2
 	sta z:det_r+2
 	rts
+.endproc
 
-texel_to_screen: ; input: texelx,texely output screenx,screeny (requires det_r)
+.proc texel_to_screen ; input: texelx,texely output screenx,screeny (requires det_r)
 	lda z:texelx
 	sec
-	sbc z:nmi_m7x
+	sbc z:mode7_m7x
 	pha ; Tx-Px 16u
 	sta z:math_a
 	lda z:nmi_m7t+4 ; C
@@ -628,7 +633,7 @@ texel_to_screen: ; input: texelx,texely output screenx,screeny (requires det_r)
 	sta z:temp+2
 	lda z:texely
 	sec
-	sbc z:nmi_m7y
+	sbc z:mode7_m7y
 	pha ; Ty-Py 16u
 	sta z:math_a
 	lda z:nmi_m7t+0 ; A
@@ -641,7 +646,7 @@ texel_to_screen: ; input: texelx,texely output screenx,screeny (requires det_r)
 	lda z:math_p+2
 	sbc z:temp+2
 	sta z:math_a+2
-	.if DETR40
+	.if ::DETR40
 		lda z:det_r+0 ; 16.16f
 		sta z:math_b+0
 		lda z:det_r+2
@@ -653,9 +658,9 @@ texel_to_screen: ; input: texelx,texely output screenx,screeny (requires det_r)
 		jsr smul32f_16f ; 16u
 	.endif
 	clc
-	adc z:nmi_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	adc z:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sec
-	sbc z:nmi_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	sbc z:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sta z:screeny
 	pla ; Ty-Py 16u
 	sta z:math_a
@@ -678,7 +683,7 @@ texel_to_screen: ; input: texelx,texely output screenx,screeny (requires det_r)
 	lda z:math_p+2
 	sbc z:temp+2
 	sta z:math_a+2
-	.if DETR40
+	.if ::DETR40
 		lda z:det_r+0 ; 16.16f
 		sta z:math_b+0
 		lda z:det_r+2
@@ -690,11 +695,12 @@ texel_to_screen: ; input: texelx,texely output screenx,screeny (requires det_r)
 		jsr smul32f_16f ; 16u
 	.endif
 	clc
-	adc z:nmi_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	adc z:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sec
-	sbc z:nmi_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	sbc z:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sta z:screenx
 	rts
+.endproc
 
 ;
 ; =============================================================================
@@ -920,17 +926,17 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 ;            s += " ; %04X" % (i+1-width)
 ;    print(s)
 
-pv_buffer_x: ; sets X to 0 or PV_HDMA_STRIDE to select the needed buffer
-	.a8
-	.i16
+.a8
+.i16
+.proc pv_buffer_x ; sets X to 0 or PV_HDMA_STRIDE to select the needed buffer
 	lda z:pv_buffer
 	beq :+
 		ldx #PV_HDMA_STRIDE
 		rts
 	:
-		ldx #0
-		rts
-	;
+	ldx #0
+	rts
+.endproc
 
 ; rebuild the perspective HDMA tables (only needed if pv input variables or angle change, moving the origin only does not require a rebuild)
 .export pv_rebuild
@@ -970,7 +976,7 @@ pv_buffer_x: ; sets X to 0 or PV_HDMA_STRIDE to select the needed buffer
 		sec
 		adc z:temp
 		sta z:temp
-		lda z:nmi_bgmode
+		lda #1 ;BG mode
 		sta a:pv_hdma_bgm0+1, X
 		lda #<pv_tm2
 		sta a:pv_hdma_tm0+1, Y
@@ -1443,7 +1449,7 @@ pv_buffer_x: ; sets X to 0 or PV_HDMA_STRIDE to select the needed buffer
 	; 5. set HDMA tables for next frame
 	; =================================
 	lda #$1F
-	sta z:new_hdma_en ; enable HDMA (0,1,2,3,4)
+	sta z:mode7_hdma_en ; enable HDMA (0,1,2,3,4)
 	stz a:new_hdma+(0*16)+0 ; bgm: 1 byte transfer
 	lda #$40
 	sta a:new_hdma+(1*16)+0 ; tm: 1 byte transfer, indirect
@@ -1816,12 +1822,12 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 		bne :-
 	rts
 
+.a16
+.i8
 .export pv_set_origin
-pv_set_origin: ; Y = scanline to place posx/posy on the centre of
+.proc pv_set_origin ; Y = scanline to place posx/posy on the centre of
 	; Call this only after pv_rebuild has brought the perspective tables up to date.
 	; If you don't rotate or change the perspective, this can be reused many times to change the origin without having to use pv_rebuild again.
-	.a16
-	.i8
 	sty z:temp+0 ; temp+0 = target scanline
 	tya
 	sec
@@ -1854,47 +1860,48 @@ pv_set_origin: ; Y = scanline to place posx/posy on the centre of
 	jsr smul16_u8
 	clc
 	adc z:posx+2
-	sta z:nmi_m7x ; ox = posx + (scanlines * b)
+	sta z:mode7_m7x ; ox = posx + (scanlines * b)
 	sec
 	sbc #128
-	sta z:nmi_hofs ; ox - 128
+	sta z:mode7_hofs ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
 	clc
 	adc z:posy+2
-	sta z:nmi_m7y ; oy = posy + (scanlines * d)
+	sta z:mode7_m7y ; oy = posy + (scanlines * d)
 	lda z:pv_l1
 	and #$00FF
 	eor #$FFFF
 	sec
-	adc z:nmi_m7y
-	sta z:nmi_vofs ; oy - L1
+	adc z:mode7_m7y
+	sta z:mode7_vofs ; oy - L1
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
 	asl
 	asl
 	eor #$FFFF
 	and #$03FF
-	sta z:nmi_bg2hofs
+	sta z:mode7_bg2hofs
 	lda z:pv_l0
 	eor #$FFFF
 	sec
 	adc #240
-	sta z:nmi_bg2vofs
+	sta z:mode7_bg2vofs
 	rts
+.endproc
 
-pv_texel_to_screen: ; input: texelx,texely output screenx,screeny (pv_rebuild must be up to date)
-	.a16
-	.i8
+.a16
+.i8
+.proc pv_texel_to_screen ; input: texelx,texely output screenx,screeny (pv_rebuild must be up to date)
 	; 1. translate to origin-relative position
 	lda z:texelx
 	sec
-	sbc z:nmi_m7x
+	sbc z:mode7_m7x
 	sta z:screenx
 	lda z:texely
 	sec
-	sbc z:nmi_m7y
+	sbc z:mode7_m7y
 	sta z:screeny
 	; 2. try wrapping if the distance is larger than half the map
 	ldx z:pv_wrap
@@ -2074,4 +2081,4 @@ pv_texel_to_screen: ; input: texelx,texely output screenx,screeny (pv_rebuild mu
 	;   but ultimately if we need to do many of these per frame a more efficient alternative route may be needed.
 	;   For example: if we only need to rotate, but don't change other parameters, we could create a lookup table with SH entries,
 	;   mapping every Y to a screeny, and providing a scaling factor for every X. (e.g. F-Zero doesn't change perspective during a race.)
-
+.endproc
