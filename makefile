@@ -26,7 +26,7 @@ objlist = \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
   playerprojectile m7blockdata mode7actors blarggapu \
-  hubworld
+  hubworld m7math
 objlistspc = \
   spcheader spcimage musicseq
 

@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2019-2020 NovaSquirrel
+; Copyright (C) 2019-2023 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as
@@ -455,7 +455,142 @@ DontIncreaseChipCounter:
   jsr MakeCheckpoint
 .endproc
 
+
+.proc DizworldMainLoop
+  jsr set_mode_y
+Loop:
+  setaxy16
+  inc framecount
+
+  jsl WaitVblank
+
+
+  seta8
+  lda #$0f
+  sta PPUBRIGHT
+
+  setaxy16
+  .import nmi_hdma, new_hdma
+  .importzp nmi_hdma_en, new_hdma_en
+  phb
+  ldx #.loword(new_hdma)
+  ldy #$4300
+  lda #(16*8)-1
+  mvn #^new_hdma,#^004300
+  plb
+
+  seta8
+  lda new_hdma_en
+  sta a:$420C
+
+
+  ; -----------------------------------
+;  lda #.loword(M7A_M7B_Table1)
+;  sta DMAADDR+$20
+;  lda #.loword(M7C_M7D_Table1)
+;  sta DMAADDR+$30
+;  lda framecount
+;  lsr
+;  bcc :+
+;    lda #.loword(M7A_M7B_Table2)
+;    sta DMAADDR+$20
+;    lda #.loword(M7C_M7D_Table2)
+;    sta DMAADDR+$30
+;  :
+
+.if 0
+  .import pv_hdma_ab0
+  .import pv_hdma_abi0, pv_hdma_abi1, pv_hdma_cdi0, pv_hdma_cdi1
+  lda #.loword(pv_hdma_abi0)
+  sta DMAADDR+$20
+  lda #.loword(pv_hdma_cdi0)
+  sta DMAADDR+$30
+  lda framecount
+  lsr
+  bcc :+
+    lda #.loword(pv_hdma_abi1)
+    sta DMAADDR+$20
+    lda #.loword(pv_hdma_cdi1)
+    sta DMAADDR+$30
+  :
+
+  lda #.loword(GradientTable)
+  sta DMAADDR+$40
+  lda #(<M7A << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7a and m7b
+  sta DMAMODE+$20
+  lda #(<M7C << 8) | DMA_0011 | DMA_FORWARD | DMA_INDIRECT ; m7c and m7d
+  sta DMAMODE+$30
+  lda #(<COLDATA <<8) ; one byte to COLDATA
+  sta DMAMODE+$40
+.endif
+
+  lda #220
+  sta HTIME
+  lda #48
+  sta VTIME
+
+  seta8
+;  lda #^pv_hdma_abi0
+;  sta DMAADDRBANK+$20
+;  sta DMAADDRBANK+$30
+;  lda #^pv_hdma_ab0
+;  sta HDMAINDBANK+$20
+;  sta HDMAINDBANK+$30
+
+;  lda #^GradientTable
+;  sta DMAADDRBANK+$40
+
+;  lda #4|8|16
+;  sta HDMASTART
+
+  ; Write to registers
+  lda nmi_m7x+0
+  sta M7X
+  lda nmi_m7x+1
+  sta M7X
+
+  lda nmi_m7y+0
+  sta M7Y
+  lda nmi_m7y+1
+  sta M7Y
+
+  lda nmi_hofs+0
+  sta BG1HOFS
+  lda nmi_hofs+1
+  sta BG1HOFS
+  lda nmi_vofs+0
+  sta BG1VOFS
+  lda nmi_vofs+1
+  sta BG1VOFS
+
+  lda #$0F
+  sta PPUBRIGHT ; Turn on rendering
+  lda #%11100000 ; Reset COLDATA
+  sta COLDATA
+
+  lda #0          ; Color math is always enabled
+  sta CGWSEL
+  lda #%00100000  ; Color math when the background color is used
+  sta CGADSUB
+
+  jsl WaitKeysReady
+  seta16
+
+  jsr mode_y
+
+  seta8
+  lda #$0d
+  sta PPUBRIGHT
+  lda #7
+  sta BGMODE
+
+  setaxy16
+  jmp Loop
+.endproc
+
+
 .proc Mode7MainLoop
+  jmp DizworldMainLoop
 Loop:
   setaxy16
   inc framecount
@@ -1466,19 +1601,6 @@ Block:
 .include "m7palettedata.s"
 
 
-.proc Mode7NMI
-  seta8
-  pha
-  lda #1
-  sta f:BGMODE
-  lda #%00010010  ; enable sprites, plane 1
-  sta f:BLENDMAIN
-  pla
-  plb
-  rti
-.endproc
-
-
 .proc Mode7IRQ
   pha
   php
@@ -2230,3 +2352,281 @@ M7C_M7D_Table2:
 .export Mode7Tiles
 Mode7Tiles:
 .incbin "../tilesetsX/M7Tileset.chr", 0, CommonTilesetLength
+
+
+
+
+
+
+
+
+
+
+
+.segment "ZEROPAGE"
+height: .res 1
+
+.segment "C_Mode7Game"
+
+.proc Mode7NMI
+  seta8
+  pha
+  lda #1
+  sta f:BGMODE
+;  lda #%00010010  ; enable sprites, plane 1
+  lda #%00000011  ; enable sprites, plane 1
+  sta f:BLENDMAIN
+  pla
+
+  plb
+  rti
+.endproc
+
+
+
+
+
+;
+;
+; =============================================================================
+; Mode Y test "Flying"
+; - Mode 1 clouds at top, fixed colour horizon fades
+; - Map rotates around the player
+; - L/R raises/lowers view
+;
+.globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
+.globalzp nmi_bgmode, nmi_hofs, nmi_vofs, nmi_m7t, nmi_m7x, nmi_m7y, nmi_cgwsel, nmi_cgadsub, nmi_bg2hofs, nmi_bg2vofs, nmi_tm, new_hdma_en, nmi_hdma_en
+.globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
+
+; focus location on ground
+MODE_Y_SX = 128
+MODE_Y_SY = 168
+; minimum height of bird above the ground (height is 0-128 + this)
+MODE_Y_HEIGHT_BASE = 16
+
+set_mode_y:
+	seta16
+	setxy8
+	; colormath
+	ldx #$00
+	stx z:nmi_cgwsel ; fixed colour
+	ldx #$23
+	stx z:nmi_cgadsub ; enable additive blend on BG1 +BG2 + backdrop
+	ldx #1
+	stx z:nmi_bgmode
+	stx z:pv_wrap
+	ldy #64
+	sty z:height ; halfway up
+mode_y:
+	seta16
+	setxy8
+	; L/R = up/down
+	ldx z:height
+	lda keydown
+	and #$0010 ; R for up
+	beq :+
+		cpx #127
+		bcs :+
+		inx
+	:
+	lda keydown
+	and #$0020 ; L for down
+	beq :+
+		cpx #1
+		bcc :+
+		dex
+	:
+	stx z:height
+	; rotate with left/right
+	ldx z:angle
+	lda keydown
+	and #$0200 ; left
+	beq :+
+		inx
+	:
+	lda keydown
+	and #$0100 ; right
+	beq :+
+		dex
+	:
+	stx z:angle
+
+
+	; generate perspective
+	; --------------------
+	; set horizon
+	lda z:height
+	and #$00FF
+	lsr
+	clc
+	adc #32
+	tax
+	sta z:pv_l0 ; l0 = 32+(height/2)  [32-96]
+	ldx #224
+	stx z:pv_l1
+	; set view scale
+	lda z:height
+	and #$00FF
+	asl
+	clc
+	adc #384
+	sta z:pv_s0 ; 384 + (height*2)    [384-640]
+	lda z:height
+	and #$00FF
+	lsr
+	adc #64
+	sta z:pv_s1 ; 64 + (height/2)     [64-128]
+	lda #0
+	sta z:pv_sh ; dependent-vertical scale
+	ldx #2
+	stx z:pv_interp ; 2x interpolation
+	.import pv_rebuild
+	jsr pv_rebuild
+
+	; up/down moves player (depends on generated rotation matrix)
+	lda keydown
+	and #$0400 ; down
+	beq :+
+		; X += B * 2
+		lda z:nmi_m7t + 2 ; B
+		asl
+		pha
+		clc
+		adc z:posx+1
+		sta z:posx+1
+		pla
+		jsr sign
+		adc z:posx+3
+		and #$0003 ; wrap to 0-1023
+		sta z:posx+3
+		; Y += D * 2
+		lda z:nmi_m7t + 6 ; D
+		asl
+		pha
+		clc
+		adc z:posy+1
+		sta z:posy+1
+		pla
+		jsr sign
+		adc z:posy+3
+		and #$0003
+		sta z:posy+3
+	:
+
+	lda keydown
+	and #$0800 ; up
+	beq :+
+        wdm 0
+		; X -= B * 2
+		lda #0
+		sec
+		sbc z:nmi_m7t + 2 ; B
+		asl
+		pha
+		clc
+		adc z:posx+1
+		sta z:posx+1
+		pla
+		jsr sign
+		adc z:posx+3
+		and #$0003
+		sta z:posx+3
+		; Y -= D * 2
+		lda #0
+		sec
+		sbc z:nmi_m7t + 6 ; D
+		asl
+		pha
+		clc
+		adc z:posy+1
+		sta z:posy+1
+		pla
+		jsr sign
+		adc z:posy+3
+		and #$0003
+		sta z:posy+3
+	:
+
+;	; select to reset position (since aspect ratio can't do anything in sh=0)
+;	lda z:newpad
+;	and #$2000 ; select
+;	beq :+
+;		stz z:posx+0
+;		stz z:posx+2
+;		stz z:posx+4
+;		stz z:posy+0
+;		stz z:posy+2
+;		stz z:posy+4
+;		ldx #0
+;		stx z:angle
+;	:
+
+	; set origin
+	ldy #MODE_Y_SY ; place focus at centre of scanline SY
+	.import pv_set_origin
+	jsr pv_set_origin
+
+	.if 0
+	; animate and draw sprites and stats
+	; ----------------------------------
+	jsr oam_sprite_clear
+	; draw flying bird
+	lda #MODE_Y_SX
+	sta z:screenx
+	lda #MODE_Y_SY - MODE_Y_HEIGHT_BASE
+	sec
+	sbc z:height
+	and #$00FF
+	sta z:screeny
+	ldx #0
+	; animate bird 0,4,8,4 pattern
+	lda z:nmi_count
+	lsr
+	and #$000C ; +4 every 8 frames
+	cmp #$000C
+	bcc :+
+		lda #$0004
+	:
+	ora z:player_tile
+	and #$00FF
+	jsr oam_sprite
+
+	; demonstrate texel to screen mapping
+	lda #PIN_TX
+	sta z:texelx
+	lda #PIN_TY
+	sta z:texely
+	jsr pv_texel_to_screen
+	ldx #4
+	lda #$8C ; arrow
+	jsr oam_sprite
+	; shadow at focus
+	lda #MODE_Y_SX
+	sta z:screenx
+	lda #MODE_Y_SY
+	sta z:screeny
+	lda z:height
+	lsr
+	lsr
+	lsr
+	and #$000C
+	ora #$0100 ; shadow sprite selected by height
+	ldx #8
+	jsr oam_sprite
+	.endif
+
+	rts
+
+.a16
+.proc sign ; A = value, returns either 0 or $FFFF, preserves flags
+	;.i any
+	php
+	cmp #$8000
+	bcs :+
+		lda #0
+		plp
+		rts
+:	lda #$FFFF
+	plp
+	rts
+.endproc
