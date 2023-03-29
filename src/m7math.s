@@ -14,7 +14,7 @@
 .segment "ZEROPAGE" ; < $100
 temp = 0
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_hofs, mode7_vofs, nmi_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
+.globalzp mode7_hofs, mode7_vofs, mode7_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
 .globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
 
 angle:        .res 1 ; for spinning modes
@@ -38,7 +38,7 @@ screeny:      .res 2
 
 mode7_hofs:     .res 2
 mode7_vofs:     .res 2
-nmi_m7t:      .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
+mode7_m7t:      .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
 mode7_m7x:      .res 2
 mode7_m7y:      .res 2
 mode7_bg2hofs:  .res 2
@@ -65,30 +65,14 @@ pv_scale:     .res 4 ; 8-bit scale of a/b/c/d
 pv_negate:    .res 1 ; negation of a/b/c/d
 pv_interps:   .res 2 ; interpolate * 4 for stride increment
 
-
-.segment "BSS7E"
-.export new_hdma
-new_hdma:     .res 16 * 8 ; HDMA channel settings to apply at next update
-
+;--------------------------------------
 ; HDMA double-buffer for perspective
-.export pv_hdma_ab0, pv_hdma_cd0, pv_hdma_bgm0, pv_hdma_tm0, pv_hdma_abi0, pv_hdma_cdi0, pv_hdma_col0
-.export pv_hdma_ab1, pv_hdma_cd1, pv_hdma_bgm1, pv_hdma_tm1, pv_hdma_abi1, pv_hdma_cdi1, pv_hdma_col1
+pv_hdma_ab0 = HDMA_Buffer1      ; Mode 7 matrix AB
+pv_hdma_cd0 = HDMA_Buffer1+1024 ; Mode 7 matrix CD
 
-pv_hdma_ab0:  .res 1024 ; Mode 7 matrix AB
-pv_hdma_cd0:  .res 1024 ; Mode 7 matrix CD
-pv_hdma_bgm0: .res 16 ; background mode
-pv_hdma_tm0:  .res 16 ; background enable
-pv_hdma_abi0: .res 16 ; indirection for AB
-pv_hdma_cdi0: .res 16 ; indirection for CD
-pv_hdma_col0: .res 16 ; fixed colour for horizon fade (indirect)
+pv_hdma_ab1 = HDMA_Buffer2
+pv_hdma_cd1 = HDMA_Buffer2+1024
 
-pv_hdma_ab1:  .res 1024
-pv_hdma_cd1:  .res 1024
-pv_hdma_bgm1: .res 16
-pv_hdma_tm1:  .res 16
-pv_hdma_abi1: .res 16
-pv_hdma_cdi1: .res 16
-pv_hdma_col1: .res 16
 PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 
 .a8
@@ -624,7 +608,7 @@ DETR40 = 1
 	sbc z:mode7_m7x
 	pha ; Tx-Px 16u
 	sta z:math_a
-	lda z:nmi_m7t+4 ; C
+	lda z:mode7_m7t+4 ; C
 	sta z:math_b
 	jsr smul16
 	lda z:math_p+0
@@ -636,7 +620,7 @@ DETR40 = 1
 	sbc z:mode7_m7y
 	pha ; Ty-Py 16u
 	sta z:math_a
-	lda z:nmi_m7t+0 ; A
+	lda z:mode7_m7t+0 ; A
 	sta z:math_b
 	jsr smul16
 	lda z:math_p+0
@@ -664,7 +648,7 @@ DETR40 = 1
 	sta z:screeny
 	pla ; Ty-Py 16u
 	sta z:math_a
-	lda z:nmi_m7t+2 ; B
+	lda z:mode7_m7t+2 ; B
 	sta z:math_b
 	jsr smul16
 	lda z:math_p+0
@@ -673,7 +657,7 @@ DETR40 = 1
 	sta z:temp+2
 	pla ; Tx-Px 16u
 	sta z:math_a
-	lda z:nmi_m7t+6 ;D
+	lda z:mode7_m7t+6 ;D
 	sta z:math_b
 	jsr smul16
 	lda z:math_p+0
@@ -947,7 +931,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	setxy16
 	.a8
 	.i16
-	lda #$7E
+	lda #$7F
 	pha
 	plb
 	; 1. flip the double buffer
@@ -1203,13 +1187,13 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	jsr sincos
 	; store m7t matrix (replaced by HDMA but used for other purposes like pv_texel_to_screen, and player movement)
 	lda z:cosa
-	sta z:nmi_m7t+0 ; A = cos
-	sta z:nmi_m7t+6 ; D = cos
+	sta z:mode7_m7t+0 ; A = cos
+	sta z:mode7_m7t+6 ; D = cos
 	lda z:sina
-	sta z:nmi_m7t+2 ; B = sin
+	sta z:mode7_m7t+2 ; B = sin
 	eor #$FFFF
 	inc
-	sta z:nmi_m7t+4 ; C = -sin
+	sta z:mode7_m7t+4 ; C = -sin
 	; check for negations, take abs of cosa/sina
 	; want: cos sin -sin cos, keep track of flips to recover from abs by negating afterwards
 	ldx #0
@@ -1364,7 +1348,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	phx
 	plb ; DB = 0 for absolute writes to hardware
 	; reuse math result ZP as long pointers
-	ldx #$7E
+	ldx #^pv_hdma_ab0
 	stx z:math_a+2
 	stx z:math_b+2
 	stx z:math_p+2
@@ -1450,37 +1434,40 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	; =================================
 	lda #$1F
 	sta z:mode7_hdma_en ; enable HDMA (0,1,2,3,4)
-	stz a:new_hdma+(0*16)+0 ; bgm: 1 byte transfer
+	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
 	lda #$40
-	sta a:new_hdma+(1*16)+0 ; tm: 1 byte transfer, indirect
+	sta a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer, indirect
 	lda #$43
-	sta a:new_hdma+(2*16)+0 ; AB: 4 byte transfer, indirect
-	sta a:new_hdma+(3*16)+0 ; CD: 4 byte transfer, indirect
+	sta a:mode7_hdma+(2*16)+0 ; AB: 4 byte transfer, indirect
+	sta a:mode7_hdma+(3*16)+0 ; CD: 4 byte transfer, indirect
 	lda #$40
-	sta a:new_hdma+(4*16)+0 ; col: 1 byte transfer, indirect
-	lda #$05
-	sta a:new_hdma+(0*16)+1 ; bgm: $2105 BGMODE
-	lda #$2C
-	sta a:new_hdma+(1*16)+1 ; tm: $212C TM
-	lda #$1B
-	sta a:new_hdma+(2*16)+1 ; AB: $211B M7A
-	lda #$1D
-	sta a:new_hdma+(3*16)+1 ; CD: $211D M7C
-	lda #$32
-	sta a:new_hdma+(4*16)+1 ; col: $3132 COLDATA
-	lda #$7E
-	sta a:new_hdma+(0*16)+4 ; bank
-	sta a:new_hdma+(1*16)+4
-	sta a:new_hdma+(2*16)+4
-	sta a:new_hdma+(3*16)+4
-	sta a:new_hdma+(4*16)+4
+	sta a:mode7_hdma+(4*16)+0 ; col: 1 byte transfer, indirect
+
+	lda #<BGMODE
+	sta a:mode7_hdma+(0*16)+1 ; bgm: $2105 BGMODE
+	lda #<BLENDMAIN
+	sta a:mode7_hdma+(1*16)+1 ; tm: $212C TM
+	lda #<M7A
+	sta a:mode7_hdma+(2*16)+1
+	lda #<M7C
+	sta a:mode7_hdma+(3*16)+1
+	lda #<COLDATA
+	sta a:mode7_hdma+(4*16)+1
+
+	lda #$7F
+	sta a:mode7_hdma+(0*16)+4 ; bank
+	sta a:mode7_hdma+(1*16)+4
+	sta a:mode7_hdma+(2*16)+4
+	sta a:mode7_hdma+(3*16)+4
+	sta a:mode7_hdma+(4*16)+4
+
 	lda #^pv_tm1
-	sta a:new_hdma+(1*16)+7 ; indirect bank
-	lda #$7E
-	sta a:new_hdma+(2*16)+7
-	sta a:new_hdma+(3*16)+7
+	sta a:mode7_hdma+(1*16)+7 ; indirect bank
+	lda #$7F
+	sta a:mode7_hdma+(2*16)+7 ; M7A M7B
+	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
 	lda #^pv_fade_table0
-	sta a:new_hdma+(4*16)+7
+	sta a:mode7_hdma+(4*16)+7
 	jsr pv_buffer_x
 	stx z:temp
 	seta16
@@ -1488,23 +1475,23 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	lda #.loword(pv_hdma_bgm0)
 	clc
 	adc z:temp
-	sta a:new_hdma+(0*16)+2
+	sta a:mode7_hdma+(0*16)+2
 	lda #.loword(pv_hdma_tm0)
 	clc
 	adc z:temp
-	sta a:new_hdma+(1*16)+2
+	sta a:mode7_hdma+(1*16)+2
 	lda #.loword(pv_hdma_abi0)
 	clc
 	adc z:temp
-	sta a:new_hdma+(2*16)+2
+	sta a:mode7_hdma+(2*16)+2
 	lda #.loword(pv_hdma_cdi0)
 	clc
 	adc z:temp
-	sta a:new_hdma+(3*16)+2
+	sta a:mode7_hdma+(3*16)+2
 	lda #.loword(pv_hdma_col0)
 	clc
 	adc z:temp
-	sta a:new_hdma+(4*16)+2
+	sta a:mode7_hdma+(4*16)+2
 	; restore register sizes, data bank, and return
 	plb
 	plp
@@ -1948,24 +1935,24 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	@rotate:
 		lda z:screenx
 		sta z:math_a
-		lda z:nmi_m7t+0
+		lda z:mode7_m7t+0
 		sta z:math_b
 		jsr smul16f ; X*A
 		pha ; X*A
-		lda z:nmi_m7t+2
+		lda z:mode7_m7t+2
 		sta z:math_b
 		jsr smul16f ; X*B
 		pha ; X*B, X*A
 		lda z:screeny
 		sta z:math_a
-		lda z:nmi_m7t+6
+		lda z:mode7_m7t+6
 		sta z:math_b
 		jsr smul16 ; Y*D
 		pla
 		clc
 		adc z:math_p+1
 		sta z:screeny ; sy = X*B + Y*D
-		lda z:nmi_m7t+4
+		lda z:mode7_m7t+4
 		sta z:math_b
 		jsr smul16 ; Y*C
 		pla

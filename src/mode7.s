@@ -163,13 +163,13 @@ DIRECTION_RIGHT = 3
   ; Upload palettes
   stz CGADDR
   ; Write black
-  stz CGDATA
-  stz CGDATA
+;  stz CGDATA
+;  stz CGDATA
   ; Old sky palette before I went with the gradient instead
-;  lda #<RGB(15,23,31)
-;  sta CGDATA
-;  lda #>RGB(15,23,31)
-;  sta CGDATA
+  lda #<RGB(15,23,31)
+  sta CGDATA
+  lda #>RGB(15,23,31)
+  sta CGDATA
   seta16
   ; ---
   lda #DMAMODE_CGDATA
@@ -215,7 +215,7 @@ DIRECTION_RIGHT = 3
   ina
   ldy #$4c00
   jsl DoPortraitUpload
- 
+
   ; Put FGCommon in the last background palette for the HUD
   lda #Palette::FGCommon
   ldy #7
@@ -271,18 +271,20 @@ CheckerLoop:
   lda [hm_node]
   .repeat 4
     asl
-    rol Mode7PlayerX+1
+    rol posx+3
   .endrep
-  sta Mode7PlayerX
+  add #$08
+  sta posx+2
   inc16 hm_node
 
   ; Starting Y pos
   lda [hm_node]
   .repeat 4
     asl
-    rol Mode7PlayerY+1
+    rol posy+3
   .endrep
-  sta Mode7PlayerY
+  add #$08
+  sta posy+2
   inc16 hm_node
 
   ; Direction
@@ -466,13 +468,13 @@ Loop:
   ; - Mode 7 vblank tasks
   ; ---------------------------------------------
   setaxy16
-  .import nmi_hdma, new_hdma
+  .import nmi_hdma, mode7_hdma
   .importzp nmi_hdma_en, mode7_hdma_en
   phb
-  ldx #.loword(new_hdma)
+  ldx #.loword(mode7_hdma)
   ldy #$4300
   lda #(16*8)-1
-  mvn #^new_hdma,#^004300
+  mvn #^mode7_hdma,#^004300
   plb
 
   seta8
@@ -1476,7 +1478,7 @@ mode7_height: .res 1
 ; - L/R raises/lowers view
 ;
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_hofs, mode7_vofs, nmi_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
+.globalzp mode7_hofs, mode7_vofs, mode7_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
 .globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
 
 ; focus location on ground
@@ -1534,9 +1536,9 @@ mode_y:
 	and #$00FF
 	lsr
 	clc
-	adc #32
+	adc #48 ; Was originally 32
 	tax
-	sta z:pv_l0 ; First scanline. l0 = 32+(mode7_height/2)  [32-96]
+	sta z:pv_l0 ; First scanline. l0 = 48+(mode7_height/2)  [48-112]
 	ldx #224
 	stx z:pv_l1 ; Last scanline + 1
 
@@ -1544,19 +1546,25 @@ mode_y:
 	lda z:mode7_height
 	and #$00FF
 	asl
+	asl ; Added by Nova for camera effect
 	clc
 	adc #384
 	sta z:pv_s0 ; 384 + (height*2)    [384-640]
+
 	lda z:mode7_height
 	and #$00FF
 	lsr
+	lsr ; Added by Nova for camera effect
 	adc #64
 	sta z:pv_s1 ; 64 + (height/2)     [64-128]
+
 	lda #0
 	sta z:pv_sh ; dependent-vertical scale
+
 	ldx #2
 	stx z:pv_interp ; 2x interpolation
 	.import pv_rebuild
+
 	jsr pv_rebuild
 
 	; up/down moves player (depends on generated rotation matrix)
@@ -1564,7 +1572,7 @@ mode_y:
 	and #$0400 ; down
 	beq :+
 		; X += B * 2
-		lda z:nmi_m7t + 2 ; B
+		lda z:mode7_m7t + 2 ; B
 		asl
 		pha
 		clc
@@ -1576,7 +1584,7 @@ mode_y:
 		and #$0003 ; wrap to 0-1023
 		sta z:posx+3
 		; Y += D * 2
-		lda z:nmi_m7t + 6 ; D
+		lda z:mode7_m7t + 6 ; D
 		asl
 		pha
 		clc
@@ -1595,7 +1603,7 @@ mode_y:
 		; X -= B * 2
 		lda #0
 		sec
-		sbc z:nmi_m7t + 2 ; B
+		sbc z:mode7_m7t + 2 ; B
 		asl
 		pha
 		clc
@@ -1609,7 +1617,7 @@ mode_y:
 		; Y -= D * 2
 		lda #0
 		sec
-		sbc z:nmi_m7t + 6 ; D
+		sbc z:mode7_m7t + 6 ; D
 		asl
 		pha
 		clc

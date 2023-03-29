@@ -399,7 +399,20 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
 
 ;  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in
+  pv_hdma_bgm0: .res 16 ; background mode
+  pv_hdma_tm0:  .res 16 ; background enable
+  pv_hdma_abi0: .res 16 ; indirection for AB
+  pv_hdma_cdi0: .res 16 ; indirection for CD
+  pv_hdma_col0: .res 16 ; fixed colour for horizon fade (indirect)
+
   HDMA_Buffer2: .res 2048    ; for double buffering the previous
+  pv_hdma_bgm1: .res 16
+  pv_hdma_tm1:  .res 16
+  pv_hdma_abi1: .res 16
+  pv_hdma_cdi1: .res 16
+  pv_hdma_col1: .res 16
+
+  mode7_hdma:   .res 16 * 8 ; HDMA channel settings to apply at next update
 
   DecompressBuffer: .res 8192 ; Not used by LZ4_DecompressToMode7Tiles, though that's also currently unused
 

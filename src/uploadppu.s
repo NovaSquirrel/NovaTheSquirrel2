@@ -763,7 +763,7 @@ SixteenTileLoop:
   seta16
   lda #.loword(DecompressBuffer)
   sta DMAADDR+$00
-  lda #.loword(DecompressBuffer)|256
+  lda #.loword(DecompressBuffer)+256
   sta DMAADDR+$10
 
   ; Set DMA parameters  
