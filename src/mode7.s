@@ -592,7 +592,7 @@ Loop:
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
 
-  lda #MODE_Y_SY - MODE_Y_mode7_height_BASE - 1
+  lda #MODE_Y_SY - MODE_Y_mode7_height_BASE + 1
   sub mode7_height
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
