@@ -12,9 +12,9 @@
 .smart
 
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_m7t, mode7_m7x, mode7_m7y
+.globalzp mode7_m7t
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
-.global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer
+.global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y
 
 .segment "ZEROPAGE" ; < $100
 temp = 0 ; temp+0 to temp+13 used
@@ -35,6 +35,7 @@ pv_negate  = TouchTemp
 pv_interps = TouchTemp+1 ;and +2
 pv_scale   = TouchTemp+3 ;and +4, +5, +6
 
+; TODO: Put these behind a union?
 angle:        .res 1 ; for spinning modes
 scale:        .res 2 ; for uniform scale
 scale2:       .res 4 ; for separate axis scale
@@ -54,10 +55,7 @@ texely:       .res 2
 screenx:      .res 2
 screeny:      .res 2
 
-mode7_m7t:      .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
-mode7_m7x:      .res 2
-mode7_m7y:      .res 2
-
+mode7_m7t:    .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
 
 ; perspective
 ; inputs
@@ -76,6 +74,8 @@ mode7_bg2hofs:  .res 2
 mode7_bg2vofs:  .res 2
 mode7_hofs:     .res 2
 mode7_vofs:     .res 2
+mode7_m7x:      .res 2
+mode7_m7y:      .res 2
 pv_buffer:      .res 1 ; 0/1 selects double buffer
 
 ;--------------------------------------
@@ -87,7 +87,7 @@ pv_hdma_ab1 = HDMA_Buffer2
 pv_hdma_cd1 = HDMA_Buffer2+1024
 
 PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
-
+.export PV_HDMA_STRIDE
 
 .a8
 .i8
@@ -156,6 +156,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 ; signed 16-bit x 8-bit multiply, 24-bit result, returns high 16
 .a16
 .i8
+.export smul16_u8
 .proc smul16_u8 ; math_a x math_b = math_p, clobbers A/X/Y
 	; DB = 0
 	ldx z:math_b
@@ -620,7 +621,7 @@ DETR40 = 1
 .proc texel_to_screen ; input: texelx,texely output screenx,screeny (requires det_r)
 	lda z:texelx
 	sec
-	sbc z:mode7_m7x
+	sbc f:mode7_m7x
 	pha ; Tx-Px 16u
 	sta z:math_a
 	lda z:mode7_m7t+4 ; C
@@ -632,7 +633,7 @@ DETR40 = 1
 	sta z:temp+2
 	lda z:texely
 	sec
-	sbc z:mode7_m7y
+	sbc f:mode7_m7y
 	pha ; Ty-Py 16u
 	sta z:math_a
 	lda z:mode7_m7t+0 ; A
@@ -657,7 +658,7 @@ DETR40 = 1
 		jsr smul32f_16f ; 16u
 	.endif
 	clc
-	adc z:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	adc f:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sec
 	sbc f:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sta z:screeny
@@ -694,7 +695,7 @@ DETR40 = 1
 		jsr smul32f_16f ; 16u
 	.endif
 	clc
-	adc z:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	adc f:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sec
 	sbc f:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sta z:screenx
@@ -763,6 +764,8 @@ DETR40 = 1
 ; The resulting view usually has a fairly natural looking scal. A square appears square, locally speaking.
 ; Many games without DSP (e.g. F-Zero, Final Fantasy VI) accepted this compromise,
 ; trading independent vertical scale away for faster computation.
+
+.export pv_tm1, pv_fade_table0, pv_fade_table1
 
 ; indirect TM tables to swap BG1 and BG2 (both with OBJ)
 pv_tm1: .byte $11
@@ -928,6 +931,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 
 .a8
 .i16
+.export pv_buffer_x
 .proc pv_buffer_x ; sets X to 0 or PV_HDMA_STRIDE to select the needed buffer
 	lda f:pv_buffer
 	beq :+
@@ -1833,23 +1837,23 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	; If you don't rotate or change the perspective, this can be reused many times to change the origin without having to use pv_rebuild again.
 	sty z:temp+0 ; temp+0 = target scanline
 	tya
-	sec
-	sbc z:pv_l0
+	sub z:pv_l0
 	and #$00FF
 	asl
 	asl
 	sta z:temp+2 ; temp+2/3 = index to line
+
 	seta8
 	setxy16
-	.a8
-	.i16
+
 	lda z:pv_l1
-	sec
-	sbc z:temp+0
+	sub z:temp+0
 	sta z:math_b ; math_b = scanlines above bottom
+
 	jsr pv_buffer_x ; X = index to pv buffers
+
 	seta16
-	.a16
+
 	txa
 	clc
 	adc z:temp+2
@@ -1863,7 +1867,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	jsr smul16_u8
 	clc
 	adc z:posx+2
-	sta z:mode7_m7x ; ox = posx + (scanlines * b)
+	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sec
 	sbc #128
 	sta f:mode7_hofs ; ox - 128
@@ -1872,12 +1876,12 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	jsr smul16_u8
 	clc
 	adc z:posy+2
-	sta z:mode7_m7y ; oy = posy + (scanlines * d)
+	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 	lda z:pv_l1
 	and #$00FF
 	eor #$FFFF
 	sec
-	adc z:mode7_m7y
+	adc f:mode7_m7y
 	sta f:mode7_vofs ; oy - L1
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
@@ -1900,11 +1904,11 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	; 1. translate to origin-relative position
 	lda z:texelx
 	sec
-	sbc z:mode7_m7x
+	sbc f:mode7_m7x
 	sta z:screenx
 	lda z:texely
 	sec
-	sbc z:mode7_m7y
+	sbc f:mode7_m7y
 	sta z:screeny
 	; 2. try wrapping if the distance is larger than half the map
 
