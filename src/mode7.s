@@ -39,14 +39,12 @@ BlockUpdateAddress = BlockUpdateAddressTop
   Burger     = 7*2
 .endenum
 
-.export Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
+.export Mode7LevelMap, Mode7LevelMapBelow
 Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapBelow           = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapCheckpoint      = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
-Mode7DynamicTileBuffer       = LevelBufAlt          ; 7 tiles long, 64*4*7 = 1792
-Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long? padded to 8 though
-Mode7Keys                    = Mode7DynamicTileUsed+8 ; 4 bytes
+Mode7Keys                    = LevelBufAlt ; 4 bytes
 Mode7Tools                   = Mode7Keys+4          ; 2 bytes? Could be 1
 
 TOOL_FIREBOOTS    = 1
@@ -331,11 +329,6 @@ RestoredFromCheckpoint:
   stz Mode7ForceMove
   stz Mode7IceDirection ; Probably don't need to init this one but whatever
 
-  stz Mode7DynamicTileUsed+0 ; 7 bytes long, padded to 8
-  stz Mode7DynamicTileUsed+2
-  stz Mode7DynamicTileUsed+4
-  stz Mode7DynamicTileUsed+6
-
   stz Mode7DoLookAround
   stz Mode7LookAroundOffsetX
   stz Mode7LookAroundOffsetY
@@ -468,8 +461,7 @@ Loop:
   ; - Mode 7 vblank tasks
   ; ---------------------------------------------
   setaxy16
-  .import nmi_hdma, mode7_hdma
-  .importzp nmi_hdma_en, mode7_hdma_en
+  .import mode7_hdma, mode7_hdma_en
   phb
   ldx #.loword(mode7_hdma)
   ldy #$4300
@@ -946,8 +938,8 @@ M7BlockToggleButton2:
   tay
 
   pla
-  .import Mode7CreateActor
-  jmp Mode7CreateActor
+;  .import Mode7CreateActor
+;  jmp Mode7CreateActor
   ; Carry = success
   ; X = actor slot
 .endproc
@@ -1478,8 +1470,9 @@ mode7_height: .res 1
 ; - L/R raises/lowers view
 ;
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_hofs, mode7_vofs, mode7_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
-.globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
+.globalzp mode7_m7t, mode7_m7x, mode7_m7y 
+.globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
+.global mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, mode7_hofs, mode7_vofs, pv_buffer
 
 ; focus location on ground
 MODE_Y_SX = 128
@@ -1490,8 +1483,6 @@ MODE_Y_mode7_height_BASE = 16
 set_mode_y:
 	seta16
 	setxy8
-	ldx #1
-	stx z:pv_wrap
 	ldy #0
 	sty mode7_height
 mode_y:

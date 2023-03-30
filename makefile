@@ -25,7 +25,7 @@ objlist = \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile m7blockdata mode7actors blarggapu \
+  playerprojectile m7blockdata blarggapu \
   hubworld m7math
 objlistspc = \
   spcheader spcimage musicseq

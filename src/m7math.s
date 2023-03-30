@@ -11,11 +11,29 @@
 .include "global.inc"
 .smart
 
-.segment "ZEROPAGE" ; < $100
-temp = 0
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_hofs, mode7_vofs, mode7_m7t, mode7_m7x, mode7_m7y, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en
-.globalzp pv_buffer, pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_wrap, pv_zr, pv_zr_inc, pv_sh_, pv_scale, pv_negate, pv_interps
+.globalzp mode7_m7t, mode7_m7x, mode7_m7y
+.globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
+.global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer
+
+.segment "ZEROPAGE" ; < $100
+temp = 0 ; temp+0 to temp+13 used
+temp2 = 14
+
+;Original definitions:
+;pv_zr:        .res 2 ; interpolated 1/Z
+;pv_zr_inc:    .res 2 ; zr increment per line
+;pv_sh_:       .res 2 ; =pv_sh, or if pv_sh=0 then computed value
+;pv_scale:     .res 4 ; 8-bit scale of a/b/c/d
+;pv_negate:    .res 1 ; negation of a/b/c/d
+;pv_interps:   .res 2 ; interpolate * 4 for stride increment
+pv_zr      = temp2
+pv_zr_inc  = pv_zr + 2
+pv_sh_     = pv_zr_inc + 2
+.assert ((pv_sh_ + 2) < 24), error, "too many temporaries in Mode 7"
+pv_negate  = TouchTemp
+pv_interps = TouchTemp+1 ;and +2
+pv_scale   = TouchTemp+3 ;and +4, +5, +6
 
 angle:        .res 1 ; for spinning modes
 scale:        .res 2 ; for uniform scale
@@ -36,34 +54,29 @@ texely:       .res 2
 screenx:      .res 2
 screeny:      .res 2
 
-mode7_hofs:     .res 2
-mode7_vofs:     .res 2
 mode7_m7t:      .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
 mode7_m7x:      .res 2
 mode7_m7y:      .res 2
-mode7_bg2hofs:  .res 2
-mode7_bg2vofs:  .res 2
 
-mode7_hdma_en:  .res 1 ; HDMA channel enable at next update
 
 ; perspective
 ; inputs
-pv_buffer:    .res 1 ; 0/1 selects double buffer
 pv_l0:        .res 1 ; first scanline
 pv_l1:        .res 1 ; last scanline + 1
 pv_s0:        .res 2 ; horizontal texel distance at l0
 pv_s1:        .res 2 ; horizontal texel distance at l1
 pv_sh:        .res 2 ; vertical texel distance from l0 to l1, sh=0 to copy s0 scale for efficiency: (s0*(l1-l0)/256)
 pv_interp:    .res 1 ; interpolate every X lines, 0,1=1x (no interpolation, 2=2x, 4=4x, other values invalid
-pv_wrap:      .res 1 ; 0 if no wrapping, 1 if wrapping (does not affect PPU wrapping)
 
-; temporaries
-pv_zr:        .res 2 ; interpolated 1/Z
-pv_zr_inc:    .res 2 ; zr increment per line
-pv_sh_:       .res 2 ; =pv_sh, or if pv_sh=0 then computed value
-pv_scale:     .res 4 ; 8-bit scale of a/b/c/d
-pv_negate:    .res 1 ; negation of a/b/c/d
-pv_interps:   .res 2 ; interpolate * 4 for stride increment
+
+.segment "BSS"
+;pv_wrap:        .res 1 ; 0 if no wrapping, 1 if wrapping (does not affect PPU wrapping)
+mode7_hdma_en:  .res 1 ; HDMA channel enable at next update
+mode7_bg2hofs:  .res 2
+mode7_bg2vofs:  .res 2
+mode7_hofs:     .res 2
+mode7_vofs:     .res 2
+pv_buffer:      .res 1 ; 0/1 selects double buffer
 
 ;--------------------------------------
 ; HDMA double-buffer for perspective
@@ -74,6 +87,7 @@ pv_hdma_ab1 = HDMA_Buffer2
 pv_hdma_cd1 = HDMA_Buffer2+1024
 
 PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
+
 
 .a8
 .i8
@@ -586,6 +600,7 @@ sincos_table:
 ;   adds about 10 more hardware multiplies to texel_to_screen (11 vs 9 scanlines?)
 DETR40 = 1
 
+.if 0
 ; recalculate det_r = 1 / (AD-BC) = 1 / (Mx * My)
 ; used by texel_to_screen
 .proc calc_det_r
@@ -644,7 +659,7 @@ DETR40 = 1
 	clc
 	adc z:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sec
-	sbc z:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	sbc f:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sta z:screeny
 	pla ; Ty-Py 16u
 	sta z:math_a
@@ -681,10 +696,11 @@ DETR40 = 1
 	clc
 	adc z:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sec
-	sbc z:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	sbc f:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sta z:screenx
 	rts
 .endproc
+.endif
 
 ;
 ; =============================================================================
@@ -913,7 +929,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 .a8
 .i16
 .proc pv_buffer_x ; sets X to 0 or PV_HDMA_STRIDE to select the needed buffer
-	lda z:pv_buffer
+	lda f:pv_buffer
 	beq :+
 		ldx #PV_HDMA_STRIDE
 		rts
@@ -936,9 +952,9 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	plb
 	; 1. flip the double buffer
 	; =========================
-	lda z:pv_buffer
+	lda f:pv_buffer
 	eor #1
-	sta z:pv_buffer
+	sta f:pv_buffer
 	; 2. calculate BG mode table + TM table (pv_hdma_bgm, pv_hdma_tm)
 	; ========================================
 	jsr pv_buffer_x
@@ -1433,7 +1449,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	; 5. set HDMA tables for next frame
 	; =================================
 	lda #$1F
-	sta z:mode7_hdma_en ; enable HDMA (0,1,2,3,4)
+	sta f:mode7_hdma_en ; enable HDMA (0,1,2,3,4)
 	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
 	lda #$40
 	sta a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer, indirect
@@ -1850,7 +1866,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sta z:mode7_m7x ; ox = posx + (scanlines * b)
 	sec
 	sbc #128
-	sta z:mode7_hofs ; ox - 128
+	sta f:mode7_hofs ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
@@ -1862,19 +1878,19 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	eor #$FFFF
 	sec
 	adc z:mode7_m7y
-	sta z:mode7_vofs ; oy - L1
+	sta f:mode7_vofs ; oy - L1
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
 	asl
 	asl
 	eor #$FFFF
 	and #$03FF
-	sta z:mode7_bg2hofs
+	sta f:mode7_bg2hofs
 	lda z:pv_l0
 	eor #$FFFF
 	sec
 	adc #240
-	sta z:mode7_bg2vofs
+	sta f:mode7_bg2vofs
 	rts
 .endproc
 
@@ -1891,7 +1907,9 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sbc z:mode7_m7y
 	sta z:screeny
 	; 2. try wrapping if the distance is larger than half the map
-	ldx z:pv_wrap
+
+.if 0
+	ldx f:pv_wrap
 	beq @wrap_end
 		lda z:screenx
 		bmi @wrap_xm
@@ -1926,6 +1944,8 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 			;bra @wrap_end
 		;
 	@wrap_end:
+.endif
+
 	; 3. project into the rotated frustum
 	ldx z:pv_scale+1
 	bne @rotate
