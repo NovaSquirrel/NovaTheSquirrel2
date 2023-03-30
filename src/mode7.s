@@ -553,6 +553,7 @@ Loop:
   ora #$02
   sta OAM_TILE+(4*3),y
 
+  ; Portrait
   lda Mode7Portrait
   sta OAM_TILE+(4*4),y
   ora #$02
@@ -563,7 +564,30 @@ Loop:
   ora #$02
   sta OAM_TILE+(4*7),y
 
+  ; Shadow
+  lda mode7_height
+  lsr
+  lsr
+  lsr
+  lsr
+  and #%1110
+  ora #$40|OAM_PRIORITY_2
+  sta 0
+  sta OAM_TILE+(4*8),y
+  ina
+  sta OAM_TILE+(4*9),y
+  lda framecount
+  lsr
+  bcc :+
+    lda 0
+    ora #OAM_XFLIP
+    sta OAM_TILE+(4*9),y
+    ina
+    sta OAM_TILE+(4*8),y    
+  :
+
   seta8
+  ; Player is made up of four sprites
   lda #MODE_Y_SX-16
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
@@ -580,6 +604,7 @@ Loop:
   sta OAM_XPOS+(4*1),y
   sta OAM_XPOS+(4*3),y
 
+  ; Portrait position
   lda #10
   sta OAM_XPOS+(4*4),y
   sta OAM_XPOS+(4*6),y
@@ -591,6 +616,15 @@ Loop:
   sta OAM_YPOS+(4*6),y
   sta OAM_YPOS+(4*7),y
 
+  ; Player's shadow
+  lda #MODE_Y_SX-8
+  sta OAM_XPOS+(4*8),y
+  lda #MODE_Y_SX
+  sta OAM_XPOS+(4*9),y
+  lda #MODE_Y_SY-4
+  sta OAM_YPOS+(4*8),y
+  sta OAM_YPOS+(4*9),y
+
   lda #$02
   sta OAMHI+1+(4*0),y
   sta OAMHI+1+(4*1),y
@@ -601,9 +635,13 @@ Loop:
   sta OAMHI+1+(4*5),y
   sta OAMHI+1+(4*6),y
   sta OAMHI+1+(4*7),y
+  ; Shadow
+  lda #$00
+  sta OAMHI+1+(4*8),y
+  sta OAMHI+1+(4*9),y
   seta16
   tya
-  add #8*4
+  add #10*4
   sta OamPtr
   rts
 .endproc
