@@ -592,7 +592,7 @@ Loop:
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
 
-  lda #MODE_Y_SY - MODE_Y_mode7_height_BASE
+  lda #MODE_Y_SY - MODE_Y_mode7_height_BASE - 1
   sub mode7_height
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
@@ -1701,10 +1701,11 @@ InAir2:
 
 
 .proc UseGroundPerspective
-	.import pv_buffer_x, pv_fade_table0, perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0, pv_tm1, sincos
+	.import pv_buffer_x, pv_fade_table0, perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks, pv_tm1, sincos
 	temp = 0
 	ab_lut_pointer = 2 ;and 3
 	cd_lut_pointer = 4 ;and 5
+	abcd_banks     = 6 ;and 7
 	phb
 
 	; Work on data structures in bank 7F
@@ -1716,14 +1717,23 @@ InAir2:
 
 	; Calculate which table to use based on which 
 	lda angle
-	lsr
-	and #%1111110
+	asl
 	tax
 	lda f:perspective_m7a_m7b_list,x
 	sta ab_lut_pointer
 	lda f:perspective_m7c_m7d_list,x
 	sta cd_lut_pointer
 
+	lda angle ; aaaaaaaa
+	lsr       ; .aaaaaaa
+	lsr       ; ..aaaaaa
+	lsr       ; ...aaaaa
+	lsr       ; ....aaaa
+	lsr       ; .....aaa
+	and            #%110
+    tax
+	lda f:perspective_abcd_banks,x
+	sta abcd_banks
 	seta8
 
 	lda f:pv_buffer
@@ -1796,9 +1806,9 @@ InAir2:
 	sta a:mode7_hdma+(3*16)+4
 
 	; Indirect banks
-	lda #^perspective_m7a_m7b_0
+	lda abcd_banks + 0
 	sta a:mode7_hdma+(2*16)+7 ; M7A M7B
-	lda #^perspective_m7c_m7d_0
+	lda abcd_banks + 1
 	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
 	lda #^pv_fade_table0
 	sta a:mode7_hdma+(4*16)+7
@@ -1851,7 +1861,8 @@ target_scanline = 0
 index_to_line   = 2 ; and 3
 ab_lut_pointer  = 4 ; and 5, 6
 cd_lut_pointer  = 7 ; and 8, 9
-	.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0
+abcd_banks      = 10 ; and 11
+	.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks
 	.import smul16_u8
 	sty target_scanline ; temp+0 = target scanline
 	tya
@@ -1864,8 +1875,7 @@ cd_lut_pointer  = 7 ; and 8, 9
 	setxy16
 	; Get the table
 	lda angle
-	lsr
-	and #%1111110
+	asl
 	tax
 	lda f:perspective_m7a_m7b_list,x
 	add index_to_line
@@ -1876,11 +1886,20 @@ cd_lut_pointer  = 7 ; and 8, 9
 	add #2
 	sta cd_lut_pointer
 
+	lda angle ; aaaaaaaa
+	lsr       ; .aaaaaaa
+	lsr       ; ..aaaaaa
+	lsr       ; ...aaaaa
+	lsr       ; ....aaaa
+	lsr       ; .....aaa
+	and            #%110
+    tax
+	lda f:perspective_abcd_banks,x
+
 	seta8
 	; Set the banks for the pointers
-	lda #^perspective_m7a_m7b_0
 	sta ab_lut_pointer+2
-	lda #^perspective_m7c_m7d_0
+	xba
 	sta cd_lut_pointer+2
 
 	lda #224 ;l1
@@ -1912,6 +1931,7 @@ cd_lut_pointer  = 7 ; and 8, 9
 	sec
 	adc f:mode7_m7y
 	sta f:mode7_vofs ; oy - L1
+
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
 	asl
@@ -1919,6 +1939,7 @@ cd_lut_pointer  = 7 ; and 8, 9
 	eor #$FFFF
 	and #$03FF
 	sta f:mode7_bg2hofs
+
 	lda #48 ;l0
 	eor #$FFFF
 	sec

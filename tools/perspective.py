@@ -2,40 +2,6 @@
 import math
 
 """
-	; set horizon
-	lda z:mode7_height
-	and #$00FF
-	lsr
-	clc
-	adc #48
-	tax
-	sta z:pv_l0 ; First scanline. l0 = 48+(mode7_height/2)  [48-112]
-	ldx #224
-	stx z:pv_l1 ; Last scanline + 1
-
-	; set view scale
-	lda z:mode7_height
-	and #$00FF
-	asl
-	clc
-	adc #384
-	sta z:pv_s0 ; 384 + (height*2)    [384-640]
-
-	lda z:mode7_height
-	and #$00FF
-	lsr
-	adc #64
-	sta z:pv_s1 ; 64 + (height/2)     [64-128]
-
-	lda #0
-	sta z:pv_sh ; dependent-vertical scale
-
-	ldx #2
-	stx z:pv_interp ; 2x interpolation
-	jsr pv_rebuild
-"""
-
-"""
 	L0 to L1 defines the area of the screen to be covered by the perspective effect.
 	S0, S1, and SH are the top, bottom, and height of a trapezoid view frustum, this is an area on the 1024x1024 mode 7 texture map that will be visible in this perspective
 
@@ -77,10 +43,10 @@ def perspective(angle, l0, l1, s0, s1):
 def output_tables():
 	outfile = open("src/perspective_data.s", "w")
 
-	angles    = 64
+	angles    = 256
 
 	outfile.write('; This is automatically generated. Edit "perspective.py" instead\n')
-	outfile.write('.export perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0\n')
+	outfile.write('.export perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks\n')
 
 	outfile.write('.segment "C_Mode7Game"\n')
 	outfile.write('perspective_m7a_m7b_list:\n')
@@ -91,6 +57,12 @@ def output_tables():
 	for a in range(angles):
 		outfile.write('  .addr .loword(perspective_m7c_m7d_%d)\n' % a)
 
+	outfile.write('perspective_abcd_banks:\n')
+	outfile.write('  .byt ^perspective_m7a_m7b_0,   ^perspective_m7c_m7d_0\n')
+	outfile.write('  .byt ^perspective_m7a_m7b_64,  ^perspective_m7c_m7d_64\n')
+	outfile.write('  .byt ^perspective_m7a_m7b_128, ^perspective_m7c_m7d_128\n')
+	outfile.write('  .byt ^perspective_m7a_m7b_192, ^perspective_m7c_m7d_192\n')
+
 	table_id = -1
 	for a in range(angles):
 		table_id += 1
@@ -98,13 +70,13 @@ def output_tables():
 		angle = (a/angles)*2*math.pi
 		m7a, m7b, m7c, m7d = perspective(angle, 48, 224, 384/256, 64/256)
 
-		outfile.write('.segment "Mode7TblAB"\n')
+		outfile.write('.segment "Mode7TblAB%d"\n' % (a//64))
 		outfile.write('perspective_m7a_m7b_%d:\n' % table_id)
 		for i in range(len(m7a)):
 			outfile.write('  .word $%.4x ;A\n' % (m7a[i]))
 			outfile.write('  .word $%.4x ;B\n' % (m7b[i]))
 
-		outfile.write('.segment "Mode7TblCD"\n')
+		outfile.write('.segment "Mode7TblCD%d"\n' % (a//64))
 		outfile.write('perspective_m7c_m7d_%d:\n' % table_id)
 		for i in range(len(m7a)):
 			outfile.write('  .word $%.4x ;C\n' % (m7c[i]))
