@@ -1470,9 +1470,9 @@ mode7_height: .res 1
 ; - L/R raises/lowers view
 ;
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_m7t, mode7_m7x, mode7_m7y 
+.globalzp mode7_m7t
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
-.global mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, mode7_hofs, mode7_vofs, pv_buffer
+.global mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, mode7_hofs, mode7_vofs, pv_buffer, mode7_m7x, mode7_m7y
 
 ; focus location on ground
 MODE_Y_SX = 128
@@ -1481,10 +1481,9 @@ MODE_Y_SY = 168
 MODE_Y_mode7_height_BASE = 16
 
 set_mode_y:
-	seta16
-	setxy8
-	ldy #0
-	sty mode7_height
+	seta8
+	lda #0
+	sta mode7_height
 mode_y:
 	seta16
 	setxy8
@@ -1525,6 +1524,7 @@ mode_y:
 	; set horizon
 	lda z:mode7_height
 	and #$00FF
+	beq OnGround
 	lsr
 	clc
 	adc #48 ; Was originally 32
@@ -1555,8 +1555,12 @@ mode_y:
 	ldx #2
 	stx z:pv_interp ; 2x interpolation
 	.import pv_rebuild
-
 	jsr pv_rebuild
+	bra UsedPVRebuild
+OnGround:
+	jsr UseGroundPerspective
+UsedPVRebuild:
+
 
 	; up/down moves player (depends on generated rotation matrix)
 	lda keydown
@@ -1635,10 +1639,18 @@ mode_y:
 ;		stx z:angle
 ;	:
 
+	setxy8
+	ldy #MODE_Y_SY ; place focus at center of scanline SY
+	lda z:mode7_height
+	and #$00FF
+	beq OnGround2
 	; set origin
-	ldy #MODE_Y_SY ; place focus at centre of scanline SY
 	.import pv_set_origin
 	jsr pv_set_origin
+	bra InAir2
+OnGround2:
+	jsr GroundSetOrigin
+InAir2:
 
 	rts
 
@@ -1654,4 +1666,248 @@ mode_y:
 :	lda #$FFFF
 	plp
 	rts
+.endproc
+
+
+
+.proc UseGroundPerspective
+	.import pv_buffer_x, pv_fade_table0, perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0, pv_tm1
+	temp = 0
+	ab_lut_pointer = 2 ;and 3
+	cd_lut_pointer = 4 ;and 5
+	phb
+
+	; Work on data structures in bank 7F
+	ph2banks mode7_hdma, mode7_hdma
+	plb
+	plb
+
+	setaxy16
+
+	; Calculate which table to use based on which 
+	lda angle
+	lsr
+	and #%1111110
+	tax
+	lda f:perspective_m7a_m7b_list,x
+	sta ab_lut_pointer
+	lda f:perspective_m7c_m7d_list,x
+	sta cd_lut_pointer
+
+	seta8
+
+	lda f:pv_buffer
+	eor #1
+	sta f:pv_buffer
+	jsr pv_buffer_x
+
+	; Make the indirect buffers
+	lda #47
+	sta a:pv_hdma_abi0+0,x
+	sta a:pv_hdma_cdi0+0,x
+	; Skip +1 and +2 because they won't be visible
+
+	; After the first 48 there's 176 scanline left, to fill with the actual perspective data
+
+	; Copy data for 127 scanlines, in repeat mode
+	lda #$80+127
+	sta a:pv_hdma_abi0+3,x
+	sta a:pv_hdma_cdi0+3,x
+	; Go for 49 more scanlines. 127+49=176
+	lda #$80+49
+	sta a:pv_hdma_abi0+6,x
+	sta a:pv_hdma_cdi0+6,x
+	; Then put the end marker
+	stz a:pv_hdma_abi0+9,x
+	stz a:pv_hdma_cdi0+9,x
+
+	seta16
+	lda ab_lut_pointer
+	sta a:pv_hdma_abi0+4,x
+	add #127*4
+	sta a:pv_hdma_abi0+7,x
+
+	lda cd_lut_pointer
+	sta a:pv_hdma_cdi0+4,x
+	add #127*4
+	sta a:pv_hdma_cdi0+7,x
+	seta8
+
+	; Set up HDMA configuration for next frame
+	lda #$1f
+	sta f:mode7_hdma_en       ; enable HDMA (0,1,2,3,4)
+	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
+	stz a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer
+	lda #DMA_INDIRECT | DMA_0011
+	sta a:mode7_hdma+(2*16)+0 ; AB: 4 byte transfer, indirect
+	sta a:mode7_hdma+(3*16)+0 ; CD: 4 byte transfer, indirect
+	lda #DMA_INDIRECT
+	sta a:mode7_hdma+(4*16)+0 ; col: 1 byte transfer, indirect
+
+	lda #<BGMODE
+	sta a:mode7_hdma+(0*16)+1 ; bgm: $2105 BGMODE
+	lda #<BLENDMAIN
+	sta a:mode7_hdma+(1*16)+1 ; tm: $212C TM
+	lda #<M7A
+	sta a:mode7_hdma+(2*16)+1
+	lda #<M7C
+	sta a:mode7_hdma+(3*16)+1
+	lda #<COLDATA
+	sta a:mode7_hdma+(4*16)+1
+
+	; Table banks
+	lda #^GroundPerspectiveTM
+	sta a:mode7_hdma+(0*16)+4 ; BGMODE
+	sta a:mode7_hdma+(1*16)+4 ; BLENDMAIN/TM
+	sta a:mode7_hdma+(4*16)+4 ; COLDATA
+	; AB and CD use tables in RAM
+	lda #^pv_hdma_abi0
+	sta a:mode7_hdma+(2*16)+4
+	sta a:mode7_hdma+(3*16)+4
+
+	; Indirect banks
+	lda #^perspective_m7a_m7b_0
+	sta a:mode7_hdma+(2*16)+7 ; M7A M7B
+	lda #^perspective_m7c_m7d_0
+	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
+	lda #^pv_fade_table0
+	sta a:mode7_hdma+(4*16)+7
+
+	lda f:pv_buffer
+	beq :+
+		seta16
+		.import PV_HDMA_STRIDE
+		lda #PV_HDMA_STRIDE
+		bra :++
+	:
+	seta16
+	lda #0
+:	sta temp
+
+	lda #.loword(GroundPerspectiveBGM)
+	sta a:mode7_hdma+(0*16)+2
+
+	lda #.loword(GroundPerspectiveTM)
+	sta a:mode7_hdma+(1*16)+2
+
+	lda #.loword(pv_hdma_abi0)
+	add temp
+	sta a:mode7_hdma+(2*16)+2
+
+	lda #.loword(pv_hdma_cdi0)
+	add temp
+	sta a:mode7_hdma+(3*16)+2
+
+	lda #.loword(GroundPerspectiveCOL)
+	sta a:mode7_hdma+(4*16)+2
+
+	plb
+	rts
+.endproc
+
+.a16
+.i8
+.export GroundSetOrigin
+.proc GroundSetOrigin ; Y = scanline to place posx/posy on the center of
+target_scanline = 0
+index_to_line   = 2 ; and 3
+ab_lut_pointer  = 4 ; and 5, 6
+cd_lut_pointer  = 7 ; and 8, 9
+	.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0
+	.import smul16_u8
+	wdm 0
+	sty target_scanline ; temp+0 = target scanline
+	tya
+	sub #48 ; l0
+	and #$00FF
+	asl ;*2
+	asl ;*4
+	sta index_to_line
+
+	setxy16
+	; Get the table
+	lda angle
+	lsr
+	and #%1111110
+	tax
+	lda f:perspective_m7a_m7b_list,x
+	add index_to_line
+	add #2
+	sta ab_lut_pointer
+	lda f:perspective_m7c_m7d_list,x
+	add index_to_line
+	add #2
+	sta cd_lut_pointer
+
+	seta8
+	; Set the banks for the pointers
+	lda #^perspective_m7a_m7b_0
+	sta ab_lut_pointer+2
+	lda #^perspective_m7c_m7d_0
+	sta cd_lut_pointer+2
+
+	lda #224 ;l1
+	sub target_scanline
+	sta z:math_b ; math_b = scanlines above bottom
+	seta16
+	lda [ab_lut_pointer]
+	sta z:math_a ; math_a = b coefficient
+	lda [cd_lut_pointer]
+	pha ; store for a moment
+	setxy8
+	.i8
+	jsr smul16_u8
+	clc
+	adc z:posx+2
+	sta f:mode7_m7x ; ox = posx + (scanlines * b)
+	sec
+	sbc #128
+	sta f:mode7_hofs ; ox - 128
+	pla
+	sta z:math_a ; math_a = d coefficient
+	jsr smul16_u8
+	clc
+	adc z:posy+2
+	sta f:mode7_m7y ; oy = posy + (scanlines * d)
+
+	lda #224 ;l1
+	eor #$FFFF
+	sec
+	adc f:mode7_m7y
+	sta f:mode7_vofs ; oy - L1
+	; scroll sky to meet L0 and pan with angle
+	lda z:angle
+	asl
+	asl
+	eor #$FFFF
+	and #$03FF
+	sta f:mode7_bg2hofs
+	lda #48 ;l0
+	eor #$FFFF
+	sec
+	adc #240
+	sta f:mode7_bg2vofs
+	rts
+.endproc
+
+.proc GroundPerspectiveTM
+	.byt 47, $12
+	.byt 1,  $11
+	.byt 0
+.endproc
+
+.proc GroundPerspectiveBGM
+	.byt 47, 1
+	.byt 1,  7
+	.byt 0
+.endproc
+
+.proc GroundPerspectiveCOL
+	.import pv_fade_table0, pv_fade_table1
+
+	.byt 48-16-1
+	.addr pv_fade_table0
+	.byt $80 | 32
+	.addr pv_fade_table1
+	.byt 0
 .endproc
