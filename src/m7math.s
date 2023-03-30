@@ -499,6 +499,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 .endproc
 
 .a16
+.export sincos
 .proc sincos ; A = angle 0-255, result in cosa/sina, clobbers A/X
 	;.i any
 	php

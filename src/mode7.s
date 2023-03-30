@@ -62,14 +62,6 @@ Mode7CheckpointChips = CheckpointState + 6
 Mode7CheckpointKeys  = CheckpointState + 8 ; Four bytes
 Mode7CheckpointTools = CheckpointState + 10
 
-M7A_M7B_Buffer1Data  = HDMA_Buffer1
-M7C_M7D_Buffer1Data  = HDMA_Buffer1+1024
-M7A_M7B_Buffer2Data  = HDMA_Buffer2
-M7C_M7D_Buffer2Data  = HDMA_Buffer2+1024
-
-.import m7a_m7b_0
-.import m7a_m7b_list
-
 .segment "BSS"
 ; Expose these for reuse by other systems
 .export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted
@@ -512,7 +504,7 @@ Loop:
   jsl ppu_pack_oamhi_partial
   .a8 ; (does seta8)
 
-  lda #$0E
+  lda #$0F
   sta PPUBRIGHT
 
   jmp Loop
@@ -1671,7 +1663,7 @@ InAir2:
 
 
 .proc UseGroundPerspective
-	.import pv_buffer_x, pv_fade_table0, perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0, pv_tm1
+	.import pv_buffer_x, pv_fade_table0, perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0, pv_tm1, sincos
 	temp = 0
 	ab_lut_pointer = 2 ;and 3
 	cd_lut_pointer = 4 ;and 5
@@ -1801,6 +1793,14 @@ InAir2:
 	lda #.loword(GroundPerspectiveCOL)
 	sta a:mode7_hdma+(4*16)+2
 
+	lda angle
+	and #255
+	jsr sincos
+	lda z:cosa
+	sta z:mode7_m7t+6 ; D = cos
+	lda z:sina
+	sta z:mode7_m7t+2 ; B = sin
+
 	plb
 	rts
 .endproc
@@ -1815,7 +1815,6 @@ ab_lut_pointer  = 4 ; and 5, 6
 cd_lut_pointer  = 7 ; and 8, 9
 	.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_m7a_m7b_0, perspective_m7c_m7d_0
 	.import smul16_u8
-	wdm 0
 	sty target_scanline ; temp+0 = target scanline
 	tya
 	sub #48 ; l0
