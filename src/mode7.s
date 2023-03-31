@@ -66,6 +66,10 @@ Mode7CheckpointTools = CheckpointState + 10
 ; Expose these for reuse by other systems
 .export Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted
 .export Mode7SidestepWanted, Mode7ChipsLeft, Mode7HappyTimer, Mode7Oops
+Mode7PlayerHeight: .res 2
+Mode7PlayerVSpeed: .res 2
+Mode7PlayerJumpCancel: .res 2
+
 Mode7ScrollX:    .res 2
 Mode7ScrollY:    .res 2
 Mode7PlayerX:    .res 2
@@ -129,13 +133,17 @@ DIRECTION_RIGHT = 3
   stz Mode7Keys
   stz Mode7Keys+2
 
+  stz Mode7PlayerHeight
+  stz Mode7PlayerVSpeed
+  stz Mode7PlayerJumpCancel
+
   ldx #.loword(Mode7LevelMapBelow)
   ldy #64*64
   jsl MemClear7F
 
   seta8
   ; Transparency outside the mode 7 plane
-  lda #M7_NOWRAP
+  lda #M7_BORDER00 ;M7_NOWRAP
   sta M7SEL
   ; Prepare LevelBlockPtr's bank byte
   lda #^Mode7LevelMap
@@ -448,10 +456,48 @@ Loop:
   jsl WaitVblank
   ; AXY size preserved, so still .a8 .i16
   jsl ppu_copy_oam_partial
+  .a8
 
   ; ---------------------------------------------
   ; - Mode 7 vblank tasks
   ; ---------------------------------------------
+  ; Parallax
+.if 0
+  seta16
+  lda posx+2
+  lsr
+;  lsr
+  and #%111   ; ........ .....xxx
+  xba         ; .....xxx ........
+  lsr         ; ......xx x.......
+  sta 0
+
+  lda posy+2
+  neg
+  lsr
+;  lsr
+  and #%111   ; ........ .....yyy
+  asl         ; ........ ....yyy.
+  asl         ; ........ ...yyy..
+  asl         ; ........ ..yyy...
+  ora 0       ; ......xx x.yyy...
+  add #.loword(Mode7Parallax)
+  sta DMAADDR
+  seta8
+
+  ldy #0
+  sty PPUADDR
+  ldy #DMAMODE_PPUHIDATA
+  sty DMAMODE
+  lda #^Mode7Parallax
+  sta DMAADDRBANK
+  ldy #64
+  sty DMALEN
+
+  lda #1
+  sta COPYSTART
+.endif  
+
   setaxy16
   .import mode7_hdma, mode7_hdma_en
   phb
@@ -462,6 +508,7 @@ Loop:
   plb
 
   seta8
+
   lda mode7_hdma_en
   sta HDMASTART
 
@@ -498,6 +545,48 @@ Loop:
   jsl WaitKeysReady ; Also clears OamPtr
   seta16
   jsr mode_y
+
+  lda Mode7PlayerHeight
+  cmp #$400
+  bcs :+
+  lda keynew
+  and #KEY_B
+  beq :+
+;    lda #.loword($400)
+    lda #.loword($200)
+    sta Mode7PlayerVSpeed
+    stz Mode7PlayerJumpCancel
+  :
+
+  lda Mode7PlayerVSpeed
+;  sub #$10
+  sub #$8
+  sta Mode7PlayerVSpeed
+
+  add Mode7PlayerHeight
+  sta Mode7PlayerHeight
+  bpl :+
+    stz Mode7PlayerVSpeed
+    stz Mode7PlayerHeight
+    lda #0
+  :
+  seta8
+  xba
+  sta mode7_height
+  seta16
+
+  ; Allow canceling jumps
+  lda keydown
+  and #KEY_B
+  bne :+
+  lda Mode7PlayerVSpeed
+  bmi :+
+  lda Mode7PlayerJumpCancel
+  bne :+
+    inc Mode7PlayerJumpCancel
+    lsr Mode7PlayerVSpeed
+    lsr Mode7PlayerVSpeed
+  :
 
   jsr Mode7DrawPlayer
 
@@ -1469,6 +1558,8 @@ GradientTable:     ;
 Mode7Tiles:
 .incbin "../tilesetsX/M7Tileset.chr", 0, CommonTilesetLength
 
+Mode7Parallax:
+.incbin "../tilesetsX/M7Parallax.chr"
 
 
 .segment "ZEROPAGE"
