@@ -16,6 +16,8 @@
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
 .global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y
 
+.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks
+
 .segment "ZEROPAGE" ; < $100
 temp = 0 ; temp+0 to temp+13 used
 temp2 = 14
@@ -156,7 +158,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 ; signed 16-bit x 8-bit multiply, 24-bit result, returns high 16
 .a16
 .i8
-.export smul16_u8
+.export smul16_u8, sdiv32, umul16, smul32f_16f, smul16, smul16f
 .proc smul16_u8 ; math_a x math_b = math_p, clobbers A/X/Y
 	; DB = 0
 	ldx z:math_b
@@ -1306,12 +1308,10 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 		sta z:temp+2
 		; these could be skipped, as the values won't display anyway
 		lda #.loword(pv_hdma_ab0)
-		clc
-		adc z:temp+4
+		add z:temp+4
 		sta a:pv_hdma_abi0+1, X
 		lda #.loword(pv_hdma_cd0)
-		clc
-		adc z:temp+4
+		add z:temp+4
 		sta a:pv_hdma_cdi0+1, X
 		; next group
 		inx
@@ -1901,18 +1901,19 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 
 .a16
 .i8
-.proc pv_texel_to_screen ; input: texelx,texely output screenx,screeny (pv_rebuild must be up to date)
+.proc pv_texel_to_screen_generic ; input: texelx,texely output screenx,screeny (pv_rebuild must be up to date)
+	php
+	setxy8
 	; 1. translate to origin-relative position
 	lda z:texelx
-	sec
-	sbc f:mode7_m7x
+	sub f:mode7_m7x
 	sta z:screenx
 	lda z:texely
-	sec
-	sbc f:mode7_m7y
+	sub f:mode7_m7y
 	sta z:screeny
-	; 2. try wrapping if the distance is larger than half the map
 
+	; 2. try wrapping if the distance is larger than half the map
+	; Skip
 .if 0
 	ldx f:pv_wrap
 	beq @wrap_end
@@ -1963,16 +1964,19 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 		lda z:mode7_m7t+0
 		sta z:math_b
 		jsr smul16f ; X*A
+
 		pha ; X*A
 		lda z:mode7_m7t+2
 		sta z:math_b
 		jsr smul16f ; X*B
+
 		pha ; X*B, X*A
 		lda z:screeny
 		sta z:math_a
 		lda z:mode7_m7t+6
 		sta z:math_b
 		jsr smul16 ; Y*D
+
 		pla
 		clc
 		adc z:math_p+1
@@ -1980,16 +1984,19 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 		lda z:mode7_m7t+4
 		sta z:math_b
 		jsr smul16 ; Y*C
+
 		pla
 		clc
 		adc z:math_p+1
 		sta z:screenx ; sx = X*A + Y*C
 	@rotate_end:
+
 	; translate Y to move 0 to the top of the screen, rather than the origin at the bottom
 	lda z:screeny
 	clc
 	adc z:pv_sh_
 	sta z:screeny
+
 	; 4. transform Y to scanline
 	;
 	; Interpolating Y from 0 to SH with perspective correction gives the relationship between Y in frustum-texel-space and scanlines:
@@ -2010,6 +2017,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	@offscreen: ; just return a very large screeny to indicate offscreen
 		lda #$5FFF
 		sta z:screeny
+		plp
 		rts
 	:
 	sta z:math_a
@@ -2021,11 +2029,11 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	lda z:math_p+2
 	sta z:math_a+2 ; Y * S1
 	lda z:pv_l1
-	sec
-	sbc z:pv_l0
+	sub z:pv_l0
 	and #$00FF
 	sta z:math_b
 	jsr smul32f_16f
+
 	lda z:math_p+0
 	sta z:temp+0
 	lda z:math_p+2
@@ -2035,6 +2043,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	lda z:pv_sh_
 	sta z:math_b
 	jsr umul16
+
 	lda z:math_p+0
 	sta z:temp+4
 	lda z:math_p+2
@@ -2042,13 +2051,12 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	lda z:screeny
 	sta z:math_a
 	lda z:pv_s0
-	sec
-	sbc z:pv_s1
+	sub z:pv_s1
 	sta z:math_b
 	jsr smul16 ; Y * (S0 - S1)
+
 	lda z:temp+4
-	sec
-	sbc z:math_p+0
+	sub z:math_p+0
 	sta z:temp+4
 	sta z:math_b+0
 	lda z:temp+6
@@ -2060,10 +2068,10 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	lda z:temp+2
 	sta z:math_a+2
 	jsr sdiv32 ; (Y * S1 * (L1-L0)) / ((S0 * SH) - Y * (S0 - S1))
+
 	lda z:pv_l0
 	and #$00FF
-	clc
-	adc z:math_p+0
+	add z:math_p+0
 	sta z:screeny ; screeny is now correct
 	; screenx
 	lda z:pv_sh_
@@ -2071,6 +2079,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	lda z:screenx
 	sta z:math_b
 	jsr smul16 ; X * SH
+
 	stz z:math_a
 	lda z:math_p+0
 	sta z:math_a+1
@@ -2086,6 +2095,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	adc #128
 	sta z:screenx
 	; NOTE: could probably only do 1 division (1 / the shared denominator) and then 2 multiplies.
+	plp
 	rts
 	; Optimization note:
 	;   Should probably do 1 division (1 / the shared denominator) and then 2 multiplies, since udiv32/sdiv32 is so slow,
@@ -2094,3 +2104,468 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	;   For example: if we only need to rotate, but don't change other parameters, we could create a lookup table with SH entries,
 	;   mapping every Y to a screeny, and providing a scaling factor for every X. (e.g. F-Zero doesn't change perspective during a race.)
 .endproc
+
+; .------------------------------------------------------------------
+; | Different versions of the perspective routines to use on the ground
+; '------------------------------------------------------------------
+
+.export pv_setup_for_ground
+.proc pv_setup_for_ground
+	temp = 0
+	ab_lut_pointer = 2 ;and 3
+	cd_lut_pointer = 4 ;and 5
+	abcd_banks     = 6 ;and 7
+	php
+	phb
+
+	; Work on data structures in bank 7F
+	ph2banks mode7_hdma, mode7_hdma
+	plb
+	plb
+
+	setaxy16
+
+	; Calculate which table to use based on which 
+	lda angle
+	asl
+	tax
+	lda f:perspective_m7a_m7b_list,x
+	sta ab_lut_pointer
+	lda f:perspective_m7c_m7d_list,x
+	sta cd_lut_pointer
+
+	lda angle ; aaaaaaaa
+	lsr       ; .aaaaaaa
+	lsr       ; ..aaaaaa
+	lsr       ; ...aaaaa
+	lsr       ; ....aaaa
+	lsr       ; .....aaa
+	and            #%110
+    tax
+	lda f:perspective_abcd_banks,x
+	sta abcd_banks
+	seta8
+
+	lda f:pv_buffer
+	eor #1
+	sta f:pv_buffer
+	jsr pv_buffer_x
+
+	; Make the indirect buffers
+	lda #47
+	sta a:pv_hdma_abi0+0,x
+	sta a:pv_hdma_cdi0+0,x
+	; Skip +1 and +2 because they won't be visible
+
+	; After the first 48 there's 176 scanline left, to fill with the actual perspective data
+
+	; Copy data for 127 scanlines, in repeat mode
+	lda #$80+127
+	sta a:pv_hdma_abi0+3,x
+	sta a:pv_hdma_cdi0+3,x
+	; Go for 49 more scanlines. 127+49=176
+	lda #$80+49
+	sta a:pv_hdma_abi0+6,x
+	sta a:pv_hdma_cdi0+6,x
+	; Then put the end marker
+	stz a:pv_hdma_abi0+9,x
+	stz a:pv_hdma_cdi0+9,x
+
+	seta16
+	lda ab_lut_pointer
+	sta a:pv_hdma_abi0+4,x
+	add #127*4
+	sta a:pv_hdma_abi0+7,x
+
+	lda cd_lut_pointer
+	sta a:pv_hdma_cdi0+4,x
+	add #127*4
+	sta a:pv_hdma_cdi0+7,x
+	seta8
+
+	; Set up HDMA configuration for next frame
+	lda #$1f
+	sta f:mode7_hdma_en       ; enable HDMA (0,1,2,3,4)
+	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
+	stz a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer
+	lda #DMA_INDIRECT | DMA_0011
+	sta a:mode7_hdma+(2*16)+0 ; AB: 4 byte transfer, indirect
+	sta a:mode7_hdma+(3*16)+0 ; CD: 4 byte transfer, indirect
+	lda #DMA_INDIRECT
+	sta a:mode7_hdma+(4*16)+0 ; col: 1 byte transfer, indirect
+
+	lda #<BGMODE
+	sta a:mode7_hdma+(0*16)+1 ; bgm: $2105 BGMODE
+	lda #<BLENDMAIN
+	sta a:mode7_hdma+(1*16)+1 ; tm: $212C TM
+	lda #<M7A
+	sta a:mode7_hdma+(2*16)+1
+	lda #<M7C
+	sta a:mode7_hdma+(3*16)+1
+	lda #<COLDATA
+	sta a:mode7_hdma+(4*16)+1
+
+	; Table banks
+	lda #^GroundPerspectiveTM
+	sta a:mode7_hdma+(0*16)+4 ; BGMODE
+	sta a:mode7_hdma+(1*16)+4 ; BLENDMAIN/TM
+	sta a:mode7_hdma+(4*16)+4 ; COLDATA
+	; AB and CD use tables in RAM
+	lda #^pv_hdma_abi0
+	sta a:mode7_hdma+(2*16)+4
+	sta a:mode7_hdma+(3*16)+4
+
+	; Indirect banks
+	lda abcd_banks + 0
+	sta a:mode7_hdma+(2*16)+7 ; M7A M7B
+	lda abcd_banks + 1
+	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
+	lda #^pv_fade_table0
+	sta a:mode7_hdma+(4*16)+7
+
+	lda f:pv_buffer
+	beq :+
+		seta16
+		lda #PV_HDMA_STRIDE
+		bra :++
+	:
+	seta16
+	lda #0
+:	sta temp
+
+	lda #.loword(GroundPerspectiveBGM)
+	sta a:mode7_hdma+(0*16)+2
+
+	lda #.loword(GroundPerspectiveTM)
+	sta a:mode7_hdma+(1*16)+2
+
+	lda #.loword(pv_hdma_abi0)
+	add temp
+	sta a:mode7_hdma+(2*16)+2
+
+	lda #.loword(pv_hdma_cdi0)
+	add temp
+	sta a:mode7_hdma+(3*16)+2
+
+	lda #.loword(GroundPerspectiveCOL)
+	sta a:mode7_hdma+(4*16)+2
+
+    ; The rest of the routine don't do anything for the effect, but do set up variables to be how other code expects them
+	; though GroundTexelToScreen only looks at the bits 1001 in pv_negate so this can be simplified
+	setxy8
+	lda #0
+	ldx z:angle
+	txa
+	jsr sincos
+	; store m7t matrix (replaced by HDMA but used for other purposes like pv_texel_to_screen, and player movement)
+	lda z:cosa
+	sta z:mode7_m7t+0 ; A = cos
+	sta z:mode7_m7t+6 ; D = cos
+	lda z:sina
+	sta z:mode7_m7t+2 ; B = sin
+	eor #$FFFF
+	inc
+	sta z:mode7_m7t+4 ; C = -sin
+
+	plb
+	plp
+	rts
+.endproc
+
+; HDMA tables to use on the ground
+.proc GroundPerspectiveTM
+	.byt 47, $12
+	.byt 1,  $11
+	.byt 0
+.endproc
+
+.proc GroundPerspectiveBGM
+	.byt 47, 1
+	.byt 1,  7
+	.byt 0
+.endproc
+
+.proc GroundPerspectiveCOL
+	.byt 48-16-1
+	.addr pv_fade_table0
+	.byt $80 | 32
+	.addr pv_fade_table1
+	.byt 0
+.endproc
+
+.a16
+.i8
+.export pv_set_ground_origin
+.proc pv_set_ground_origin ; Y = scanline to place posx/posy on the center of
+target_scanline = 0
+index_to_line   = 2 ; and 3
+ab_lut_pointer  = 4 ; and 5, 6
+cd_lut_pointer  = 7 ; and 8, 9
+abcd_banks      = 10 ; and 11
+	sty target_scanline ; temp+0 = target scanline
+	tya
+	sub #48 ; l0
+	and #$00FF
+	asl ;*2
+	asl ;*4
+	sta index_to_line
+
+	setxy16
+	; Get the table
+	lda angle
+	asl
+	tax
+	lda f:perspective_m7a_m7b_list,x
+	add index_to_line
+	add #2
+	sta ab_lut_pointer
+	lda f:perspective_m7c_m7d_list,x
+	add index_to_line
+	add #2
+	sta cd_lut_pointer
+
+	lda angle ; aaaaaaaa
+	lsr       ; .aaaaaaa
+	lsr       ; ..aaaaaa
+	lsr       ; ...aaaaa
+	lsr       ; ....aaaa
+	lsr       ; .....aaa
+	and            #%110
+    tax
+	lda f:perspective_abcd_banks,x
+
+	seta8
+	; Set the banks for the pointers
+	sta ab_lut_pointer+2
+	xba
+	sta cd_lut_pointer+2
+
+	lda #224 ;l1
+	sub target_scanline
+	sta z:math_b ; math_b = scanlines above bottom
+	seta16
+	lda [ab_lut_pointer]
+	sta z:math_a ; math_a = b coefficient
+	lda [cd_lut_pointer]
+	pha ; store for a moment
+	setxy8
+	.i8
+	jsr smul16_u8
+	clc
+	adc z:posx+2
+	sta f:mode7_m7x ; ox = posx + (scanlines * b)
+	sec
+	sbc #128
+	sta f:mode7_hofs ; ox - 128
+	pla
+	sta z:math_a ; math_a = d coefficient
+	jsr smul16_u8
+	clc
+	adc z:posy+2
+	sta f:mode7_m7y ; oy = posy + (scanlines * d)
+
+	lda #224 ;l1
+	eor #$FFFF
+	sec
+	adc f:mode7_m7y
+	sta f:mode7_vofs ; oy - L1
+
+	; scroll sky to meet L0 and pan with angle
+	lda z:angle
+	asl
+	asl
+	eor #$FFFF
+	and #$03FF
+	sta f:mode7_bg2hofs
+
+	lda #48 ;l0
+	eor #$FFFF
+	sec
+	adc #240
+	sta f:mode7_bg2vofs
+	rts
+.endproc
+
+.a16
+.i8
+.export pv_texel_to_screen
+.proc pv_texel_to_screen
+  .importzp mode7_height
+  lda mode7_height
+  and #255
+  beq :+
+  jmp pv_texel_to_screen_generic
+:
+.endproc
+; Fall through
+
+.a16
+.i8
+.export pv_texel_to_screen_ground
+.proc pv_texel_to_screen_ground ; input: texelx,texely output screenx,screeny (pv_rebuild must be up to date)
+pv_sh_constant = (384 * (224-48)) / 256 ;(S0 * (L1-L0)) / 256 = 264
+s0_constant = 384
+s1_constant = 64
+l0_constant = 48
+l1_constant = 224
+
+temp = 0
+	php
+	setxy8
+
+	; 1. translate to origin-relative position
+	lda z:texelx
+	sub f:mode7_m7x
+	sta z:screenx
+	lda z:texely
+	sub f:mode7_m7y
+	sta z:screeny
+	; 2. try wrapping if the distance is larger than half the map
+	; Skip
+
+	; 3. project into the rotated frustum
+;	ldx z:pv_scale+1
+;	bne @rotate
+;	lda z:pv_negate
+;	and #%1001
+;	beq @rotate_end ; if b=0, assume c=0, and if a/d are not negated, angle=0
+	@rotate:
+		lda z:screenx
+		sta z:math_a
+		lda z:mode7_m7t+0
+		sta z:math_b
+		jsr smul16f ; X*A
+
+		pha ; X*A
+		lda z:mode7_m7t+2
+		sta z:math_b
+		jsr smul16f ; X*B
+
+		pha ; X*B, X*A
+		lda z:screeny
+		sta z:math_a
+		lda z:mode7_m7t+6
+		sta z:math_b
+		jsr smul16 ; Y*D
+
+		pla
+		add z:math_p+1
+		sta z:screeny ; sy = X*B + Y*D
+		lda z:mode7_m7t+4
+		sta z:math_b
+		jsr smul16 ; Y*C
+
+		pla
+		add z:math_p+1
+		sta z:screenx ; sx = X*A + Y*C
+	@rotate_end:
+
+	; translate Y to move 0 to the top of the screen, rather than the origin at the bottom
+	lda z:screeny
+	add #pv_sh_constant
+	sta z:screeny
+
+	; 4. transform Y to scanline
+	;
+	; Interpolating Y from 0 to SH with perspective correction gives the relationship between Y in frustum-texel-space and scanlines:
+	;   t = (scanline - L0) / (L1-L0)
+	;   Y = lerp(0/S0,SH/S1,t) / lerp(1/S0,1/S1,t)
+	; Inverting this calculation to find scanline from Y:
+	;   (scanline - L0) = (Y * S1 * (L1-L0)) / ((S0 * SH) - Y * (S0 - S1))
+	;
+	; X must be rescaled by a factor of S0-to-S1 / 256, interpolating linearly with Y:
+	;   screenx = X / lerp(S0/256,S1/256,Y/SH)
+	; This becomes a division by the same factor as with Y:
+	;   screenx = (X * SH * 256) / ((S0 * SH) - Y * (S0 - S1))
+	;
+	lda z:screeny
+	bmi @offscreen
+	cmp #pv_sh_constant
+	bcc :+
+	@offscreen: ; just return a very large screeny to indicate offscreen
+		lda #$5FFF
+		sta z:screeny
+		plp
+		rts
+	:
+	sta z:math_a
+	lda #s1_constant
+	sta z:math_b
+	jsr smul16
+	lda z:math_p+0
+	sta z:math_a+0
+	lda z:math_p+2
+	sta z:math_a+2 ; Y * S1
+    lda #l1_constant - l0_constant
+	sta z:math_b
+	jsr smul32f_16f
+
+	lda z:math_p+0
+	sta z:temp+0
+	lda z:math_p+2
+	sta z:temp+2 ; Y * S1 * (L1-L0)
+	lda #s0_constant
+	sta z:math_a
+	lda #pv_sh_constant
+	sta z:math_b
+	jsr umul16
+
+	lda z:math_p+0
+	sta z:temp+4
+	lda z:math_p+2
+	sta z:temp+6 ; S0 * SH
+	lda z:screeny
+	sta z:math_a
+    lda #s0_constant - s1_constant
+	sta z:math_b
+	jsr smul16 ; Y * (S0 - S1)
+
+	lda z:temp+4
+	sub z:math_p+0
+	sta z:temp+4
+	sta z:math_b+0
+	lda z:temp+6
+	sbc z:math_p+2
+	sta z:math_b+2 ; (S0 * SH) - Y * (S0 - S1)
+	sta z:temp+6
+	lda z:temp+0
+	sta z:math_a+0
+	lda z:temp+2
+	sta z:math_a+2
+	jsr sdiv32 ; (Y * S1 * (L1-L0)) / ((S0 * SH) - Y * (S0 - S1))
+
+	lda #l0_constant
+	add z:math_p+0
+	sta z:screeny ; screeny is now correct
+	; screenx
+	lda #pv_sh_constant
+	sta z:math_a
+	lda z:screenx
+	sta z:math_b
+	jsr smul16 ; X * SH
+
+	stz z:math_a
+	lda z:math_p+0
+	sta z:math_a+1
+	ldx z:math_p+2
+	stx z:math_a+3 ; X * SH * 256
+	lda z:temp+4
+	sta z:math_b+0
+	lda z:temp+6
+	sta z:math_b+2 ; (S0 * SH) - Y * (S0 - S1)
+	jsr sdiv32 ; (X * SH * 256) / ((S0 * SH) - Y * (S0 - S1))
+
+	lda z:math_p+0
+	add #128
+	sta z:screenx
+	; NOTE: could probably only do 1 division (1 / the shared denominator) and then 2 multiplies.
+	plp
+	rts
+	; Optimization note:
+	;   Should probably do 1 division (1 / the shared denominator) and then 2 multiplies, since udiv32/sdiv32 is so slow,
+	;   and overlapped hardware multiplies can probably do it faster? This function could probably be made a lot leaner,
+	;   but ultimately if we need to do many of these per frame a more efficient alternative route may be needed.
+	;   For example: if we only need to rotate, but don't change other parameters, we could create a lookup table with SH entries,
+	;   mapping every Y to a screeny, and providing a scaling factor for every X. (e.g. F-Zero doesn't change perspective during a race.)
+.endproc
+

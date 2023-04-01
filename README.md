@@ -15,7 +15,9 @@ The game also intends to be more polished and refined than the first one. Here's
 * Levels can have a second foreground layer that can move independently from the first
 * Mode 7 perspective levels starring a mouse named Maffi
 
-Some parts based on [LoROM template](https://github.com/pinobatch/lorom-template)
+Some parts based on [LoROM template](https://github.com/pinobatch/lorom-template).
+
+Mode 7 perspective code based on [Dizworld](https://github.com/bbbradsmith/SNES_stuff/tree/main/dizworld#readme), by rainwarrior.
 
 The corresponding level editor is [Princess Edit 2](https://github.com/NovaSquirrel/PrincessEdit2).
 
