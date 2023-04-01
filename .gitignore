@@ -38,6 +38,7 @@ tools/M7TilesetRearranged.png
 tools/M7Tileset.chrm7
 src/m7palettedata.s
 *.hfm
+Mesen.exe
 Mesen-S.exe
 src/overworldblockenum.s
 src/overworldblockdata.s
@@ -69,4 +70,4 @@ audio/gss_data.s
 audio/brr/gssbrr.exe
 hubworld/*.bin
 hubworld/*.chrsfc
-Mesen.exe
+tools/lut/*.bin
