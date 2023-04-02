@@ -68,6 +68,10 @@ Mode7CheckpointChips = CheckpointState + 6
 Mode7CheckpointKeys  = CheckpointState + 8 ; Four bytes
 Mode7CheckpointTools = CheckpointState + 10
 
+; Where to draw Maffi
+MODE_Y_SX = 128
+MODE_Y_SY = 168
+
 .segment "ZEROPAGE"
 .exportzp mode7_height
 mode7_height: .res 1
@@ -456,190 +460,380 @@ DontIncreaseChipCounter:
 ; Falls through into DizworldMainLoop
 
 .proc DizworldMainLoop
-  jsr set_mode_y
+	seta8
+	stz mode7_height
 Loop:
-  setaxy16
-  inc framecount
+	setaxy16
+	inc framecount
 
-  jsl prepare_ppu_copy_oam_partial
-  seta8
-  jsl WaitVblank
-  ; AXY size preserved, so still .a8 .i16
-  jsl ppu_copy_oam_partial
-  .a8
+	jsl prepare_ppu_copy_oam_partial
+	seta8
+	jsl WaitVblank
+	; AXY size preserved, so still .a8 .i16
+	jsl ppu_copy_oam_partial
+	.a8
 
-  ; ---------------------------------------------
-  ; - Mode 7 vblank tasks
-  ; ---------------------------------------------
-  ; Parallax
-.if 0
-  seta16
-  lda posx+2
-  lsr
-;  lsr
-  and #%111   ; ........ .....xxx
-  xba         ; .....xxx ........
-  lsr         ; ......xx x.......
-  sta 0
+	; ---------------------------------------------
+	; - Mode 7 vblank tasks
+	; ---------------------------------------------
+	; Parallax
+	.if 0
+		seta16
+		lda posx+2
+		lsr
+		;  lsr
+		and #%111   ; ........ .....xxx
+		xba         ; .....xxx ........
+		lsr         ; ......xx x.......
+		sta 0
 
-  lda posy+2
-  neg
-  lsr
-;  lsr
-  and #%111   ; ........ .....yyy
-  asl         ; ........ ....yyy.
-  asl         ; ........ ...yyy..
-  asl         ; ........ ..yyy...
-  ora 0       ; ......xx x.yyy...
-  add #.loword(Mode7Parallax)
-  sta DMAADDR
-  seta8
+		lda posy+2
+		neg
+		lsr
+		;  lsr
+		and #%111   ; ........ .....yyy
+		asl         ; ........ ....yyy.
+		asl         ; ........ ...yyy..
+		asl         ; ........ ..yyy...
+		ora 0       ; ......xx x.yyy...
+		add #.loword(Mode7Parallax)
+		sta DMAADDR
+		seta8
 
-  ldy #0
-  sty PPUADDR
-  ldy #DMAMODE_PPUHIDATA
-  sty DMAMODE
-  lda #^Mode7Parallax
-  sta DMAADDRBANK
-  ldy #64
-  sty DMALEN
+		ldy #0
+		sty PPUADDR
+		ldy #DMAMODE_PPUHIDATA
+		sty DMAMODE
+		lda #^Mode7Parallax
+		sta DMAADDRBANK
+		ldy #64
+		sty DMALEN
 
-  lda #1
-  sta COPYSTART
-.endif  
+		lda #1
+		sta COPYSTART
+	.endif
 
-  setaxy16
-  .import mode7_hdma, mode7_hdma_en
-  phb
-  ldx #.loword(mode7_hdma)
-  ldy #$4300
-  lda #(16*8)-1
-  mvn #^mode7_hdma,#^004300
-  plb
+	setaxy16
+	.import mode7_hdma, mode7_hdma_en
+	phb
+	ldx #.loword(mode7_hdma)
+	ldy #$4300
+	lda #(16*8)-1
+	mvn #^mode7_hdma,#^004300
+	plb
 
-  seta8
+	seta8
 
-  lda mode7_hdma_en
-  sta HDMASTART
+	lda mode7_hdma_en
+	sta HDMASTART
 
-  ; Write to registers
-  lda mode7_m7x+0
-  sta M7X
-  lda mode7_m7x+1
-  sta M7X
-  ;---
-  lda mode7_m7y+0
-  sta M7Y
-  lda mode7_m7y+1
-  sta M7Y
-  ;---
-  lda mode7_hofs+0
-  sta BG1HOFS
-  lda mode7_hofs+1
-  sta BG1HOFS
-  lda mode7_vofs+0
-  sta BG1VOFS
-  lda mode7_vofs+1
-  sta BG1VOFS
-  ;---
-  lda #$0F
-  sta PPUBRIGHT
+	; Write to registers
+	lda mode7_m7x+0
+	sta M7X
+	lda mode7_m7x+1
+	sta M7X
+	;---
+	lda mode7_m7y+0
+	sta M7Y
+	lda mode7_m7y+1
+	sta M7Y
+	;---
+	lda mode7_hofs+0
+	sta BG1HOFS
+	lda mode7_hofs+1
+	sta BG1HOFS
+	lda mode7_vofs+0
+	sta BG1VOFS
+	lda mode7_vofs+1
+	sta BG1VOFS
+	;---
+	lda #$0F
+	sta PPUBRIGHT
 
-  stz CGWSEL      ; Color math is always enabled
-  lda #$23        ; Enable additive blend on BG1 + BG2 + backdrop
-  sta CGADSUB
+	stz CGWSEL      ; Color math is always enabled
+	lda #$23        ; Enable additive blend on BG1 + BG2 + backdrop
+	sta CGADSUB
 
-  ; ---------------------------------------------
-  ; - Calculate stuff for the next frame!
-  ; ---------------------------------------------
-  jsl WaitKeysReady ; Also clears OamPtr
-  seta16
-  jsr mode_y
+	; ---------------------------------------------
+	; - Calculate stuff for the next frame!
+	; ---------------------------------------------
+	jsl WaitKeysReady ; Also clears OamPtr
 
-  lda Mode7PlayerHeight
-  cmp #$400
-  bcs :+
-  lda keynew
-  and #KEY_B
-  beq :+
-;    lda #.loword($400)
-    lda #.loword($200)
-;    lda #.loword($240)
-    sta Mode7PlayerVSpeed
-    stz Mode7PlayerJumpCancel
-  :
+	seta16
+	setxy8
+	; Allow jumping
+	lda Mode7PlayerHeight
+	cmp #$400
+	bcs :+
+	lda keynew
+	and #KEY_B
+	beq :+
+		lda #.loword($200) ; other values tried: $240, $400
+		sta Mode7PlayerVSpeed
+		stz Mode7PlayerJumpCancel
+	:
 
-  lda Mode7PlayerVSpeed
-;  sub #$10
-  sub #$8
-  sta Mode7PlayerVSpeed
+	; Apply gravity
+	lda Mode7PlayerVSpeed
+	sub #$8 ; other values tried: $10
+	sta Mode7PlayerVSpeed
+	add Mode7PlayerHeight
+	sta Mode7PlayerHeight
+	bpl :+
+		stz Mode7PlayerVSpeed
+		stz Mode7PlayerHeight
+		lda #0
+	:
+	seta8
+	xba
+	sta mode7_height
+	seta16
 
-  add Mode7PlayerHeight
-  sta Mode7PlayerHeight
-  bpl :+
-    stz Mode7PlayerVSpeed
-    stz Mode7PlayerHeight
-    lda #0
-  :
-  seta8
-  xba
-  sta mode7_height
-  seta16
+	; Allow canceling jumps
+	lda keydown
+	and #KEY_B
+	bne :+
+	lda Mode7PlayerVSpeed
+	bmi :+
+	lda Mode7PlayerJumpCancel
+	bne :+
+		inc Mode7PlayerJumpCancel
+		lsr Mode7PlayerVSpeed
+		lsr Mode7PlayerVSpeed
+	:
 
-  ; Allow canceling jumps
-  lda keydown
-  and #KEY_B
-  bne :+
-  lda Mode7PlayerVSpeed
-  bmi :+
-  lda Mode7PlayerJumpCancel
-  bne :+
-    inc Mode7PlayerJumpCancel
-    lsr Mode7PlayerVSpeed
-    lsr Mode7PlayerVSpeed
-  :
+	; rotate with left/right
+	ldx z:angle
+	lda keydown
+	bit #KEY_LEFT
+	beq :+
+		inx
+		bit #KEY_Y
+		beq :+
+			inx
+	:
+	lda keydown
+	bit #KEY_RIGHT
+	beq :+
+		dex
+		bit #KEY_Y
+		beq :+
+			dex
+	:
+	stx z:angle
 
-  jsr Mode7DrawPlayer
-  .a16
-  .i16
+	; Generate perspective, unless you're on the ground
+	; in which case use precalculated perspective
+	; --------------------
+	lda z:mode7_height
+	and #$00FF
+	beq OnGround
+		; set horizon
+		lsr
+		add #48 ; Was originally 32
+		tax
+		sta z:pv_l0 ; First scanline. l0 = 48+(mode7_height/2)  [48-112]
+		ldx #224
+		stx z:pv_l1 ; Last scanline + 1
 
-  ; TEST
-  lda #150
-  sta texelx
-  sta texely
-  jsr pv_texel_to_screen
-  lda screeny
-  cmp #$5FFF
-  beq :+
-    ldy OamPtr
+		; set view scale
+		lda z:mode7_height
+		and #$00FF
+		asl
+	;	asl ; Added by Nova for camera effect
+		add #384
+		sta z:pv_s0 ; 384 + (height*2)    [384-640]
 
-    lda #$40|OAM_PRIORITY_2
-    sta OAM_TILE,y
-    seta8
-	lda screenx
-	sta OAM_XPOS,y
-	lda screeny
-	sta OAM_YPOS,y
+		lda z:mode7_height
+		and #$00FF
+		lsr
+	;	lsr ; Added by Nova for camera effect
+		adc #64
+		sta z:pv_s1 ; 64 + (height/2)     [64-128]
 
-    lda #$00
-    sta OAMHI+1,y
-    seta16
+		stz z:pv_sh ; dependent-vertical scale
 
-	iny
-	iny
-	iny
-	iny
-    sty OamPtr
-  :
+		ldx #2
+		stx z:pv_interp ; 2x interpolation
+		jsr pv_rebuild
+		bra :+
+	OnGround:
+		jsr pv_setup_for_ground
+	:
 
 
-  jsl ppu_pack_oamhi_partial
-  .a8 ; (does seta8)
+	; up/down moves player (depends on generated rotation matrix)
+	lda keydown
+	and #KEY_DOWN ; down
+	beq :+
+		; X += B * 2
+		lda z:mode7_m7t + 2 ; B
+		asl
+		pha
+		add z:posx+1
+		sta z:posx+1
+		pla
+		jsr sign
+		adc z:posx+3
+		and #$0003 ; wrap to 0-1023
+		sta z:posx+3
+		; Y += D * 2
+		lda z:mode7_m7t + 6 ; D
+		asl
+		pha
+		add z:posy+1
+		sta z:posy+1
+		pla
+		jsr sign
+		adc z:posy+3
+		and #$0003
+		sta z:posy+3
+	:
 
-  lda #$0F
-  sta PPUBRIGHT
+	lda keydown
+	and #KEY_UP ; up
+	beq :+
+		; X -= B * 2
+		lda #0
+		sub z:mode7_m7t + 2 ; B
+		asl
+		pha
+		add z:posx+1
+		sta z:posx+1
+		pla
+		jsr sign
+		adc z:posx+3
+		and #$0003
+		sta z:posx+3
+		; Y -= D * 2
+		lda #0
+		sub z:mode7_m7t + 6 ; D
+		asl
+		pha
+		add z:posy+1
+		sta z:posy+1
+		pla
+		jsr sign
+		adc z:posy+3
+		and #$0003
+		sta z:posy+3
+	:
 
-  jmp Loop
+	setxy8
+	; Set origin
+	ldy #MODE_Y_SY ; place focus at center of scanline SY
+	lda z:mode7_height
+	and #$00FF
+	beq OnGround2
+	jsr pv_set_origin
+	bra :+
+OnGround2:
+	jsr pv_set_ground_origin
+	:
+
+
+	jsr Mode7DrawPlayer
+	.a16
+	.i16
+
+	.if 0
+	  ; TEST
+	  lda #150
+	  sta texelx
+	  sta texely
+	  jsr pv_texel_to_screen
+	  lda screeny
+	  cmp #$5FFF
+	  beq :+
+		ldy OamPtr
+
+		lda #$40|OAM_PRIORITY_2
+		sta OAM_TILE,y
+		seta8
+		lda screenx
+		sta OAM_XPOS,y
+		lda screeny
+		sta OAM_YPOS,y
+
+		lda #$00
+		sta OAMHI+1,y
+		seta16
+
+		iny
+		iny
+		iny
+		iny
+		sty OamPtr
+	  :
+	.endif
+
+	.if 0
+	  lda #160
+	  sta texelx
+	  sta texely
+	  jsr pv_texel_to_screen
+	  lda screeny
+	  cmp #$5FFF
+	  beq :+
+		ldy OamPtr
+
+		lda #$40|OAM_PRIORITY_2
+		sta OAM_TILE,y
+		seta8
+		lda screenx
+		sta OAM_XPOS,y
+		lda screeny
+		sta OAM_YPOS,y
+
+		lda #$00
+		sta OAMHI+1,y
+		seta16
+
+		iny
+		iny
+		iny
+		iny
+		sty OamPtr
+	  :
+	.endif
+
+	.if 0
+	  lda #170
+	  sta texelx
+	  sta texely
+	  jsr pv_texel_to_screen
+	  lda screeny
+	  cmp #$5FFF
+	  beq :+
+		ldy OamPtr
+
+		lda #$40|OAM_PRIORITY_2
+		sta OAM_TILE,y
+		seta8
+		lda screenx
+		sta OAM_XPOS,y
+		lda screeny
+		sta OAM_YPOS,y
+
+		lda #$00
+		sta OAMHI+1,y
+		seta16
+
+		iny
+		iny
+		iny
+		iny
+		sty OamPtr
+	  :
+	.endif
+
+	jsl ppu_pack_oamhi_partial
+	.a8 ; (does seta8)
+
+	lda #$0E
+	sta PPUBRIGHT
+
+	jmp Loop
 .endproc
 
 
@@ -724,7 +918,7 @@ Loop:
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
 
-  lda #MODE_Y_SY - MODE_Y_mode7_height_BASE + 1
+  lda #MODE_Y_SY - 16 + 1
   sub mode7_height
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
@@ -1621,194 +1815,6 @@ Mode7Parallax:
   plb
   rti
 .endproc
-
-
-;
-;
-; =============================================================================
-; Mode Y test "Flying"
-; - Mode 1 clouds at top, fixed colour horizon fades
-; - Map rotates around the player
-; - L/R raises/lowers view
-;
-
-; focus location on ground
-MODE_Y_SX = 128
-MODE_Y_SY = 168
-; minimum height of bird above the ground (height is 0-128 + this)
-MODE_Y_mode7_height_BASE = 16
-
-set_mode_y:
-	seta8
-	lda #0
-	sta mode7_height
-mode_y:
-	seta16
-	setxy8
-	; L/R = up/down
-	ldx z:mode7_height
-	lda keydown
-	and #$0010 ; R for up
-	beq :+
-		cpx #127
-		bcs :+
-		inx
-	:
-	lda keydown
-	and #$0020 ; L for down
-	beq :+
-		cpx #1
-		bcc :+
-		dex
-	:
-	stx z:mode7_height
-	; rotate with left/right
-	ldx z:angle
-	lda keydown
-	and #$0200 ; left
-	beq :+
-		inx
-	:
-	lda keydown
-	and #$0100 ; right
-	beq :+
-		dex
-	:
-	stx z:angle
-
-
-	; generate perspective
-	; --------------------
-	; set horizon
-	lda z:mode7_height
-	and #$00FF
-	beq OnGround
-	lsr
-	clc
-	adc #48 ; Was originally 32
-	tax
-	sta z:pv_l0 ; First scanline. l0 = 48+(mode7_height/2)  [48-112]
-	ldx #224
-	stx z:pv_l1 ; Last scanline + 1
-
-	; set view scale
-	lda z:mode7_height
-	and #$00FF
-	asl
-;	asl ; Added by Nova for camera effect
-	clc
-	adc #384
-	sta z:pv_s0 ; 384 + (height*2)    [384-640]
-
-	lda z:mode7_height
-	and #$00FF
-	lsr
-;	lsr ; Added by Nova for camera effect
-	adc #64
-	sta z:pv_s1 ; 64 + (height/2)     [64-128]
-
-	lda #0
-	sta z:pv_sh ; dependent-vertical scale
-
-	ldx #2
-	stx z:pv_interp ; 2x interpolation
-	jsr pv_rebuild
-	bra UsedPVRebuild
-OnGround:
-	jsr pv_setup_for_ground
-UsedPVRebuild:
-
-
-	; up/down moves player (depends on generated rotation matrix)
-	lda keydown
-	and #$0400 ; down
-	beq :+
-		; X += B * 2
-		lda z:mode7_m7t + 2 ; B
-		asl
-		pha
-		clc
-		adc z:posx+1
-		sta z:posx+1
-		pla
-		jsr sign
-		adc z:posx+3
-		and #$0003 ; wrap to 0-1023
-		sta z:posx+3
-		; Y += D * 2
-		lda z:mode7_m7t + 6 ; D
-		asl
-		pha
-		clc
-		adc z:posy+1
-		sta z:posy+1
-		pla
-		jsr sign
-		adc z:posy+3
-		and #$0003
-		sta z:posy+3
-	:
-
-	lda keydown
-	and #$0800 ; up
-	beq :+
-		; X -= B * 2
-		lda #0
-		sec
-		sbc z:mode7_m7t + 2 ; B
-		asl
-		pha
-		clc
-		adc z:posx+1
-		sta z:posx+1
-		pla
-		jsr sign
-		adc z:posx+3
-		and #$0003
-		sta z:posx+3
-		; Y -= D * 2
-		lda #0
-		sec
-		sbc z:mode7_m7t + 6 ; D
-		asl
-		pha
-		clc
-		adc z:posy+1
-		sta z:posy+1
-		pla
-		jsr sign
-		adc z:posy+3
-		and #$0003
-		sta z:posy+3
-	:
-
-;	; select to reset position (since aspect ratio can't do anything in sh=0)
-;	lda z:newpad
-;	and #$2000 ; select
-;	beq :+
-;		stz z:posx+0
-;		stz z:posx+2
-;		stz z:posx+4
-;		stz z:posy+0
-;		stz z:posy+2
-;		stz z:posy+4
-;		ldx #0
-;		stx z:angle
-;	:
-
-	setxy8
-	; Set origin
-	ldy #MODE_Y_SY ; place focus at center of scanline SY
-	lda z:mode7_height
-	and #$00FF
-	beq OnGround2
-	jsr pv_set_origin
-	bra InAir2
-OnGround2:
-	jsr pv_set_ground_origin
-InAir2:
-
-	rts
 
 .a16
 .proc sign ; A = value, returns either 0 or $FFFF, preserves flags

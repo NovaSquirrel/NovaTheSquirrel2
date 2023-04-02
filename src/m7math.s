@@ -140,8 +140,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	lda a:CPUPROD
 	stx a:CPUMCAND
 	sty a:CPUMUL       ; a1 x b0 (C)
-	clc
-	adc z:math_p+1    ; 00AA + 0BB0 (can't set carry because high byte was 0)
+	add z:math_p+1    ; 00AA + 0BB0 (can't set carry because high byte was 0)
 	ldy z:math_b+1
 	adc a:CPUPROD
 	sty a:CPUMUL       ; a1 x b1 (D)
@@ -171,8 +170,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	stx a:CPUMUL       ; b x a1 (B)
 	sta z:math_p+0    ; 0AA
 	lda z:math_p+1
-	clc
-	adc a:CPUPROD       ; 0AA + BB0
+	add a:CPUPROD       ; 0AA + BB0
 	sta z:math_p+1
 	cpx #$80
 	bcc :+ ; if sign bit, must mutiply b by sign extend
@@ -228,10 +226,8 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	lda a:CPUPROD
 	stx a:CPUMCAND
 	sty a:CPUMUL       ; a1 x b0 (C)
-	clc
-	adc z:math_p+1    ; AA + B0
-	clc
-	adc a:CPUPROD       ; AA + B0 + C0
+	add z:math_p+1    ; AA + B0
+	add a:CPUPROD       ; AA + B0 + C0
 	tax
 	stx z:math_p+1
 	lda z:math_p+0
@@ -274,16 +270,14 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	lda z:math_r+6
 	sta z:math_b+0
 	jsr mul16t     ; a0 x b1 (B)
-	clc
-	adc z:math_r+2
+	add z:math_r+2
 	sta z:math_r+2 ; r+0 = AAAA + BB00
 	lda z:math_p+6
 	sta z:math_a+0
 	lda z:math_r+4
 	sta z:math_b+0
 	jsr mul16t     ; a1 x b0 (C)
-	clc
-	adc z:math_r+2 ; r+0 = AAAA + BB00 + CC00
+	add z:math_r+2 ; r+0 = AAAA + BB00 + CC00
 	sta z:math_p+2
 	lda z:math_r+0
 	sta z:math_p+0
@@ -327,8 +321,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	sta z:math_b
 	jsr umul16 ; a0 x b1 (B)
 	lda z:math_p+0
-	clc
-	adc z:math_r+2
+	add z:math_r+2
 	sta z:math_r+2
 	lda z:math_p+2
 	adc z:math_r+4
@@ -339,8 +332,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	sta z:math_b
 	jsr umul16 ; a1 x b0 (C)
 	lda z:math_p+0
-	clc
-	adc z:math_r+2
+	add z:math_r+2
 	sta z:math_r+2
 	lda z:math_p+2
 	adc z:math_r+4 ; 0AAAA + BBB00 + CCC00
@@ -351,21 +343,18 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	ldx z:temp+12
 	stx a:CPUMUL ; a0 x b2 (D)
 	ldx z:temp+2
-	clc
-	adc a:CPUPROD      ; 0AAAA + BBB00 + CCC00 + D0000
+	add a:CPUPROD      ; 0AAAA + BBB00 + CCC00 + D0000
 	stx a:CPUMCAND
 	ldx z:temp+10
 	stx a:CPUMUL ; a1 x b1 (E)
 	ldx z:temp+4
-	clc
-	adc a:CPUPROD     ; 0AAAA + BBB00 + CCC00 + D0000 + E0000
+	add a:CPUPROD     ; 0AAAA + BBB00 + CCC00 + D0000 + E0000
 	stx a:CPUMCAND
 	ldx z:temp+8
 	stx a:CPUMUL ; a2 x b0 (F)
 	nop
 	nop
-	clc
-	adc a:CPUPROD     ; 0AAAA + BBB00 + CCC00 + D0000 + E0000 + F0000
+	add a:CPUPROD     ; 0AAAA + BBB00 + CCC00 + D0000 + E0000 + F0000
 	sta z:math_r+4
 	lda z:math_r+3 ; return top 16 bits
 	rts
@@ -424,8 +413,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 		iny
 		lda z:math_a+0
 		eor #$FFFF
-		clc
-		adc #1
+		add #1
 		sta z:math_a+0
 		lda z:math_a+2
 		eor #$FFFF
@@ -437,8 +425,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 		iny
 		lda z:math_b+0
 		eor #$FFFF
-		clc
-		adc #1
+		add #1
 		sta z:math_b+0
 		lda z:math_b+2
 		eor #$FFFF
@@ -450,8 +437,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	bne :+
 		lda z:math_p+0
 		eor #$FFFF
-		clc
-		adc #1
+		add #1
 		sta z:math_p+0
 		lda z:math_p+2
 		eor #$FFFF
@@ -485,8 +471,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	cpy #1
 	bne :+
 		lda #0
-		sec
-		sbc z:math_p+0
+		sub z:math_p+0
 		sta z:math_p+0
 		lda #0
 		sbc z:math_p+2
@@ -511,8 +496,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	lda f:sincos_table, X
 	sta z:cosa
 	txa
-	clc
-	adc #(192*2) ; sin(x) = cos(x + 3/4 turn)
+	add #(192*2) ; sin(x) = cos(x + 3/4 turn)
 	and #(256*2)-1
 	tax
 	lda f:sincos_table, X
@@ -623,8 +607,7 @@ DETR40 = 1
 
 .proc texel_to_screen ; input: texelx,texely output screenx,screeny (requires det_r)
 	lda z:texelx
-	sec
-	sbc f:mode7_m7x
+	sub f:mode7_m7x
 	pha ; Tx-Px 16u
 	sta z:math_a
 	lda z:mode7_m7t+4 ; C
@@ -635,16 +618,14 @@ DETR40 = 1
 	lda z:math_p+2
 	sta z:temp+2
 	lda z:texely
-	sec
-	sbc f:mode7_m7y
+	sub f:mode7_m7y
 	pha ; Ty-Py 16u
 	sta z:math_a
 	lda z:mode7_m7t+0 ; A
 	sta z:math_b
 	jsr smul16
 	lda z:math_p+0
-	sec
-	sbc z:temp+0 ; A(Ty-Py)-C(Tx-Px) 24.8f
+	sub z:temp+0 ; A(Ty-Py)-C(Tx-Px) 24.8f
 	sta z:math_a+0
 	lda z:math_p+2
 	sbc z:temp+2
@@ -660,10 +641,8 @@ DETR40 = 1
 		sta z:math_b
 		jsr smul32f_16f ; 16u
 	.endif
-	clc
-	adc f:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
-	sec
-	sbc f:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	add f:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	sub f:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sta z:screeny
 	pla ; Ty-Py 16u
 	sta z:math_a
@@ -680,8 +659,7 @@ DETR40 = 1
 	sta z:math_b
 	jsr smul16
 	lda z:math_p+0
-	sec
-	sbc z:temp+0 ; D(Tx-Px)-B(Ty-Py) 24.8f
+	sub z:temp+0 ; D(Tx-Px)-B(Ty-Py) 24.8f
 	sta z:math_a+0
 	lda z:math_p+2
 	sbc z:temp+2
@@ -697,10 +675,8 @@ DETR40 = 1
 		sta z:math_b
 		jsr smul32f_16f ; 16u
 	.endif
-	clc
-	adc f:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
-	sec
-	sbc f:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	add f:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	sub f:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sta z:screenx
 	rts
 .endproc
@@ -1016,8 +992,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	; =====================================================
 	jsr pv_buffer_x
 	lda z:pv_l0
-	sec
-	sbc #(16+1)
+	sub #(16+1)
 	sta z:temp+0
 	stz z:temp+1
 	@col_fade: ; black until L0-16
@@ -1117,8 +1092,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	:
 	; calculate (ZR1 - ZR0) / (L1 - L0) for interpolation increment
 	ldy #0
-	sec
-	sbc z:pv_zr
+	sub z:pv_zr
 	bcs :+
 		eor #$FFFF
 		inc
@@ -1139,8 +1113,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	sta z:pv_interps+0 ; interps = interp * 4 (stride for increment)
 	stz z:pv_interps+1 ; high byte zero for use with 16-bit registers
 	lda z:pv_l1
-	sec
-	sbc z:pv_l0
+	sub z:pv_l0
 	sta f:$004206 ; WRDIVB = (L1 - L0), result in 12 cycles + far load
 	sta z:temp+0 ; temp+0 = L1-L0 = scanline count
 	ldx z:pv_interp
@@ -1337,12 +1310,10 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 		and #$00FF
 		sta z:temp+2
 		lda #.loword(pv_hdma_ab0)
-		clc
-		adc z:temp+4
+		add z:temp+4
 		sta a:pv_hdma_abi0+1, X
 		lda #.loword(pv_hdma_cd0)
-		clc
-		adc z:temp+4
+		add z:temp+4
 		sta a:pv_hdma_cdi0+1, X
 		inx
 		inx
@@ -1350,8 +1321,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 		lda z:temp+2
 		beq @abcdi_body_end
 		lda z:temp+4 ; if split 127 + rest, add the offset
-		clc
-		adc #(127*4)
+		add #(127*4)
 		sta z:temp+4
 		lda z:temp+2
 		bra @abcdi_body
@@ -1494,24 +1464,19 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	seta16
 	.a16
 	lda #.loword(pv_hdma_bgm0)
-	clc
-	adc z:temp
+	add z:temp
 	sta a:mode7_hdma+(0*16)+2
 	lda #.loword(pv_hdma_tm0)
-	clc
-	adc z:temp
+	add z:temp
 	sta a:mode7_hdma+(1*16)+2
 	lda #.loword(pv_hdma_abi0)
-	clc
-	adc z:temp
+	add z:temp
 	sta a:mode7_hdma+(2*16)+2
 	lda #.loword(pv_hdma_cdi0)
-	clc
-	adc z:temp
+	add z:temp
 	sta a:mode7_hdma+(3*16)+2
 	lda #.loword(pv_hdma_col0)
-	clc
-	adc z:temp
+	add z:temp
 	sta a:mode7_hdma+(4*16)+2
 	; restore register sizes, data bank, and return
 	plb
@@ -1541,8 +1506,7 @@ pv_abcd_lines_full_: ; full perspective with independent horizontal/vertical sca
 	stx a:CPUMUL ; WRMPYB = scale a (spurious write to $4304)
 		; while waiting for the result: lerp(zr)
 		lda z:pv_zr
-		clc
-		adc z:pv_zr_inc
+		add z:pv_zr_inc
 		sta z:pv_zr ; zr += linear interpolation increment for next line
 	lda a:CPUPROD ; RDMPYH:RDMPYL = z * a
 	lsr
@@ -1609,8 +1573,7 @@ pv_abcd_lines_full_: ; full perspective with independent horizontal/vertical sca
 	and #$000F
 	sta z:temp+4
 	tya
-	clc
-	adc z:pv_interps
+	add z:pv_interps
 	tay
 	dec z:temp+2
 	beq :+
@@ -1651,8 +1614,7 @@ pv_abcd_lines_sa1_: ; SA=1 means d=a and c=-b: ~1210 clocks per line
 	ldx z:pv_scale+0
 	stx a:CPUMUL
 		lda z:pv_zr
-		clc
-		adc z:pv_zr_inc
+		add z:pv_zr_inc
 		sta z:pv_zr
 	lda a:CPUPROD
 	lsr
@@ -1695,8 +1657,7 @@ pv_abcd_lines_sa1_: ; SA=1 means d=a and c=-b: ~1210 clocks per line
 	and #$000F
 	sta z:temp+4
 	tya
-	clc
-	adc z:pv_interps
+	add z:pv_interps
 	tay
 	dec z:temp+2
 	bne pv_abcd_lines_sa1_
@@ -1720,8 +1681,7 @@ pv_abcd_lines_angle0_: ; angle 0 means a/d are positive and b=c=0: ~970 clocks p
 	ldx z:pv_scale+0
 	stx a:CPUMUL
 		lda z:pv_zr
-		clc
-		adc z:pv_zr_inc
+		add z:pv_zr_inc
 		sta z:pv_zr
 	lda a:CPUPROD
 	; scale d
@@ -1747,8 +1707,7 @@ pv_abcd_lines_angle0_: ; angle 0 means a/d are positive and b=c=0: ~970 clocks p
 	sta [math_p], Y
 	; next
 	tya
-	clc
-	adc z:pv_interps
+	add z:pv_interps
 	tay
 	dec z:temp+2
 	bne pv_abcd_lines_angle0_
@@ -1764,28 +1723,23 @@ pv_interpolate_4x_: ; interpolate from every 4th line to every 2nd line
 	phx
 	:
 		lda a:pv_hdma_ab0+0,    X
-		clc
-		adc a:pv_hdma_ab0+0+16, X
+		add a:pv_hdma_ab0+0+16, X
 		ror
 		sta a:pv_hdma_ab0+0+ 8, X
 		lda a:pv_hdma_ab0+2,    X
-		clc
-		adc a:pv_hdma_ab0+2+16, X
+		add a:pv_hdma_ab0+2+16, X
 		ror
 		sta a:pv_hdma_ab0+2+ 8, X
 		lda a:pv_hdma_cd0+0,    X
-		clc
-		adc a:pv_hdma_cd0+0+16, X
+		add a:pv_hdma_cd0+0+16, X
 		ror
 		sta a:pv_hdma_cd0+0+ 8, X
 		lda a:pv_hdma_cd0+2,    X
-		clc
-		adc a:pv_hdma_cd0+2+16, X
+		add a:pv_hdma_cd0+2+16, X
 		ror
 		sta a:pv_hdma_cd0+2+ 8, X
 		txa
-		clc
-		adc #16
+		add #16
 		tax
 		dec z:temp+2
 		bne :-
@@ -1803,28 +1757,23 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	; temp+2/3 = lines to interpolate
 	:
 		lda a:pv_hdma_ab0+0,   X
-		clc
-		adc a:pv_hdma_ab0+0+8, X
+		add a:pv_hdma_ab0+0+8, X
 		ror
 		sta a:pv_hdma_ab0+0+4, X
 		lda a:pv_hdma_ab0+2,   X
-		clc
-		adc a:pv_hdma_ab0+2+8, X
+		add a:pv_hdma_ab0+2+8, X
 		ror
 		sta a:pv_hdma_ab0+2+4, X
 		lda a:pv_hdma_cd0+0,   X
-		clc
-		adc a:pv_hdma_cd0+0+8, X
+		add a:pv_hdma_cd0+0+8, X
 		ror
 		sta a:pv_hdma_cd0+0+4, X
 		lda a:pv_hdma_cd0+2,   X
-		clc
-		adc a:pv_hdma_cd0+2+8, X
+		add a:pv_hdma_cd0+2+8, X
 		ror
 		sta a:pv_hdma_cd0+2+4, X
 		txa
-		clc
-		adc #8
+		add #8
 		tax
 		dec z:temp+2
 		bne :-
@@ -1856,8 +1805,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	seta16
 
 	txa
-	clc
-	adc z:temp+2
+	add z:temp+2
 	tax ; X = index of target scanline in pv buffers
 	lda f:pv_hdma_ab0+2, X
 	sta z:math_a ; math_a = b coefficient
@@ -1866,17 +1814,14 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	setxy8
 	.i8
 	jsr smul16_u8
-	clc
-	adc z:posx+2
+	add z:posx+2
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
-	sec
-	sbc #128
+	sub #128
 	sta f:mode7_hofs ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
-	clc
-	adc z:posy+2
+	add z:posy+2
 	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 	lda z:pv_l1
 	and #$00FF
@@ -1921,15 +1866,13 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 		bmi @wrap_xm
 			cmp #512
 			bcc @wrap_x_end
-			sec
-			sbc #1024
+			sub #1024
 			sta z:screenx ; try X-1024
 			bra @wrap_x_end
 		@wrap_xm:
 			cmp #.loword(-513)
 			bcs @wrap_x_end
-			clc
-			adc #1024
+			add #1024
 			sta z:screenx ; try X+1024
 			;bra @wrap_y
 		@wrap_x_end:
@@ -1937,15 +1880,13 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 		bmi @wrap_ym
 			cmp #512
 			bcc @wrap_end
-			sec
-			sbc #1024
+			sub #1024
 			sta z:screeny ; try Y-1024
 			bra @wrap_end
 		@wrap_ym:
 			cmp #.loword(-513)
 			bcs @wrap_end
-			clc
-			adc #1024
+			add #1024
 			sta z:screeny ; try Y+1024
 			;bra @wrap_end
 		;
@@ -1978,23 +1919,20 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 		jsr smul16 ; Y*D
 
 		pla
-		clc
-		adc z:math_p+1
+		add z:math_p+1
 		sta z:screeny ; sy = X*B + Y*D
 		lda z:mode7_m7t+4
 		sta z:math_b
 		jsr smul16 ; Y*C
 
 		pla
-		clc
-		adc z:math_p+1
+		add z:math_p+1
 		sta z:screenx ; sx = X*A + Y*C
 	@rotate_end:
 
 	; translate Y to move 0 to the top of the screen, rather than the origin at the bottom
 	lda z:screeny
-	clc
-	adc z:pv_sh_
+	add z:pv_sh_
 	sta z:screeny
 
 	; 4. transform Y to scanline
@@ -2091,8 +2029,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sta z:math_b+2 ; (S0 * SH) - Y * (S0 - S1)
 	jsr sdiv32 ; (X * SH * 256) / ((S0 * SH) - Y * (S0 - S1))
 	lda z:math_p+0
-	clc
-	adc #128
+	add #128
 	sta z:screenx
 	; NOTE: could probably only do 1 division (1 / the shared denominator) and then 2 multiplies.
 	plp
@@ -2351,17 +2288,14 @@ abcd_banks      = 10 ; and 11
 	setxy8
 	.i8
 	jsr smul16_u8
-	clc
-	adc z:posx+2
+	add z:posx+2
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
-	sec
-	sbc #128
+	sub #128
 	sta f:mode7_hofs ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
-	clc
-	adc z:posy+2
+	add z:posy+2
 	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 
 	lda #224 ;l1
