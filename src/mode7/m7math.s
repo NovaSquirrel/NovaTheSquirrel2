@@ -7,8 +7,8 @@
 ;
 ; Adapted by NovaSquirrel
 
-.include "snes.inc"
-.include "global.inc"
+.include "../snes.inc"
+.include "../global.inc"
 .smart
 
 .globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
@@ -449,6 +449,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 
 ; fixed point reciprocal, clobbers A/X/Y/math_a/math_b/math_p/math_r
 .proc recip16f ; A = fixed point number, result in A
+; Used only by calc_det_r
 	; DB = any
 	sta z:math_b+0
 	stz z:math_b+2
@@ -2188,7 +2189,6 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sta a:mode7_hdma+(4*16)+2
 
     ; The rest of the routine don't do anything for the effect, but do set up variables to be how other code expects them
-	; though GroundTexelToScreen only looks at the bits 1001 in pv_negate so this can be simplified
 	setxy8
 	lda #0
 	ldx z:angle

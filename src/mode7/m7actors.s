@@ -14,9 +14,10 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
-.include "snes.inc"
-.include "global.inc"
+.include "../snes.inc"
+.include "../global.inc"
 .include "m7blockenum.s"
+.include "m7global.s"
 .smart
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
 .import Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed

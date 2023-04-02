@@ -20,13 +20,13 @@ objlist = \
   uploadppu graphics blockdata snesgss_driver \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode actorshared \
-  mode7 perspective_data sincos_data inventory vwf \
-  overworldblockdata overworlddata overworldcode m7leveldata \
+  mode7/mode7 mode7/m7blocks mode7/m7math mode7/m7leveldata mode7/m7blockdata mode7/perspective_data \
+  overworldblockdata overworlddata overworldcode sincos_data inventory vwf \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile m7blockdata blarggapu \
-  hubworld m7math
+  playerprojectile blarggapu \
+  hubworld
 objlistspc = \
   spcheader spcimage musicseq
 
@@ -222,7 +222,7 @@ $(srcdir)/leveldata.s: $(levels) tools/levelconvert.py
 	$(PY) tools/levelconvert.py
 $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
 	$(PY) tools/overworld.py
-$(srcdir)/perspective_data.s: tools/perspective.py
+$(srcdir)/mode7/perspective_data.s: tools/perspective.py
 	$(PY) tools/perspective.py
 $(srcdir)/sincos_data.s: tools/makesincos.py
 	$(PY) tools/makesincos.py
@@ -233,9 +233,9 @@ m7levels/%.lz4: m7levels/%.bin
 	@touch $@
 m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py
 	$(PY) tools/m7levelconvert.py $< $@
-$(srcdir)/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
+$(srcdir)/mode7/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py
-$(objdir)/m7leveldata.o: $(m7levels_lz4) $(m7levels_bin) $(srcdir)/m7leveldata.s
+$(objdir)/mode7/m7leveldata.o: $(m7levels_lz4) $(m7levels_bin) $(srcdir)/mode7/m7leveldata.s
 $(objdir)/backgrounddata.o: $(srcdir)/backgroundenum.s
 $(objdir)/hubworld.o: hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/palettes.bin hubworld/hubworld.chrsfc hubworld/solidmap.bin $(srcdir)/paletteenum.s
 hubworld/fg.bin hubworld/bg.bin hubworld/metatiles.bin hubworld/solidmap.bin hubworld/palettes.bin hubworld/hubworld.chrsfc: hubworld/fg.png hubworld/bg.png hubworld/palettes.png hubworld/attribute.png tools/hubworld.py

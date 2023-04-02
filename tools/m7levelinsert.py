@@ -2,9 +2,9 @@
 import xml.etree.ElementTree as ET # phone home
 import glob, os
 
-outfile = open("src/m7leveldata.s", "w")
+outfile = open("src/mode7/m7leveldata.s", "w")
 outfile.write('; This is automatically generated. Edit mode 7 level Tiled maps instead\n')
-outfile.write('.include "snes.inc"\n')
+#outfile.write('.include "snes.inc"\n')
 outfile.write('.segment "C_Mode7Game"\n\n')
 
 all_m7pointers = []
@@ -51,7 +51,7 @@ for f in sorted(glob.glob("m7levels/*.tmx")):
 	# Write the level data
 	outfile.write('  .byt %d, %d ; X and Y\n' % (start_x, start_y))
 	outfile.write('  .byt %d ; Start direction\n' % (start_dir))
-	outfile.write('  .incbin "../%s"\n' % compressed_name.replace('\\', '/'))
+	outfile.write('  .incbin "../../%s"\n' % compressed_name.replace('\\', '/'))
 
 	outfile.write('\n')
 outfile.close()

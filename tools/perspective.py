@@ -41,7 +41,7 @@ def perspective(angle, l0, l1, s0, s1):
 	return (m7a, m7b, m7c, m7d)
 
 def output_tables():
-	outfile = open("src/perspective_data.s", "w")
+	outfile = open("src/mode7/perspective_data.s", "w")
 
 	angles = 256
 
@@ -84,11 +84,11 @@ def output_tables():
 	for a in range(angles//64):
 		outfile.write('.segment "Mode7TblAB%d"\n' % a)
 		outfile.write('perspective_m7a_m7b_%d:\n' % a)
-		outfile.write('  .incbin "../tools/lut/perspective_lut_ab_%d.bin"\n' % a)
+		outfile.write('  .incbin "../../tools/lut/perspective_lut_ab_%d.bin"\n' % a)
 
 		outfile.write('.segment "Mode7TblCD%d"\n' % a)
 		outfile.write('perspective_m7c_m7d_%d:\n' % a)
-		outfile.write('  .incbin "../tools/lut/perspective_lut_cd_%d.bin"\n' % a)
+		outfile.write('  .incbin "../../tools/lut/perspective_lut_cd_%d.bin"\n' % a)
 
 	# Clean up
 	outfile.close()
