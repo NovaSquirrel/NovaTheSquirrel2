@@ -17,6 +17,9 @@ Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapBelow           = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapCheckpoint      = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
+Mode7DynamicTileBuffer       = LevelBufAlt          ; 7 tiles long, 64*4*7 = 1792
+Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long? padded to 8 though
+
 Mode7Keys                    = LevelBufAlt ; 4 bytes
 Mode7Tools                   = Mode7Keys+4          ; 2 bytes? Could be 1
 

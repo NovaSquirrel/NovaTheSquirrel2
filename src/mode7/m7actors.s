@@ -20,14 +20,12 @@
 .include "m7global.s"
 .smart
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
-.import Mode7LevelMap, Mode7LevelMapBelow, Mode7DynamicTileBuffer, Mode7DynamicTileUsed
 .import Mode7BlockAddress, Mode7Tiles
 
 .segment "C_Mode7Game"
 ActorM7DynamicSlot = ActorIndexInLevel ; Reuse this
 ActorM7LastDrawX = ActorState    ; and ActorOnGround
 ActorM7LastDrawY = ActorOnScreen ; and ActorDamage
-BlockUpdateAddress = BlockUpdateAddressTop
 
 NUM_M7_ACTORS = 8
 

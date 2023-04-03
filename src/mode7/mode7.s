@@ -630,6 +630,7 @@ Loop:
 		adc z:posx+3
 		and #$0003 ; wrap to 0-1023
 		sta z:posx+3
+
 		; Y += D * 2
 		lda z:mode7_m7t + 6 ; D
 		asl
@@ -658,6 +659,7 @@ Loop:
 		adc z:posx+3
 		and #$0003
 		sta z:posx+3
+
 		; Y -= D * 2
 		lda #0
 		sub z:mode7_m7t + 6 ; D
@@ -677,11 +679,10 @@ Loop:
 	ldy #MODE_Y_SY ; place focus at center of scanline SY
 	lda z:mode7_height
 	and #$00FF
-	beq OnGround2
+	beq :+
 	jsr pv_set_origin
-	bra :+
-OnGround2:
-	jsr pv_set_ground_origin
+	bra :++
+:	jsr pv_set_ground_origin
 	:
 
 
@@ -783,7 +784,7 @@ OnGround2:
 	jsl ppu_pack_oamhi_partial
 	.a8 ; (does seta8)
 
-	lda #$0E
+	lda #$0F
 	sta PPUBRIGHT
 
 	jmp Loop
