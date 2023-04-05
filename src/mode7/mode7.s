@@ -84,6 +84,8 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7Tools
   stz Mode7Keys
   stz Mode7Keys+2
+  stz GenericUpdateLength
+  stz ToggleSwitch1 ; and ToggleSwitch2
 
   stz Mode7PlayerHeight
   stz Mode7PlayerVSpeed
@@ -459,6 +461,28 @@ SkipBlock:
 	seta8
 	lda #INC_DATAHI
 	sta PPUCTRL
+
+	.i16
+	ldx GenericUpdateLength
+	beq :+
+		stx DMALEN
+		ldx #DMAMODE_PPUHIDATA
+		stx DMAMODE
+		ldx GenericUpdateSource
+		stx DMAADDR
+		lda GenericUpdateFlags
+		sta DMAADDRBANK
+		ldx GenericUpdateDestination
+		stx PPUADDR
+
+		lda #1
+		sta COPYSTART
+
+		; Disable this update
+		stz GenericUpdateLength
+		stz GenericUpdateLength+1
+	:
+
 
 	; Parallax
 	.if 0
@@ -887,6 +911,7 @@ SkipBlock:
 	lda 1
 	ldy M7PosY+1
 	jsr Mode7LevelPtrXY
+	jsr ApplyToggleBlockIDSwap
 	tax
 	lda M7BlockFlags,x
 	and SolidMask
@@ -926,6 +951,7 @@ SkipBlock:
 	lda M7PosX+1
 	ldy 1
 	jsr Mode7LevelPtrXY
+	jsr ApplyToggleBlockIDSwap
 	tax
 	lda M7BlockFlags,x
 	and SolidMask
@@ -943,6 +969,43 @@ SkipBlock:
 	sta M7PosY+0
 	lda 2
 	sta M7PosY+2
+	rts
+.endproc
+
+.a16
+.proc ApplyToggleBlockIDSwap
+	cmp #Mode7Block::ToggleFloor1
+	beq ToggleFloor1
+	cmp #Mode7Block::ToggleWall1
+	beq ToggleWall1
+	cmp #Mode7Block::ToggleFloor2
+	beq ToggleFloor2
+	cmp #Mode7Block::ToggleWall2
+	beq ToggleWall2
+	rts
+
+ToggleFloor1:
+	bit8 ToggleSwitch1
+	bmi BeBarrier
+	rts
+ToggleWall1:
+	bit8 ToggleSwitch1
+	bmi BeFloor
+	rts
+ToggleFloor2:
+	bit8 ToggleSwitch2
+	bmi BeBarrier
+	rts
+ToggleWall2:
+	bit8 ToggleSwitch2
+	bmi BeFloor
+	rts
+
+BeFloor:
+	lda #Mode7Block::Checker1
+	rts
+BeBarrier:
+	lda #Mode7Block::Barrier
 	rts
 .endproc
 
@@ -1428,6 +1491,12 @@ GradientTable:     ;
 .export Mode7Tiles
 Mode7Tiles:
 .incbin "../../tilesetsX/M7Tileset.chr", 0, CommonTilesetLength
+
+
+.export Mode7ToggleSwapped, Mode7ToggleNotSwapped
+Mode7ToggleNotSwapped = Mode7Tiles + 4*64*16
+Mode7ToggleSwapped:
+.incbin "../../tilesetsX/M7ToggleSwapped.chr"
 
 Mode7Parallax:
 .incbin "../../tilesetsX/M7Parallax.chr"

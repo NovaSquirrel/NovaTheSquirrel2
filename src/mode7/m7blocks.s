@@ -212,10 +212,6 @@ M7BlockCloneButton:
 M7BlockMessage:
 .export M7BlockTeleport
 M7BlockTeleport:
-.export M7BlockToggleButton1
-M7BlockToggleButton1:
-.export M7BlockToggleButton2
-M7BlockToggleButton2:
   rts
 
 ; Creates actor A at the block corresponding to LevelBlockPtr
@@ -584,6 +580,61 @@ Unlock:
 .proc M7BlockFan
 	lda #1
 	sta Mode7PlayerJumping
+	rts
+.endproc
+
+
+.import Mode7ToggleSwapped, Mode7ToggleNotSwapped
+
+.a16
+.i16
+.export M7BlockToggleButton1
+.proc M7BlockToggleButton1
+	lda #64*8
+	sta GenericUpdateLength
+	lda #^Mode7ToggleSwapped
+	sta GenericUpdateFlags
+	lda #$1000
+	sta GenericUpdateDestination
+
+	seta8
+	lda ToggleSwitch1
+	eor #128
+	sta ToggleSwitch1
+	seta16
+
+	beq :+
+	lda #.loword(Mode7ToggleSwapped)
+	sta GenericUpdateSource
+	rts
+:	lda #.loword(Mode7ToggleNotSwapped)
+	sta GenericUpdateSource
+	rts
+.endproc
+
+.a16
+.i16
+.export M7BlockToggleButton2
+.proc M7BlockToggleButton2
+	lda #64*8
+	sta GenericUpdateLength
+	lda #^Mode7ToggleSwapped
+	sta GenericUpdateFlags
+	lda #$1000 + 64*8
+	sta GenericUpdateDestination
+
+	seta8
+	lda ToggleSwitch2
+	eor #128
+	sta ToggleSwitch2
+	seta16
+
+	beq :+
+	lda #.loword(Mode7ToggleSwapped + 64*8)
+	sta GenericUpdateSource
+	rts
+:	lda #.loword(Mode7ToggleNotSwapped + 64*8)
+	sta GenericUpdateSource
 	rts
 .endproc
 
