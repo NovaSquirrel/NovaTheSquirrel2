@@ -33,7 +33,7 @@ for line in text:
 		saveBlock()
 		# Reset to prepare for the new block
 		priority = False
-		block = {"name": line[1:], "solid_u": False, "solid_d": False, "solid_l": False, "solid_r": False, \
+		block = {"name": line[1:], "solid": False, "solid_air": False, \
 		  "solid_block": False, "solid_creature": False, "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
 		continue
 	word, arg = separateFirstWord(line)
@@ -46,7 +46,12 @@ for line in text:
 		arg = arg.split(", ")
 
 		# Aliases for selecting multiple interaction types at once
-		arg[0] = (arg[0],)
+		if arg[0] == "Enter":
+			arg[0] = ("StepOn", "JumpOn")
+		elif arg[0] == "Exit":
+			arg[0] = ("StepOff", "JumpOff")
+		else:
+			arg[0] = (arg[0],)
 
 		for i in arg[0]:
 			block["interaction"][i] = arg[1]
@@ -56,12 +61,10 @@ for line in text:
 		all_classes.add(arg)
 
 	# Specifying tiles and tile attributes
-	elif word == "solid":
-		block["solid_l"] = True
-		block["solid_d"] = True
-		block["solid_u"] = True
-		block["solid_r"] = True
-	elif word in ["solid_l", "solid_r", "solid_u", "solid_d", "solid_inside"]:
+	elif word == "impassable":
+		block['solid'] = True
+		block['solid_air'] = True
+	elif word in ["solid", "solid_air"]:
 		block[word] = True
 	elif word == "t": # add tiles
 		split = arg.split(" ")
@@ -75,12 +78,12 @@ for line in text:
 saveBlock()
 
 # Generate the output that's actually usable in the game
-outfile = open("src/m7blockdata.s", "w")
+outfile = open("src/mode7/m7blockdata.s", "w")
 
 outfile.write('; This is automatically generated. Edit "blocks.txt" instead\n')
 outfile.write('.include "m7blockenum.s"\n\n')
 outfile.write('.export M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight\n')
-outfile.write('.export M7BlockFlags, M7BlockInteractionSet, M7BlockInteractionEnter, M7BlockInteractionExit, M7BlockInteractionBump\n')
+outfile.write('.export M7BlockFlags, M7BlockInteractionSet, M7BlockInteractionStepOn, M7BlockInteractionStepOff, M7BlockInteractionBump, M7BlockInteractionJumpOn, M7BlockInteractionJumpOff, M7BlockInteractionTouching\n')
 outfile.write('.import %s\n' % str(", ".join(all_interaction_procs)))
 outfile.write('\n.segment "C_Mode7Game"\n\n') # Put it in the game segment
 
@@ -96,18 +99,14 @@ for corner, cornername in enumerate(corners):
 outfile.write('.proc M7BlockFlags\n')
 for b in all_blocks:
 	flags = 0
-	if b['solid_l']:
+	if b['solid']:
 		flags |= 1
-	if b['solid_r']:
+	if b['solid_air']:
 		flags |= 2
-	if b['solid_d']:
-		flags |= 4
-	if b['solid_u']:
-		flags |= 8
 	if b['solid_block']:
-		flags |= 16
+		flags |= 4
 	if b['solid_creature']:
-		flags |= 32
+		flags |= 8
 	outfile.write('  .byt %d ; %s\n' % (flags, b['name']))
 outfile.write('.endproc\n\n')
 
@@ -121,7 +120,7 @@ outfile.write(".proc M7BlockNothing\n  rts\n.endproc\n\n")
 print("Interaction sets: %d" % len(all_interaction_sets))
 
 # Write all interaction type tables corresponding to each interaction set
-interaction_types = ["Enter", "Exit", "Bump"]
+interaction_types = ["StepOn", "StepOff", "Bump", "JumpOn", "JumpOff", "Touching"]
 for interaction in interaction_types:
 	outfile.write(".export M7BlockInteraction%s\n" % interaction)
 	outfile.write(".proc M7BlockInteraction%s\n" % interaction)
@@ -136,7 +135,7 @@ for interaction in interaction_types:
 outfile.close()
 
 # Generate the enum in a separate file
-outfile = open("src/m7blockenum.s", "w")
+outfile = open("src/mode7/m7blockenum.s", "w")
 outfile.write('; This is automatically generated. Edit "m7blocks.txt" instead\n')
 outfile.write('.enum Mode7Block\n')
 for b in all_blocks:

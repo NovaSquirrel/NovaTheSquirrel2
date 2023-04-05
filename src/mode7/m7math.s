@@ -11,7 +11,7 @@
 .include "../global.inc"
 .smart
 
-.globalzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
+.globalzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
 .globalzp mode7_m7t
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
 .global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y
@@ -41,8 +41,8 @@ pv_scale   = TouchTemp+3 ;and +4, +5, +6
 angle:        .res 1 ; for spinning modes
 scale:        .res 2 ; for uniform scale
 scale2:       .res 4 ; for separate axis scale
-posx:         .res 6 ; position for some modes with subpixel precision
-posy:         .res 6
+M7PosX:       .res 4 ; position for some modes with subpixel precision
+M7PosY:       .res 4 ; ff ii ii ..
 
 cosa:         .res 2 ; sincos result
 sina:         .res 2
@@ -1815,14 +1815,14 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	setxy8
 	.i8
 	jsr smul16_u8
-	add z:posx+2
+	add z:M7PosX+1
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sub #128
 	sta f:mode7_hofs ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
-	add z:posy+2
+	add z:M7PosY+1
 	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 	lda z:pv_l1
 	and #$00FF
@@ -2288,14 +2288,14 @@ abcd_banks      = 10 ; and 11
 	setxy8
 	.i8
 	jsr smul16_u8
-	add z:posx+2
+	add z:M7PosX+1
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sub #128
 	sta f:mode7_hofs ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
-	add z:posy+2
+	add z:M7PosY+1
 	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 
 	lda #224 ;l1

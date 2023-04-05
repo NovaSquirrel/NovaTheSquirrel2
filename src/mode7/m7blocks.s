@@ -20,6 +20,11 @@
 .include "m7global.s"
 .smart
 
+.import Mode7PlayerVSpeed, Mode7PlayerJumpCancel, Mode7PlayerJumping
+.importzp M7PosX, M7PosY
+
+.segment "C_Mode7Game"
+
 ; LevelBlockPtr = block address
 ; Replaces a tile with the tile "underneath" or a regular floor if there was nothing
 .a16
@@ -158,7 +163,6 @@ Exit:
 
 
 .a16
-.import M7BlockInteractionSet, M7BlockInteractionEnter, M7BlockInteractionExit, M7BlockInteractionBump
 GetInteractionSet:
   tay
   lda M7BlockInteractionSet,y
@@ -166,19 +170,36 @@ GetInteractionSet:
   asl
   tay
   rts
-CallBlockEnter:
+.import M7BlockInteractionSet, M7BlockInteractionStepOn, M7BlockInteractionStepOff, M7BlockInteractionBump, M7BlockInteractionJumpOn, M7BlockInteractionJumpOff, M7BlockInteractionTouching
+.export Mode7CallBlockStepOn, Mode7CallBlockStepOff, Mode7CallBlockBump, Mode7CallBlockJumpOn, Mode7CallBlockJumpOff, Mode7CallBlockTouching
+Mode7CallBlockStepOn:
   jsr GetInteractionSet
-  lda M7BlockInteractionEnter,y
+  lda M7BlockInteractionStepOn,y
   pha
   rts
-CallBlockExit:
+Mode7CallBlockStepOff:
   jsr GetInteractionSet
-  lda M7BlockInteractionExit,y
+  lda M7BlockInteractionStepOff,y
   pha
   rts
-CallBlockBump:
+Mode7CallBlockBump:
   jsr GetInteractionSet
   lda M7BlockInteractionBump,y
+  pha
+  rts
+Mode7CallBlockJumpOn:
+  jsr GetInteractionSet
+  lda M7BlockInteractionJumpOn,y
+  pha
+  rts
+Mode7CallBlockJumpOff:
+  jsr GetInteractionSet
+  lda M7BlockInteractionJumpOff,y
+  pha
+  rts
+Mode7CallBlockTouching:
+  jsr GetInteractionSet
+  lda M7BlockInteractionTouching,y
   pha
   rts
 
@@ -189,8 +210,6 @@ M7BlockNothing:
 M7BlockCloneButton:
 .export M7BlockMessage
 M7BlockMessage:
-.export M7BlockSpring
-M7BlockSpring:
 .export M7BlockTeleport
 M7BlockTeleport:
 .export M7BlockToggleButton1
@@ -373,7 +392,7 @@ Mode7EraseBlock:
   lda [LevelBlockPtr]
   sub #Mode7Block::Key1
   tax
-  inc Mode7Keys,x  
+  inc Mode7Keys,x
   seta16
   bra Mode7EraseBlock
 .endproc
@@ -422,29 +441,10 @@ Unlock:
 .export M7BlockIce
 .proc M7BlockIce
   jsr CancelIfHaveSkates
-  lda Mode7IceDirection
-  ora #$8000 | $4000
-  sta Mode7ForceMove
-  rts
+  .import Mode7MoveForward
+  jmp Mode7MoveForward
 .endproc
 
-
-IceGoUp:
-  lda #$8000 | $4000 | DIRECTION_UP
-  sta Mode7ForceMove
-  rts
-IceGoLeft:
-  lda #$8000 | $4000 | DIRECTION_LEFT
-  sta Mode7ForceMove
-  rts
-IceGoDown:
-  lda #$8000 | $4000 | DIRECTION_DOWN
-  sta Mode7ForceMove
-  rts
-IceGoRight:
-  lda #$8000 | $4000 | DIRECTION_RIGHT
-  sta Mode7ForceMove
-  rts
 
 .proc CancelIfHaveSkates
   lda Mode7Tools
@@ -454,38 +454,6 @@ IceGoRight:
     rts
   :
   rts
-.endproc
-.export M7BlockIceCornerUL
-.proc M7BlockIceCornerUL
-  jsr CancelIfHaveSkates
-  lda Mode7IceDirection
-  cmp #DIRECTION_LEFT
-  beq IceGoDown
-  bra IceGoRight
-.endproc
-.export M7BlockIceCornerUR
-.proc M7BlockIceCornerUR
-  jsr CancelIfHaveSkates
-  lda Mode7IceDirection
-  cmp #DIRECTION_RIGHT
-  beq IceGoDown
-  bra IceGoLeft
-.endproc
-.export M7BlockIceCornerDL
-.proc M7BlockIceCornerDL
-  jsr CancelIfHaveSkates
-  lda Mode7IceDirection
-  cmp #DIRECTION_LEFT
-  beq IceGoUp
-  bra IceGoRight
-.endproc
-.export M7BlockIceCornerDR
-.proc M7BlockIceCornerDR
-  jsr CancelIfHaveSkates
-  lda Mode7IceDirection
-  cmp #DIRECTION_RIGHT
-  beq IceGoUp
-  bra IceGoLeft
 .endproc
 
 .proc CancelIfHaveSuctionBoots
@@ -500,29 +468,33 @@ IceGoRight:
 .export M7BlockForceLeft
 .proc M7BlockForceLeft
   jsr CancelIfHaveSuctionBoots
-  lda #$8000 | DIRECTION_LEFT
-  sta Mode7ForceMove
+  lda M7PosX+1
+  sub #$0002
+  sta M7PosX+1
   rts
 .endproc
 .export M7BlockForceDown
 .proc M7BlockForceDown
   jsr CancelIfHaveSuctionBoots
-  lda #$8000 | DIRECTION_DOWN
-  sta Mode7ForceMove
+  lda M7PosY+1
+  add #$0002
+  sta M7PosY+1
   rts
 .endproc
 .export M7BlockForceUp
 .proc M7BlockForceUp
   jsr CancelIfHaveSuctionBoots
-  lda #$8000 | DIRECTION_UP
-  sta Mode7ForceMove
+  lda M7PosY+1
+  sub #$0002
+  sta M7PosY+1
   rts
 .endproc
 .export M7BlockForceRight
 .proc M7BlockForceRight
   jsr CancelIfHaveSuctionBoots
-  lda #$8000 | DIRECTION_RIGHT
-  sta Mode7ForceMove
+  lda M7PosX+1
+  add #$0002
+  sta M7PosX+1
   rts
 .endproc
 
@@ -580,22 +552,7 @@ IceGoRight:
   sub #1
   sta Mode7ChipsLeft
   cld
-  lda #Mode7Block::Hurt
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockCountFour
-.proc M7BlockCountFour
-  lda #Mode7Block::CountThree
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockCountThree
-.proc M7BlockCountThree
-  lda #Mode7Block::CountTwo
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockCountTwo
-.proc M7BlockCountTwo
-  lda #Mode7Block::Collect
+  lda #Mode7Block::Empty
   jmp Mode7ChangeBlock
 .endproc
 .export M7BlockCheckpoint
@@ -605,3 +562,28 @@ IceGoRight:
   .import Mode7MakeCheckpoint
   jmp Mode7MakeCheckpoint
 .endproc
+
+.a16
+.export M7BlockSpringOnce
+.proc M7BlockSpringOnce
+	lda #Mode7Block::Void
+	jsr Mode7ChangeBlock
+.endproc
+; Fall through
+.export M7BlockSpring
+.proc M7BlockSpring
+	lda #.loword($2c0)
+	sta Mode7PlayerVSpeed
+	lda #1
+	sta Mode7PlayerJumpCancel
+	sta Mode7PlayerJumping
+	rts
+.endproc
+
+.export M7BlockFan
+.proc M7BlockFan
+	lda #1
+	sta Mode7PlayerJumping
+	rts
+.endproc
+

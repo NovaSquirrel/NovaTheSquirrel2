@@ -70,8 +70,8 @@ SlopeY = 2
 
   ;------------------------------------
   ; Load X with the actual pointer instead of a starting index
-.import Mode7ScrollX
-LastNonEmpty = Mode7ScrollX
+.import Mode7PlayerHeight
+LastNonEmpty = Mode7PlayerHeight
 
   ldx #ActorStart
   stx LastNonEmpty

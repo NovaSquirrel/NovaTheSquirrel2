@@ -152,8 +152,8 @@ $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
 $(objdir)/main.o: $(srcdir)/vblank.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
-$(objdir)/m7blockdata.o: $(srcdir)/m7blockenum.s
-$(objdir)/mode7actors.o: $(srcdir)/m7blockenum.s tilesetsX/M7SoftSprites.chr
+$(objdir)/m7blockdata.o: $(srcdir)/mode7/m7blockenum.s
+$(objdir)/mode7actors.o: $(srcdir)/mode7/m7blockenum.s tilesetsX/M7SoftSprites.chr
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/actorshared.o: $(srcdir)/blockenum.s
@@ -164,7 +164,7 @@ $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(sr
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/vwf.inc
-$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s $(srcdir)/m7blockenum.s
+$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s $(srcdir)/mode7/m7blockenum.s
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
@@ -191,8 +191,9 @@ $(srcdir)/blockenum.s: tools/blocks.txt tools/makeblocks.py
 	$(PY) tools/makeblocks.py
 
 # For Mode 7 levels too
-$(srcdir)/m7blockdata.s: tools/m7blocks.txt tools/m7makeblocks.py
-$(srcdir)/m7blockenum.s: tools/m7blocks.txt tools/m7makeblocks.py
+$(srcdir)/mode7/m7blockdata.s: tools/m7blocks.txt tools/m7makeblocks.py
+	$(PY) tools/m7makeblocks.py
+$(srcdir)/mode7/m7blockenum.s: tools/m7blocks.txt tools/m7makeblocks.py
 	$(PY) tools/m7makeblocks.py
 
 # Automatically create the list of overworld blocks from a description
@@ -218,7 +219,7 @@ $(srcdir)/itemenum.s: tools/items.txt tools/makeitems.py
 	$(PY) tools/makeitems.py
 $(srcdir)/backgroundenum.s: tools/backgrounds.txt tools/makebackgrounds.py
 	$(PY) tools/makebackgrounds.py
-$(srcdir)/leveldata.s: $(levels) tools/levelconvert.py
+$(srcdir)/leveldata.s: $(levels) tools/levelconvert.py 
 	$(PY) tools/levelconvert.py
 $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
 	$(PY) tools/overworld.py
@@ -231,7 +232,7 @@ $(srcdir)/dialog_text_data.s: tools/makedialog.py story/dialog.txt
 m7levels/%.lz4: m7levels/%.bin
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
-m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py
+m7levels/%.bin: m7levels/%.tmx tools/m7levelconvert.py $(srcdir)/mode7/m7blockenum.s
 	$(PY) tools/m7levelconvert.py $< $@
 $(srcdir)/mode7/m7leveldata.s: $(m7levels_lz4) $(m7levels_bin) tools/m7levelinsert.py
 	$(PY) tools/m7levelinsert.py

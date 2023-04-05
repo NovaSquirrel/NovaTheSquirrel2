@@ -15,7 +15,7 @@ for t in tileset_root:
 				name_for_tiled_id[int(t.attrib['id'])] = p.attrib['value']
 
 # Get the block enum
-define_file = open("src/m7blockenum.s")
+define_file = open("src/mode7/m7blockenum.s")
 define_lines = [x.strip() for x in define_file.readlines()]
 define_file.close()
 id_for_block = {}
@@ -57,7 +57,12 @@ else:
 							if not len(t):
 								continue
 							tile = max(0, int(t)-1)
-							row.append(id_for_block[name_for_tiled_id[tile]])
+
+							if tile in name_for_tiled_id and name_for_tiled_id[tile] in id_for_block:
+								row.append(id_for_block[name_for_tiled_id[tile]])
+							else:
+								print(name_for_tiled_id[tile] + " not found in enum")
+								row.append(0)
 						map_data.append(row)
 
 	for row in map_data:

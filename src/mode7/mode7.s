@@ -24,39 +24,31 @@
 .smart
 .importzp hm_node
 
-.importzp angle, scale, scale2, posx, posy, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
+.importzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
 .importzp mode7_m7t
 .importzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_negate
 .import mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, mode7_hofs, mode7_vofs, pv_buffer, mode7_m7x, mode7_m7y
 
 .import pv_texel_to_screen, pv_rebuild, pv_set_origin, pv_setup_for_ground, pv_set_ground_origin
 
-.export Mode7LevelMap, Mode7LevelMapBelow
+.import Mode7CallBlockStepOn, Mode7CallBlockStepOff, Mode7CallBlockBump, Mode7CallBlockJumpOn, Mode7CallBlockJumpOff, Mode7CallBlockTouching
 
 ; Where to draw Maffi
-MODE_Y_SX = 128
-MODE_Y_SY = 168
+MODE7_PLAYER_SX = 128
+MODE7_PLAYER_SY = 168
 
 .segment "ZEROPAGE"
 .exportzp mode7_height
 mode7_height: .res 1
 
 .segment "BSS"
+.export Mode7PlayerHeight, Mode7PlayerVSpeed, Mode7PlayerJumpCancel, Mode7PlayerJumping
 ; Expose these for reuse by other systems
 Mode7PlayerHeight: .res 2
 Mode7PlayerVSpeed: .res 2
 Mode7PlayerJumpCancel: .res 2
+Mode7PlayerJumping: .res 2
 
-Mode7ScrollX:    .res 2
-Mode7ScrollY:    .res 2
-Mode7PlayerX:    .res 2
-Mode7PlayerY:    .res 2
-Mode7RealAngle:  .res 2 ; 0-31
-Mode7Direction:  .res 2 ; 0-3
-Mode7MoveDirection: .res 2 ; 0-3
-Mode7Turning:    .res 2
-Mode7TurnWanted: .res 2
-Mode7SidestepWanted: .res 2
 Mode7ChipsLeft:      .res 2
 Mode7Portrait = TouchTemp
 Mode7HappyTimer:  .res 2
@@ -64,7 +56,6 @@ Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
 Mode7LastPositionPtr: .res 2
 Mode7ForceMove: .res 2
-Mode7IceDirection: .res 2 ; Last direction used
 
 Mode7DoLookAround: .res 2
 Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
@@ -88,12 +79,6 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   sta StartedLevelNumber
 
   ; Clear variables
-  stz Mode7ScrollX
-  stz Mode7ScrollY
-  stz Mode7RealAngle
-  stz Mode7Direction
-  stz Mode7PlayerX
-  stz Mode7PlayerY
   stz Mode7ChipsLeft
   stz Mode7CheckpointChips
   stz Mode7Tools
@@ -103,6 +88,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7PlayerHeight
   stz Mode7PlayerVSpeed
   stz Mode7PlayerJumpCancel
+  stz Mode7PlayerJumping
 
   ldx #.loword(Mode7LevelMapBelow)
   ldy #64*64
@@ -236,29 +222,28 @@ CheckerLoop:
   lda [hm_node]
   .repeat 4
     asl
-    rol posx+3
+    rol M7PosX+2
   .endrep
   add #$08
-  sta posx+2
+  sta M7PosX+1
   inc16 hm_node
 
   ; Starting Y pos
   lda [hm_node]
   .repeat 4
     asl
-    rol posy+3
+    rol M7PosY+2
   .endrep
   add #$08
-  sta posy+2
+  sta M7PosY+1
   inc16 hm_node
 
   ; Direction
   lda [hm_node]
-  sta Mode7Direction
-  .repeat 4
+  .repeat 6
     asl
   .endrep
-  sta Mode7RealAngle
+  sta angle
   inc16 hm_node
 
   ; Decompress the level map
@@ -286,15 +271,11 @@ CheckerboardAdd:
   seta16
 
 RestoredFromCheckpoint:
-  stz Mode7Turning
-  stz Mode7TurnWanted
-  stz Mode7SidestepWanted
   stz Mode7HappyTimer
   stz Mode7Oops
 
   stz Mode7LastPositionPtr
   stz Mode7ForceMove
-  stz Mode7IceDirection ; Probably don't need to init this one but whatever
 
   stz Mode7DoLookAround
   stz Mode7LookAroundOffsetX
@@ -429,10 +410,60 @@ Loop:
 	; ---------------------------------------------
 	; - Mode 7 vblank tasks
 	; ---------------------------------------------
+
+	seta8
+	stz PPUCTRL
+	seta16
+	; Do block updates.
+	; The second bytes of the tile numbers aren't normally used, because Mode 7 has 8-bit tile numbers,
+	; so they're repurposed here.
+	ldx #(BLOCK_UPDATE_COUNT-1)*2
+BlockUpdateLoop:
+	lda BlockUpdateDataTL+1,x ; Repurposed to be an update size/shape
+	and #255
+	jeq SkipBlock
+	dea
+	beq @Square
+	dea
+	beq @Tall
+@Wide:
+	jsr Mode7DoBlockUpdateWide
+	bra SkipBlock
+@Tall:
+	jsr Mode7DoBlockUpdateTall
+	bra SkipBlock
+@Square: ; 2x2
+	.a16
+	lda BlockUpdateAddress,x
+	sta PPUADDR
+	seta8
+	lda BlockUpdateDataTL,x
+	sta PPUDATA
+	lda BlockUpdateDataTR,x
+	sta PPUDATA
+	seta16
+	lda BlockUpdateAddress,x ; Move down a row
+	add #128
+	sta PPUADDR
+	seta8
+	lda BlockUpdateDataBL,x
+	sta PPUDATA
+	lda BlockUpdateDataBR,x
+	sta PPUDATA
+	stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
+SkipBlock:
+	seta16
+	dex
+	dex
+	bpl BlockUpdateLoop
+	seta8
+	lda #INC_DATAHI
+	sta PPUCTRL
+
 	; Parallax
 	.if 0
 		seta16
-		lda posx+2
+		lda M7PosX+1
 		lsr
 		;  lsr
 		and #%111   ; ........ .....xxx
@@ -440,7 +471,7 @@ Loop:
 		lsr         ; ......xx x.......
 		sta 0
 
-		lda posy+2
+		lda M7PosY+1
 		neg
 		lsr
 		;  lsr
@@ -512,8 +543,7 @@ Loop:
 	; ---------------------------------------------
 	jsl WaitKeysReady ; Also clears OamPtr
 
-	seta16
-	setxy8
+	setaxy16
 	; Allow jumping
 	lda Mode7PlayerHeight
 	cmp #$400
@@ -523,7 +553,11 @@ Loop:
 	beq :+
 		lda #.loword($200) ; other values tried: $240, $400
 		sta Mode7PlayerVSpeed
+		sta Mode7PlayerJumping ; Nonzero
 		stz Mode7PlayerJumpCancel
+
+		jsr Mode7LevelPtrXYAtPlayer
+		jsr Mode7CallBlockJumpOff
 	:
 
 	; Apply gravity
@@ -532,12 +566,20 @@ Loop:
 	sta Mode7PlayerVSpeed
 	add Mode7PlayerHeight
 	sta Mode7PlayerHeight
-	bpl :+
+	cmp #.loword(-$1000)
+	bcc DidntLand
 		stz Mode7PlayerVSpeed
 		stz Mode7PlayerHeight
-		lda #0
-	:
-	seta8
+
+		lda Mode7PlayerJumping
+		stz Mode7PlayerJumping
+		beq :+
+			jsr Mode7LevelPtrXYAtPlayer
+			jsr Mode7CallBlockJumpOn
+		:
+		lda #0 ; For mode7_height
+	DidntLand:
+	setaxy8
 	xba
 	sta mode7_height
 	seta16
@@ -614,6 +656,43 @@ Loop:
 		jsr pv_setup_for_ground
 	:
 
+	setaxy16
+
+	jsr Mode7LevelPtrXYAtPlayer
+	; React to fans
+	FanMaxHeight = $7000
+	FanCancelSpeed = .loword($100)
+	cmp #Mode7Block::Fan
+	bne NotOverFan
+		lda Mode7PlayerHeight
+		cmp #FanMaxHeight
+		bcs NotOverFan
+
+		lda Mode7PlayerVSpeed
+		add #16
+		sta Mode7PlayerVSpeed		
+	NotOverFan:
+	; Save the block the player is standing on
+	lda Mode7PlayerHeight ; Not touching the tile if you're in the air
+	bne :+
+		lda [LevelBlockPtr]
+		and #255
+		jsr Mode7CallBlockTouching
+	:
+	pei (LevelBlockPtr)
+
+	; If player is too high up, soften their vertical lift
+	lda Mode7PlayerHeight
+	cmp #FanMaxHeight
+	bcc :+
+		lda Mode7PlayerVSpeed ; If negative, already good
+		bmi :+
+		cmp #FanCancelSpeed   ; If slow enough, already good 
+		bcc :+
+
+		lda #FanCancelSpeed   ; Soften the fly with a smaller lift
+		sta Mode7PlayerVSpeed
+	:
 
 	; up/down moves player (depends on generated rotation matrix)
 	lda keydown
@@ -623,60 +702,58 @@ Loop:
 		lda z:mode7_m7t + 2 ; B
 		asl
 		pha
-		add z:posx+1
-		sta z:posx+1
+		add z:M7PosX+0
+		sta 0
 		pla
 		jsr sign
-		adc z:posx+3
+		adc z:M7PosX+2
 		and #$0003 ; wrap to 0-1023
-		sta z:posx+3
+		sta 2
+		jsr Mode7TryNewX
 
 		; Y += D * 2
 		lda z:mode7_m7t + 6 ; D
 		asl
 		pha
-		add z:posy+1
-		sta z:posy+1
+		add z:M7PosY+0
+		sta 0
 		pla
 		jsr sign
-		adc z:posy+3
+		adc z:M7PosY+2
 		and #$0003
-		sta z:posy+3
+		sta 2
+		jsr Mode7TryNewY
 	:
 
 	lda keydown
 	and #KEY_UP ; up
 	beq :+
-		; X -= B * 2
-		lda #0
-		sub z:mode7_m7t + 2 ; B
-		asl
-		pha
-		add z:posx+1
-		sta z:posx+1
-		pla
-		jsr sign
-		adc z:posx+3
-		and #$0003
-		sta z:posx+3
-
-		; Y -= D * 2
-		lda #0
-		sub z:mode7_m7t + 6 ; D
-		asl
-		pha
-		add z:posy+1
-		sta z:posy+1
-		pla
-		jsr sign
-		adc z:posy+3
-		and #$0003
-		sta z:posy+3
+		jsr Mode7MoveForward
 	:
+
+	; Calculate LevelBlockPtr again
+	jsr Mode7LevelPtrXYAtPlayer
+	; Old LevelBlockPtr
+	pla
+	sta ScrollX ; Temporary space
+	cmp LevelBlockPtr
+	beq SameTile
+		lda Mode7PlayerHeight
+		bne SameTile
+		lda [LevelBlockPtr]
+		and #255
+		jsr Mode7CallBlockStepOn
+
+		lda ScrollX
+		sta LevelBlockPtr
+		lda [LevelBlockPtr]
+		and #255
+		jsr Mode7CallBlockStepOff
+	SameTile:
 
 	setxy8
 	; Set origin
-	ldy #MODE_Y_SY ; place focus at center of scanline SY
+	ldy #MODE7_PLAYER_SY ; place focus at center of scanline SY
 	lda z:mode7_height
 	and #$00FF
 	beq :+
@@ -791,9 +868,207 @@ Loop:
 .endproc
 
 
-.proc Mode7DrawPlayer
-  setxy16
+.a16
+.i16
+.proc Mode7TryNewX
+	; 0,2 = New position
+	; M7PosX+0, M7PosX+2 = Current position
+
+	SolidMask = 4
+	lda #M7_BLOCK_SOLID
+	sta SolidMask
+	lda mode7_height
+	and #255
+	beq :+
+		lda #M7_BLOCK_SOLID_AIR
+		sta SolidMask
+	:
+
+	lda 1
+	ldy M7PosY+1
+	jsr Mode7LevelPtrXY
+	tax
+	lda M7BlockFlags,x
+	and SolidMask
+	beq :++
+		and #M7_BLOCK_SOLID_AIR
+		bne :+
+			txa
+			jmp Mode7CallBlockBump
+		:
+		rts
+	:
+
+	; Apply the new position
+	lda 0
+	sta M7PosX+0
+	lda 2
+	sta M7PosX+2
+	rts
+.endproc
+
+.a16
+.i16
+.proc Mode7TryNewY
+	; 0,2 = New position
+	; M7PosY+0, M7PosY+2 = Current position
+
+	SolidMask = 4
+	lda #M7_BLOCK_SOLID
+	sta SolidMask
+	lda mode7_height
+	and #255
+	beq :+
+		lda #M7_BLOCK_SOLID_AIR
+		sta SolidMask
+	:
+
+	lda M7PosX+1
+	ldy 1
+	jsr Mode7LevelPtrXY
+	tax
+	lda M7BlockFlags,x
+	and SolidMask
+	beq :++
+		and #M7_BLOCK_SOLID_AIR
+		bne :+
+			txa
+			jmp Mode7CallBlockBump
+		:
+		rts
+	:
+
+	; Apply the new position
+	lda 0
+	sta M7PosY+0
+	lda 2
+	sta M7PosY+2
+	rts
+.endproc
+
+
+Mode7LevelPtrXYAtPlayer:
+	lda M7PosX+1
+	ldy M7PosY+1
+.a16
+.i16
+; A = X position, in pixels
+; Y = Y position, in pixels
+.proc Mode7LevelPtrXY
+	    ; ......xx xxxx....
+	lsr ; .......x xxxxx...
+	lsr ; ........ xxxxxx..
+	lsr ; ........ .xxxxxx.
+	lsr ; ........ ..xxxxxx
+	sta LevelBlockPtr
+
+	tya ; ......yy yyyy....
+	asl ; .....yyy yyy.....
+	asl ; ....yyyy yy......
+	and  #%0000111111000000
+	tsb LevelBlockPtr
+	    ; 0000yyyy yyxxxxxx
+	lda [LevelBlockPtr]
+	and #255
+	rts
+.endproc
+
+.a16
+.proc Mode7DoBlockUpdateWide
+  ; 3x2, BL+1 and BR+1 go to the right
+  lda BlockUpdateAddress,x
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  lda BlockUpdateDataTR,x
+  sta PPUDATA
+  lda BlockUpdateDataBL+1,x
+  sta PPUDATA
   seta16
+  lda BlockUpdateAddress,x ; Move down a row
+  add #128
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataBL,x
+  sta PPUDATA
+  lda BlockUpdateDataBR,x
+  sta PPUDATA
+  lda BlockUpdateDataBR+1,x
+  sta PPUDATA
+  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
+  rts
+.endproc
+
+.a16
+.proc Mode7DoBlockUpdateTall
+  ; 2x3, BL+1 and BR+1 go below
+  lda BlockUpdateAddress,x
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  lda BlockUpdateDataTR,x
+  sta PPUDATA
+  seta16
+  lda BlockUpdateAddress,x ; Move down a row
+  add #128
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataBL,x
+  sta PPUDATA
+  lda BlockUpdateDataBR,x
+  sta PPUDATA
+  seta16
+  lda BlockUpdateAddress,x ; Move down two rows
+  add #256
+  sta PPUADDR
+  seta8
+  lda BlockUpdateDataBL+1,x
+  sta PPUDATA
+  lda BlockUpdateDataBR+1,x
+  sta PPUDATA
+  stz BlockUpdateDataTL+1,x ; Cancel out the block now that it's been written
+  rts
+.endproc
+
+.a16
+.export Mode7MoveForward
+.proc Mode7MoveForward
+	; X -= B * 2
+	lda #0
+	sub z:mode7_m7t + 2 ; B
+	asl
+	pha
+	add z:M7PosX+0
+	sta 0
+	pla
+	jsr sign
+	adc z:M7PosX+2
+	and #$0003
+	sta 2
+	jsr Mode7TryNewX
+
+	; Y -= D * 2
+	lda #0
+	sub z:mode7_m7t + 6 ; D
+	asl
+	pha
+	add z:M7PosY+0
+	sta 0
+	pla
+	jsr sign
+	adc z:M7PosY+2
+	and #$0003
+	sta 2
+	jmp Mode7TryNewY
+.endproc
+
+
+.proc Mode7DrawPlayer
+  setaxy16
+  jsr Mode7LevelPtrXYAtPlayer ; Prepare pointer for later
+
   lda #PORTRAIT_NORMAL
   sta Mode7Portrait
 
@@ -868,11 +1143,11 @@ Loop:
 
   seta8
   ; Player is made up of four sprites
-  lda #MODE_Y_SX-16
+  lda #MODE7_PLAYER_SX-16
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
 
-  lda #MODE_Y_SY - 16 + 1
+  lda #MODE7_PLAYER_SY - 16 + 1
   sub mode7_height
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
@@ -880,7 +1155,7 @@ Loop:
   sta OAM_YPOS+(4*0),y
   sta OAM_YPOS+(4*1),y
 
-  lda #MODE_Y_SX
+  lda #MODE7_PLAYER_SX
   sta OAM_XPOS+(4*1),y
   sta OAM_XPOS+(4*3),y
 
@@ -897,13 +1172,19 @@ Loop:
   sta OAM_YPOS+(4*7),y
 
   ; Player's shadow
-  lda #MODE_Y_SX-8
+  lda #MODE7_PLAYER_SX-8
   sta OAM_XPOS+(4*8),y
-  lda #MODE_Y_SX
+  lda #MODE7_PLAYER_SX
   sta OAM_XPOS+(4*9),y
-  lda #MODE_Y_SY-4
+  lda #MODE7_PLAYER_SY-4
   sta OAM_YPOS+(4*8),y
   sta OAM_YPOS+(4*9),y
+  lda [LevelBlockPtr]
+  bne :+
+    lda #240
+    sta OAM_YPOS+(4*8),y
+    sta OAM_YPOS+(4*9),y
+  :
 
   lda #$02
   sta OAMHI+1+(4*0),y
@@ -1006,10 +1287,6 @@ ForwardXTile:
   .word 0, .loword(-16), 0, .loword(16)
 ForwardYTile:
   .word .loword(-16), 0, .loword(16), 0
-ForwardWallBitOutside:
-  .word M7_BLOCK_SOLID_U, M7_BLOCK_SOLID_R, M7_BLOCK_SOLID_D, M7_BLOCK_SOLID_L
-ForwardWallBitInside:
-  .word M7_BLOCK_SOLID_D, M7_BLOCK_SOLID_L, M7_BLOCK_SOLID_U, M7_BLOCK_SOLID_R
 
 ForwardPtrTile:
   .word .loword(-64), .loword(-1), .loword(64), .loword(1)
@@ -1051,11 +1328,11 @@ ForwardPtrTile:
 .i16
 .export Mode7MakeCheckpoint
 .proc Mode7MakeCheckpoint
-  lda Mode7PlayerX
+;  lda Mode7PlayerX
   sta Mode7CheckpointX
-  lda Mode7PlayerY
+;  lda Mode7PlayerY
   sta Mode7CheckpointY
-  lda Mode7Direction
+  lda angle
   sta Mode7CheckpointDir
   lda Mode7ChipsLeft
   sta Mode7CheckpointChips
@@ -1088,15 +1365,11 @@ ForwardPtrTile:
 .proc RestoreCheckpoint
   setaxy16
   lda Mode7CheckpointX
-  sta Mode7PlayerX
+;  sta Mode7PlayerX
   lda Mode7CheckpointY
-  sta Mode7PlayerY
+;  sta Mode7PlayerY
   lda Mode7CheckpointDir
-  sta Mode7Direction
-  .repeat 4
-    asl
-  .endrep
-  sta Mode7RealAngle
+  sta angle
   lda Mode7CheckpointChips
   sta Mode7ChipsLeft
   lda Mode7CheckpointKeys+0
@@ -1114,18 +1387,6 @@ ForwardPtrTile:
   plb
 
   jmp StartMode7Level::RestoredFromCheckpoint
-.endproc
-
-.proc CalculateScroll
-  lda Mode7PlayerX
-  add Mode7LookAroundOffsetX
-  sub #7*16+8
-  sta Mode7ScrollX
-  lda Mode7PlayerY
-  add Mode7LookAroundOffsetY
-  sub #11*16+8
-  sta Mode7ScrollY
-  rts
 .endproc
 
 GradientTable:     ; 

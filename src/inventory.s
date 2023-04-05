@@ -23,7 +23,7 @@
 .segment "C_Inventory"
 .import InitVWF, DrawVWF, CopyVWF, KeyRepeat
 CursorTopMenu = CursorX + 1
-.import Mode7ScrollX, Mode7ScrollY ; Reuse these since it's not used during the inventory
+.import Mode7PlayerHeight, Mode7PlayerVSpeed; Reuse these since it's not used during the inventory
 MenuBGScroll = SpriteTileBase
 .include "vwf.inc"
 
@@ -33,9 +33,8 @@ InventoryTilemapText = $d000
 InventoryPalette     = 7<<10
 .export InventoryTilemapMenu, InventoryTilemapBG, InventoryTilemapText, InventoryPalette
 
-.import Mode7ScrollX, Mode7ScrollY
-InventorySwapRow    = Mode7ScrollY
-InventorySwapColumn = Mode7ScrollX
+InventorySwapRow    = Mode7PlayerHeight
+InventorySwapColumn = Mode7PlayerVSpeed
 
 TopMenuStrings:
   .addr StringReset, StringToss, StringOptions, StringHelp, StringExitLevel
