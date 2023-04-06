@@ -55,7 +55,7 @@
 7000 SPBurgerRider
 1c00 FGTreehouse
 1e00 FGIndoorDecor
-4400 Mode7HUDSprites
+4600 Mode7HUDSprites
 7000 SPLife
 7000 SPKnuckleSandwich
 7000 SPPumpkinBoat

@@ -1,114 +1,98 @@
 #!/usr/bin/env python3
 import math
 
-raw_tables = True # Don't do premade HDMA tables
-sine_only = True # Repeat first 1/4 of the angles; single overlapping sine/cosine table
+"""
+	L0 to L1 defines the area of the screen to be covered by the perspective effect.
+	S0, S1, and SH are the top, bottom, and height of a trapezoid view frustum, this is an area on the 1024x1024 mode 7 texture map that will be visible in this perspective
 
-def perspective(angle, height, scale_x, scale_y):
-    """
-    angle   - angle to face
-    height  - this is the height of the camera above the plane
-    scale_x - scale of space coordinates to pixels
-    scale_y - scale of space coordinates to pixels
-    """
-    def to_fixed(f):
-        return int(round(f*256)) & 0xffff
-   
-    m7a, m7b, m7c, m7d = [], [], [], []
-    for screen_y in range(224):
-        scale_z = 1/((screen_y+1)*0.75)
-        
-        m7a.append(to_fixed( math.cos(angle) * scale_x * scale_z))
-        m7b.append(to_fixed( math.sin(angle) * scale_x * scale_z))
-        m7c.append(to_fixed(-math.sin(angle) * scale_y * scale_z))
-        m7d.append(to_fixed( math.cos(angle) * scale_y * scale_z))
-    return (m7a, m7b, m7c, m7d)
-
-""" HDMA format:
-xx Line count
-xx * N Data
-xx Line count
-xx * N Data
-xx Line count
-xx * N Data
-00 Terminate
+	Setup:
+		ZR0 = 1/S0
+		ZR1 = 1/S1
+		SA = (256 * SH) / (S0 * (L1 - L0)), or SA = 1 if automatic (SH=0)
+	Per-line:
+		zr = lerp(ZR0,ZR1,(line-L0)/(L1-L0))
+		z = 1 / zr
+		a = z *  cos(angle)
+		b = z *  sin(angle) * SA
+		c = z * -sin(angle)
+		d = z *  cos(angle) * SA
 """
 
-# Takes a value from 0 to 1
-# Returns a value from 0 to 1 with some smoothing?
-def smoothing(value):
-	value = (2*value-1) * math.pi/2
-	value = (math.sin(value)+1)/2
-	return value
+def lerp(a, b, t):
+	return (1 - t) * a + t * b
+
+def to_fixed(f):
+	return int(round(f*256)) & 0xffff
+
+def perspective(angle, l0, l1, s0, s1):
+	zr0 = 1/s0
+	zr1 = 1/s1
+
+	m7a, m7b, m7c, m7d = [], [], [], []
+
+	lines = (l1-l0)
+	for i in range(lines):
+		zr = lerp(zr0, zr1, i/lines)
+		z = 1 / zr
+		m7a.append(to_fixed(z *  math.cos(angle)))
+		m7b.append(to_fixed(z *  math.sin(angle)))
+		m7c.append(to_fixed(z * -math.sin(angle)))
+		m7d.append(to_fixed(z *  math.cos(angle)))
+	return (m7a, m7b, m7c, m7d)
 
 def output_tables():
-	outfile = open("src/perspective_data.s", "w")
+	outfile = open("src/mode7/perspective_data.s", "w")
 
-	sky_lines = 48
-	data_skip = 16
-	angles    = 64
-	denominator = angles
+	angles = 256
 
-	quarters = 4
-	if sine_only:
-		angles += angles//4
-		quarters += 1
+	outfile_ab_luts = []
+	outfile_cd_luts = []
+	for a in range(angles//64):
+		outfile_ab_luts.append(open("tools/lut/perspective_lut_ab_%d.bin" % a, "wb"))
+		outfile_cd_luts.append(open("tools/lut/perspective_lut_cd_%d.bin" % a, "wb"))
 
 	outfile.write('; This is automatically generated. Edit "perspective.py" instead\n')
-	if raw_tables:
-		outfile.write('.export m7a_m7b_list, m7a_m7b_0\n')
-	else:
-		outfile.write('.export m7a_m7b_list, m7c_m7d_list, m7a_m7b_0, m7c_m7d_0\n')
+	outfile.write('.export perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks\n')
+
+	lines = 224-48
+
 	outfile.write('.segment "C_Mode7Game"\n')
-	outfile.write('m7a_m7b_list:\n')
-	for a in range(denominator):
-		outfile.write('  .addr .loword(m7a_m7b_%d)\n' % a)
-	if not raw_tables:
-		outfile.write('m7c_m7d_list:\n')
-		for a in range(angles):
-			outfile.write('  .addr .loword(m7c_m7d_%d)\n' % a)
 
-	table_id = -1
-	for quarter in range(quarters):
-		quarter_size = denominator//4
-		base_angle = quarter*quarter_size
+	# Table of addresses
+	outfile.write('perspective_m7a_m7b_list:\n')
+	for a in range(angles):
+		outfile.write('  .addr .loword(perspective_m7a_m7b_%d + %d)\n' % (a//64, (a % 64)*lines*4))
+	outfile.write('perspective_m7c_m7d_list:\n')
+	for a in range(angles):
+		outfile.write('  .addr .loword(perspective_m7c_m7d_%d + %d)\n' % (a//64, (a % 64)*lines*4))
 
-		for a in range(quarter_size):
-			table_id += 1
+	# Banks
+	outfile.write('perspective_abcd_banks:\n')
+	for a in range(angles//64):
+		outfile.write('  .byt ^perspective_m7a_m7b_%d, ^perspective_m7c_m7d_%d\n' % (a, a))
 
-			desired_angle = base_angle + quarter_size*smoothing(a/quarter_size)
-			desired_angle = desired_angle/denominator*2*math.pi
-			m7a, m7b, m7c, m7d = perspective(desired_angle, 0, 64, 64)
+	# Generate the data and write the lookup tables
+	for a in range(angles):
+		angle = (a/angles)*2*math.pi
+		m7a, m7b, m7c, m7d = perspective(angle, 48, 224, 384/256, 64/256)
 
-			if raw_tables:
-				if sine_only:
-					outfile.write('.segment "Mode7TblAB"\n')
-					outfile.write('m7a_m7b_%d:\n' % table_id)
-					for i in range(224-sky_lines):
-						outfile.write('  .word $%.4x\n' % (m7b[i+data_skip]))
-				else:
-					outfile.write('.segment "Mode7TblAB"\n')
-					outfile.write('m7a_m7b_%d:\n' % table_id)
-					for i in range(224-sky_lines):
-						outfile.write('  .word $%.4x, $%.4x\n' % (m7a[i+data_skip], m7b[i+data_skip]))
-			else:
-				outfile.write('.segment "Mode7TblAB"\n')
-				outfile.write('m7a_m7b_%d:\n' % table_id)
-				outfile.write('  .byte %d\n' % sky_lines)
-				outfile.write('  .word 0, 0\n')
-				for i in range(224-sky_lines):
-					outfile.write('  .byte 1\n')
-					outfile.write('  .word $%.4x, $%.4x\n' % (m7a[i+data_skip], m7b[i+data_skip]))
-				outfile.write('  .byte 0\n')
+		for i in range(len(m7a)):
+			outfile_ab_luts[a//64].write(bytes([m7a[i] & 255, m7a[i]>>8, m7b[i] & 255, m7b[i]>>8]))
+			outfile_cd_luts[a//64].write(bytes([m7c[i] & 255, m7c[i]>>8, m7d[i] & 255, m7d[i]>>8]))
 
-				outfile.write('.segment "Mode7TblCD"\n')
-				outfile.write('m7c_m7d_%d:\n' % table_id)
-				outfile.write('  .byte %d\n' % sky_lines)
-				outfile.write('  .word 0, 0\n')
-				for i in range(224-sky_lines):
-					outfile.write('  .byte 1\n')
-					outfile.write('  .word $%.4x, $%.4x\n' % (m7c[i+data_skip], m7d[i+data_skip]))
-				outfile.write('  .byte 0\n')
+	# Include the lookup tables in the ROM
+	for a in range(angles//64):
+		outfile.write('.segment "Mode7TblAB%d"\n' % a)
+		outfile.write('perspective_m7a_m7b_%d:\n' % a)
+		outfile.write('  .incbin "../../tools/lut/perspective_lut_ab_%d.bin"\n' % a)
 
+		outfile.write('.segment "Mode7TblCD%d"\n' % a)
+		outfile.write('perspective_m7c_m7d_%d:\n' % a)
+		outfile.write('  .incbin "../../tools/lut/perspective_lut_cd_%d.bin"\n' % a)
+
+	# Clean up
 	outfile.close()
+	for i in range(4):
+		outfile_ab_luts[i].close()
+		outfile_cd_luts[i].close()
 output_tables()

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="1.4.0" name="M7Tileset" tilewidth="16" tileheight="16" tilecount="128" columns="8">
+<tileset version="1.10" tiledversion="1.10.0" name="M7Tileset" tilewidth="16" tileheight="16" tilecount="128" columns="8">
  <image source="M7Tileset.png" width="128" height="256"/>
  <tile id="0">
   <properties>
@@ -23,7 +23,7 @@
  </tile>
  <tile id="4">
   <properties>
-   <property name="Name" value="Cancel"/>
+   <property name="Name" value="Barrier"/>
   </properties>
  </tile>
  <tile id="5">
@@ -163,12 +163,12 @@
  </tile>
  <tile id="32">
   <properties>
-   <property name="Name" value="Dirt"/>
+   <property name="Name" value="Balloon"/>
   </properties>
  </tile>
  <tile id="33">
   <properties>
-   <property name="Name" value="Thief"/>
+   <property name="Name" value="Fan"/>
   </properties>
  </tile>
  <tile id="34">
@@ -178,7 +178,7 @@
  </tile>
  <tile id="35">
   <properties>
-   <property name="Name" value="IceCornerUL"/>
+   <property name="Name" value="SpringOnce"/>
   </properties>
  </tile>
  <tile id="36">

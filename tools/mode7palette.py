@@ -20,7 +20,7 @@ def getPNGPalette(filename):
 				im.seek(length, 1) # Skip this chunk's data
 			im.seek(4, 1) # Ignore the chunk's CRC
 
-outfile = open("src/m7palettedata.s", "w")
+outfile = open("src/mode7/m7palettedata.s", "w")
 outfile.write('; This is automatically generated. Edit "M7Tileset.png" instead\n')
 
 outfile.write('.proc Mode7Palette\n')
