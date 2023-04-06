@@ -552,22 +552,21 @@ PlayerIsntOnLadder:
   bpl :+
     seta8
     lda PlayerJumpCancel
+    ora PlayerJumpCancelLock ; Set by springs
     bne :+
     lda keydown+1
     and #(KEY_B>>8)
     bne :+
-      lda PlayerJumpCancelLock ; Set by springs
-      bne :+
-        inc PlayerJumpCancel
+      inc PlayerJumpCancel
 
-        ; Reduce the jump to a small upward boost
-        ; (unless the upward movement is already less than that)
-        seta16
-        lda PlayerVY
-        cmp #.loword(-$20)
-        bcs :+
-        lda #.loword(-$20)
-        sta PlayerVY
+      ; Reduce the jump to a small upward boost
+      ; (unless the upward movement is already less than that)
+      seta16
+      lda PlayerVY
+      cmp #.loword(-$20)
+      bcs :+
+      lda #.loword(-$20)
+      sta PlayerVY
   :
 
   ; Cancel the jump cancel
