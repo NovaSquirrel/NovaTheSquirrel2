@@ -1479,7 +1479,7 @@ editor_hide
 #######################################
 # Arrow blocks
 #######################################
-base $5400
+base $2a00
 palette global_palette
 tileset FGHannah
 editor_category Puzzle
