@@ -152,8 +152,8 @@ $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
 $(objdir)/main.o: $(srcdir)/vblank.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
-$(objdir)/m7blockdata.o: $(srcdir)/mode7/m7blockenum.s
-$(objdir)/mode7actors.o: $(srcdir)/mode7/m7blockenum.s tilesetsX/M7SoftSprites.chr
+$(objdir)/mode7/m7blockdata.o: $(srcdir)/mode7/m7blockenum.s
+$(objdir)/mode7/m7actors.o: $(srcdir)/mode7/m7blockenum.s tilesetsX/M7SoftSprites.chr
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/actorshared.o: $(srcdir)/blockenum.s
@@ -164,7 +164,7 @@ $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(sr
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/vwf.inc
-$(objdir)/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s $(srcdir)/mode7/m7blockenum.s
+$(objdir)/mode7/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/mode7/m7palettedata.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s $(srcdir)/mode7/m7blockenum.s tilesetsX/M7Tileset.chr $(m7levels_lz4)
 $(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
@@ -268,13 +268,8 @@ $(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
 	$(PY) tools/makebackgroundmap.py $<
-$(srcdir)/m7palettedata.s: tilesetsX/M7Tileset.png
+$(srcdir)/mode7/m7palettedata.s: tilesetsX/M7Tileset.png
 	$(PY) tools/mode7palette.py
-
-$(objdir)/mode7.o: tilesetsX/M7Tileset.chr $(srcdir)/m7palettedata.s $(m7levels_lz4)
-#tools/M7Tileset.chrm7.lz4: tools/M7Tileset.chrm7
-#	$(lz4_compress) $(lz4_flags) $< $@
-#	@touch $@
 
 tilesets4/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc
 	$(lz4_compress) $(lz4_flags) $< $@
