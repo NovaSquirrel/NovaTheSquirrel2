@@ -1432,7 +1432,7 @@ q 4,0
 #######################################
 # Glass
 #######################################
-base $2800
+base $1400
 palette glass_palette
 tileset FGGlassBlocks
 editor_category Themed
@@ -1451,7 +1451,7 @@ q 4,0
 +GlassNonsolidBlue
 q 6,0
 
-base $2C00
+base $1600
 palette glass_palette_gray
 tileset FGGlassBlocksGray
 
