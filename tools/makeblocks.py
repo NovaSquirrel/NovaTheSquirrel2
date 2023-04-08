@@ -104,6 +104,9 @@ for line in text:
 	elif word == "q": # add four tiles at once
 		tile = parseMetatileTile(arg, default_palette, default_base, priority)
 		block["tiles"] = [tile, tile+1, tile+16, tile+17]
+	elif word == "w": # add four tiles at once, but wide
+		tile = parseMetatileTile(arg, default_palette, default_base, priority)
+		block["tiles"] = [tile, tile+1, tile+2, tile+3]
 
 # Save the last one
 saveBlock()

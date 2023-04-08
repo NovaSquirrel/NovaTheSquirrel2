@@ -43,7 +43,7 @@ when Enter, M7BlockSpringOnce
 q 8,0
 
 +Balloon
-q 8,6
+q 4,2
 
 +Fan
 when Enter, M7BlockFan
@@ -51,74 +51,66 @@ q 6,0
 
 +ForceDown
 when Touching, M7BlockForceDown
-q 0,2
+w 0,5
 
 +ForceUp
 when Touching, M7BlockForceUp
-q 2,2
+w 4,5
 
 +ForceLeft
 when Touching, M7BlockForceLeft
-q 4,2
+w 8,5
 
 +ForceRight
 when Touching, M7BlockForceRight
-q 6,2
+w 12,5
 
 +Empty
-q 8,2
+q 0,2
 
 +Checkpoint
 when Enter, M7BlockCheckpoint
-q 10,2
+q 2,2
 
 +Bomb
 when Enter, M7BlockHurt
-q 12,0
+q 8,6
 
 +Teleport
 when Enter, M7BlockTeleport
-q 14,2
+q 6,2
 
 +ToggleFloor1
-t 0,4 1,4
-t 2,4 3,4
+w 0,4
 
 +ToggleWall1
 impassable
-t 4,4 5,4
-t 6,4 7,4
+w 4,4
 
 +ToggleButton1
 when Enter, M7BlockToggleButton1
-t 0,5 1,5
-t 2,5 3,5
+q 8,2
 
 +ToggleFloor2
-t 8,4 9,4
-t 10,4 11,4
+w 8,4
 
 +ToggleWall2
 impassable
-t 12,4 13,4
-t 14,4 15,4
+w 12,4
 
 +ToggleButton2
 when Enter, M7BlockToggleButton2
-t 4,5 5,5
-t 6,5 7,5
+q 10,2
 
 +PushableBlock
 when Bump, M7BlockPushableBlock
 solid
-t 8,5 9,5
-t 10,5 11,5
+q 12,2
 
 +Exit
 when Enter, M7BlockExit
 solid_creature
-t 12,5 13,5
-t 14,5 15,5
+q 14,2
 
 +Dirt
 solid_creature
