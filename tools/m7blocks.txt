@@ -112,294 +112,206 @@ when Enter, M7BlockExit
 solid_creature
 q 14,2
 
-+Dirt
-solid_creature
-solid_block
-when Enter, M7BlockDirt
-q 0,6
-
 +WoodArrowUp
 when Bump, M7BlockWoodArrow
 solid
-q 2,6
+w 0,6
 
 +WoodArrowLeft
 when Bump, M7BlockWoodArrow
 solid
-t 2,6 7,6
-t 4,7 7,7
+t 0,6 9,6
+t 6,6 11,6
 
 +WoodArrowDown
 when Bump, M7BlockWoodArrow
 solid
-q 4,6
+w 4,6
 
 +WoodArrowRight
 when Bump, M7BlockWoodArrow
 solid
-t 6,6 3,6 
-t 6,7 5,7
+t 8,6 1,6
+t 10,6 7,6
 
 +MetalArrowUp
 impassable
-q 2,8
+w 0,7
 
 +MetalArrowLeft
 impassable
-t 2,8 7,8
-t 4,9 7,9
+t 0,7 9,7
+t 6,7 11,7
 
 +MetalArrowDown
 impassable
-q 4,8
+w 4,7
 
 +MetalArrowRight
 impassable
-t 6,8 3,8
-t 6,9 5,9
+t 8,7 1,7
+t 10,7 7,7
 
 +MetalArrowForkUp
 impassable
+t 0,7 1,7
 t 2,8 3,8
-t 8,9 9,9
 
 +MetalArrowForkLeft
 impassable
-t 2,8 11,8
-t 4,9 11,9
+t 0,7 5,8
+t 6,7 7,8
 
 +MetalArrowForkDown
 impassable
-t 8,8 9,8
-t 4,9 5,9
+t 0,8 1,8
+t 6,7 7,7
 
 +MetalArrowForkRight
 impassable
-t 10,8 3,8
-t 10,9 5,9
+t 4,8 1,7
+t 6,8 7,7
+
++WoodCrate
+w 12,6
 
 +MetalCrate
 impassable
-q 0,8
-
+w 12,7
 
 +Ice
 when Touching, M7BlockIce
-q 10,6
-
-+Thief
-solid_creature
-when Enter, M7BlockThief
-q 8,6
-
-+BorderL
-#solid_l
-t 14,6 3,0
-t 14,6 3,0
-
-+BorderR
-#solid_r
-t 3,0 15,6
-t 3,0 15,6
-
-+BorderU
-#solid_u
-t 14,7 14,7
-t 3,0 3,0
-
-+BorderD
-#solid_d
-t 3,0 3,0
-t 15,7 15,7
-
-+BorderLR
-#solid_l
-#solid_r
-t 14,6 15,6
-t 14,6 15,6
-
-+BorderUD
-#solid_u
-#solid_d
-t 14,7 14,7
-t 15,7 15,7
-
-+RotateBorderLR
-when Exit, M7BlockRotateBorderLR
-#solid_l
-#solid_r
-t 14,8 15,8
-t 14,8 15,8
-
-+RotateBorderUD
-when Exit, M7BlockRotateBorderUD
-#solid_u
-#solid_d
-t 14,9 14,9
-t 15,9 15,9
-
-+RotateCornerUL
-when Exit, M7BlockRotateCornerUL
-#solid_u
-#solid_l
-t 12,8 14,9
-t 14,8 3,0
-
-+RotateCornerUR
-when Exit, M7BlockRotateCornerUR
-#solid_u
-#solid_r
-t 14,9 13,8
-t 3,0 15,8
-
-+RotateCornerDR
-when Exit, M7BlockRotateCornerDR
-#solid_d
-#solid_r
-t 3,0 15,8
-t 15,9 13,9
-
-+RotateCornerDL
-when Exit, M7BlockRotateCornerDL
-#solid_d
-#solid_l
-t 14,8 3,0
-t 12,9 15,9
+w 8,9
 
 +Key1
 when Enter, M7BlockKey
-t 0,10 0,10
-t 0,10 0,10
+t 8,8 8,8
+t 8,8 8,8
 
 +Key2
 when Enter, M7BlockKey
-t 1,10 1,10
-t 1,10 1,10
+t 9,8 9,8
+t 9,8 9,8
 
 +Key3
 when Enter, M7BlockKey
-t 0,11 0,11
-t 0,11 0,11
+t 10,8 10,8
+t 10,8 10,8
 
 +Key4
 when Enter, M7BlockKey
-t 1,11 1,11
-t 1,11 1,11
+t 11,8 11,8
+t 11,8 11,8
 
 +Lock1
 when Bump, M7BlockLock
 impassable
-t 4,10 0,10
-t 4,11 5,11
+t 12,8 8,8
+t 13,8 14,8
 
 +Lock2
 when Bump, M7BlockLock
 impassable
-t 4,10 1,10
-t 4,11 5,11
+t 12,8 9,8
+t 13,8 14,8
 
 +Lock3
 when Bump, M7BlockLock
 impassable
-t 4,10 0,11
-t 4,11 5,11
+t 12,8 10,8
+t 13,8 14,8
 
 +Lock4
 when Bump, M7BlockLock
 impassable
-t 4,10 1,11
-t 4,11 5,11
+t 12,8 11,8
+t 13,8 14,8
 
 +CloneBlock
 solid
-t 4,10 9,5
-t 4,11 5,11
+t 15,8 13,2
+t 13,8 14,8
 
 +CloneArrowUp
 solid
-t 4,10 2,12
-t 4,11 5,11
+t 15,8 14,9
+t 13,8 14,8
 
 +CloneArrowDown
 solid
-t 4,10 1,12
-t 4,11 5,11
+t 15,8 13,9
+t 13,8 14,8
 
 +CloneArrowLeft
 solid
-t 4,10 0,12
-t 4,11 5,11
+t 15,8 12,9
+t 13,8 14,8
 
 +CloneArrowRight
 solid
-t 4,10 3,12
-t 4,11 5,11
+t 15,8 15,9
+t 13,8 14,8
 
 +Message
 when Enter, M7BlockMessage
-q 6,10
+q 4,10
 
 +CloneButton
 when Enter, M7BlockCloneButton
-q 8,10
+w 0,9
 
 +Water
 when Enter, M7BlockWater
-q 10,10
+w 4,10
 
 +Turtle
 when Exit, M7BlockTurtle
-q 12,10
+w 8,10
 
 +Fire
 when Enter, M7BlockFire
-q 14,10
+w 12,10
 
 +PointUp
 solid
-t 0,12 0,12
-t 0,12 0,12
+t 14,9 14,9
+t 14,9 14,9
 
 +PointDown
 solid
-t 1,12 1,12
-t 1,12 1,12
+t 13,9 13,9
+t 13,9 13,9
 
 +PointLeft
 solid
-t 0,13 0,13
-t 0,13 0,13
+t 12,9 12,9
+t 12,9 12,9
 
 +PointRight
 solid
-t 1,13 1,13
-t 1,13 1,13
-
-+BlueAllCorners
-solid
-q 12,8
+t 15,9 15,9
+t 15,9 15,9
 
 +FireBoots
 solid_creature
 when Enter, M7BlockFireBoots
-t 2,10 2,10
-t 2,10 2,10
+t 0,10 0,10
+t 0,10 0,10
 
 +SuctionBoots
 solid_creature
 when Enter, M7BlockSuctionBoots
-t 3,10 3,10
-t 3,10 3,10
+t 1,10 1,10
+t 1,10 1,10
 
 +Flippers
 solid_creature
 when Enter, M7BlockFlippers
-t 2,11 2,11
-t 2,11 2,11
+t 2,10 2,10
+t 2,10 2,10
 
 +IceSkates
 solid_creature
 when Enter, M7BlockIceSkates
-t 3,11 3,11
-t 3,11 3,11
-
+t 3,10 3,10
+t 3,10 3,10

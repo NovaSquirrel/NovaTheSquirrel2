@@ -361,8 +361,8 @@ Mode7ActorTable:
   jsr Mode7BlockAddress
   cmp #Mode7Block::Bomb
   beq RemoveCrate
-  cmp #Mode7Block::Dirt
-  beq RemoveCrate
+;  cmp #Mode7Block::Dirt
+;  beq RemoveCrate
   cmp #Mode7Block::MetalCrate
   beq RemoveCrate
   cmp #Mode7Block::WoodArrowUp
@@ -422,7 +422,7 @@ RemoveCrate:
     jsr Mode7BlockAddress
     cmp #Mode7Block::Water
     bne :+
-      lda #Mode7Block::Dirt
+      lda #Mode7Block::Empty
       jmp Mode7ActorBecomeBlock
     :
     lda #Mode7Block::PushableBlock
