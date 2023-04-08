@@ -46,13 +46,14 @@ def output_tables():
 	angles = 256
 
 	outfile_ab_luts = []
-	outfile_cd_luts = []
+	#outfile_cd_luts = []
 	for a in range(angles//64):
 		outfile_ab_luts.append(open("tools/lut/perspective_lut_ab_%d.bin" % a, "wb"))
-		outfile_cd_luts.append(open("tools/lut/perspective_lut_cd_%d.bin" % a, "wb"))
+	#	outfile_cd_luts.append(open("tools/lut/perspective_lut_cd_%d.bin" % a, "wb"))
 
 	outfile.write('; This is automatically generated. Edit "perspective.py" instead\n')
-	outfile.write('.export perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks\n')
+	#outfile.write('.export perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks\n')
+	outfile.write('.export perspective_m7a_m7b_list, perspective_ab_banks\n')
 
 	lines = 224-48
 
@@ -62,14 +63,14 @@ def output_tables():
 	outfile.write('perspective_m7a_m7b_list:\n')
 	for a in range(angles):
 		outfile.write('  .addr .loword(perspective_m7a_m7b_%d + %d)\n' % (a//64, (a % 64)*lines*4))
-	outfile.write('perspective_m7c_m7d_list:\n')
-	for a in range(angles):
-		outfile.write('  .addr .loword(perspective_m7c_m7d_%d + %d)\n' % (a//64, (a % 64)*lines*4))
+	#outfile.write('perspective_m7c_m7d_list:\n')
+	#for a in range(angles):
+	#	outfile.write('  .addr .loword(perspective_m7c_m7d_%d + %d)\n' % (a//64, (a % 64)*lines*4))
 
 	# Banks
-	outfile.write('perspective_abcd_banks:\n')
+	outfile.write('perspective_ab_banks:\n')
 	for a in range(angles//64):
-		outfile.write('  .byt ^perspective_m7a_m7b_%d, ^perspective_m7c_m7d_%d\n' % (a, a))
+		outfile.write('  .byt ^perspective_m7a_m7b_%d\n' % a)
 
 	# Generate the data and write the lookup tables
 	for a in range(angles):
@@ -78,7 +79,7 @@ def output_tables():
 
 		for i in range(len(m7a)):
 			outfile_ab_luts[a//64].write(bytes([m7a[i] & 255, m7a[i]>>8, m7b[i] & 255, m7b[i]>>8]))
-			outfile_cd_luts[a//64].write(bytes([m7c[i] & 255, m7c[i]>>8, m7d[i] & 255, m7d[i]>>8]))
+	#		outfile_cd_luts[a//64].write(bytes([m7c[i] & 255, m7c[i]>>8, m7d[i] & 255, m7d[i]>>8]))
 
 	# Include the lookup tables in the ROM
 	for a in range(angles//64):
@@ -86,13 +87,13 @@ def output_tables():
 		outfile.write('perspective_m7a_m7b_%d:\n' % a)
 		outfile.write('  .incbin "../../tools/lut/perspective_lut_ab_%d.bin"\n' % a)
 
-		outfile.write('.segment "Mode7TblCD%d"\n' % a)
-		outfile.write('perspective_m7c_m7d_%d:\n' % a)
-		outfile.write('  .incbin "../../tools/lut/perspective_lut_cd_%d.bin"\n' % a)
+	#	outfile.write('.segment "Mode7TblCD%d"\n' % a)
+	#	outfile.write('perspective_m7c_m7d_%d:\n' % a)
+	#	outfile.write('  .incbin "../../tools/lut/perspective_lut_cd_%d.bin"\n' % a)
 
 	# Clean up
 	outfile.close()
 	for i in range(4):
 		outfile_ab_luts[i].close()
-		outfile_cd_luts[i].close()
+	#	outfile_cd_luts[i].close()
 output_tables()

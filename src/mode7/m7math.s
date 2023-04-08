@@ -16,7 +16,7 @@
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
 .global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y
 
-.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_abcd_banks
+.import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_ab_banks
 
 .segment "ZEROPAGE" ; < $100
 temp = 0 ; temp+0 to temp+13 used
@@ -2050,9 +2050,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 .export pv_setup_for_ground
 .proc pv_setup_for_ground
 	temp = 0
-	ab_lut_pointer = 2 ;and 3
-	cd_lut_pointer = 4 ;and 5
-	abcd_banks     = 6 ;and 7
+	ab_lut_pointer = 2 ;and 3, 4
 	php
 	phb
 
@@ -2063,33 +2061,30 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 
 	setaxy16
 
-	; Calculate which table to use based on which 
+	; Calculate which table to use based on which angle is used
 	lda angle
 	asl
 	tax
 	lda f:perspective_m7a_m7b_list,x
 	sta ab_lut_pointer
-	lda f:perspective_m7c_m7d_list,x
-	sta cd_lut_pointer
 
-	lda angle ; aaaaaaaa
-	lsr       ; .aaaaaaa
-	lsr       ; ..aaaaaa
-	lsr       ; ...aaaaa
-	lsr       ; ....aaaa
-	lsr       ; .....aaa
-	and            #%110
+	; Find what bank the table is in
+	lda angle
+	asl
+	asl
+	xba
+	and #%11
     tax
-	lda f:perspective_abcd_banks,x
-	sta abcd_banks
+	lda f:perspective_ab_banks,x
 	seta8
+	sta ab_lut_pointer+2
 
 	lda f:pv_buffer
 	eor #1
 	sta f:pv_buffer
 	jsr pv_buffer_x
 
-	; Make the indirect buffers
+	; Make the HDMA tables that will point to the data
 	lda #47
 	sta a:pv_hdma_abi0+0,x
 	sta a:pv_hdma_cdi0+0,x
@@ -2115,10 +2110,38 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	add #127*4
 	sta a:pv_hdma_abi0+7,x
 
-	lda cd_lut_pointer
+	txa
+	add #.loword(pv_hdma_cd0)
 	sta a:pv_hdma_cdi0+4,x
 	add #127*4
 	sta a:pv_hdma_cdi0+7,x
+
+
+	; Derive CD from AB
+	; X not needed after this process so it's ok to modify
+	ldy #0
+DeriveCDFromAB:
+	.repeat 8, I
+	lda [ab_lut_pointer],y  ; Get A, which is cos(angle)
+	iny
+	iny
+	sta pv_hdma_cd0+2+I*4,x ; D is also cos(angle), so D = A
+	lda [ab_lut_pointer],y  ; Get B, which is sin(angle)
+	iny
+	iny
+	eor #$ffff
+	ina
+	sta pv_hdma_cd0+I*4,x   ; C is -sin(angle), so it can be -B
+	.endrep
+
+	txa
+	add #4*8
+	tax
+	cpy #176*4
+	bcs :+
+		jmp DeriveCDFromAB
+	:
+
 	seta8
 
 	; Set up HDMA configuration for next frame
@@ -2154,9 +2177,9 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sta a:mode7_hdma+(3*16)+4
 
 	; Indirect banks
-	lda abcd_banks + 0
+	lda ab_lut_pointer+2 ; From LUT
 	sta a:mode7_hdma+(2*16)+7 ; M7A M7B
-	lda abcd_banks + 1
+	lda #^pv_hdma_cd0    ; Derived from LUT
 	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
 	lda #^pv_fade_table0
 	sta a:mode7_hdma+(4*16)+7
@@ -2237,7 +2260,6 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 target_scanline = 0
 index_to_line   = 2 ; and 3
 ab_lut_pointer  = 4 ; and 5, 6
-cd_lut_pointer  = 7 ; and 8, 9
 abcd_banks      = 10 ; and 11
 	sty target_scanline ; temp+0 = target scanline
 	tya
@@ -2248,43 +2270,36 @@ abcd_banks      = 10 ; and 11
 	sta index_to_line
 
 	setxy16
-	; Get the table
+	; Calculate which table to use based on which angle is used
 	lda angle
 	asl
 	tax
 	lda f:perspective_m7a_m7b_list,x
 	add index_to_line
-	add #2
 	sta ab_lut_pointer
-	lda f:perspective_m7c_m7d_list,x
-	add index_to_line
-	add #2
-	sta cd_lut_pointer
 
-	lda angle ; aaaaaaaa
-	lsr       ; .aaaaaaa
-	lsr       ; ..aaaaaa
-	lsr       ; ...aaaaa
-	lsr       ; ....aaaa
-	lsr       ; .....aaa
-	and            #%110
-    tax
-	lda f:perspective_abcd_banks,x
-
-	seta8
-	; Set the banks for the pointers
-	sta ab_lut_pointer+2
+	; Find what bank the table is in
+	lda angle
+	asl
+	asl
 	xba
-	sta cd_lut_pointer+2
+	and #%11
+    tax
+	lda f:perspective_ab_banks,x
+	seta8
+	; Set the bank for the pointer
+	sta ab_lut_pointer+2
 
 	lda #224 ;l1
 	sub target_scanline
 	sta z:math_b ; math_b = scanlines above bottom
 	seta16
-	lda [ab_lut_pointer]
-	sta z:math_a ; math_a = b coefficient
-	lda [cd_lut_pointer]
+	lda [ab_lut_pointer] ; Get A, which is the same as D
 	pha ; store for a moment
+	inc ab_lut_pointer
+	inc ab_lut_pointer
+	lda [ab_lut_pointer] ; Get B
+	sta z:math_a ; math_a = b coefficient
 	setxy8
 	.i8
 	jsr smul16_u8
