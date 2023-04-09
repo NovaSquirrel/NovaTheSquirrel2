@@ -185,7 +185,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   sta DMAADDRBANK
   ldy #.loword(Mode7Tiles)
   sty DMAADDR
-  ldy #CommonTilesetLength
+  ldy #Mode7TilesEnd-Mode7Tiles
   sty DMALEN
 
   stz PPUADDR+0
@@ -282,6 +282,11 @@ RestoredFromCheckpoint:
   stz Mode7DoLookAround
   stz Mode7LookAroundOffsetX
   stz Mode7LookAroundOffsetY
+
+  stz Mode7DynamicTileUsed+0
+  stz Mode7DynamicTileUsed+2
+  stz Mode7DynamicTileUsed+4
+  stz Mode7DynamicTileUsed+6
 
   ldx #ActorStart
   ldy #ActorEnd-ActorStart
@@ -483,6 +488,20 @@ SkipBlock:
 		stz GenericUpdateLength+1
 	:
 
+	; Upload the dynamic tile area
+	; TODO: make this conditional, intead of always doing it?
+	ldy #DMAMODE_PPUHIDATA
+	sty DMAMODE
+	lda #^Mode7DynamicTileBuffer
+	sta DMAADDRBANK
+	ldy #.loword(Mode7DynamicTileBuffer)
+	sty DMAADDR
+	ldy #32*64
+	sty DMALEN
+	ldy #(14*16)*64
+	sty PPUADDR
+	lda #1
+	sta COPYSTART
 
 	; Parallax
 	.if 0
@@ -582,6 +601,16 @@ SkipBlock:
 
 		jsr Mode7LevelPtrXYAtPlayer
 		jsr Mode7CallBlockJumpOff
+	:
+
+	lda keynew
+	and #KEY_X
+	beq :+
+		lda #Mode7ActorType::ArrowUp
+		ldx M7PosX+1
+		ldy M7PosY+1
+		.import Mode7CreateActor
+		jsr Mode7CreateActor
 	:
 
 	; Apply gravity
@@ -793,8 +822,11 @@ SkipBlock:
 
 	.if 0
 	  ; TEST
-	  lda #150
+      lda framecount
+      and #63
+	  add #150
 	  sta texelx
+      lda #150
 	  sta texely
 	  jsr pv_texel_to_screen
 	  lda screeny
@@ -881,6 +913,9 @@ SkipBlock:
 		sty OamPtr
 	  :
 	.endif
+
+	.import Mode7RunActors
+	jsr Mode7RunActors
 
 	jsl ppu_pack_oamhi_partial
 	.a8 ; (does seta8)
@@ -1017,12 +1052,15 @@ Mode7LevelPtrXYAtPlayer:
 .i16
 ; A = X position, in pixels
 ; Y = Y position, in pixels
+; Output: LevelBlockPtr
+.export Mode7LevelPtrXY
 .proc Mode7LevelPtrXY
 	    ; ......xx xxxx....
 	lsr ; .......x xxxxx...
 	lsr ; ........ xxxxxx..
 	lsr ; ........ .xxxxxx.
 	lsr ; ........ ..xxxxxx
+	and            #%111111
 	sta LevelBlockPtr
 
 	tya ; ......yy yyyy....
@@ -1490,8 +1528,8 @@ GradientTable:     ;
 .segment "Mode7Tiles"
 .export Mode7Tiles
 Mode7Tiles:
-.incbin "../../tilesetsX/M7Tileset.chr", 0, CommonTilesetLength
-
+.incbin "../../tilesetsX/M7Tileset.chr"
+Mode7TilesEnd:
 
 .export Mode7ToggleSwapped, Mode7ToggleNotSwapped
 Mode7ToggleNotSwapped = Mode7Tiles + 4*64*16

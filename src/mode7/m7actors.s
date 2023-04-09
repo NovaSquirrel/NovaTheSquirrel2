@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2020 NovaSquirrel
+; Copyright (C) 2020-2023 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 .include "m7global.s"
 .smart
 .import M7BlockTopLeft, M7BlockTopRight, M7BlockBottomLeft, M7BlockBottomRight, M7BlockFlags
-.import Mode7BlockAddress, Mode7Tiles
+.import Mode7LevelPtrXY, Mode7Tiles
 
 .segment "C_Mode7Game"
 ActorM7DynamicSlot = ActorIndexInLevel ; Reuse this
@@ -38,7 +38,7 @@ NUM_M7_ACTORS = 8
   phx
   seta8
   ; Look for a slot
-  ldx #6
+  ldx #7
 : lda Mode7DynamicTileUsed,x
   beq Found
   dex
@@ -90,9 +90,12 @@ Fail:
 ; Output: Carry, if creation was successful
 .export Mode7CreateActor
 .proc Mode7CreateActor
-  sta 0
-  stx 2
-  sty 4
+TypeToMake = 0
+XPos = 2
+YPos = 4
+  sta TypeToMake
+  stx XPos
+  sty YPos
 
   jsl FindFreeActorX
   bcc Fail
@@ -100,13 +103,13 @@ Fail:
   bcc Fail
 Success:
   sta ActorM7DynamicSlot,x
-  lda 0
+  lda TypeToMake
   sta ActorType,x
-  lda 2
+  lda XPos
   and #$fff0
   sta ActorPX,x
   sta ActorM7LastDrawX,x
-  lda 4
+  lda YPos
   and #$fff0
   sta ActorPY,x
   sta ActorM7LastDrawY,x
@@ -114,7 +117,7 @@ Success:
   ; Update the tilemap under the sprite
   lda ActorPX,x
   ldy ActorPY,x
-  jsr Mode7BlockAddress
+  jsr Mode7LevelPtrXY
 
   jsr Mode7FindFreeTilemapUpdateSlot
   bcc NoTilemapUpdate
@@ -149,20 +152,20 @@ Fail:
 .a16
 .i16
 .proc Mode7ActorBecomeBlock
-  pha
+  pha ; Save the block type to become
 
   ; Get block address
   lda ActorPX,x
   ldy ActorPY,x
-  jsr Mode7BlockAddress
+  jsr Mode7LevelPtrXY
   lda LevelBlockPtr
   pha
 
-  jsr Mode7RemoveActor
+  jsr Mode7RemoveActor ; Un-draws the actor, which changes LevelBlockPtr
 
   pla
   sta LevelBlockPtr
-  pla
+  pla ; Block to become
   .import Mode7PutBlockAbove
   jmp Mode7PutBlockAbove
 .endproc
@@ -178,7 +181,7 @@ Fail:
   tay
   lda ActorM7LastDrawX,x
   sta ActorPX,x
-  jsr Mode7BlockAddress
+  jsr Mode7LevelPtrXY
 
   jsr Mode7FindFreeTilemapUpdateSlot
   jcc NoTilemapUpdate
@@ -320,7 +323,7 @@ Mode7ActorTable:
   asl
   asl
   ; assert((PS & 1) == 0) Carry will be clear
-  adc #$e4
+  adc #$e0
   rts
 .endproc
 
@@ -358,7 +361,7 @@ Mode7ActorTable:
 
   lda ActorPX,x
   ldy ActorPY,x
-  jsr Mode7BlockAddress
+  jsr Mode7LevelPtrXY
   cmp #Mode7Block::Bomb
   beq RemoveCrate
 ;  cmp #Mode7Block::Dirt
@@ -419,7 +422,7 @@ RemoveCrate:
     ; Calculates it again in BecomeBlock, probably fine though
     lda ActorPX,x
     ldy ActorPY,x
-    jsr Mode7BlockAddress
+    jsr Mode7LevelPtrXY
     cmp #Mode7Block::Water
     bne :+
       lda #Mode7Block::Empty
@@ -495,7 +498,7 @@ AlignedToGrid:
   phy
   lda ActorPX,x
   ldy ActorPY,x
-  jsr Mode7BlockAddress
+  jsr Mode7LevelPtrXY
 
   lda LevelBlockPtr ; Preserve LevelBlockPtr because RenderAligned can overwrite it
   pha

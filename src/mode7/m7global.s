@@ -17,8 +17,8 @@ Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapBelow           = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapCheckpoint      = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
-Mode7DynamicTileBuffer       = LevelBufAlt          ; 7 tiles long, 64*4*7 = 1792
-Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 7 bytes long? padded to 8 though
+Mode7DynamicTileBuffer       = LevelBufAlt          ; 8 tiles long, 64*4*8 = 2048
+Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 8 bytes long and extends into RowUpdateAddress2
 
 Mode7Keys                    = ActorAdvertisePointer ; 4 bytes
 Mode7Tools                   = Mode7Keys+4           ; 2 bytes? Could be 1
@@ -27,8 +27,6 @@ TOOL_FIREBOOTS    = 1
 TOOL_FLIPPERS     = 2
 TOOL_SUCTIONBOOTS = 4
 TOOL_ICESKATES    = 8
-
-CommonTilesetLength = (12*16+4)*64
 
 ; Reusing this may be a little risky but it should be big enough
 Mode7CheckpointX     = CheckpointState + 0

@@ -136,31 +136,6 @@ Exit:
   rts
 .endproc
 
-; A = X coordinate (in pixels)
-; Y = Y coordinate (in pixels)
-; Output: LevelBlockPtr
-.a16
-.i16
-.export Mode7BlockAddress
-.proc Mode7BlockAddress
-  and #%1111110000
-      ; ......xx xxxx....
-  lsr ; .......x xxxxx...
-  lsr ; ........ xxxxxx..
-  lsr ; ........ .xxxxxx.
-  lsr ; ........ ..xxxxxx
-  sta LevelBlockPtr
-  tya ; ......yy yyyy....
-  and #%1111110000
-  asl ; .....yyy yyy.....
-  asl ; ....yyyy yy......
-  tsb LevelBlockPtr
-      ; ....yyyy yyxxxxxx
-  lda [LevelBlockPtr]
-  and #255
-  rts
-.endproc
-
 
 .a16
 GetInteractionSet:
@@ -238,8 +213,8 @@ M7BlockTeleport:
   tay
 
   pla
-;  .import Mode7CreateActor
-;  jmp Mode7CreateActor
+  .import Mode7CreateActor
+  jmp Mode7CreateActor
   ; Carry = success
   ; X = actor slot
 .endproc
@@ -506,37 +481,6 @@ Unlock:
   jmp Mode7ChangeBlock
 .endproc
 
-.export M7BlockRotateBorderLR
-.proc M7BlockRotateBorderLR
-  lda #Mode7Block::RotateBorderUD
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockRotateBorderUD
-.proc M7BlockRotateBorderUD
-  lda #Mode7Block::RotateBorderLR
-  jmp Mode7ChangeBlock
-.endproc
-
-.export M7BlockRotateCornerUL
-.proc M7BlockRotateCornerUL
-  lda #Mode7Block::RotateCornerUR
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockRotateCornerUR
-.proc M7BlockRotateCornerUR
-  lda #Mode7Block::RotateCornerDR
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockRotateCornerDR
-.proc M7BlockRotateCornerDR
-  lda #Mode7Block::RotateCornerDL
-  jmp Mode7ChangeBlock
-.endproc
-.export M7BlockRotateCornerDL
-.proc M7BlockRotateCornerDL
-  lda #Mode7Block::RotateCornerUL
-  jmp Mode7ChangeBlock
-.endproc
 
 .export M7BlockCollect
 .proc M7BlockCollect
