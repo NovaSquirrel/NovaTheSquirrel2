@@ -4,17 +4,17 @@ t 0,0 0,0
 t 0,0 0,0
 
 +Checker1
-t 0,1 0,1
-t 0,1 0,1
+t 1,0 1,0
+t 1,0 1,0
 
 +Checker2
-t 1,1 1,1
-t 1,1 1,1
+t 2,0 2,0
+t 2,0 2,0
 
 +Gravel
 solid_creature
-t 2,0 2,0
-t 2,0 2,0
+t 1,1 1,1
+t 1,1 1,1
 
 +BecomeWall
 when Exit, M7BlockBecomeWall
@@ -23,8 +23,8 @@ t 1,1 0,1
 
 +Barrier
 impassable
-t 1,0 1,0
-t 1,0 1,0
+t 0,1 0,1
+t 0,1 0,1
 
 +Collect
 when Enter, M7BlockCollect

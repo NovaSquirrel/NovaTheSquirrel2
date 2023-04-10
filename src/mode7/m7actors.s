@@ -29,6 +29,9 @@ ActorM7LastDrawY = ActorOnScreen ; and ActorDamage
 
 NUM_M7_ACTORS = 8
 
+; Last tile number where there there is a version of the sprite in SoftwareSprites with that tile number underneath it
+LastTileNumberWithPrerenderedSprite = 2
+
 ; Finds a dynamic sprite slot and allocates it
 ; A = Index into Mode7DynamicTileBuffer to use
 ; Carry = success
@@ -702,6 +705,61 @@ AlignedToGrid:
 ; -------------------------------------
 ; Render the actor on top of the tile it's on top of
 .a16
+
+.macro RenderOrCopyPrerenderedTile TileNumber
+  .local Loop
+  .local SkipLoop
+
+  .a8
+  lda TileNumber
+  cmp #LastTileNumberWithPrerenderedSprite+1
+  bcs :+
+    setaxy16
+    phb
+    phx
+    phy
+
+    stx 0 ; X = Destination index
+    and #255
+	asl ; Carry is guaranteed clear after this
+	tax
+    tya
+    adc SpritePointer
+    ; Use this lookup table to figure out what offset is needed to put the desired tile underneath the sprite tile
+	adc f:OffsetForPrerenderedSprites,x
+    tax ; X = Source pointer: Source index + base for desired sprite + offset to the part of the sprite sheet with desired tile underneath
+
+    lda 0 ; Destination index
+    add #.loword(Mode7DynamicTileBuffer)
+    tay ; Y = Destination pointer: Destination index + base
+
+    lda #64-1
+    mvn SoftwareSprites, Mode7DynamicTileBuffer
+    pla
+    add #64
+    tay
+    pla
+    add #64
+    tax
+    plb
+    seta8
+    bra SkipLoop
+  :
+
+  lda #64
+  sta Bytes
+Loop:
+  lda (SpritePointer),y
+  beq :+
+    sta f:Mode7DynamicTileBuffer,x
+  :
+  iny
+  inx
+  dec Bytes
+  bne Loop
+SkipLoop:
+.endmacro
+
 RenderAligned:
 UnderTileUL = 4
 UnderTileUR = 6
@@ -727,18 +785,15 @@ SpritePointer = 12
 
     ph2banks SoftwareSprites, RenderAligned
     plb
+
     ldy #0 ; Index for SpritePointer
     seta8
-    stz Bytes
-  @Loop:
-    lda (SpritePointer),y
-    beq :+
-      sta f:Mode7DynamicTileBuffer,x
-    :
-    iny
-    inx
-    inc Bytes
-    bne @Loop
+
+    RenderOrCopyPrerenderedTile UnderTileUL
+    RenderOrCopyPrerenderedTile UnderTileBL
+    RenderOrCopyPrerenderedTile UnderTileUR
+    RenderOrCopyPrerenderedTile UnderTileBR
+
     plb
   .endscope
 
@@ -747,13 +802,9 @@ SpritePointer = 12
   plx
   rts
 
-  .macro PointerForM7TileNumber
-    and #255
-    xba
-    lsr
-    lsr
-    add #.loword(Mode7Tiles)
-  .endmacro
+; Offset to add in order to put different background tiles underneath the sprite tiles
+OffsetForPrerenderedSprites:
+  .addr 0, 7*256*1, 7*256*2
 
 .a16
 LoadUpTileNumbersUnderActor:
@@ -763,13 +814,7 @@ LoadUpTileNumbersUnderActor:
 @Left:
   lda ActorPY,x
   and #$0008
-  beq LoadUpTileNumbersAligned
-  bra LoadUpTileNumbersDown
-;@Right:
-;  lda ActorPY,x
-;  and #$0008
-;  jeq LoadUpTileNumbersRight
-;  jmp LoadUpTileNumbersBoth
+  bne LoadUpTileNumbersDown
 
 LoadUpTileNumbersAligned:
   lda [LevelBlockPtr]
@@ -777,16 +822,16 @@ LoadUpTileNumbersAligned:
   tay
   ;---
   lda M7BlockTopLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUL
   lda M7BlockTopRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUR
   lda M7BlockBottomLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBL
   lda M7BlockBottomRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBR
   rts
 
@@ -796,12 +841,13 @@ LoadUpTileNumbersDown:
   tay
 
   lda M7BlockBottomLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUL
   lda M7BlockBottomRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUR
 
+  ; Down one row
   lda LevelBlockPtr
   add #64
   sta LevelBlockPtr
@@ -810,10 +856,10 @@ LoadUpTileNumbersDown:
   tay
 
   lda M7BlockTopLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBL
   lda M7BlockTopRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBR
   rts
 
@@ -823,22 +869,23 @@ LoadUpTileNumbersRight:
   tay
   ;---
   lda M7BlockTopRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUL
   lda M7BlockBottomRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBL
 
+  ; Across one column
   inc LevelBlockPtr
   lda [LevelBlockPtr]
   and #255
   tay
   ;---
   lda M7BlockTopLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUR
   lda M7BlockBottomLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBR
   rts
 
@@ -851,7 +898,7 @@ LoadUpTileNumbersBoth:
   tay
   ;---
   lda M7BlockTopLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUL
 
   inc LevelBlockPtr
@@ -860,7 +907,7 @@ LoadUpTileNumbersBoth:
   tay
   ;---
   lda M7BlockTopRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileUR
 
   lda LevelBlockPtr
@@ -871,7 +918,7 @@ LoadUpTileNumbersBoth:
   tay
   ;---
   lda M7BlockBottomLeft,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBL
 
   inc LevelBlockPtr
@@ -880,12 +927,32 @@ LoadUpTileNumbersBoth:
   tay
   ;---
   lda M7BlockBottomRight,y
-  PointerForM7TileNumber
+  and #255
   sta UnderTileBR
   rts
 .endif
 
 ; Copies the tiles at UnderTileUL, UnderTileUR, UnderTileBL and UnderTileBR in order
+.macro CopyOverOneTileGfx TileNumber
+  lda TileNumber
+  cmp #LastTileNumberWithPrerenderedSprite+1
+  bcs :+
+    ; Skip if the sprite tile will be MVN'd in instead
+    tya
+    adc #64 ; BCS not being taken means carry is clear
+    tay
+    bra :++
+  :
+  xba
+  lsr
+  lsr
+  add #.loword(Mode7Tiles)
+  tax
+  lda #64-1
+  mvn Mode7Tiles, Mode7DynamicTileBuffer
+  :
+.endmacro
+
 .a16
 CopyOverFourTileGfx:
   jsr Mode7GetDynamicBuffer
@@ -894,18 +961,12 @@ CopyOverFourTileGfx:
   phb ; MVN overwrites the data bank
   add #.loword(Mode7DynamicTileBuffer)
   tay
-  ldx UnderTileUL
-  lda #64-1
-  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles ;<--- this is MVN
-  ldx UnderTileBL
-  lda #64-1
-  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
-  ldx UnderTileUR
-  lda #64-1
-  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
-  ldx UnderTileBR
-  lda #64-1
-  .byt $54, ^Mode7DynamicTileBuffer, ^Mode7Tiles
+
+  CopyOverOneTileGfx UnderTileUL
+  CopyOverOneTileGfx UnderTileBL
+  CopyOverOneTileGfx UnderTileUR
+  CopyOverOneTileGfx UnderTileBR
+
   plb
   plx
   pla ; A = Mode7GetDynamicBuffer's result still
