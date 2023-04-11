@@ -40,6 +40,7 @@
   sta ScrollX
 
   lda PlayerPY
+  sta PlayerCameraTargetY
   sub #(8*256)
   bcs :+
     lda #0
