@@ -20,7 +20,7 @@
 .include "m7global.s"
 .smart
 
-.import Mode7PlayerVSpeed, Mode7PlayerJumpCancel, Mode7PlayerJumping
+.import Mode7PlayerVSpeed, Mode7PlayerJumpCancel, Mode7PlayerJumping, ForwardPtrTile
 .importzp M7PosX, M7PosY
 
 .segment "C_Mode7Game"
@@ -219,14 +219,18 @@ M7BlockTeleport:
   ; X = actor slot
 .endproc
 
+.a16
 .export M7BlockPushableBlock
 .proc M7BlockPushableBlock
-.if 0
-  lda LevelBlockPtr
-  sta 0
+  .import Mode7GetFourDirectionsAngle
+  .importzp angle
+  TargetAngle = 6 ; and 7
 
-  lda Mode7MoveDirection
-  and #3
+  jsr GetFourDirectionAngle
+
+  pei (LevelBlockPtr)
+
+  lda TargetAngle
   asl
   tay
   lda ForwardPtrTile,y
@@ -234,30 +238,80 @@ M7BlockTeleport:
   sta LevelBlockPtr
   lda [LevelBlockPtr]
   and #255
-  cmp #Mode7Block::Dirt ; Special-case dirt specifically until the 16 below works
-  beq Fail
   tax
   lda M7BlockFlags,x
-  bit #16 ; Check if the block is specifically solid to blocks
-  bne Fail
-  and ForwardWallBitOutside,y
+  bit #M7_BLOCK_SOLID_BLOCK
   beq :+
-Fail:
+    pla
     rts
   :
-  lda 0
+
+  pla
   sta LevelBlockPtr
+
+  ; -------------------------
 
   ; Create the block
   lda #Mode7ActorType::PushBlock
   jsr Mode7CreateActorFromBlock
-  bcc :+
+  bcs :+
+    rts
+  :
+  jsr GetFourDirectionAngle
+  seta8
+  sta ActorDirection,x
+  seta16
+
+  ; Rotate it back if it was rotated
+  ldy Mode7BumpDirection
+  beq :+
+    inc
+    inc
+    and #3
+  :
+  ; Then expand it to 256 angles
+  xba
+  lsr
+  lsr
+  seta8
+  sta TargetAngle ; Target angle (256 directions)
+  sub angle
+  beq Skip
+  cmp #128
+  bcs :+
+    ; Less than 180 degrees
+    inc angle
+    inc angle
+    bra Skip
+  :
+  dec angle
+  dec angle
+Skip:
+
+  ; If close to the angle, snap to it
+  seta16
+  lda angle
+  and #255
+  sub TargetAngle
+  abs
+  dea
+  bne :+
     seta8
-    lda Mode7MoveDirection
-    sta ActorDirection,x
+    lda TargetAngle
+    sta angle
     seta16
   :
-.endif
+  rts
+
+GetFourDirectionAngle: ; Also applies a 180 degree rotation if bumping from behind
+  jsr Mode7GetFourDirectionsAngle
+  ldy Mode7BumpDirection
+  beq :+
+    inc
+    inc
+    and #3
+  :
+  sta TargetAngle
   rts
 .endproc
 

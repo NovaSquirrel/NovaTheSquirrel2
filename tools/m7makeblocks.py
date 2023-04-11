@@ -64,7 +64,8 @@ for line in text:
 	elif word == "impassable":
 		block['solid'] = True
 		block['solid_air'] = True
-	elif word in ["solid", "solid_air"]:
+		block['solid_block'] = True
+	elif word in ["solid", "solid_air", "solid_block", "solid_creature"]:
 		block[word] = True
 	elif word == "t": # add tiles
 		split = arg.split(" ")

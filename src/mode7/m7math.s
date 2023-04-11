@@ -448,6 +448,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 .endproc
 
 ; fixed point reciprocal, clobbers A/X/Y/math_a/math_b/math_p/math_r
+.if 0
 .proc recip16f ; A = fixed point number, result in A
 ; Used only by calc_det_r
 	; DB = any
@@ -485,6 +486,7 @@ PV_HDMA_STRIDE = pv_hdma_ab1 - pv_hdma_ab0
 	;   If not using the p+0 byte, this could be done a little faster with a udiv24,
 	;   but this demo needs p+0 for all uses.
 .endproc
+.endif
 
 .a16
 .export sincos
@@ -2012,6 +2014,8 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	and #$00FF
 	add z:math_p+0
 	sta z:screeny ; screeny is now correct
+
+
 	; screenx
 	lda z:pv_sh_
 	sta z:math_a

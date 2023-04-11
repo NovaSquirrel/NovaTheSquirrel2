@@ -751,6 +751,9 @@ SkipBlock:
 	lda keydown
 	and #KEY_DOWN ; down
 	beq :+
+		lda #1
+		sta Mode7BumpDirection
+
 		; X += B * 2
 		lda z:mode7_m7t + 2 ; B
 		asl
@@ -1136,6 +1139,8 @@ Mode7LevelPtrXYAtPlayer:
 .a16
 .export Mode7MoveForward
 .proc Mode7MoveForward
+	stz Mode7BumpDirection
+
 	; X -= B * 2
 	lda #0
 	sub z:mode7_m7t + 2 ; B
@@ -1379,21 +1384,27 @@ AddOneSprite:
   rts
 .endproc
 
-; Up, Right, Down, Left?
-ForwardX:
-  .word 0, .loword(-2), 0, .loword(2)
-ForwardY:
-  .word .loword(-2), 0, .loword(2), 0
-ForwardXTile:
-  .word 0, .loword(-16), 0, .loword(16)
-ForwardYTile:
-  .word .loword(-16), 0, .loword(16), 0
+.a16
+.export Mode7GetFourDirectionsAngle
+.proc Mode7GetFourDirectionsAngle
+	lda angle
+	add #32 ; -32 to 32 should be direction 0
+	asl
+	asl
+	xba
+	and #3
+	rts
+.endproc
 
+; Right, Down, Left, Up
+.export ForwardPtrTile
 ForwardPtrTile:
   .word .loword(-64), .loword(-1), .loword(64), .loword(1)
+;  .word .loword(1), .loword(64), .loword(-1), .loword(-64)
 
 ; For the lookaround code above in the main loop
 .a16
+.if 0
 .proc AddLookAroundDirection
   and #3
   asl
@@ -1406,6 +1417,7 @@ ForwardPtrTile:
   sta Mode7LookAroundOffsetY
   rts
 .endproc
+.endif
 
 .include "m7palettedata.s"
 

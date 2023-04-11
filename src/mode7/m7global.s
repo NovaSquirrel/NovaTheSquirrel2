@@ -22,6 +22,7 @@ Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 8 bytes long a
 
 Mode7Keys                    = ActorAdvertisePointer ; 4 bytes
 Mode7Tools                   = Mode7Keys+4           ; 2 bytes? Could be 1
+Mode7BumpDirection           = ActorAdvertiseCountNext
 
 TOOL_FIREBOOTS    = 1
 TOOL_FLIPPERS     = 2
