@@ -84,7 +84,7 @@ spcrun: $(title).spc
 all: $(title).sfc $(title).spc
 
 clean:
-	-rm $(objdir)/*.o $(objdir)/*.chr $(objdir)/*.ov53 $(objdir)/*.sav $(objdir)/*.pb53 $(objdir)/*.s
+	-rm $(objdir)/*.o $(objdir)/mode7/*.o $(objdir)/*.chr $(objdir)/*.ov53 $(objdir)/*.sav $(objdir)/*.pb53 $(objdir)/*.s
 
 dist: zip
 zip: $(title)-$(version).zip

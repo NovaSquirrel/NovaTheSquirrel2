@@ -1,5 +1,6 @@
 +Void
 solid
+solid_block
 t 0,0 0,0
 t 0,0 0,0
 
@@ -105,6 +106,7 @@ q 10,2
 +PushableBlock
 when Bump, M7BlockPushableBlock
 solid
+solid_block
 q 12,2
 
 +Exit
@@ -114,23 +116,31 @@ q 14,2
 
 +WoodArrowUp
 when Bump, M7BlockWoodArrow
+when JumpOn, M7BlockWoodArrow
 solid
+solid_block
 w 0,6
 
 +WoodArrowLeft
 when Bump, M7BlockWoodArrow
+when JumpOn, M7BlockWoodArrow
 solid
+solid_block
 t 0,6 9,6
 t 6,6 11,6
 
 +WoodArrowDown
 when Bump, M7BlockWoodArrow
+when JumpOn, M7BlockWoodArrow
 solid
+solid_block
 w 4,6
 
 +WoodArrowRight
 when Bump, M7BlockWoodArrow
+when JumpOn, M7BlockWoodArrow
 solid
+solid_block
 t 8,6 1,6
 t 10,6 7,6
 
@@ -229,26 +239,31 @@ t 13,8 14,8
 
 +CloneBlock
 solid
+solid_block
 t 15,8 13,2
 t 13,8 14,8
 
 +CloneArrowUp
 solid
+solid_block
 t 15,8 14,9
 t 13,8 14,8
 
 +CloneArrowDown
 solid
+solid_block
 t 15,8 13,9
 t 13,8 14,8
 
 +CloneArrowLeft
 solid
+solid_block
 t 15,8 12,9
 t 13,8 14,8
 
 +CloneArrowRight
 solid
+solid_block
 t 15,8 15,9
 t 13,8 14,8
 
@@ -274,21 +289,25 @@ w 12,10
 
 +PointUp
 solid
+solid_block
 t 14,9 14,9
 t 14,9 14,9
 
 +PointDown
 solid
+solid_block
 t 13,9 13,9
 t 13,9 13,9
 
 +PointLeft
 solid
+solid_block
 t 12,9 12,9
 t 12,9 12,9
 
 +PointRight
 solid
+solid_block
 t 15,9 15,9
 t 15,9 15,9
 

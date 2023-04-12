@@ -38,9 +38,9 @@ pv_interps = TouchTemp+1 ;and +2
 pv_scale   = TouchTemp+3 ;and +4, +5, +6
 
 ; TODO: Put these behind a union?
-angle:        .res 1 ; for spinning modes
-scale:        .res 2 ; for uniform scale
-scale2:       .res 4 ; for separate axis scale
+angle:        .res 2 ; for spinning modes
+;scale:        .res 2 ; for uniform scale
+;scale2:       .res 4 ; for separate axis scale
 M7PosX:       .res 4 ; position for some modes with subpixel precision
 M7PosY:       .res 4 ; ff ii ii ..
 
@@ -51,7 +51,7 @@ math_b:       .res 4
 math_p:       .res 8 ; product/quotient
 math_r:       .res 8 ; remainder
 
-det_r:        .res 4 ; storage for 1 / AD-BC (16.16f)
+;det_r:        .res 4 ; storage for 1 / AD-BC (16.16f)
 texelx:       .res 2 ; input/result for coordinate transforms
 texely:       .res 2
 screenx:      .res 2
