@@ -10,19 +10,12 @@
   Burger     = 7*2
 .endenum
 
-.global Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted
-.global Mode7SidestepWanted, Mode7ChipsLeft, Mode7HappyTimer, Mode7Oops, Mode7IceDirection, Mode7ForceMove
-
 Mode7LevelMap                = LevelBuf + (64*64*0) ;\
 Mode7LevelMapBelow           = LevelBuf + (64*64*1) ; \ 16KB, 4KB each
 Mode7LevelMapCheckpoint      = LevelBuf + (64*64*2) ; /
 Mode7LevelMapBelowCheckpoint = LevelBuf + (64*64*3) ;/
 Mode7DynamicTileBuffer       = LevelBufAlt          ; 8 tiles long, 64*4*8 = 2048
-Mode7DynamicTileUsed         = ColumnUpdateAddress  ; Reuse this, 8 bytes long and extends into RowUpdateAddress2
-
-Mode7Keys                    = ActorAdvertisePointer ; 4 bytes
-Mode7Tools                   = Mode7Keys+4           ; 2 bytes? Could be 1
-Mode7BumpDirection           = ActorAdvertiseCountNext
+Mode7ShadowHUD = Scratchpad
 
 TOOL_FIREBOOTS    = 1
 TOOL_FLIPPERS     = 2

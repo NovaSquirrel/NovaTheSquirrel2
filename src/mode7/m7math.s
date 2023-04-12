@@ -11,11 +11,6 @@
 .include "../global.inc"
 .smart
 
-.globalzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.globalzp mode7_m7t
-.globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
-.global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y
-
 .import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_ab_banks
 
 .segment "ZEROPAGE" ; < $100
@@ -38,48 +33,8 @@ pv_interps = TouchTemp+1 ;and +2
 pv_scale   = TouchTemp+3 ;and +4, +5, +6
 
 ; TODO: Put these behind a union?
-angle:        .res 1 ; for spinning modes
-scale:        .res 2 ; for uniform scale
-scale2:       .res 4 ; for separate axis scale
-M7PosX:       .res 4 ; position for some modes with subpixel precision
-M7PosY:       .res 4 ; ff ii ii ..
-
-cosa:         .res 2 ; sincos result
-sina:         .res 2
-math_a:       .res 4 ; multiply/divide/math input terms 16 or 32-bit
-math_b:       .res 4
-math_p:       .res 8 ; product/quotient
-math_r:       .res 8 ; remainder
-
-det_r:        .res 4 ; storage for 1 / AD-BC (16.16f)
-texelx:       .res 2 ; input/result for coordinate transforms
-texely:       .res 2
-screenx:      .res 2
-screeny:      .res 2
-
-mode7_m7t:    .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
-
-; perspective
-; inputs
-pv_l0:        .res 1 ; first scanline
-pv_l1:        .res 1 ; last scanline + 1
-pv_s0:        .res 2 ; horizontal texel distance at l0
-pv_s1:        .res 2 ; horizontal texel distance at l1
-pv_sh:        .res 2 ; vertical texel distance from l0 to l1, sh=0 to copy s0 scale for efficiency: (s0*(l1-l0)/256)
-pv_interp:    .res 1 ; interpolate every X lines, 0,1=1x (no interpolation, 2=2x, 4=4x, other values invalid
-
 
 .segment "BSS"
-;pv_wrap:        .res 1 ; 0 if no wrapping, 1 if wrapping (does not affect PPU wrapping)
-mode7_hdma_en:  .res 1 ; HDMA channel enable at next update
-mode7_bg2hofs:  .res 2
-mode7_bg2vofs:  .res 2
-mode7_hofs:     .res 2
-mode7_vofs:     .res 2
-mode7_m7x:      .res 2
-mode7_m7y:      .res 2
-pv_buffer:      .res 1 ; 0/1 selects double buffer
-
 ;--------------------------------------
 ; HDMA double-buffer for perspective
 pv_hdma_ab0 = HDMA_Buffer1      ; Mode 7 matrix AB
@@ -1181,7 +1136,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	sta z:math_a ; SA = (SH * 256) / (S0 * (L1-L0))
 	; fetch sincos for rotation matrix
 	lda #0
-	ldx z:angle
+	ldx z:mode7_angle
 	txa
 	jsr sincos
 	; store m7t matrix (replaced by HDMA but used for other purposes like pv_texel_to_screen, and player movement)
@@ -1833,7 +1788,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	adc f:mode7_m7y
 	sta f:mode7_vofs ; oy - L1
 	; scroll sky to meet L0 and pan with angle
-	lda z:angle
+	lda z:mode7_angle
 	asl
 	asl
 	eor #$FFFF
@@ -2066,14 +2021,15 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	setaxy16
 
 	; Calculate which table to use based on which angle is used
-	lda angle
+	lda mode7_angle
+	wdm 0
 	asl
 	tax
 	lda f:perspective_m7a_m7b_list,x
 	sta ab_lut_pointer
 
 	; Find what bank the table is in
-	lda angle
+	lda mode7_angle
 	asl
 	asl
 	xba
@@ -2218,7 +2174,7 @@ DeriveCDFromAB:
     ; The rest of the routine don't do anything for the effect, but do set up variables to be how other code expects them
 	setxy8
 	lda #0
-	ldx z:angle
+	ldx z:mode7_angle
 	txa
 	jsr sincos
 	; store m7t matrix (replaced by HDMA but used for other purposes like pv_texel_to_screen, and player movement)
@@ -2275,7 +2231,7 @@ abcd_banks      = 10 ; and 11
 
 	setxy16
 	; Calculate which table to use based on which angle is used
-	lda angle
+	lda mode7_angle
 	asl
 	tax
 	lda f:perspective_m7a_m7b_list,x
@@ -2283,7 +2239,7 @@ abcd_banks      = 10 ; and 11
 	sta ab_lut_pointer
 
 	; Find what bank the table is in
-	lda angle
+	lda mode7_angle
 	asl
 	asl
 	xba
@@ -2324,7 +2280,7 @@ abcd_banks      = 10 ; and 11
 	sta f:mode7_vofs ; oy - L1
 
 	; scroll sky to meet L0 and pan with angle
-	lda z:angle
+	lda z:mode7_angle
 	asl
 	asl
 	eor #$FFFF

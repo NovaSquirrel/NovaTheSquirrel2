@@ -30,11 +30,6 @@
   keylast:  .res 2
   keynew:   .res 2
 
-  ScrollX:  .res 2   ; Primary foreground
-  ScrollY:  .res 2
-  FG2OffsetX: .res 2 ; Secondary foreground
-  FG2OffsetY: .res 2
-
   random1:  .res 2
   random2:  .res 2
 
@@ -43,57 +38,168 @@
   CGADSUB_Mirror: .res 1   ; Currently only maintained during gameplay
 
   LevelBlockPtr: .res 3 ; Pointer to one block or a column of blocks. 00xxxxxxxxyyyyy0
-  BlockFlag:     .res 2 ; Contains block class, solid flags, and interaction set
-  BlockRealX:    .res 2 ; Real X coordinate used to calculate LevelBlockPtr (Unused)
-  BlockRealY:    .res 2 ; Real Y coordinate used to calculate LevelBlockPtr (Unused)
   BlockTemp:     .res 4 ; Temporary bytes for block interaction routines specifically
-
-  PlayerPX:        .res 2 ; \ player X and Y positions
-  PlayerPY:        .res 2 ; /
-
-  PlayerVX:        .res 2 ; \
-  PlayerVY:        .res 2 ; /
-  PlayerFrame:     .res 1 ; Player animation frame
-  PlayerFrameXFlip: .res 1
-  PlayerFrameYFlip: .res 1
-
-  ; Precomputed hitbox edges to speed up collision detection with the player
-  PlayerPXLeft:    .res 2 ; 
-  PlayerPXRight:   .res 2 ;
-  PlayerPYTop:     .res 2 ; Y position for the top of the player
 
   ForceControllerBits: .res 2
   ForceControllerTime: .res 1
 
   PlayerAbility:    .res 1     ; ability the player currently has
 
-  PlayerWasRunning: .res 1     ; was the player running when they jumped?
-  PlayerDir:        .res 1     ; currently facing left?
-  PlayerJumping:    .res 1     ; true if jumping (not falling)
-  PlayerOnGround:   .res 1     ; true if on ground
-  PlayerOnGroundLast: .res 1   ; true if on ground last frame - used to display the landing particle
-  PlayerWalkLock:   .res 1     ; timer for the player being unable to move left/right
-  PlayerDownTimer:  .res 1     ; timer for how long the player has been holding down
-                               ; (used for fallthrough platforms)
-  PlayerSelectTimer:  .res 1   ; timer for how long the player has been holding select
-  PlayerHealth:     .res 1     ; current health, measured in half hearts
-
-  StartedLevelNumber:    .res 2 ; Level number that was picked from the level select (level select number)
-
-  SpriteTileBase:   .res 2 ; Detected tile base for the current entity (includes palette index)
+  StartedLevelNumber: .res 2 ; Level number that was picked from the level select (level select number)
 
   OamPtr:           .res 2 ; Current index into OAM and OAMHI
   TempVal:          .res 4
   TouchTemp:        .res 8
 
-  LevelColumnSize:  .res 2 ; for moving left and right in a level buffer
-  LevelColumnMask:  .res 2 ; LevelColumnSize-1
-  DecodePointer:    .res 3 ; multipurpose 24-bit pointer
-  ScriptPointer:    .res 3 ; multipurpose 24-bit pointer
+  DecodePointer:     .res 3 ; multipurpose 24-bit pointer
+  ScriptPointer:     .res 3 ; multipurpose 24-bit pointer
   LevelActorPointer: .res 3 ; actor pointer for this level
 
-  ActorIterationLimit:    .res 2 ; Ending point for RunAllActors
-  ParticleIterationLimit: .res 2 ; Ending point for RunAllParticles
+  .union ZPUnionDefinition
+  ; -------------------------------------------------------
+  ; - Platformer gameplay zeropage variables
+  ; -------------------------------------------------------
+  .struct
+  ScrollX    .res 2   ; Primary foreground
+  ScrollY    .res 2
+  FG2OffsetX .res 2 ; Secondary foreground
+  FG2OffsetY .res 2
+
+  BlockFlag  .res 2 ; Contains block class, solid flags, and interaction set
+  BlockRealX .res 2 ; Real X coordinate used to calculate LevelBlockPtr (Unused)
+  BlockRealY .res 2 ; Real Y coordinate used to calculate LevelBlockPtr (Unused)
+
+  PlayerPX         .res 2 ; \ player X and Y positions
+  PlayerPY         .res 2 ; /
+  PlayerVX         .res 2 ; \
+  PlayerVY         .res 2 ; /
+  PlayerFrame      .res 1 ; Player animation frame
+  PlayerFrameXFlip .res 1
+  PlayerFrameYFlip .res 1
+
+  ; Precomputed hitbox edges to speed up collision detection with the player
+  PlayerPXLeft    .res 2 ; 
+  PlayerPXRight   .res 2 ;
+  PlayerPYTop     .res 2 ; Y position for the top of the player
+
+  PlayerWasRunning .res 1     ; was the player running when they jumped?
+  PlayerDir        .res 1     ; currently facing left?
+  PlayerJumping    .res 1     ; true if jumping (not falling)
+  PlayerOnGround   .res 1     ; true if on ground
+  PlayerOnGroundLast .res 1   ; true if on ground last frame - used to display the landing particle
+  PlayerWalkLock   .res 1     ; timer for the player being unable to move left/right
+  PlayerDownTimer  .res 1     ; timer for how long the player has been holding down
+                              ; (used for fallthrough platforms)
+  PlayerSelectTimer  .res 1   ; timer for how long the player has been holding select
+  PlayerHealth       .res 1   ; current health, measured in half hearts
+
+  ActorAdvertiseCount    .res 2 ; Counts up by 2
+
+  ActorIterationLimit    .res 2 ; Ending point for RunAllActors
+  ParticleIterationLimit .res 2 ; Ending point for RunAllParticles
+
+  SpriteTileBase   .res 2 ; Detected tile base for the current entity (includes palette index)
+
+  LevelColumnSize  .res 2 ; for moving left and right in a level buffer
+  LevelColumnMask  .res 2 ; LevelColumnSize-1
+  .endstruct
+
+  ; -------------------------------------------------------
+  ; - Mode 7 zeropage variables
+  ; -------------------------------------------------------
+  .struct
+  mode7_height .res 1
+  mode7_angle  .res 2 ; player's current rotation
+; scale        .res 2 ; for uniform scale
+; scale2       .res 4 ; for separate axis scale
+  M7PosX       .res 4 ; position for some modes with subpixel precision
+  M7PosY       .res 4 ; ff ii ii ..
+
+  cosa         .res 2 ; sincos result
+  sina         .res 2
+  math_a       .res 4 ; multiply/divide/math input terms 16 or 32-bit
+  math_b       .res 4
+  math_p       .res 8 ; product/quotient
+  math_r       .res 8 ; remainder
+
+; det_r        .res 4 ; storage for 1 / AD-BC (16.16f)
+  texelx       .res 2 ; input/result for coordinate transforms
+  texely       .res 2
+  screenx      .res 2
+  screeny      .res 2
+
+  mode7_m7t    .res 8 ; <-- Initial mode 7 matrix settings. Can ignore because HDMA will overwrite it.
+
+  ; perspective
+  ; inputs
+  pv_l0        .res 1 ; first scanline
+  pv_l1        .res 1 ; last scanline + 1
+  pv_s0        .res 2 ; horizontal texel distance at l0
+  pv_s1        .res 2 ; horizontal texel distance at l1
+  pv_sh        .res 2 ; vertical texel distance from l0 to l1, sh=0 to copy s0 scale for efficiency: (s0*(l1-l0)/256)
+  pv_interp    .res 1 ; interpolate every X lines, 0,1=1x (no interpolation, 2=2x, 4=4x, other values invalid
+  .endstruct
+  .endunion
+
+  ; ---------------------------------------------------------------------------
+  ZPUnionSpace: .tag ZPUnionDefinition
+
+  ScrollX                = ZPUnionSpace + ZPUnionDefinition::ScrollX
+  ScrollY                = ZPUnionSpace + ZPUnionDefinition::ScrollY
+  FG2OffsetX             = ZPUnionSpace + ZPUnionDefinition::FG2OffsetX
+  FG2OffsetY             = ZPUnionSpace + ZPUnionDefinition::FG2OffsetY
+  BlockFlag              = ZPUnionSpace + ZPUnionDefinition::BlockFlag
+  BlockRealX             = ZPUnionSpace + ZPUnionDefinition::BlockRealX
+  BlockRealY             = ZPUnionSpace + ZPUnionDefinition::BlockRealY
+  PlayerPX               = ZPUnionSpace + ZPUnionDefinition::PlayerPX
+  PlayerPY               = ZPUnionSpace + ZPUnionDefinition::PlayerPY
+  PlayerVX               = ZPUnionSpace + ZPUnionDefinition::PlayerVX
+  PlayerVY               = ZPUnionSpace + ZPUnionDefinition::PlayerVY
+  PlayerFrame            = ZPUnionSpace + ZPUnionDefinition::PlayerFrame
+  PlayerFrameXFlip       = ZPUnionSpace + ZPUnionDefinition::PlayerFrameXFlip
+  PlayerFrameYFlip       = ZPUnionSpace + ZPUnionDefinition::PlayerFrameYFlip
+  PlayerPXLeft           = ZPUnionSpace + ZPUnionDefinition::PlayerPXLeft
+  PlayerPXRight          = ZPUnionSpace + ZPUnionDefinition::PlayerPXRight
+  PlayerPYTop            = ZPUnionSpace + ZPUnionDefinition::PlayerPYTop
+  PlayerWasRunning       = ZPUnionSpace + ZPUnionDefinition::PlayerWasRunning
+  PlayerDir              = ZPUnionSpace + ZPUnionDefinition::PlayerDir
+  PlayerJumping          = ZPUnionSpace + ZPUnionDefinition::PlayerJumping
+  PlayerOnGround         = ZPUnionSpace + ZPUnionDefinition::PlayerOnGround
+  PlayerOnGroundLast     = ZPUnionSpace + ZPUnionDefinition::PlayerOnGroundLast
+  PlayerWalkLock         = ZPUnionSpace + ZPUnionDefinition::PlayerWalkLock
+  PlayerDownTimer        = ZPUnionSpace + ZPUnionDefinition::PlayerDownTimer
+  PlayerSelectTimer      = ZPUnionSpace + ZPUnionDefinition::PlayerSelectTimer
+  PlayerHealth           = ZPUnionSpace + ZPUnionDefinition::PlayerHealth
+  ActorAdvertiseCount    = ZPUnionSpace + ZPUnionDefinition::ActorAdvertiseCount
+  ActorIterationLimit    = ZPUnionSpace + ZPUnionDefinition::ActorIterationLimit
+  ParticleIterationLimit = ZPUnionSpace + ZPUnionDefinition::ParticleIterationLimit
+  SpriteTileBase         = ZPUnionSpace + ZPUnionDefinition::SpriteTileBase
+  LevelColumnSize        = ZPUnionSpace + ZPUnionDefinition::LevelColumnSize
+  LevelColumnMask        = ZPUnionSpace + ZPUnionDefinition::LevelColumnMask
+
+  mode7_height = ZPUnionSpace + ZPUnionDefinition::mode7_height
+  mode7_angle  = ZPUnionSpace + ZPUnionDefinition::mode7_angle
+  M7PosX       = ZPUnionSpace + ZPUnionDefinition::M7PosX
+  M7PosY       = ZPUnionSpace + ZPUnionDefinition::M7PosY
+  cosa         = ZPUnionSpace + ZPUnionDefinition::cosa
+  sina         = ZPUnionSpace + ZPUnionDefinition::sina
+  math_a       = ZPUnionSpace + ZPUnionDefinition::math_a
+  math_b       = ZPUnionSpace + ZPUnionDefinition::math_b
+  math_p       = ZPUnionSpace + ZPUnionDefinition::math_p
+  math_r       = ZPUnionSpace + ZPUnionDefinition::math_r
+  texelx       = ZPUnionSpace + ZPUnionDefinition::texelx
+  texely       = ZPUnionSpace + ZPUnionDefinition::texely
+  screenx      = ZPUnionSpace + ZPUnionDefinition::screenx
+  screeny      = ZPUnionSpace + ZPUnionDefinition::screeny
+  mode7_m7t    = ZPUnionSpace + ZPUnionDefinition::mode7_m7t
+  pv_l0        = ZPUnionSpace + ZPUnionDefinition::pv_l0
+  pv_l1        = ZPUnionSpace + ZPUnionDefinition::pv_l1
+  pv_s0        = ZPUnionSpace + ZPUnionDefinition::pv_s0
+  pv_s1        = ZPUnionSpace + ZPUnionDefinition::pv_s1
+  pv_sh        = ZPUnionSpace + ZPUnionDefinition::pv_sh
+  pv_interp    = ZPUnionSpace + ZPUnionDefinition::pv_interp
+
+  ; ---------------------------------------------------------------------------
 
 .segment "BSS" ; First 8KB of RAM
   ActorSize = 12*2+7
@@ -136,31 +242,184 @@
   ParticleTimer      = 10
   ParticleVariable   = 12
 
+  .segment "BSS"
+
+  .union BSSUnionDefinition
+  ; -------------------------------------------------------
+  ; - Platformer gameplay BSS variables
+  ; -------------------------------------------------------
+  .struct
   ; The ActorAdvertise array allows actors that other actors may care about interacting with
   ; into a little list together, so that they can look at this list instead of the full actor array.
   ; the Next array is copied into the main one after all actors are done.
-  ActorAdvertisePointer:     .res ActorAdvertiseLen*2
-  ActorAdvertiseType:        .res ActorAdvertiseLen*2
-  .segment "ZEROPAGE"
-  ActorAdvertiseCount:       .res 2 ; Counts up by 2
-  .segment "BSS"
-  ActorAdvertisePointerNext: .res ActorAdvertiseLen*2
-  ActorAdvertiseTypeNext:    .res ActorAdvertiseLen*2
-  ActorAdvertiseCountNext:   .res 2
+  ActorAdvertisePointer      .res ::ActorAdvertiseLen*2
+  ActorAdvertiseType         .res ::ActorAdvertiseLen*2
+; ActorAdvertiseCount:       - in zeropage instead
+
+  ActorAdvertisePointerNext  .res ::ActorAdvertiseLen*2
+  ActorAdvertiseTypeNext     .res ::ActorAdvertiseLen*2
+  ActorAdvertiseCountNext    .res 2
 
   ; For automatically detecting which tile slot or palette has the right data
-  SpriteTileSlots:     .res 2*8
-  SpritePaletteSlots:  .res 2*4
+  SpriteTileSlots      .res 2*8
+  SpritePaletteSlots   .res 2*4
   ; For reuploading palette information
-  BackgroundPaletteSlots: .res 8
-  GraphicalAssets:     .res 30
+  BackgroundPaletteSlots  .res 8
+  GraphicalAssets         .res 30
+
+  NeedLevelReload         .res 1 ; If set, decode LevelNumber again
+  NeedLevelRerender       .res 1 ; If set, rerender the level again
+
+  RerenderInitEntities    .res 1 ; If set, init entity lists for next rerender;
+                                 ; if $80 (RERENDER_INIT_ENTITIES_TELEPORT), preserve certain entity types
+
+
+  JumpGracePeriod .res 1
+  PlayerJumpCancelLock .res 1 ; timer for the player being unable to cancel a jump
+  PlayerJumpCancel .res 1
+  PlayerWantsToJump .res 1    ; true if player pressed the jump button
+  PlayerWantsToAttack .res 1  ; true if player pressed the attack button
+  PlayerRidingSomething .res 1 ; if 1, player is treated to be standing on a solid and can jump
+  PlayerRidingFG2 .res 1
+  PlayerDownRecently .res 1   ; Player pressed down recently (for down+up abilities)
+
+
+  GetLevelPtrXY_Ptr  .res 2 ; Pointer for how to handle getting a pointer from an X and Y position
+  GetBlockX_Ptr      .res 2 ; Pointer for how to get the X position (in blocks) from a level pointer
+  GetBlockY_Ptr      .res 2 ; Pointer for how to get the Y position (in blocks) from a level pointer
+  GetBlockXCoord_Ptr .res 2 ; Pointer for how to get the X position (coordinate) from a level pointer
+  GetBlockYCoord_Ptr .res 2 ; Pointer for how to get the Y position (coordinate) from a level pointer
+  ScrollXLimit       .res 2
+  ScrollYLimit       .res 2
+
+  ; For speeding up actor spawning
+  ; (keeps track of which actor index is the first one on a particular screen)
+  ; Multiply by 4 to use it.
+  FirstActorOnScreen .res 16
+
+  TailAttackVariable .res 2 ; Zero'd when an attack starts
+
+  ; Mirrors, for effects
+  FGScrollXPixels  .res 2
+  FGScrollYPixels  .res 2
+  BGScrollXPixels  .res 2
+  BGScrollYPixels  .res 2
+  FG2ScrollXPixels .res 2
+  FG2ScrollYPixels .res 2
+  ; Storage, for effects
+  BGEffectRAM     .res 8
+
+  LevelBackgroundColor   .res 2 ; Palette entry
+  LevelBackgroundId      .res 1 ; Backgrounds specified in backgrounds.txt
+
+  OldFG2OffsetX          .res 2 ; Secondary foreground
+  OldFG2OffsetY          .res 2
+  OldScrollX             .res 2
+  OldScrollY             .res 2
+  SecondFGTilemapPointer .res 2 ; Usually BackgroundBG but can be ExtraBG
+  .endstruct
+
+  ; -------------------------------------------------------
+  ; - Mode 7 BSS variables
+  ; -------------------------------------------------------
+  .struct
+  Mode7PlayerHeight     .res 2
+  Mode7PlayerVSpeed     .res 2
+  Mode7PlayerJumpCancel .res 2
+  Mode7PlayerJumping    .res 2
+
+  Mode7ChipsLeft        .res 2
+  Mode7Portrait         .res 2
+  Mode7HappyTimer       .res 2
+  Mode7Oops             .res 2
+
+  Mode7DynamicTileUsed  .res 8
+  Mode7Keys             .res 4
+  Mode7Tools            .res 2
+  Mode7BumpDirection    .res 2
+
+  mode7_hdma_en  .res 1 ; HDMA channel enable at next update
+  mode7_bg2hofs  .res 2
+  mode7_bg2vofs  .res 2
+  mode7_hofs     .res 2
+  mode7_vofs     .res 2
+  mode7_m7x      .res 2
+  mode7_m7y      .res 2
+  pv_buffer      .res 1 ; 0/1 selects double buffer
+  .endstruct
+  .endunion
+  ; ---------------------------------------------------------------------------
+  BSSUnionSpace: .tag BSSUnionDefinition
+
+  ActorAdvertisePointer     = BSSUnionSpace + BSSUnionDefinition::ActorAdvertisePointer
+  ActorAdvertiseType        = BSSUnionSpace + BSSUnionDefinition::ActorAdvertiseType
+  ActorAdvertisePointerNext = BSSUnionSpace + BSSUnionDefinition::ActorAdvertisePointerNext
+  ActorAdvertiseTypeNext    = BSSUnionSpace + BSSUnionDefinition::ActorAdvertiseTypeNext
+  ActorAdvertiseCountNext   = BSSUnionSpace + BSSUnionDefinition::ActorAdvertiseCountNext
+  SpriteTileSlots           = BSSUnionSpace + BSSUnionDefinition::SpriteTileSlots
+  SpritePaletteSlots        = BSSUnionSpace + BSSUnionDefinition::SpritePaletteSlots
+  BackgroundPaletteSlots    = BSSUnionSpace + BSSUnionDefinition::BackgroundPaletteSlots
+  GraphicalAssets           = BSSUnionSpace + BSSUnionDefinition::GraphicalAssets
+  NeedLevelReload           = BSSUnionSpace + BSSUnionDefinition::NeedLevelReload
+  NeedLevelRerender         = BSSUnionSpace + BSSUnionDefinition::NeedLevelRerender
+  RerenderInitEntities      = BSSUnionSpace + BSSUnionDefinition::RerenderInitEntities
+  JumpGracePeriod           = BSSUnionSpace + BSSUnionDefinition::JumpGracePeriod
+  PlayerJumpCancelLock      = BSSUnionSpace + BSSUnionDefinition::PlayerJumpCancelLock
+  PlayerJumpCancel          = BSSUnionSpace + BSSUnionDefinition::PlayerJumpCancel
+  PlayerWantsToJump         = BSSUnionSpace + BSSUnionDefinition::PlayerWantsToJump
+  PlayerWantsToAttack       = BSSUnionSpace + BSSUnionDefinition::PlayerWantsToAttack
+  PlayerRidingSomething     = BSSUnionSpace + BSSUnionDefinition::PlayerRidingSomething
+  PlayerRidingFG2           = BSSUnionSpace + BSSUnionDefinition::PlayerRidingFG2
+  PlayerDownRecently        = BSSUnionSpace + BSSUnionDefinition::PlayerDownRecently
+  GetLevelPtrXY_Ptr         = BSSUnionSpace + BSSUnionDefinition::GetLevelPtrXY_Ptr
+  GetBlockX_Ptr             = BSSUnionSpace + BSSUnionDefinition::GetBlockX_Ptr
+  GetBlockY_Ptr             = BSSUnionSpace + BSSUnionDefinition::GetBlockY_Ptr
+  GetBlockXCoord_Ptr        = BSSUnionSpace + BSSUnionDefinition::GetBlockXCoord_Ptr
+  GetBlockYCoord_Ptr        = BSSUnionSpace + BSSUnionDefinition::GetBlockYCoord_Ptr
+  ScrollXLimit              = BSSUnionSpace + BSSUnionDefinition::ScrollXLimit
+  ScrollYLimit              = BSSUnionSpace + BSSUnionDefinition::ScrollYLimit
+  FirstActorOnScreen        = BSSUnionSpace + BSSUnionDefinition::FirstActorOnScreen
+  TailAttackVariable        = BSSUnionSpace + BSSUnionDefinition::TailAttackVariable
+  FGScrollXPixels           = BSSUnionSpace + BSSUnionDefinition::FGScrollXPixels
+  FGScrollYPixels           = BSSUnionSpace + BSSUnionDefinition::FGScrollYPixels
+  BGScrollXPixels           = BSSUnionSpace + BSSUnionDefinition::BGScrollXPixels
+  BGScrollYPixels           = BSSUnionSpace + BSSUnionDefinition::BGScrollYPixels
+  FG2ScrollXPixels          = BSSUnionSpace + BSSUnionDefinition::FG2ScrollXPixels
+  FG2ScrollYPixels          = BSSUnionSpace + BSSUnionDefinition::FG2ScrollYPixels
+  BGEffectRAM               = BSSUnionSpace + BSSUnionDefinition::BGEffectRAM
+  LevelBackgroundColor      = BSSUnionSpace + BSSUnionDefinition::LevelBackgroundColor
+  LevelBackgroundId         = BSSUnionSpace + BSSUnionDefinition::LevelBackgroundId
+  OldFG2OffsetX             = BSSUnionSpace + BSSUnionDefinition::OldFG2OffsetX
+  OldFG2OffsetY             = BSSUnionSpace + BSSUnionDefinition::OldFG2OffsetY
+  OldScrollX                = BSSUnionSpace + BSSUnionDefinition::OldScrollX
+  OldScrollY                = BSSUnionSpace + BSSUnionDefinition::OldScrollY
+  SecondFGTilemapPointer    = BSSUnionSpace + BSSUnionDefinition::SecondFGTilemapPointer
+
+  Mode7PlayerHeight     = BSSUnionSpace + BSSUnionDefinition::Mode7PlayerHeight
+  Mode7PlayerVSpeed     = BSSUnionSpace + BSSUnionDefinition::Mode7PlayerVSpeed
+  Mode7PlayerJumpCancel = BSSUnionSpace + BSSUnionDefinition::Mode7PlayerJumpCancel
+  Mode7PlayerJumping    = BSSUnionSpace + BSSUnionDefinition::Mode7PlayerJumping
+  Mode7ChipsLeft        = BSSUnionSpace + BSSUnionDefinition::Mode7ChipsLeft
+  Mode7Portrait         = BSSUnionSpace + BSSUnionDefinition::Mode7Portrait
+  Mode7HappyTimer       = BSSUnionSpace + BSSUnionDefinition::Mode7HappyTimer
+  Mode7Oops             = BSSUnionSpace + BSSUnionDefinition::Mode7Oops
+  Mode7DynamicTileUsed  = BSSUnionSpace + BSSUnionDefinition::Mode7DynamicTileUsed
+  Mode7Keys             = BSSUnionSpace + BSSUnionDefinition::Mode7Keys
+  Mode7Tools            = BSSUnionSpace + BSSUnionDefinition::Mode7Tools
+  Mode7BumpDirection    = BSSUnionSpace + BSSUnionDefinition::Mode7BumpDirection
+  mode7_hdma_en         = BSSUnionSpace + BSSUnionDefinition::mode7_hdma_en
+  mode7_bg2hofs         = BSSUnionSpace + BSSUnionDefinition::mode7_bg2hofs
+  mode7_bg2vofs         = BSSUnionSpace + BSSUnionDefinition::mode7_bg2vofs
+  mode7_hofs            = BSSUnionSpace + BSSUnionDefinition::mode7_hofs
+  mode7_vofs            = BSSUnionSpace + BSSUnionDefinition::mode7_vofs
+  mode7_m7x             = BSSUnionSpace + BSSUnionDefinition::mode7_m7x
+  mode7_m7y             = BSSUnionSpace + BSSUnionDefinition::mode7_m7y
+  pv_buffer             = BSSUnionSpace + BSSUnionDefinition::pv_buffer
+
+  ; ---------------------------------------------------------------------------
 
   GraphicUploadOffset: .res 2
 
-  NeedLevelReload:       .res 1 ; If set, decode LevelNumber again
-  NeedLevelRerender:     .res 1 ; If set, rerender the level again
-  RerenderInitEntities:  .res 1 ; If set, init entity lists for next rerender;
-                                ; if $80 (RERENDER_INIT_ENTITIES_TELEPORT), preserve certain entity types
   NMIHandler: .res 3
   IRQHandler: .res 3
 
@@ -172,48 +431,11 @@
   ; being sent to the PPU, but it makes sprite drawing code much
   ; simpler.
 
-  GetLevelPtrXY_Ptr: .res 2 ; Pointer for how to handle getting a pointer from an X and Y position
-  GetBlockX_Ptr: .res 2     ; Pointer for how to get the X position (in blocks) from a level pointer
-  GetBlockY_Ptr: .res 2     ; Pointer for how to get the Y position (in blocks) from a level pointer
-  GetBlockXCoord_Ptr: .res 2     ; Pointer for how to get the X position (coordinate) from a level pointer
-  GetBlockYCoord_Ptr: .res 2     ; Pointer for how to get the Y position (coordinate) from a level pointer
-  ScrollXLimit: .res 2
-  ScrollYLimit: .res 2
-
-  PlayerAccelSpeed: .res 2
-  PlayerDecelSpeed: .res 2
-  JumpGracePeriod: .res 1
-  PlayerJumpCancelLock: .res 1 ; timer for the player being unable to cancel a jump
-  PlayerJumpCancel: .res 1
-  PlayerWantsToJump: .res 1    ; true if player pressed the jump button
-  PlayerWantsToAttack: .res 1  ; true if player pressed the attack button
-  PlayerRidingSomething: .res 1 ; if 1, player is treated to be standing on a solid and can jump
-  PlayerRidingFG2: .res 1
-  PlayerDownRecently: .res 1   ; Player pressed down recently (for down+up abilities)
-
   PlayerDrawX: .res 1
   PlayerDrawY: .res 1
   PlayerOAMIndex: .res 2
   HighPriorityOAMIndex: .res 2
 
-  ; Mirrors, for effects
-  FGScrollXPixels: .res 2
-  FGScrollYPixels: .res 2
-  BGScrollXPixels: .res 2
-  BGScrollYPixels: .res 2
-  FG2ScrollXPixels: .res 2
-  FG2ScrollYPixels: .res 2
-  ; Storage, for effects
-  BGEffectRAM:     .res 8
-
-  LevelBackgroundColor:   .res 2 ; Palette entry
-  LevelBackgroundId:      .res 1 ; Backgrounds specified in backgrounds.txt
-
-  OldFG2OffsetX: .res 2 ; Secondary foreground
-  OldFG2OffsetY: .res 2
-  OldScrollX: .res 2
-  OldScrollY: .res 2
-  SecondFGTilemapPointer: .res 2 ; Usually BackgroundBG>>1 but can be ExtraBG>>1
 
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:
@@ -321,14 +543,8 @@ LevelZeroWhenLoad_Start:
   CopyingAnimationTimer: .res 1
   InteractionByProjectile: .res 1 ; Block is being interacted with by projectile instead of the player 
 LevelZeroWhenLoad_End:
-  TailAttackVariable:  .res 2 ; Zero'd when an attack starts
   GenericUpdateByteTotal: .res 2 ; How many bytes are queued up this frame
   PlayerFrameLast:     .res 1 ; Player animation frame, from last frame
-
-  ; For speeding up actor spawning
-  ; (keeps track of which actor index is the first one on a particular screen)
-  ; Multiply by 4 to use it.
-  FirstActorOnScreen:     .res 16
 
 
   ; Tap-run state

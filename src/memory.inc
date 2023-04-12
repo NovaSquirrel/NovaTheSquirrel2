@@ -81,8 +81,6 @@
 .global PlayerJumpCancelLock
 .global PlayerWantsToJump
 .global PlayerWantsToAttack
-.global PlayerAccelSpeed
-.global PlayerDecelSpeed
 .global JumpGracePeriod
 .global PlayerRidingSomething, PlayerRidingFG2
 ; 1 = Riding something normally, 2 = Don't update the PlayerCameraTargetY 
@@ -346,3 +344,22 @@ DialogCharacterLen = 5
 .global SmallRenderBuffer
 .global DecompressBuffer
 .global IrisEffectBuffer1, IrisEffectBuffer2
+
+
+.global Mode7PlayerHeight
+.global Mode7PlayerVSpeed
+.global Mode7PlayerJumpCancel
+.global Mode7PlayerJumping
+.global Mode7ChipsLeft
+.global Mode7Portrait
+.global Mode7HappyTimer
+.global Mode7Oops
+.global Mode7DynamicTileUsed
+.global Mode7Keys
+.global Mode7Tools
+.global Mode7BumpDirection
+
+.globalzp mode7_height, mode7_angle, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, texelx, texely, screenx, screeny
+.globalzp mode7_m7t
+.globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
+.global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y

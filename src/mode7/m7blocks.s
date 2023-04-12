@@ -223,7 +223,6 @@ M7BlockTeleport:
 .export M7BlockPushableBlock
 .proc M7BlockPushableBlock
   .import Mode7GetFourDirectionsAngle
-  .importzp angle
   TargetAngle = 6 ; and 7
 
   jsr GetFourDirectionAngle
@@ -275,22 +274,22 @@ M7BlockTeleport:
   lsr
   seta8
   sta TargetAngle ; Target angle (256 directions)
-  sub angle
+  sub mode7_angle
   beq Skip
   cmp #128
   bcs :+
     ; Less than 180 degrees
-    inc angle
-    inc angle
+    inc mode7_angle
+    inc mode7_angle
     bra Skip
   :
-  dec angle
-  dec angle
+  dec mode7_angle
+  dec mode7_angle
 Skip:
 
   ; If close to the angle, snap to it
   seta16
-  lda angle
+  lda mode7_angle
   and #255
   sub TargetAngle
   abs
@@ -298,7 +297,7 @@ Skip:
   bne :+
     seta8
     lda TargetAngle
-    sta angle
+    sta mode7_angle
     seta16
   :
   rts

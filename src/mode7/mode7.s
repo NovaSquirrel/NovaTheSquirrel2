@@ -24,11 +24,6 @@
 .smart
 .importzp hm_node
 
-.importzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
-.importzp mode7_m7t
-.importzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_negate
-.import mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, mode7_hofs, mode7_vofs, pv_buffer, mode7_m7x, mode7_m7y
-
 .import pv_texel_to_screen, pv_rebuild, pv_set_origin, pv_setup_for_ground, pv_set_ground_origin
 
 .import Mode7CallBlockStepOn, Mode7CallBlockStepOff, Mode7CallBlockBump, Mode7CallBlockJumpOn, Mode7CallBlockJumpOff, Mode7CallBlockTouching
@@ -37,30 +32,12 @@
 MODE7_PLAYER_SX = 128
 MODE7_PLAYER_SY = 168
 
-.segment "ZEROPAGE"
-.exportzp mode7_height
-mode7_height: .res 1
-
 .segment "BSS"
-.export Mode7PlayerHeight, Mode7PlayerVSpeed, Mode7PlayerJumpCancel, Mode7PlayerJumping
 ; Expose these for reuse by other systems
-Mode7PlayerHeight: .res 2
-Mode7PlayerVSpeed: .res 2
-Mode7PlayerJumpCancel: .res 2
-Mode7PlayerJumping: .res 2
 
-Mode7ChipsLeft:      .res 2
-Mode7Portrait = TouchTemp
-Mode7HappyTimer:  .res 2
-Mode7Oops:        .res 2
-Mode7ShadowHUD = Scratchpad
-Mode7LastPositionPtr: .res 2
-Mode7ForceMove: .res 2
-
-Mode7DoLookAround: .res 2
-Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
-Mode7LookAroundOffsetY = FG2OffsetY
-; Maybe I can reuse more of the above?? Have some sort of overlay system
+;Mode7DoLookAround: .res 2
+;Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
+;Mode7LookAroundOffsetY = FG2OffsetY
 
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
 PORTRAIT_OOPS   = $88 | OAM_PRIORITY_3
@@ -245,7 +222,7 @@ CheckerLoop:
   .repeat 6
     asl
   .endrep
-  sta angle
+  sta mode7_angle
   inc16 hm_node
 
   ; Decompress the level map
@@ -276,12 +253,9 @@ RestoredFromCheckpoint:
   stz Mode7HappyTimer
   stz Mode7Oops
 
-  stz Mode7LastPositionPtr
-  stz Mode7ForceMove
-
-  stz Mode7DoLookAround
-  stz Mode7LookAroundOffsetX
-  stz Mode7LookAroundOffsetY
+;  stz Mode7DoLookAround
+;  stz Mode7LookAroundOffsetX
+;  stz Mode7LookAroundOffsetY
 
   stz Mode7DynamicTileUsed+0
   stz Mode7DynamicTileUsed+2
@@ -403,6 +377,7 @@ DontIncreaseChipCounter:
 .proc Mode7MainLoop
 	seta8
 	stz mode7_height
+	wdm 0
 Loop:
 	setaxy16
 	inc framecount
@@ -651,7 +626,7 @@ SkipBlock:
 	:
 
 	; rotate with left/right
-	ldx z:angle
+	ldx z:mode7_angle
 	lda keydown
 	bit #KEY_LEFT
 	beq :+
@@ -668,7 +643,7 @@ SkipBlock:
 		beq :+
 			dex
 	:
-	stx z:angle
+	stx z:mode7_angle
 
 	; Generate perspective, unless you're on the ground
 	; in which case use precalculated perspective
@@ -791,7 +766,7 @@ SkipBlock:
 	jsr Mode7LevelPtrXYAtPlayer
 	; Old LevelBlockPtr
 	pla
-	sta ScrollX ; Temporary space
+	sta TempVal ; Temporary space
 	cmp LevelBlockPtr
 	beq SameTile
 		lda Mode7PlayerHeight
@@ -800,7 +775,7 @@ SkipBlock:
 		and #255
 		jsr Mode7CallBlockStepOn
 
-		lda ScrollX
+		lda TempVal
 		sta LevelBlockPtr
 		lda [LevelBlockPtr]
 		and #255
@@ -1387,7 +1362,7 @@ AddOneSprite:
 .a16
 .export Mode7GetFourDirectionsAngle
 .proc Mode7GetFourDirectionsAngle
-	lda angle
+	lda mode7_angle
 	add #32 ; -32 to 32 should be direction 0
 	asl
 	asl
@@ -1445,7 +1420,7 @@ ForwardPtrTile:
   sta Mode7CheckpointX
 ;  lda Mode7PlayerY
   sta Mode7CheckpointY
-  lda angle
+  lda mode7_angle
   sta Mode7CheckpointDir
   lda Mode7ChipsLeft
   sta Mode7CheckpointChips
@@ -1482,7 +1457,7 @@ ForwardPtrTile:
   lda Mode7CheckpointY
 ;  sta Mode7PlayerY
   lda Mode7CheckpointDir
-  sta angle
+  sta mode7_angle
   lda Mode7CheckpointChips
   sta Mode7ChipsLeft
   lda Mode7CheckpointKeys+0
