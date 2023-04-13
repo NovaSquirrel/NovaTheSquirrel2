@@ -54,12 +54,15 @@ Mode7Portrait = TouchTemp
 Mode7HappyTimer:  .res 2
 Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
-Mode7LastPositionPtr: .res 2
-Mode7ForceMove: .res 2
 
-Mode7DoLookAround: .res 2
-Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
-Mode7LookAroundOffsetY = FG2OffsetY
+Mode7HaveBlock:  .res 2
+
+;Mode7LastPositionPtr: .res 2
+;Mode7ForceMove: .res 2
+
+;Mode7DoLookAround: .res 2
+;Mode7LookAroundOffsetX = FG2OffsetX ; Reuse
+;Mode7LookAroundOffsetY = FG2OffsetY
 ; Maybe I can reuse more of the above?? Have some sort of overlay system
 
 PORTRAIT_NORMAL = $80 | OAM_PRIORITY_3
@@ -86,6 +89,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7Keys+2
   stz GenericUpdateLength
   stz ToggleSwitch1 ; and ToggleSwitch2
+  stz Mode7HaveBlock
 
   stz Mode7PlayerHeight
   stz Mode7PlayerVSpeed
@@ -276,12 +280,12 @@ RestoredFromCheckpoint:
   stz Mode7HappyTimer
   stz Mode7Oops
 
-  stz Mode7LastPositionPtr
-  stz Mode7ForceMove
+;  stz Mode7LastPositionPtr
+;  stz Mode7ForceMove
 
-  stz Mode7DoLookAround
-  stz Mode7LookAroundOffsetX
-  stz Mode7LookAroundOffsetY
+;  stz Mode7DoLookAround
+;  stz Mode7LookAroundOffsetX
+;  stz Mode7LookAroundOffsetY
 
   stz Mode7DynamicTileUsed+0
   stz Mode7DynamicTileUsed+2
@@ -789,6 +793,8 @@ SkipBlock:
 
 	; Calculate LevelBlockPtr again
 	jsr Mode7LevelPtrXYAtPlayer
+	lda LevelBlockPtr
+	sta ScrollY ; Temporary space
 	; Old LevelBlockPtr
 	pla
 	sta ScrollX ; Temporary space
@@ -806,6 +812,75 @@ SkipBlock:
 		and #255
 		jsr Mode7CallBlockStepOff
 	SameTile:
+
+	lda Mode7PlayerHeight
+	bne @NotPickupPush
+	lda keynew
+	and #KEY_A|KEY_R
+	beq @NotPickupPush
+		lda Mode7HaveBlock
+		beq @DontHaveBlock
+	@DoHaveBlock:
+		jsr Mode7GetFourDirectionsAngle
+		asl
+		tay
+		lda LevelBlockPtr
+		add ForwardPtrTile,y
+		sta LevelBlockPtr
+
+		lda [LevelBlockPtr]
+		and #255
+		tay
+		lda M7BlockFlags,y
+		bit #M7_BLOCK_SOLID_BLOCK
+		bne @NotPickupPush
+
+		stz Mode7HaveBlock
+
+		lda LevelBlockPtr ; X
+		and #63
+		asl
+		asl
+		asl
+		asl
+		tax
+
+		lda LevelBlockPtr ; Y
+		and #63*64
+		lsr
+		lsr
+		tay
+
+		.import Mode7CreateActor
+		lda #Mode7ActorType::SlidingBlock
+		jsr Mode7CreateActor
+		bcc :+
+			jsr Mode7GetFourDirectionsAngle
+			seta8
+			sta ActorDirection,x
+			seta16
+		:
+		bra @NotPickupPush
+	@DontHaveBlock:
+		lda [LevelBlockPtr]
+		and #255
+		cmp #Mode7Block::PushableBlock
+		beq @FoundPushBlock
+		jsr Mode7GetFourDirectionsAngle
+		asl
+		tay
+		lda ForwardPtrTile,y
+		add ScrollY ; LevelBlockPtr
+		sta LevelBlockPtr
+		lda [LevelBlockPtr]
+		and #255
+		cmp #Mode7Block::PushableBlock
+		bne @NotPickupPush
+		@FoundPushBlock:
+			.import Mode7UncoverAndShow
+			jsr Mode7UncoverAndShow
+			inc Mode7HaveBlock
+	@NotPickupPush:
 
 	setxy8
 	; Set origin
@@ -1401,6 +1476,10 @@ AddOneSprite:
 ForwardPtrTile:
   .word .loword(-64), .loword(-1), .loword(64), .loword(1)
 ;  .word .loword(1), .loword(64), .loword(-1), .loword(-64)
+ForwardPixelTileX:
+  .word 0, .loword(-16), 0, 16
+ForwardPixelTileY:
+  .word .loword(-16), 0, 16, 0
 
 ; For the lookaround code above in the main loop
 .a16

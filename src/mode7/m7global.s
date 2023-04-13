@@ -7,7 +7,8 @@
   ArrowRight = 4*2
   PinkBall   = 5*2
   PushBlock  = 6*2
-  Burger     = 7*2
+  SlidingBlock = 7*2
+  Burger       = 8*2
 .endenum
 
 .global Mode7ScrollX, Mode7ScrollY, Mode7PlayerX, Mode7PlayerY, Mode7RealAngle, Mode7Direction, Mode7MoveDirection, Mode7Turning, Mode7TurnWanted

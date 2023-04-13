@@ -307,7 +307,19 @@ Mode7ActorTable:
   .raddr M7FlyingArrowRight
   .raddr M7PinkBall
   .raddr M7PushBlock
+  .raddr M7SlidingBlock
   .raddr M7Burger
+
+Mode7ActorGraphic:
+  .word 0
+  .word .loword(SoftwareSprites+(64*4*0)) ; Flying up 
+  .word .loword(SoftwareSprites+(64*4*1)) ; Flying left
+  .word .loword(SoftwareSprites+(64*4*2)) ; Flying down
+  .word .loword(SoftwareSprites+(64*4*3)) ; Flying right
+  .word .loword(SoftwareSprites+(64*4*4)) ; Pink ball
+  .word .loword(SoftwareSprites+(64*4*5)) ; Push block
+  .word .loword(SoftwareSprites+(64*4*5)) ; Sliding block
+  .word .loword(SoftwareSprites+(64*4*6)) ; Burger
 
 ; Get the index into the dynamic tile buffer
 .a16
@@ -440,6 +452,55 @@ OffsetX:
   .word 0, .loword(-4), 0, .loword(4)
 OffsetY:
   .word .loword(-4), 0, .loword(4), 0
+.endproc
+
+.a16
+.proc M7SlidingBlock
+  ; Has it arrived on a grid square?
+  lda ActorPX,x
+  ora ActorPY,x
+  and #15
+  bne NotOnGrid
+    ; Calculates it again in BecomeBlock, probably fine though
+    lda ActorPX,x
+    ldy ActorPY,x
+    jsr Mode7LevelPtrXY
+
+    lda ActorDirection,x
+    and #3
+    asl
+    tay
+
+    lda LevelBlockPtr
+    .import ForwardPtrTile
+    add ForwardPtrTile,y
+    sta LevelBlockPtr
+
+    lda [LevelBlockPtr]
+    and #255
+    tay
+    lda M7BlockFlags,y
+    bit #M7_BLOCK_SOLID_BLOCK
+    beq :+
+      lda #Mode7Block::PushableBlock
+      jmp Mode7ActorBecomeBlock
+    :
+  NotOnGrid:
+
+  lda ActorDirection,x
+  and #3
+  asl
+  tay
+
+  lda ActorPX,x
+  add M7PushBlock::OffsetX,y
+  sta ActorPX,x
+
+  lda ActorPY,x
+  add M7PushBlock::OffsetY,y
+  sta ActorPY,x
+
+  jmp Mode7UpdateActorPicture
 .endproc
 
 .a16
@@ -770,10 +831,8 @@ SpritePointer = 12
 
   ; Do this before X gets reused for other stuff: 
   lda ActorType,x ; Multiply by 256 for four 64-byte tiles (but it's already pre-multiplied by 2, so fix that)
-  xba
-  lsr
-  ; assert((PS & 1) == 0) Carry will be clear
-  adc #.loword(SoftwareSprites-64*4) ; So the first non-empty type uses the first sprite
+  tay
+  lda Mode7ActorGraphic,y
   sta SpritePointer
 
   jsr CopyOverFourTileGfx

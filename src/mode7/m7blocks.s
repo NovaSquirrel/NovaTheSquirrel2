@@ -25,10 +25,21 @@
 
 .segment "C_Mode7Game"
 
+.a16
+.i16
+.export Mode7UncoverAndShow
+.proc Mode7UncoverAndShow
+  jsr Mode7UncoverBlock
+  lda [LevelBlockPtr]
+  and #255
+  jmp Mode7ChangeBlock
+.endproc
+
 ; LevelBlockPtr = block address
 ; Replaces a tile with the tile "underneath" or a regular floor if there was nothing
 .a16
 .i16
+.export Mode7UncoverBlock
 .proc Mode7UncoverBlock
   php
 
@@ -73,6 +84,7 @@
 ; LevelBlockPtr = block address
 .a16
 .i16
+.export Mode7ChangeBlock
 .proc Mode7ChangeBlock
 Temp = BlockTemp
   phx
