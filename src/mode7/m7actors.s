@@ -31,6 +31,7 @@ NUM_M7_ACTORS = 8
 
 ; Last tile number where there there is a version of the sprite in SoftwareSprites with that tile number underneath it
 LastTileNumberWithPrerenderedSprite = 2
+NumberOfSoftSprites = 7
 
 ; Finds a dynamic sprite slot and allocates it
 ; A = Index into Mode7DynamicTileBuffer to use
@@ -863,7 +864,7 @@ SpritePointer = 12
 
 ; Offset to add in order to put different background tiles underneath the sprite tiles
 OffsetForPrerenderedSprites:
-  .addr 0, 7*256*1, 7*256*2
+  .addr 0, NumberOfSoftSprites*256*1, NumberOfSoftSprites*256*2
 
 .a16
 LoadUpTileNumbersUnderActor:

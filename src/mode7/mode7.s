@@ -607,15 +607,15 @@ SkipBlock:
 		jsr Mode7CallBlockJumpOff
 	:
 
-	lda keynew
-	and #KEY_X
-	beq :+
-		lda #Mode7ActorType::ArrowUp
-		ldx M7PosX+1
-		ldy M7PosY+1
-		.import Mode7CreateActor
-		jsr Mode7CreateActor
-	:
+;	lda keynew
+;	and #KEY_X
+;	beq :+
+;		lda #Mode7ActorType::ArrowUp
+;		ldx M7PosX+1
+;		ldy M7PosY+1
+;		.import Mode7CreateActor
+;		jsr Mode7CreateActor
+;	:
 
 	; Apply gravity
 	lda Mode7PlayerVSpeed
@@ -814,13 +814,21 @@ SkipBlock:
 	SameTile:
 
 	lda Mode7PlayerHeight
-	bne @NotPickupPush
+	bne :+
 	lda keynew
 	and #KEY_A|KEY_R
-	beq @NotPickupPush
+	bne :++
+	:	jmp @NotPickupPush
+	:
 		lda Mode7HaveBlock
 		beq @DontHaveBlock
 	@DoHaveBlock:
+		lda angle
+		add #18
+		and #63 ; Only one quarter
+		cmp #18*2
+		bcs @NotPickupPush
+
 		jsr Mode7GetFourDirectionsAngle
 		asl
 		tay
