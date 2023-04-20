@@ -13,6 +13,8 @@ for f in glob.glob("palettes/*.png"):
 
 	im = Image.open(f)
 	pal = im.getpalette()[3:]
+	pal = pal[:45] + [0]*(45 - len(pal))
+
 	# Read out 15 colors
 	for i in range(15):
 		r = pal.pop(0)

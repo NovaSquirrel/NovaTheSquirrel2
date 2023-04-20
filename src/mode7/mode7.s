@@ -19,6 +19,7 @@
 .include "../graphicsenum.s"
 .include "../paletteenum.s"
 .include "../portraitenum.s"
+.include "m7playerframe.inc"
 .include "m7blockenum.s"
 .include "m7global.s"
 .smart
@@ -32,6 +33,7 @@
 .import pv_texel_to_screen, pv_rebuild, pv_set_origin, pv_setup_for_ground, pv_set_ground_origin
 
 .import Mode7CallBlockStepOn, Mode7CallBlockStepOff, Mode7CallBlockBump, Mode7CallBlockJumpOn, Mode7CallBlockJumpOff, Mode7CallBlockTouching
+.import Mode7PlayerGraphics
 
 ; Where to draw Maffi
 MODE7_PLAYER_SX = 128
@@ -506,6 +508,38 @@ SkipBlock:
 	sty PPUADDR
 	lda #1
 	sta COPYSTART
+
+	; Upload the player frame
+	ldy #DMAMODE_PPUDATA
+	sty DMAMODE
+	sty DMAMODE+$10
+	lda #^Mode7PlayerGraphics
+	sta DMAADDRBANK
+	sta DMAADDRBANK+$10
+	ldy #512
+	sty DMALEN
+	sty DMALEN+$10
+	seta16
+	lda PlayerFrame
+	and #255
+	xba
+	asl
+	adc #.loword(Mode7PlayerGraphics)
+	sta DMAADDR
+	add #256
+	sta DMAADDR+$10
+	seta8
+	; First row
+	ldy #$4000
+	sty PPUADDR
+	lda #1
+	sta COPYSTART
+	; Second row
+	ldy #$4100
+	sty PPUADDR
+	lda #2
+	sta COPYSTART
+
 
 	; Parallax
 	.if 0
@@ -1275,26 +1309,68 @@ Mode7LevelPtrXYAtPlayer:
     sta Mode7Portrait
   :
 
-  ; Draw the player
-  ldy OamPtr
-  lda keydown
-  and #KEY_UP|KEY_DOWN|KEY_L|KEY_R
-  bne :+
-    lda #4
-    bra :++
-  :
+  setxy8
+  ; Find the frame to use
   lda framecount
   lsr
-: and #%1100
-  ora #OAM_PRIORITY_2
-  sta 0
+  lsr
+  sta CPUNUM
+  ldx #20
+  stx CPUDEN
+
+  lda Mode7PlayerHeight
+  beq @NotInAir
+    ldx #Mode7PlayerFrame::JUMP1
+    stx PlayerFrame
+
+    lda Mode7PlayerVSpeed
+    bpl @GoingUp
+      ldx #Mode7PlayerFrame::FALL1
+      stx PlayerFrame
+    @GoingUp:
+
+    lda framecount
+    and #8
+    beq :+
+      inc PlayerFrame
+    :
+    bra @NotIdle
+  @NotInAir:
+
+  lda keydown
+  and #KEY_UP|KEY_DOWN
+  beq :+
+    lda framecount ; Each cel is 8 frames
+    lsr
+    lsr
+    lsr
+    and #7
+    add #Mode7PlayerFrame::WALK1
+    tax
+    stx PlayerFrame
+    bra @NotIdle
+  :
+
+  ; For idle animation, use the remainder
+  ldx CPUREM
+  lda PlayerIdleFrames,x
+  tax
+  stx PlayerFrame
+
+  @NotIdle:
+
+  setxy16
+
+  ; Draw the player
+  ldy OamPtr
+
+  lda #OAM_PRIORITY_2
   sta OAM_TILE+(4*0),y
-  ora #$02
+  add #2
   sta OAM_TILE+(4*1),y
-  lda 0
-  ora #$20
+  adc #2
   sta OAM_TILE+(4*2),y
-  ora #$02
+  adc #2
   sta OAM_TILE+(4*3),y
 
   ; Portrait
@@ -1336,7 +1412,7 @@ Mode7LevelPtrXYAtPlayer:
   sta OAM_XPOS+(4*0),y
   sta OAM_XPOS+(4*2),y
 
-  lda #MODE7_PLAYER_SY - 16 + 1
+  lda #MODE7_PLAYER_SY - 16 + 1 + 1 ; additional + 1 for the empty row on the bottom
   sub mode7_height
   sta OAM_YPOS+(4*2),y
   sta OAM_YPOS+(4*3),y
@@ -1394,6 +1470,12 @@ Mode7LevelPtrXYAtPlayer:
   add #10*4
   sta OamPtr
   rts
+
+PlayerIdleFrames:
+  .byt Mode7PlayerFrame::IDLE1, Mode7PlayerFrame::IDLE1
+  .byt Mode7PlayerFrame::IDLE2, Mode7PlayerFrame::IDLE3, Mode7PlayerFrame::IDLE4, Mode7PlayerFrame::IDLE5, Mode7PlayerFrame::IDLE6, Mode7PlayerFrame::IDLE7, Mode7PlayerFrame::IDLE8, Mode7PlayerFrame::IDLE9
+  .byt Mode7PlayerFrame::IDLE10, Mode7PlayerFrame::IDLE10
+  .byt Mode7PlayerFrame::IDLE11, Mode7PlayerFrame::IDLE12, Mode7PlayerFrame::IDLE13, Mode7PlayerFrame::IDLE14, Mode7PlayerFrame::IDLE15, Mode7PlayerFrame::IDLE16, Mode7PlayerFrame::IDLE17, Mode7PlayerFrame::IDLE18
 .endproc
 
 .a16

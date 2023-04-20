@@ -75,6 +75,8 @@ for f in glob.glob("portraits/*.png"):
 
 	# Read palette
 	pal = im.getpalette()[3:]
+	pal = pal[:45] + [0]*(45 - len(pal))
+
 	triplets = []
 	for i in range(15):
 		r = pal.pop(0)
