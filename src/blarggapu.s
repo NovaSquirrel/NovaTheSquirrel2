@@ -310,11 +310,11 @@ Quad:
 	jmp 0
 ReturnFromTransfer:
 	tya
+	dex
 
 	; Wait for SPC700 to signal it's ready
 :	cmp <APU2+0 ; Silence "Suspicious address expression"
 	bne :-
-	dex
 	dey
 	bpl Quad
 
