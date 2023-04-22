@@ -334,3 +334,90 @@ solid_creature
 when Enter, M7BlockIceSkates
 t 3,10 3,10
 t 3,10 3,10
+
+# ------- Park tileset ---------
++Flowers1
+q 0,11
+
++Flowers2
+q 2,11
+
++Sand
+q 4,11
+
++FlowerBush
+solid
+q 6,11
+
++FlowerBushVertU
+solid
+t 6,11 7,11
+t 8,11 9,11
+
++FlowerBushVert
+solid
+t 8,12 9,12
+t 8,11 9,11
+
++FlowerBushVertD
+solid
+t 8,12 9,12
+t 6,12 7,12
+
++FlowerBushHorizL
+solid
+t 6,11 10,11
+t 6,12 10,12
+
++FlowerBushHoriz
+solid
+t 11,11 10,11
+t 11,12 10,12
+
++FlowerBushHorizR
+solid
+t 11,11 7,11
+t 11,12 7,12
+
++WoodWall
+solid
+q 12,11
+
++BrickWall
+impassable
+q 14,11
+
++Grass1
+t 2,13 0,13
+t 0,13 2,13
+
++Grass2
+t 1,13 0,13
+t 0,13 1,13
+
++Grass3
+t 1,13 1,13
+t 1,13 1,13
+
++Dirt
+t 3,13 3,13
+t 3,13 3,13
+
++BridgeVert
+t 4,13 4,13
+t 4,13 4,13
+
++BridgeHoriz
+t 5,13 5,13
+t 5,13 5,13
+
++Barrier2
+impassable
+t 6,13 6,13
+t 6,13 6,13
+
++Sparkles
+solid
+t 7,13 7,13
+t 7,13 7,13
+

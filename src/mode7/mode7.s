@@ -133,7 +133,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   ; ---
   lda #DMAMODE_CGDATA
   ldx #$ffff & Mode7Palette
-  ldy #90*2
+  ldy #93*2
   jsl ppu_copy
 
   ; Common sprites
@@ -1366,11 +1366,14 @@ Mode7LevelPtrXYAtPlayer:
 
   lda #OAM_PRIORITY_2
   sta OAM_TILE+(4*0),y
-  add #2
+  ina
+  ina
   sta OAM_TILE+(4*1),y
-  adc #2
+  ina
+  ina
   sta OAM_TILE+(4*2),y
-  adc #2
+  ina
+  ina
   sta OAM_TILE+(4*3),y
 
   ; Portrait
