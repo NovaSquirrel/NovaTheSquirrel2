@@ -404,6 +404,7 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   pv_hdma_abi0: .res 16 ; indirection for AB
   pv_hdma_cdi0: .res 16 ; indirection for CD
   pv_hdma_col0: .res 16 ; fixed colour for horizon fade (indirect)
+  pv_hdma_bgcolor0: .res 16
 
   HDMA_Buffer2: .res 2048    ; for double buffering the previous
   pv_hdma_bgm1: .res 16
@@ -411,6 +412,7 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   pv_hdma_abi1: .res 16
   pv_hdma_cdi1: .res 16
   pv_hdma_col1: .res 16
+  pv_hdma_bgcolor1: .res 16
 
   mode7_hdma:   .res 16 * 8 ; HDMA channel settings to apply at next update
 

@@ -1,0 +1,2 @@
+tile_base 0
+palette_base 7

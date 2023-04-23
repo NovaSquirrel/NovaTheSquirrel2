@@ -2,13 +2,8 @@
 # convert PNG backgrounds to Nova the Squirrel 2 background maps
 import PIL, sys, os
 from PIL import Image
-# Palette to use
-palette_base = 7
-# Tile number the background tiles start at
-tile_number_base = 256
-
-# Base value for a tilemap value
-tile_base = (palette_base<<10) | tile_number_base
+from pathlib import Path
+from nts2shared import *
 
 ## Tiles that are completely solid
 #all_solid = [("%x" % i) * 64 for i in range(16)]
@@ -54,6 +49,27 @@ def convert(f):
 	# Name of the background is the filename with path and extension taken out
 	name = os.path.splitext(os.path.basename(f))[0]
 	print("Name "+name)
+
+	# Palette to use
+	palette_base = 7
+	# Tile number the background tiles start at
+	tile_number_base = 256
+
+	text_filename = Path(f).with_suffix('.txt')
+	if text_filename.is_file():
+		with open(text_filename) as config_file:
+			for line in config_file.readlines():
+				line = line.rstrip()
+				word, arg = separateFirstWord(line)
+
+				if word == 'tile_base':
+					tile_number_base = int(arg)
+				elif word == 'palette_base':
+					palette_base = int(arg)
+				else:
+					print("Unrecognized config word: "+word)
+	# Base value for a tilemap value
+	tile_base = (palette_base<<10) | tile_number_base
 
 	im = Image.open(f)
 

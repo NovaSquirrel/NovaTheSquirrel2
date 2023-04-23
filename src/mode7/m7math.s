@@ -1426,15 +1426,16 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	.i16
 	; 5. set HDMA tables for next frame
 	; =================================
-	lda #$1F
-	sta f:mode7_hdma_en ; enable HDMA (0,1,2,3,4)
+	lda #%111111
+	sta f:mode7_hdma_en       ; enable HDMA (0,1,2,3,4)
 	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
-	lda #$40
-	sta a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer, indirect
-	lda #$43
+	lda #DMA_INDIRECT
+	sta a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer
+	lda #DMA_INDIRECT | DMA_0011
 	sta a:mode7_hdma+(2*16)+0 ; AB: 4 byte transfer, indirect
 	sta a:mode7_hdma+(3*16)+0 ; CD: 4 byte transfer, indirect
-	lda #$40
+	sta a:mode7_hdma+(5*16)+0
+	lda #DMA_INDIRECT
 	sta a:mode7_hdma+(4*16)+0 ; col: 1 byte transfer, indirect
 
 	lda #<BGMODE
@@ -1447,6 +1448,9 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	sta a:mode7_hdma+(3*16)+1
 	lda #<COLDATA
 	sta a:mode7_hdma+(4*16)+1
+	lda #<CGADDR
+	sta a:mode7_hdma+(5*16)+1
+
 
 	lda #$7F
 	sta a:mode7_hdma+(0*16)+4 ; bank
@@ -1454,6 +1458,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	sta a:mode7_hdma+(2*16)+4
 	sta a:mode7_hdma+(3*16)+4
 	sta a:mode7_hdma+(4*16)+4
+	sta a:mode7_hdma+(5*16)+4
 
 	lda #^pv_tm1
 	sta a:mode7_hdma+(1*16)+7 ; indirect bank
@@ -1461,7 +1466,8 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	sta a:mode7_hdma+(2*16)+7 ; M7A M7B
 	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
 	lda #^pv_fade_table0
-	sta a:mode7_hdma+(4*16)+7
+	sta a:mode7_hdma+(4*16)+7 ; fog effect
+	sta a:mode7_hdma+(5*16)+7 ; BG color
 	jsr pv_buffer_x
 	stx z:temp
 	seta16
@@ -1481,6 +1487,14 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	lda #.loword(pv_hdma_col0)
 	add z:temp
 	sta a:mode7_hdma+(4*16)+2
+	lda #.loword(pv_hdma_bgcolor0)
+	add z:temp
+	sta a:mode7_hdma+(5*16)+2
+
+	lda z:pv_l0
+	dea
+	jsr UpdateMode7BGColorHDMA
+
 	; restore register sizes, data bank, and return
 	plb
 	plp
@@ -2149,13 +2163,14 @@ DeriveCDFromAB:
 	seta8
 
 	; Set up HDMA configuration for next frame
-	lda #$1f
+	lda #%111111
 	sta f:mode7_hdma_en       ; enable HDMA (0,1,2,3,4)
 	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
 	stz a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer
 	lda #DMA_INDIRECT | DMA_0011
 	sta a:mode7_hdma+(2*16)+0 ; AB: 4 byte transfer, indirect
 	sta a:mode7_hdma+(3*16)+0 ; CD: 4 byte transfer, indirect
+	sta a:mode7_hdma+(5*16)+0
 	lda #DMA_INDIRECT
 	sta a:mode7_hdma+(4*16)+0 ; col: 1 byte transfer, indirect
 
@@ -2169,16 +2184,20 @@ DeriveCDFromAB:
 	sta a:mode7_hdma+(3*16)+1
 	lda #<COLDATA
 	sta a:mode7_hdma+(4*16)+1
+	lda #<CGADDR
+	sta a:mode7_hdma+(5*16)+1
 
 	; Table banks
 	lda #^GroundPerspectiveTM
 	sta a:mode7_hdma+(0*16)+4 ; BGMODE
 	sta a:mode7_hdma+(1*16)+4 ; BLENDMAIN/TM
 	sta a:mode7_hdma+(4*16)+4 ; COLDATA
+
 	; AB and CD use tables in RAM
 	lda #^pv_hdma_abi0
-	sta a:mode7_hdma+(2*16)+4
-	sta a:mode7_hdma+(3*16)+4
+	sta a:mode7_hdma+(2*16)+4 ; AB
+	sta a:mode7_hdma+(3*16)+4 ; CD
+	sta a:mode7_hdma+(5*16)+4 ; BGColor
 
 	; Indirect banks
 	lda ab_lut_pointer+2 ; From LUT
@@ -2186,7 +2205,8 @@ DeriveCDFromAB:
 	lda #^pv_hdma_cd0    ; Derived from LUT
 	sta a:mode7_hdma+(3*16)+7 ; M7C M7D
 	lda #^pv_fade_table0
-	sta a:mode7_hdma+(4*16)+7
+	sta a:mode7_hdma+(4*16)+7 ; fog effect
+	sta a:mode7_hdma+(5*16)+7 ; BG color
 
 	lda f:pv_buffer
 	beq :+
@@ -2215,6 +2235,13 @@ DeriveCDFromAB:
 	lda #.loword(GroundPerspectiveCOL)
 	sta a:mode7_hdma+(4*16)+2
 
+	lda #.loword(pv_hdma_bgcolor0)
+	add temp
+	sta a:mode7_hdma+(5*16)+2
+
+	lda #47
+	jsr UpdateMode7BGColorHDMA
+
     ; The rest of the routine don't do anything for the effect, but do set up variables to be how other code expects them
 	setxy8
 	lda #0
@@ -2234,6 +2261,233 @@ DeriveCDFromAB:
 	plb
 	plp
 	rts
+.endproc
+
+.a16
+.i16
+.proc UpdateMode7BGColorHDMA
+	pha
+	jsr pv_buffer_x
+
+	pla
+	sta a:pv_hdma_bgcolor0+0,x
+	lda #.loword(SkyColor)
+	sta a:pv_hdma_bgcolor0+1,x ; and +2
+
+;	lda #1
+;	sta a:pv_hdma_bgcolor0+3,x
+;	lda #.loword(GroundColor)
+;	sta a:pv_hdma_bgcolor0+4,x ; and +5
+;	stz a:pv_hdma_bgcolor0+6,x
+
+	lda #128 + 127
+	sta a:pv_hdma_bgcolor0+3,x
+	lda #.loword(GroundColor2)
+	sta a:pv_hdma_bgcolor0+4,x ; and +5
+
+	lda #128 + 49
+	sta a:pv_hdma_bgcolor0+6,x
+	lda #.loword(GroundColor2 + 127*4)
+	sta a:pv_hdma_bgcolor0+7,x ; and +8
+
+	stz a:pv_hdma_bgcolor0+9,x
+
+	rts
+
+SkyColorValue = RGB(15,23,31)
+;GroundColorValue = RGB(43/8,78/8,149/8)
+
+SkyColor:
+	.byt 0, 0, <SkyColorValue, >SkyColorValue
+;GroundColor:
+;	.byt 0, 0, <GroundColorValue, >GroundColorValue
+
+GroundColor2:
+; Generated with this Python code:
+;def lerp(a, b, t):
+;	return (1 - t) * a + t * b
+;
+;for i in range(176):
+;	r = lerp(39,  27, i/176)
+;	g = lerp(137, 36, i/176)
+;	b = lerp(205, 71, i/176)
+;	print(".word 0, RGB(%d,%d,%d)" % (int(r/8),int(g/8),int(b/8)))
+.word 0, RGB(4,17,25)
+.word 0, RGB(4,17,25)
+.word 0, RGB(4,16,25)
+.word 0, RGB(4,16,25)
+.word 0, RGB(4,16,25)
+.word 0, RGB(4,16,25)
+.word 0, RGB(4,16,25)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,16,24)
+.word 0, RGB(4,15,24)
+.word 0, RGB(4,15,24)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,23)
+.word 0, RGB(4,15,22)
+.word 0, RGB(4,15,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,22)
+.word 0, RGB(4,14,21)
+.word 0, RGB(4,14,21)
+.word 0, RGB(4,14,21)
+.word 0, RGB(4,14,21)
+.word 0, RGB(4,14,21)
+.word 0, RGB(4,13,21)
+.word 0, RGB(4,13,21)
+.word 0, RGB(4,13,21)
+.word 0, RGB(4,13,21)
+.word 0, RGB(4,13,21)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,13,20)
+.word 0, RGB(4,12,20)
+.word 0, RGB(4,12,20)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,19)
+.word 0, RGB(4,12,18)
+.word 0, RGB(4,12,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,18)
+.word 0, RGB(4,11,17)
+.word 0, RGB(4,11,17)
+.word 0, RGB(4,11,17)
+.word 0, RGB(4,11,17)
+.word 0, RGB(4,11,17)
+.word 0, RGB(4,10,17)
+.word 0, RGB(4,10,17)
+.word 0, RGB(4,10,17)
+.word 0, RGB(4,10,17)
+.word 0, RGB(4,10,17)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,10,16)
+.word 0, RGB(4,9,16)
+.word 0, RGB(4,9,16)
+.word 0, RGB(4,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,15)
+.word 0, RGB(3,9,14)
+.word 0, RGB(3,9,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,14)
+.word 0, RGB(3,8,13)
+.word 0, RGB(3,8,13)
+.word 0, RGB(3,8,13)
+.word 0, RGB(3,8,13)
+.word 0, RGB(3,8,13)
+.word 0, RGB(3,7,13)
+.word 0, RGB(3,7,13)
+.word 0, RGB(3,7,13)
+.word 0, RGB(3,7,13)
+.word 0, RGB(3,7,13)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,7,12)
+.word 0, RGB(3,6,12)
+.word 0, RGB(3,6,12)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,11)
+.word 0, RGB(3,6,10)
+.word 0, RGB(3,6,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,10)
+.word 0, RGB(3,5,9)
+.word 0, RGB(3,5,9)
+.word 0, RGB(3,5,9)
+.word 0, RGB(3,5,9)
+.word 0, RGB(3,5,9)
+.word 0, RGB(3,4,9)
+.word 0, RGB(3,4,9)
+.word 0, RGB(3,4,9)
+.word 0, RGB(3,4,9)
+.word 0, RGB(3,4,9)
+.word 0, RGB(3,4,8)
 .endproc
 
 ; HDMA tables to use on the ground
@@ -2256,6 +2510,7 @@ DeriveCDFromAB:
 	.addr pv_fade_table1
 	.byt 0
 .endproc
+
 
 .a16
 .i8

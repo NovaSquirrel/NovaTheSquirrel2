@@ -268,7 +268,7 @@ $(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
 
 $(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
 	$(PY) tools/makebackgroundmap.py $<
-$(srcdir)/mode7/m7palettedata.s: tilesetsX/M7Tileset.png
+$(srcdir)/mode7/m7palettedata.s: tilesetsX/M7Tileset.png tools/mode7palette.py
 	$(PY) tools/mode7palette.py
 
 tilesets4/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc

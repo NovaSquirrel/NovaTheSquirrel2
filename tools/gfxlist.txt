@@ -64,3 +64,5 @@
 7000 SPStrifeCloud
 2400 FGLineFollowing
 7000 SPActorBlocks
+7c00 MapBGMode7Clouds
+6000 BGMode7Clouds

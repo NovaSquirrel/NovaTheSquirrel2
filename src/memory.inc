@@ -285,9 +285,9 @@ SF_SPECIAL_MASK     = %00001111
 .global IRQHandler ; For changing what IRQ does for different effects
 
 .global HDMA_Buffer1
-.global pv_hdma_bgm0, pv_hdma_tm0, pv_hdma_abi0, pv_hdma_cdi0, pv_hdma_col0
+.global pv_hdma_bgm0, pv_hdma_tm0, pv_hdma_abi0, pv_hdma_cdi0, pv_hdma_col0, pv_hdma_bgcolor0
 .global HDMA_Buffer2
-.global pv_hdma_bgm1, pv_hdma_tm1, pv_hdma_abi1, pv_hdma_cdi1, pv_hdma_col1
+.global pv_hdma_bgm1, pv_hdma_tm1, pv_hdma_abi1, pv_hdma_cdi1, pv_hdma_col1, pv_hdma_bgcolor1
 .global mode7_hdma
 
 .global Scratchpad

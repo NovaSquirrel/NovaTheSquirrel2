@@ -14,6 +14,13 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;
+
+; VRAM map:
+; 0000-3FFF: Mode 7
+; 4000-5FFF: Sprites
+; 6000-7BFF: Clouds tiles
+; 7C00-FFFF: Clouds map, 32x32
+
 .include "../snes.inc"
 .include "../global.inc"
 .include "../graphicsenum.s"
@@ -110,10 +117,10 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   lda #^Mode7LevelMap
   sta LevelBlockPtr+2
 
-  ; The HUD goes on layer 2 and goes at $c000
-  lda #0 | (($6000 >> 10)<<2) ; Right after the sprite graphics
+  ; The HUD goes on layer 2 and goes at the end of video RAM
+  lda #0 | (($7c00 >> 10)<<2)
   sta NTADDR+1
-  ; Base for the tiles themselves are $c000 too
+  ; Base for the tiles themselves are $6000
   lda #($6000>>12) | (($6000>>12)<<4)
   sta BGCHRADDR+0
 
@@ -129,6 +136,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   sta CGDATA
   lda #>RGB(15,23,31)
   sta CGDATA
+
   seta16
   ; ---
   lda #DMAMODE_CGDATA
@@ -149,7 +157,11 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   jsl DoGraphicUpload
   lda #GraphicsUpload::MaffiM7TempWalk
   jsl DoGraphicUpload
-  lda #GraphicsUpload::Mode7HUD
+;  lda #GraphicsUpload::Mode7HUD
+;  jsl DoGraphicUpload
+  lda #GraphicsUpload::BGMode7Clouds
+  jsl DoGraphicUpload
+  lda #GraphicsUpload::MapBGMode7Clouds
   jsl DoGraphicUpload
   lda #Palette::SPMaffi
   ldy #8
@@ -305,10 +317,10 @@ RestoredFromCheckpoint:
   jsl ppu_clear_oam
 
   ; Clear the HUD's nametable
-  ldx #$6000
-  ldy #64
-  jsl ppu_clear_nt
-  .a8
+;  ldx #$6000
+;  ldy #64
+;  jsl ppu_clear_nt
+  seta8
   tdc ; Clear all of accumulator
 
   ; .----------------------------------
@@ -390,8 +402,8 @@ DontIncreaseChipCounter:
   sta NMIHandler+2
   ; -----------------------
 
-  lda #$8000 >> 14
-  sta OBSEL       ; sprite CHR at $8000, sprites are 8x8 and 16x16
+  lda #$4000 >> 13
+  sta OBSEL       ; sprite CHR at $4000, sprites are 8x8 and 16x16
 
   lda #VBLANK_NMI|AUTOREAD
   sta PPUNMI
@@ -611,6 +623,15 @@ SkipBlock:
 	sta BG1VOFS
 	lda mode7_vofs+1
 	sta BG1VOFS
+
+	lda mode7_bg2hofs+0
+	sta BG2HOFS
+	lda mode7_bg2hofs+1
+	sta BG2HOFS
+	lda mode7_bg2vofs+0
+	sta BG2VOFS
+	lda mode7_bg2vofs+1
+	sta BG2VOFS
 	;---
 	lda #$0F
 	sta PPUBRIGHT
