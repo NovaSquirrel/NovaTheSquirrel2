@@ -19,7 +19,7 @@
 5000 OWStone
 3e00 OWPaths
 0000 SolidTiles
-4000 MaffiM7TempWalk
+4200 Mode7Sprites
 1400 FGSmallTrees
 1700 FGCommonPalFlowertops
 7000 SPFire

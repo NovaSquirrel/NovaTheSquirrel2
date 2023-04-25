@@ -110,6 +110,9 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   jsl MemClear7F
 
   seta8
+  lda #4
+  sta PlayerHealth
+
   ; Transparency outside the mode 7 plane
   lda #M7_BORDER00 ;M7_NOWRAP
   sta M7SEL
@@ -144,21 +147,10 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   ldy #93*2
   jsl ppu_copy
 
-  ; Common sprites
-  lda #Palette::Mode7HUDSprites
-  pha
-  ldy #9
-  jsl DoPaletteUpload
-  pla
-  ; And upload the common palette to the last background palette
-  ldy #7
-  jsl DoPaletteUpload
   lda #GraphicsUpload::Mode7HUDSprites
   jsl DoGraphicUpload
-  lda #GraphicsUpload::MaffiM7TempWalk
+  lda #GraphicsUpload::Mode7Sprites
   jsl DoGraphicUpload
-;  lda #GraphicsUpload::Mode7HUD
-;  jsl DoGraphicUpload
   lda #GraphicsUpload::BGMode7Clouds
   jsl DoGraphicUpload
   lda #GraphicsUpload::MapBGMode7Clouds
@@ -189,7 +181,16 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
 
   ; Put FGCommon in the last background palette for the HUD
   lda #Palette::FGCommon
+  pha
   ldy #7
+  jsl DoPaletteUpload
+  pla
+  ; Also the second sprite palette
+  ldy #9
+  jsl DoPaletteUpload
+  ; HUD sprites too
+  lda #Palette::Mode7HUDSprites
+  ldy #10
   jsl DoPaletteUpload
 
   ; -----------------------------------
@@ -528,7 +529,7 @@ SkipBlock:
 	lda #^Mode7PlayerGraphics
 	sta DMAADDRBANK
 	sta DMAADDRBANK+$10
-	ldy #512
+	ldy #256
 	sty DMALEN
 	sty DMALEN+$10
 	seta16
@@ -1308,8 +1309,16 @@ Mode7LevelPtrXYAtPlayer:
 	jmp Mode7TryNewY
 .endproc
 
-
 .proc Mode7DrawPlayer
+HUDTileNumberStart = 32
+  PlayerSpriteStart    = 0 ; 1 2 3
+  PortraitSpriteStart  = 4 ; 5 6 7
+  ShadowSpriteStart    = 8 ; 9
+  CollectibleIconStart = 10
+  CollectibleLeftStart = 11 ; 12 13 14
+  ItemSpriteStart      = 15
+  SpriteCount          = 16
+
   setaxy16
   jsr Mode7LevelPtrXYAtPlayer ; Prepare pointer for later
 
@@ -1386,27 +1395,27 @@ Mode7LevelPtrXYAtPlayer:
   ldy OamPtr
 
   lda #OAM_PRIORITY_2
-  sta OAM_TILE+(4*0),y
+  sta OAM_TILE+(4*(PlayerSpriteStart+0)),y
   ina
   ina
-  sta OAM_TILE+(4*1),y
+  sta OAM_TILE+(4*(PlayerSpriteStart+1)),y
   ina
   ina
-  sta OAM_TILE+(4*2),y
+  sta OAM_TILE+(4*(PlayerSpriteStart+2)),y
   ina
   ina
-  sta OAM_TILE+(4*3),y
+  sta OAM_TILE+(4*(PlayerSpriteStart+3)),y
 
   ; Portrait
   lda Mode7Portrait
-  sta OAM_TILE+(4*4),y
+  sta OAM_TILE+(4*(PortraitSpriteStart+0)),y
   ora #$02
-  sta OAM_TILE+(4*5),y
+  sta OAM_TILE+(4*(PortraitSpriteStart+1)),y
   lda Mode7Portrait
   ora #$04
-  sta OAM_TILE+(4*6),y
+  sta OAM_TILE+(4*(PortraitSpriteStart+2)),y
   ora #$02
-  sta OAM_TILE+(4*7),y
+  sta OAM_TILE+(4*(PortraitSpriteStart+3)),y
 
   ; Shadow
   lda mode7_height
@@ -1417,82 +1426,167 @@ Mode7LevelPtrXYAtPlayer:
   and #%1110
   ora #$40|OAM_PRIORITY_2
   sta 0
-  sta OAM_TILE+(4*8),y
+  sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
   ina
-  sta OAM_TILE+(4*9),y
+  sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
   lda framecount
   lsr
   bcc :+
     lda 0
     ora #OAM_XFLIP
-    sta OAM_TILE+(4*9),y
+    sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
     ina
-    sta OAM_TILE+(4*8),y    
+    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y    
   :
+
+  ; Items left to get
+  lda #HUDTileNumberStart + 11 + OAM_COLOR_1 + OAM_PRIORITY_3
+  sta OAM_TILE+(4*CollectibleIconStart),y
+
+  lda Mode7ChipsLeft
+  beq @GoldZeros
+  lsr
+  lsr
+  lsr
+  lsr
+  add #HUDTileNumberStart + 1 + OAM_COLOR_1 + OAM_PRIORITY_3
+  sta OAM_TILE+(4*(CollectibleLeftStart+0)),y
+  ora #16
+  sta OAM_TILE+(4*(CollectibleLeftStart+1)),y
+
+  lda Mode7ChipsLeft
+  and #15
+  add #HUDTileNumberStart + 1 + OAM_COLOR_1 + OAM_PRIORITY_3
+  sta OAM_TILE+(4*(CollectibleLeftStart+2)),y
+  ora #16
+  sta OAM_TILE+(4*(CollectibleLeftStart+3)),y
+  bra @NotZero
+@GoldZeros:
+  lda #HUDTileNumberStart + OAM_COLOR_1 + OAM_PRIORITY_3
+  sta OAM_TILE+(4*(CollectibleLeftStart+0)),y
+  sta OAM_TILE+(4*(CollectibleLeftStart+2)),y
+  ora #16
+  sta OAM_TILE+(4*(CollectibleLeftStart+1)),y
+  sta OAM_TILE+(4*(CollectibleLeftStart+3)),y
+@NotZero:
+
 
   seta8
   ; Player is made up of four sprites
   lda #MODE7_PLAYER_SX-16
-  sta OAM_XPOS+(4*0),y
-  sta OAM_XPOS+(4*2),y
+  sta OAM_XPOS+(4*(PlayerSpriteStart+0)),y
+  sta OAM_XPOS+(4*(PlayerSpriteStart+2)),y
 
   lda #MODE7_PLAYER_SY - 16 + 1 + 1 ; additional + 1 for the empty row on the bottom
   sub mode7_height
-  sta OAM_YPOS+(4*2),y
-  sta OAM_YPOS+(4*3),y
+  sta OAM_YPOS+(4*(PlayerSpriteStart+2)),y
+  sta OAM_YPOS+(4*(PlayerSpriteStart+3)),y
   sub #16
-  sta OAM_YPOS+(4*0),y
-  sta OAM_YPOS+(4*1),y
+  sta OAM_YPOS+(4*(PlayerSpriteStart+0)),y
+  sta OAM_YPOS+(4*(PlayerSpriteStart+1)),y
 
   lda #MODE7_PLAYER_SX
-  sta OAM_XPOS+(4*1),y
-  sta OAM_XPOS+(4*3),y
+  sta OAM_XPOS+(4*(PlayerSpriteStart+1)),y
+  sta OAM_XPOS+(4*(PlayerSpriteStart+3)),y
 
   ; Portrait position
   lda #10
-  sta OAM_XPOS+(4*4),y
-  sta OAM_XPOS+(4*6),y
-  sta OAM_YPOS+(4*4),y
-  sta OAM_YPOS+(4*5),y
+  sta OAM_XPOS+(4*(PortraitSpriteStart+0)),y
+  sta OAM_XPOS+(4*(PortraitSpriteStart+2)),y
+  sta OAM_YPOS+(4*(PortraitSpriteStart+0)),y
+  sta OAM_YPOS+(4*(PortraitSpriteStart+1)),y
   lda #10+16
-  sta OAM_XPOS+(4*5),y
-  sta OAM_XPOS+(4*7),y
-  sta OAM_YPOS+(4*6),y
-  sta OAM_YPOS+(4*7),y
+  sta OAM_XPOS+(4*(PortraitSpriteStart+1)),y
+  sta OAM_XPOS+(4*(PortraitSpriteStart+3)),y
+  sta OAM_YPOS+(4*(PortraitSpriteStart+2)),y
+  sta OAM_YPOS+(4*(PortraitSpriteStart+3)),y
+
+  ; How many items are left to collect
+  lda #10 + 16 - 8
+  sta OAM_YPOS+(4*(CollectibleIconStart+0)),y
+  sta OAM_YPOS+(4*(CollectibleLeftStart+0)),y
+  sta OAM_YPOS+(4*(CollectibleLeftStart+2)),y
+  lda #10 + 16
+  sta OAM_YPOS+(4*(CollectibleLeftStart+1)),y
+  sta OAM_YPOS+(4*(CollectibleLeftStart+3)),y
+  lda #10 + 32 + 4
+  sta OAM_XPOS+(4*(CollectibleIconStart+0)),y
+  lda #10 + 32 + 4 + 16
+  sta OAM_XPOS+(4*(CollectibleLeftStart+0)),y
+  sta OAM_XPOS+(4*(CollectibleLeftStart+1)),y
+  lda #10 + 32 + 4 + 16 + 8
+  sta OAM_XPOS+(4*(CollectibleLeftStart+2)),y
+  sta OAM_XPOS+(4*(CollectibleLeftStart+3)),y
 
   ; Player's shadow
   lda #MODE7_PLAYER_SX-8
-  sta OAM_XPOS+(4*8),y
+  sta OAM_XPOS+(4*(ShadowSpriteStart+0)),y
   lda #MODE7_PLAYER_SX
-  sta OAM_XPOS+(4*9),y
+  sta OAM_XPOS+(4*(ShadowSpriteStart+1)),y
   lda #MODE7_PLAYER_SY-4
-  sta OAM_YPOS+(4*8),y
-  sta OAM_YPOS+(4*9),y
+  sta OAM_YPOS+(4*(ShadowSpriteStart+0)),y
+  sta OAM_YPOS+(4*(ShadowSpriteStart+1)),y
   lda [LevelBlockPtr]
   bne :+
     lda #240
-    sta OAM_YPOS+(4*8),y
-    sta OAM_YPOS+(4*9),y
+    sta OAM_YPOS+(4*(ShadowSpriteStart+0)),y
+    sta OAM_YPOS+(4*(ShadowSpriteStart+1)),y
   :
 
   lda #$02
-  sta OAMHI+1+(4*0),y
-  sta OAMHI+1+(4*1),y
-  sta OAMHI+1+(4*2),y
-  sta OAMHI+1+(4*3),y
+  sta OAMHI+1+(4*(PlayerSpriteStart+0)),y
+  sta OAMHI+1+(4*(PlayerSpriteStart+1)),y
+  sta OAMHI+1+(4*(PlayerSpriteStart+2)),y
+  sta OAMHI+1+(4*(PlayerSpriteStart+3)),y
   ; Portrait
-  sta OAMHI+1+(4*4),y
-  sta OAMHI+1+(4*5),y
-  sta OAMHI+1+(4*6),y
-  sta OAMHI+1+(4*7),y
+  sta OAMHI+1+(4*(PortraitSpriteStart+0)),y
+  sta OAMHI+1+(4*(PortraitSpriteStart+1)),y
+  sta OAMHI+1+(4*(PortraitSpriteStart+2)),y
+  sta OAMHI+1+(4*(PortraitSpriteStart+3)),y
+  sta OAMHI+1+(4*(CollectibleIconStart)),y
+  sta OAMHI+1+(4*(ItemSpriteStart)),y
   ; Shadow
   lda #$00
-  sta OAMHI+1+(4*8),y
-  sta OAMHI+1+(4*9),y
+  sta OAMHI+1+(4*(ShadowSpriteStart+0)),y
+  sta OAMHI+1+(4*(ShadowSpriteStart+1)),y
+  ; Collectibles left
+  sta OAMHI+1+(4*(CollectibleLeftStart+0)),y
+  sta OAMHI+1+(4*(CollectibleLeftStart+1)),y
+  sta OAMHI+1+(4*(CollectibleLeftStart+2)),y
+  sta OAMHI+1+(4*(CollectibleLeftStart+3)),y
   seta16
   tya
-  add #10*4
+  add #SpriteCount*4
   sta OamPtr
+
+  ; Draw health
+  tay
+  HealthX = 0
+  HealthCount = 2
+  lda #10 + 32 + 4
+  sta HealthX
+
+  lda PlayerHealth
+  and #255
+  lsr
+  php
+  sta HealthCount
+HealthLoop:
+  lda HealthCount
+  beq HealthLoopEnd
+  lda #HUDTileNumberStart + OAM_COLOR_1 + OAM_PRIORITY_3 + $2e
+  jsr MakeHealthIcon
+  dec HealthCount
+  bne HealthLoop
+HealthLoopEnd:
+  plp 
+  bcc :+
+    lda #HUDTileNumberStart + OAM_COLOR_1 + OAM_PRIORITY_3 + $2f
+    jsr MakeHealthIcon
+  :
+
+  sty OamPtr
+
   rts
 
 PlayerIdleFrames:
@@ -1500,6 +1594,26 @@ PlayerIdleFrames:
   .byt Mode7PlayerFrame::IDLE2, Mode7PlayerFrame::IDLE3, Mode7PlayerFrame::IDLE4, Mode7PlayerFrame::IDLE5, Mode7PlayerFrame::IDLE6, Mode7PlayerFrame::IDLE7, Mode7PlayerFrame::IDLE8, Mode7PlayerFrame::IDLE9
   .byt Mode7PlayerFrame::IDLE10, Mode7PlayerFrame::IDLE10
   .byt Mode7PlayerFrame::IDLE11, Mode7PlayerFrame::IDLE12, Mode7PlayerFrame::IDLE13, Mode7PlayerFrame::IDLE14, Mode7PlayerFrame::IDLE15, Mode7PlayerFrame::IDLE16, Mode7PlayerFrame::IDLE17, Mode7PlayerFrame::IDLE18
+
+MakeHealthIcon:
+  sta OAM_TILE,y
+  seta8
+  lda HealthX
+  sta OAM_XPOS,y
+  add #8
+  sta HealthX
+  lda #10 + 16 + 8
+  sta OAM_YPOS,y
+  seta16
+  lda #0
+  sta OAMHI+0,y
+
+  ; Next sprite
+  iny
+  iny
+  iny
+  iny
+  rts
 .endproc
 
 .a16
@@ -1695,41 +1809,6 @@ ForwardPixelTileY:
   jmp StartMode7Level::RestoredFromCheckpoint
 .endproc
 
-GradientTable:     ; 
-   .byt $02, $9F   ; 
-   .byt $07, $9E   ; 
-   .byt $08, $9D   ; 
-   .byt $07, $9C   ; 
-   .byt $07, $9B   ; 
-   .byt $07, $9A   ; 
-   .byt $08, $99   ; 
-   .byt $07, $98   ; 
-   .byt $07, $97   ; 
-   .byt $07, $96   ; 
-   .byt $08, $95   ; 
-   .byt $07, $94   ; 
-   .byt $07, $93   ; 
-   .byt $07, $92   ; 
-   .byt $07, $91   ; 
-   .byt $07, $90   ; 
-   .byt $08, $8F   ; 
-   .byt $07, $8E   ; 
-   .byt $07, $8D   ; 
-   .byt $07, $8C   ; 
-   .byt $08, $8B   ; 
-   .byt $07, $8A   ; 
-   .byt $07, $89   ; 
-   .byt $07, $88   ; 
-   .byt $08, $87   ; 
-   .byt $07, $86   ; 
-   .byt $07, $85   ; 
-   .byt $07, $84   ; 
-   .byt $08, $83   ; 
-   .byt $07, $82   ; 
-   .byt $07, $81   ; 
-   .byt $05, $80   ; 
-   .byt $00        ; 
-
 .segment "Mode7Tiles"
 .export Mode7Tiles
 Mode7Tiles:
@@ -1743,7 +1822,6 @@ Mode7ToggleSwapped:
 
 Mode7Parallax:
 .incbin "../../tilesetsX/M7Parallax.chr"
-
 
 
 .segment "C_Mode7Game"
