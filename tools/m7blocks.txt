@@ -48,7 +48,7 @@ q 4,2
 
 +Fan
 when Enter, M7BlockFan
-q 6,0
+w 4,1
 
 +ForceDown
 when Touching, M7BlockForceDown
@@ -269,7 +269,7 @@ t 13,8 14,8
 
 +Message
 when Enter, M7BlockMessage
-q 4,10
+w 4,0
 
 +CloneButton
 when Enter, M7BlockCloneButton

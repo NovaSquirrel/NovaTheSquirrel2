@@ -522,6 +522,32 @@ SkipBlock:
 	lda #1
 	sta COPYSTART
 
+	; Upload the fan frame
+	; TODO: Use a more generic system for this?
+	lda framecount
+	and #3
+	bne :+
+	ldy #DMAMODE_PPUHIDATA
+	sty DMAMODE
+	lda #^Mode7FanAnimation
+	sta DMAADDRBANK
+	ldy #256
+	sty DMALEN
+	seta16
+	lda framecount
+	lsr
+	lsr
+	and #3
+	xba
+	add #.loword(Mode7FanAnimation)
+	sta DMAADDR
+	seta8
+	ldy #$0500
+	sty PPUADDR
+	lda #1
+	sta COPYSTART
+	:
+
 	; Upload the player frame
 	ldy #DMAMODE_PPUDATA
 	sty DMAMODE
@@ -1822,6 +1848,9 @@ Mode7ToggleSwapped:
 
 Mode7Parallax:
 .incbin "../../tilesetsX/M7Parallax.chr"
+
+Mode7FanAnimation:
+.incbin "../../tilesetsX/M7FanAnimation.chr"
 
 
 .segment "C_Mode7Game"
