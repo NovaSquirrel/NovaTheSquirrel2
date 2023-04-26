@@ -422,6 +422,7 @@ DontIncreaseChipCounter:
 .proc Mode7MainLoop
 	seta8
 	stz mode7_height
+	stz LevelFadeIn
 Loop:
 	setaxy16
 	inc framecount
@@ -660,8 +661,13 @@ SkipBlock:
 	lda mode7_bg2vofs+1
 	sta BG2VOFS
 	;---
-	lda #$0F
+	lda LevelFadeIn
 	sta PPUBRIGHT
+	cmp #$0f
+	beq :+
+		ina
+	:
+	sta LevelFadeIn
 
 	stz CGWSEL      ; Color math is always enabled
 	lda #$23        ; Enable additive blend on BG1 + BG2 + backdrop
@@ -1088,8 +1094,8 @@ SkipBlock:
 	jsl ppu_pack_oamhi_partial
 	.a8 ; (does seta8)
 
-	lda #$0F
-	sta PPUBRIGHT
+	;lda #$0F
+	;sta PPUBRIGHT
 
 	jmp Loop
 .endproc
