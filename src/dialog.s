@@ -56,6 +56,8 @@ DialogPortrait = Mode7HappyTimer
   sta DMAADDR+$30
 
   seta8
+  lda #255 ; Re-upload the player frame after this
+  sta PlayerFrameLast
   lda #%00010111  ; enable sprites, plane 0, 1 and 2
   sta BLENDMAIN
   stz BLENDSUB
