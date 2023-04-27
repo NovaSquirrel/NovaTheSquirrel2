@@ -478,7 +478,7 @@ SetScrollForTwoLayerLevel:
   lsr
   adc #0
   add FGScrollYPixels
-  dec a ; SNES displays lines 1-224 so shift it up to 0-223
+;  dec a ; SNES displays lines 1-224 so shift it up to 0-223
   sta 2
   sta FG2ScrollYPixels
   seta8
