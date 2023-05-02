@@ -158,12 +158,13 @@ No:
   cmp #Block::GradualSlopeR_U4_Dirt+1
   bcs No
   cmp #Block::Ledge
-  bcc No
+  bcc No2 ; Carry is already clear so skip right to the rts
 Yes:
   sec
   rts
 No:
   clc
+No2:
   rts
 .endproc
 

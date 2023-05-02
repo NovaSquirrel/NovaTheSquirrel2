@@ -536,30 +536,32 @@ SpriteLoop:
     ldx #ExtraBG
     ldy #32*4
     jsl ppu_clear_nt
+    .a8 ; Side effect of ppu_clear_nt
   :
 
   ; .------------------------------------.
   ; | Set up PPU registers for level use |
   ; '------------------------------------'
-  .a8 ; Side effect of ppu_clear_nt
-  lda #1
-  sta BGMODE       ; mode 1
+  lda LevelBGMode
+  sta BGMODE
 
   lda #(BG1CHRBase>>12)|((BG2CHRBase>>12)<<4)
   sta BGCHRADDR+0  ; bg plane 0 CHR at $0000, plane 1 CHR at $2000
-  lda #(BG3CHRBase>>12)
-  sta BGCHRADDR+1  ; bg plane 2 CHR at $3000
+  lda #(BG3CHRBase>>12)|((BG3CHRBase>>12)<<4)
+  sta BGCHRADDR+1  ; bg plane 2 CHR at $3000, plane 3 CHR at same
 
   lda #SpriteCHRBase >> 13
   sta OBSEL      ; sprite CHR at $6000, sprites are 8x8 and 16x16
 
   lda #1 | ((ForegroundBG >> 10)<<2)
   sta NTADDR+0   ; plane 0 nametable at $5800, 2 screens wide
-  tdc
+  tdc ; A = zero
   lda LevelBackgroundId
   tax
   .import BackgroundFlags
   lda f:BackgroundFlags,x
+  ; ......ss
+  ;       ++- Tilemap size
   and #3
   ora #(BackgroundBG >> 10)<<2
   sta NTADDR+1   ; plane 1 nametable at $5000, size specified by BackgroundFlags
@@ -572,7 +574,9 @@ SpriteLoop:
       stz BGCHRADDR ; First two planes both at $0000
   :
   lda #0 | ((ExtraBG >> 10)<<2)
-  sta NTADDR+2   ; plane 2 nametable at $9800, 1 screen
+  sta NTADDR+2   ; plane 2 nametable at $4c00, 1 screen
+  lda #0 | ((ExtraBGWide >> 10)<<2)
+  sta NTADDR+2   ; plane 3 nametable at $4800, 1 screen
 
   stz PPURES
   lda #%00010011  ; enable sprites, plane 0 and 1

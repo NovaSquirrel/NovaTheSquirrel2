@@ -157,6 +157,10 @@
   ldy #LevelZeroWhenLoad_End-LevelZeroWhenLoad_Start
   jsl MemClear
 
+  ; Initialize settings that don't start at zero
+  lda #1
+  sta LevelBGMode
+
   ; Health
   lda #4
   sta PlayerHealth

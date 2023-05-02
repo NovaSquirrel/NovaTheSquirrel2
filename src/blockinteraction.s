@@ -1,5 +1,5 @@
 ; Super Princess Engine
-; Copyright (C) 2019-2020 NovaSquirrel
+; Copyright (C) 2019-2023 NovaSquirrel
 ;
 ; This program is free software: you can redistribute it and/or
 ; modify it under the terms of the GNU General Public License as

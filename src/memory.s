@@ -321,6 +321,7 @@ LevelZeroWhenLoad_Start:
   CopyingAnimationTimer: .res 1
   InteractionByProjectile: .res 1 ; Block is being interacted with by projectile instead of the player 
 LevelZeroWhenLoad_End:
+  LevelBGMode:         .res 1 ; Usually 1
   TailAttackVariable:  .res 2 ; Zero'd when an attack starts
   GenericUpdateByteTotal: .res 2 ; How many bytes are queued up this frame
   PlayerFrameLast:     .res 1 ; Player animation frame, from last frame
