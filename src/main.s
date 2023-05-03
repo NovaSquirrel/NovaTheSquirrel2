@@ -291,9 +291,10 @@ DelayedBlockLoop:
   sta BGScrollYPixels
   sta Layer2_ScrollYPixels
 
-  ; Two-layer levels do additional calculations
+  ; If the level has two foreground layers, calculate the scroll positions for that
+  ; second foreground layer, and also move actors and the player if they're standing on the second layer.
   bit8 TwoLayerLevel
-  bpl @NotTwoLayerForLayerScroll
+  jpl @NotTwoLayer
     lda FG2OffsetX
     lsr
     lsr
@@ -327,11 +328,10 @@ DelayedBlockLoop:
       lda BGScrollYPixels
       sta Layer3_ScrollYPixels
     :
-  @NotTwoLayerForLayerScroll:
 
-  ; Update foreground layer 2
-  bit TwoLayerLevel-1
-  bpl @NotTwoLayer
+	; -------------------------------------------
+    ; Handle the gameplay aspects of two foreground layer levels too:
+
     ; Carry the player along if they're riding on foreground layer 2
     lda PlayerRidingFG2
     and #255
