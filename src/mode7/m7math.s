@@ -1848,11 +1848,12 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	eor #$FFFF
 	and #$03FF
 	sta f:Layer2_ScrollXPixels
+
 	lda z:pv_l0
 	eor #$FFFF
 	sec
 	adc #240
-	sta f:Layer2_ScrollXPixels
+	sta f:Layer2_ScrollYPixels
 	rts
 .endproc
 
