@@ -267,7 +267,8 @@ SF_SPECIAL_MASK     = %00001111
 .global LevelBackgroundColor
 .global LevelBackgroundId
 .global FGScrollXPixels, FGScrollYPixels, BGScrollXPixels, BGScrollYPixels, BGEffectRAM
-.global FG2ScrollXPixels, FG2ScrollYPixels
+.global Layer2_ScrollXPixels, Layer2_ScrollYPixels, Layer3_ScrollXPixels, Layer3_ScrollYPixels, Layer4_ScrollXPixels, Layer4_ScrollYPixels
+
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled

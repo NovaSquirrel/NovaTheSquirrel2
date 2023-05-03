@@ -258,6 +258,7 @@ DelayedBlockLoop:
   sta FGScrollXPixels
   lsr
   sta BGScrollXPixels
+  sta Layer2_ScrollXPixels
   ; ---
   lda ScrollY
   lsr
@@ -270,6 +271,45 @@ DelayedBlockLoop:
   lsr
   add #128
   sta BGScrollYPixels
+  sta Layer2_ScrollYPixels
+
+  ; Two-layer levels do additional calculations
+  bit8 TwoLayerLevel
+  bpl @NotTwoLayerForLayerScroll
+    lda FG2OffsetX
+    lsr
+    lsr
+    lsr
+    lsr
+    add FGScrollXPixels
+    tax
+
+    lda FG2OffsetY
+    lsr
+    lsr
+    lsr
+    lsr
+    adc #0              ; Should be carry clear after this because of the LSRs
+    adc FGScrollYPixels
+    ; Don't decrement A because FGScrollYPixels did it already
+    tay
+
+    bit8 ForegroundLayerThree
+    bpl :+
+      ; Extra FG on layer 3
+      stx Layer3_ScrollXPixels
+      sty Layer3_ScrollYPixels
+      bra :++
+    :
+      ; Extra FG on layer 2
+      stx Layer2_ScrollXPixels
+      sty Layer2_ScrollYPixels
+      lda BGScrollXPixels
+      sta Layer3_ScrollXPixels
+      lda BGScrollYPixels
+      sta Layer3_ScrollYPixels
+    :
+  @NotTwoLayerForLayerScroll:
 
   lda FG2OffsetX
   sta OldFG2OffsetX
@@ -399,42 +439,53 @@ OnlyCheckHealth:
   sta LevelFadeIn
 
   ; Wait for control reading to finish
+  ; (will almost certainly skip the loop immediately)
   lda #$01
 padwait:
   bit VBLSTATUS
   bne padwait
 
   ; Update scroll registers
-  ; ---Primary foreground---
-  seta8
+  pea $2100
+  pld
   lda FGScrollXPixels+0
-  sta BGSCROLLX
+  sta <BGSCROLLX
   lda FGScrollXPixels+1
-  sta BGSCROLLX
+  sta <BGSCROLLX
   lda FGScrollYPixels+0
-  sta BGSCROLLY
+  sta <BGSCROLLY
   lda FGScrollYPixels+1
-  sta BGSCROLLY
+  sta <BGSCROLLY
 
-  lda TwoLayerLevel
-  eor ForegroundLayerThree
-  bne :+
-    lda BGScrollXPixels+0
-    sta BGSCROLLX+2
-    lda BGScrollXPixels+1
-    sta BGSCROLLX+2
-    lda BGScrollYPixels+0
-    sta BGSCROLLY+2
-    lda BGScrollYPixels+1
-    sta BGSCROLLY+2
-  :
+  lda Layer2_ScrollXPixels
+  sta <BGSCROLLX+2
+  lda Layer2_ScrollXPixels+1
+  sta <BGSCROLLX+2
+  lda Layer2_ScrollYPixels
+  sta <BGSCROLLY+2
+  lda Layer2_ScrollYPixels+1
+  sta <BGSCROLLY+2
 
-  ; If in a two-layer level, scroll the second layer differently
-  lda TwoLayerLevel
-  bne SetScrollForTwoLayerLevel
+  lda Layer3_ScrollXPixels
+  sta <BGSCROLLX+4
+  lda Layer3_ScrollXPixels+1
+  sta <BGSCROLLX+4
+  lda Layer3_ScrollYPixels
+  sta <BGSCROLLY+4
+  lda Layer3_ScrollYPixels+1
+  sta <BGSCROLLY+4
 
-; Jump back here if the second layer's scrolling was already set
-ReturnFromTwoLayer:
+  lda Layer4_ScrollXPixels
+  sta <BGSCROLLX+6
+  lda Layer4_ScrollXPixels+1
+  sta <BGSCROLLX+6
+  lda Layer4_ScrollYPixels
+  sta <BGSCROLLY+6
+  lda Layer4_ScrollYPixels+1
+  sta <BGSCROLLY+6
+  pea $0000
+  pld
+
   seta16
   .import BGEffectRun
   jsl BGEffectRun
@@ -458,55 +509,6 @@ ReturnFromTwoLayer:
 
   ; Go on with game logic again
   jmp forever
-
-; ---------------------------------------------------------
-SetScrollForTwoLayerLevel:
-  seta16
-  lda FG2OffsetX
-  lsr
-  lsr
-  lsr
-  lsr
-  add FGScrollXPixels
-  sta 0
-  sta FG2ScrollXPixels
-
-  lda FG2OffsetY
-  lsr
-  lsr
-  lsr
-  lsr
-  adc #0
-  add FGScrollYPixels
-;  dec a ; SNES displays lines 1-224 so shift it up to 0-223
-  sta 2
-  sta FG2ScrollYPixels
-  seta8
-
-  lda ForegroundLayerThree
-  bne :+
-    ; Foreground on layer 2
-    lda 0
-    sta BGSCROLLX+2
-    lda 1
-    sta BGSCROLLX+2
-    lda 2
-    sta BGSCROLLY+2
-    lda 3
-    sta BGSCROLLY+2
-    jmp ReturnFromTwoLayer
-  :
-  ; Foreground on layer 3
-  lda 0
-  sta BGSCROLLX+4
-  lda 1
-  sta BGSCROLLX+4
-  lda 2
-  sta BGSCROLLY+4
-  lda 3
-  sta BGSCROLLY+4
-
-  jmp ReturnFromTwoLayer
 .endproc
 
 .a16

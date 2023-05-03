@@ -35,7 +35,7 @@
 .importzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
 .importzp mode7_m7t
 .importzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp, pv_negate
-.import mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, mode7_hofs, mode7_vofs, pv_buffer, mode7_m7x, mode7_m7y
+.import pv_buffer, mode7_m7x, mode7_m7y
 
 .import pv_texel_to_screen, pv_rebuild, pv_set_origin, pv_setup_for_ground, pv_set_ground_origin
 
@@ -619,7 +619,7 @@ SkipBlock:
 	.endif
 
 	setaxy16
-	.import mode7_hdma, mode7_hdma_en
+	.import mode7_hdma
 	phb
 	ldx #.loword(mode7_hdma)
 	ldy #$4300
@@ -629,7 +629,7 @@ SkipBlock:
 
 	seta8
 
-	lda mode7_hdma_en
+	lda HDMASTART_Mirror
 	sta HDMASTART
 
 	; Write to registers
@@ -643,22 +643,22 @@ SkipBlock:
 	lda mode7_m7y+1
 	sta M7Y
 	;---
-	lda mode7_hofs+0
+	lda FGScrollXPixels+0
 	sta BG1HOFS
-	lda mode7_hofs+1
+	lda FGScrollXPixels+1
 	sta BG1HOFS
-	lda mode7_vofs+0
+	lda FGScrollYPixels+0
 	sta BG1VOFS
-	lda mode7_vofs+1
+	lda FGScrollYPixels+1
 	sta BG1VOFS
 
-	lda mode7_bg2hofs+0
+	lda Layer2_ScrollXPixels+0
 	sta BG2HOFS
-	lda mode7_bg2hofs+1
+	lda Layer2_ScrollXPixels+1
 	sta BG2HOFS
-	lda mode7_bg2vofs+0
+	lda Layer2_ScrollYPixels+0
 	sta BG2VOFS
-	lda mode7_bg2vofs+1
+	lda Layer2_ScrollYPixels+1
 	sta BG2VOFS
 	;---
 	lda LevelFadeIn

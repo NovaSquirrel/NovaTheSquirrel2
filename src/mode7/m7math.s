@@ -14,7 +14,7 @@
 .globalzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
 .globalzp mode7_m7t
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
-.global mode7_hofs, mode7_vofs, mode7_bg2hofs, mode7_bg2vofs, mode7_hdma_en, pv_buffer, mode7_m7x, mode7_m7y
+.global pv_buffer, mode7_m7x, mode7_m7y
 
 .import perspective_m7a_m7b_list, perspective_m7c_m7d_list, perspective_ab_banks
 
@@ -71,11 +71,6 @@ pv_interp:    .res 1 ; interpolate every X lines, 0,1=1x (no interpolation, 2=2x
 
 .segment "BSS"
 ;pv_wrap:        .res 1 ; 0 if no wrapping, 1 if wrapping (does not affect PPU wrapping)
-mode7_hdma_en:  .res 1 ; HDMA channel enable at next update
-mode7_bg2hofs:  .res 2
-mode7_bg2vofs:  .res 2
-mode7_hofs:     .res 2
-mode7_vofs:     .res 2
 mode7_m7x:      .res 2
 mode7_m7y:      .res 2
 pv_buffer:      .res 1 ; 0/1 selects double buffer
@@ -645,7 +640,7 @@ DETR40 = 1
 		jsr smul32f_16f ; 16u
 	.endif
 	add f:mode7_m7y ; Py + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
-	sub f:mode7_vofs ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
+	sub f:FGScrollYPixels ; Py - Oy + (A(Ty-Py)-C(Tx-Px)) / (AD-BC)
 	sta z:screeny
 	pla ; Ty-Py 16u
 	sta z:math_a
@@ -679,7 +674,7 @@ DETR40 = 1
 		jsr smul32f_16f ; 16u
 	.endif
 	add f:mode7_m7x ; Px + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
-	sub f:mode7_hofs ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
+	sub f:FGScrollXPixels ; Px - Ox + (D(Tx-Px)-B(Ty-Py)) / (AD-BC)
 	sta z:screenx
 	rts
 .endproc
@@ -1427,7 +1422,7 @@ pv_ztable: ; 12 bit (1<<15)/z lookup
 	; 5. set HDMA tables for next frame
 	; =================================
 	lda #%111111
-	sta f:mode7_hdma_en       ; enable HDMA (0,1,2,3,4)
+	sta z:HDMASTART_Mirror    ; enable HDMA (0,1,2,3,4)
 	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
 	lda #DMA_INDIRECT
 	sta a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer
@@ -1834,7 +1829,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	add z:M7PosX+1
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sub #128
-	sta f:mode7_hofs ; ox - 128
+	sta f:FGScrollXPixels ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
@@ -1845,19 +1840,19 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	eor #$FFFF
 	sec
 	adc f:mode7_m7y
-	sta f:mode7_vofs ; oy - L1
+	sta f:FGScrollYPixels ; oy - L1
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
 	asl
 	asl
 	eor #$FFFF
 	and #$03FF
-	sta f:mode7_bg2hofs
+	sta f:Layer2_ScrollXPixels
 	lda z:pv_l0
 	eor #$FFFF
 	sec
 	adc #240
-	sta f:mode7_bg2vofs
+	sta f:Layer2_ScrollXPixels
 	rts
 .endproc
 
@@ -2164,7 +2159,7 @@ DeriveCDFromAB:
 
 	; Set up HDMA configuration for next frame
 	lda #%111111
-	sta f:mode7_hdma_en       ; enable HDMA (0,1,2,3,4)
+	sta z:HDMASTART_Mirror    ; enable HDMA (0,1,2,3,4)
 	stz a:mode7_hdma+(0*16)+0 ; bgm: 1 byte transfer
 	stz a:mode7_hdma+(1*16)+0 ; tm: 1 byte transfer
 	lda #DMA_INDIRECT | DMA_0011
@@ -2565,7 +2560,7 @@ abcd_banks      = 10 ; and 11
 	add z:M7PosX+1
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sub #128
-	sta f:mode7_hofs ; ox - 128
+	sta f:FGScrollXPixels ; ox - 128
 	pla
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
@@ -2576,7 +2571,7 @@ abcd_banks      = 10 ; and 11
 	eor #$FFFF
 	sec
 	adc f:mode7_m7y
-	sta f:mode7_vofs ; oy - L1
+	sta f:FGScrollYPixels ; oy - L1
 
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
@@ -2584,13 +2579,13 @@ abcd_banks      = 10 ; and 11
 	asl
 	eor #$FFFF
 	and #$03FF
-	sta f:mode7_bg2hofs
+	sta f:Layer2_ScrollXPixels
 
 	lda #48 ;l0
 	eor #$FFFF
 	sec
 	adc #240
-	sta f:mode7_bg2vofs
+	sta f:Layer2_ScrollYPixels
 	rts
 .endproc
 

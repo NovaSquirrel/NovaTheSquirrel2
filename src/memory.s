@@ -197,12 +197,17 @@
   HighPriorityOAMIndex: .res 2
 
   ; Mirrors, for effects
-  FGScrollXPixels: .res 2
+  FGScrollXPixels: .res 2 ; Gets copied into first layer's scroll registers
   FGScrollYPixels: .res 2
-  BGScrollXPixels: .res 2
+  Layer2_ScrollXPixels: .res 2
+  Layer2_ScrollYPixels: .res 2
+  Layer3_ScrollXPixels: .res 2
+  Layer3_ScrollYPixels: .res 2
+  Layer4_ScrollXPixels: .res 2
+  Layer4_ScrollYPixels: .res 2
+
+  BGScrollXPixels: .res 2 ; Gets copied into second layer's scroll registers
   BGScrollYPixels: .res 2
-  FG2ScrollXPixels: .res 2
-  FG2ScrollYPixels: .res 2
   ; Storage, for effects
   BGEffectRAM:     .res 8
 
@@ -213,7 +218,7 @@
   OldFG2OffsetY: .res 2
   OldScrollX: .res 2
   OldScrollY: .res 2
-  SecondFGTilemapPointer: .res 2 ; Usually BackgroundBG>>1 but can be ExtraBG>>1
+  SecondFGTilemapPointer: .res 2 ; Usually BackgroundBG but can be ExtraBG
 
 ; All of these are cleared in one go at the start of level decompression
 LevelZeroWhenLoad_Start:
