@@ -158,6 +158,10 @@ IRIS_EFFECT_END = 30
   dec
   sta random2
 
+
+;  .import OpenHubworld
+;  jml OpenHubworld
+
   .import OpenOverworld
   seta8
   lda #2*16
@@ -249,7 +253,21 @@ DelayedBlockLoop:
   jsl RunPlayer
   jsl AdjustCamera
 
-  ; Calculate the scroll positions ahead of time so their integer values are ready
+  ; Make a copy of the old layer 2 position so it can be compared against new values
+  lda FG2OffsetX
+  sta OldFG2OffsetX
+  lda FG2OffsetY
+  sta OldFG2OffsetY
+
+  .a16
+  ; Hook is primarily meant for controlling foreground layer 2 movement, but can be whatever
+  lda GameplayHook
+  beq :+
+    jsl CallGameplayHook
+  :
+
+  ; Calculate the integer versions of the scroll positions now,
+  ; so that the player and actors can use them for their own positioning.
   lda ScrollX
   lsr
   lsr
@@ -311,18 +329,6 @@ DelayedBlockLoop:
     :
   @NotTwoLayerForLayerScroll:
 
-  lda FG2OffsetX
-  sta OldFG2OffsetX
-  lda FG2OffsetY
-  sta OldFG2OffsetY
-
-  .a16
-  ; Hook is primarily meant for controlling foreground layer 2 movement, but can be whatever
-  lda GameplayHook
-  beq :+
-    jsl CallGameplayHook
-  :
-
   ; Update foreground layer 2
   bit TwoLayerLevel-1
   bpl @NotTwoLayer
@@ -342,13 +348,8 @@ DelayedBlockLoop:
     :
     .import FG2TilemapUpdate
     jsl FG2TilemapUpdate
-  @NotTwoLayer:
 
-  jsl DrawPlayerStatus
-
-  ; Move all of the actors that are standing on a second FG layer
-  bit TwoLayerInteraction-1
-  bpl @NotTwoLayerForActors
+    ; Carry the actors along if they're riding on foreground layer 2
     ldx #ActorStart
   @TwoLayerActorLoop:
     lda ActorType,x
@@ -371,7 +372,9 @@ DelayedBlockLoop:
     tax
     cpx #ActorEnd
     bne @TwoLayerActorLoop
-  @NotTwoLayerForActors:
+  @NotTwoLayer:
+
+  jsl DrawPlayerStatus
 
   jsl RunAllActors
   jsl DrawPlayer
@@ -423,6 +426,11 @@ OnlyCheckHealth:
     seta16
     jml ResumeLevelFromCheckpoint
   NotDie:
+
+    seta8
+;    lda #$0d
+;    sta PPUBRIGHT
+    seta16
 
   ; Include code for handling the vblank
   ; and updating PPU memory.
