@@ -1,0 +1,19 @@
+Normal levels:
+0                     : Used to DMA in graphics
+1                     : Used to DMA in graphics
+2 COLDATA red         : Background gradient
+3 COLDATA green       : Background gradient
+4 COLDATA blue        : Background gradient
+5                     :
+6                     :
+7 WINDOW1L + WINDOW1R : Iris in/out effects
+
+Mode 7 levels:
+0 BGMODE          : Switching from mode 1 to 7 at the horizon
+1 BLENDMAIN       : Switching from second layer being visible to the first one at the horizon
+2 M7A + M7B       : Perspective effect
+3 M7C + M7D       : Perspective effect
+4 COLDATA         : Fog effect at the horizon
+5 CGADDR + CGDATA : Gradient effect on the ground
+6                 :
+7                 :

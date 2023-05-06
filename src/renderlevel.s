@@ -159,9 +159,17 @@ Exit:
 NoInitEntities:
   seta16
 
+  ; If the foreground should be shown with sprites, go set that up instead
+  bit8 RenderLevelWithSprites
+  bpl :+
+    assert_same_banks RenderLevelScreens, InitRenderLevelWithSprites
+    .import InitRenderLevelWithSprites
+    jmp InitRenderLevelWithSprites
+  :
 
-
-  ; -------------------
+  ; .------------------------------------------------------
+  ; | Render the foreground to the first layer
+  ; '------------------------------------------------------
 
 BlockNum = 0
 BlocksLeft = 2

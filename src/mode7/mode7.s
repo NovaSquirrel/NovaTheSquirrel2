@@ -624,7 +624,7 @@ SkipBlock:
 	ldx #.loword(mode7_hdma)
 	ldy #$4300
 	lda #(16*8)-1
-	mvn #^mode7_hdma,#^004300
+	mvn #^mode7_hdma,#^$004300
 	plb
 
 	seta8

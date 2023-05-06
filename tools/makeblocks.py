@@ -45,7 +45,8 @@ for line in text:
 		# Reset to prepare for the new block
 		priority = False
 		block = {"name": line[1:], "solid": False, "solid_top": False, \
-		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None", "autotile": None}
+		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None", "autotile": None,
+		  "sprite_tile": 0}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -83,6 +84,31 @@ for line in text:
 	elif word == "autotile":
 		block["autotile"] = arg
 		all_interaction_procs.add(arg)
+	elif word == "sprite_tile": # Format: 
+		split = arg.split(" ")
+		value = 0
+		priority = 0
+		if len(split) >= 1: # Basic tile number
+			value = parseNumber(split[0])
+		if len(split) >= 2: # Palette
+			value |= parseNumber(split[1]) << 9
+		if len(split) >= 3: # Priority, flips
+			if "0" in split[2]:
+				pass
+			elif "1" in split[2]:
+				value |= 1 << 12
+			elif "3" in split[2]:
+				value |= 3 << 12
+			else:
+				value |= 2 << 12
+
+			if "x" in split[2]:
+				value |= 0x4000
+			if "y" in split[2]:
+				value |= 0x8000
+		else:
+			value |= 2 << 12
+		block["sprite_tile"] = value
 
 	elif word == "class":
 		block["class"] = arg
@@ -119,6 +145,9 @@ outfile.write('.include "blockenum.s"\n\n')
 outfile.write('.export BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight\n')
 outfile.write('.export BlockFlags\n')
 outfile.write('.import %s\n' % str(", ".join(all_interaction_procs)))
+
+# --------------------------------
+
 outfile.write('\n.segment "BlockGraphicData"\n\n')
 
 # Block appearance information
@@ -128,6 +157,8 @@ for corner, cornername in enumerate(corners):
 	for b in all_blocks:
 		outfile.write('  .word $%.4x ; %s\n' % (b['tiles'][corner], b['name']))
 	outfile.write(".endproc\n\n")
+
+# --------------------------------
 
 # Write block interaction information
 outfile.write('.segment "C_BlockInteraction"\n\n')
@@ -155,6 +186,8 @@ for interaction in interaction_types:
 			outfile.write('  .addr .loword(BlockNothing)\n')
 	outfile.write(".endproc\n\n")
 
+# --------------------------------
+
 # Write all the autotile settings
 outfile.write('.segment "C_LevelDecompress"\n\n')
 
@@ -166,6 +199,18 @@ for b in all_blocks:
 	else:
 		outfile.write('  .addr 0\n')
 outfile.write('.endproc\n\n')
+
+# --------------------------------
+
+outfile.write('.segment "BlockExtraData"\n\n')
+
+outfile.write('.export BlockSpriteTile\n')
+outfile.write('.proc BlockSpriteTile\n')
+for b in all_blocks:
+	outfile.write('  .addr $%x\n' % b['sprite_tile'])
+outfile.write('.endproc\n\n')
+
+# --------------------------------
 
 outfile.close()
 

@@ -32,7 +32,7 @@
 .global PlayerOnSlope
 .global PlayerSlopeType
 .global PlayerRolling
-.global PlayerCameraTargetY, CameraDisableNudgeAbove
+.global PlayerCameraTargetY, CameraDisableNudgeAbove, CameraShake
 .globalzp PlayerOnGround
 .globalzp PlayerOnGroundLast
 .globalzp PlayerHealth
@@ -272,7 +272,7 @@ SF_SPECIAL_MASK     = %00001111
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
-.global LevelBGMode, GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, SecondFGTilemapPointer
+.global LevelBGMode, GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, RenderLevelWithSprites, SecondFGTilemapPointer
 .global LevelFadeIn, LevelIrisIn, GameplayHook
 .global ToggleSwitch1, ToggleSwitch2, ToggleSwitch3
 .global UploadLevelGraphicsHook
@@ -347,3 +347,4 @@ DialogCharacterLen = 5
 .global SmallRenderBuffer
 .global DecompressBuffer
 .global IrisEffectBuffer1, IrisEffectBuffer2
+.global LevelSpriteFGBuffer

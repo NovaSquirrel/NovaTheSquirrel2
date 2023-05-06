@@ -230,6 +230,7 @@ LevelZeroWhenLoad_Start:
   TwoLayerLevel:          .res 1 ; Two foreground layer level
   TwoLayerInteraction:    .res 1 ; Interaction with the second layer is enabled
   ForegroundLayerThree:   .res 1 ; The second foreground layer is on layer 3, not layer 2
+  RenderLevelWithSprites: .res 1 ; Use sprites to display the foreground layer, instead of a background
   LevelFadeIn:            .res 1 ; Timer for fading the level in
   LevelIrisIn:            .res 1 ; Timer for doing the "iris in" effect
   GameplayHook:           .res 3 ; Pointer for a routine to call every frame - meant for foreground layer 2 movement
@@ -264,6 +265,7 @@ LevelZeroWhenLoad_Start:
 
   PlayerCameraTargetY: .res 2 ; Y position to target with the camera
   CameraDisableNudgeAbove: .res 1 ; Set to 1 to disable drifting the camera up a bit when the player touches the top
+  CameraShake: .res 1
 
   ; Video updates from scrolling
   ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
@@ -402,6 +404,7 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
   LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
   ColumnWords: .res 512      ; Two byte per column of the level
+  LevelSpriteFGBuffer: .res 512
 
 ;  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in

@@ -86,6 +86,7 @@ t 3,3 3,3h
 +SolidBlock
 solid
 q 4,2
+sprite_tile $44 0
 
 +PickupBlock
 when Above, BlockPickupBlock

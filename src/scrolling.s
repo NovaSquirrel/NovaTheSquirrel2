@@ -241,6 +241,13 @@ NoScreenChangeRight:
 
   ; -----------------------------------
 
+  ; If the foreground should be shown with sprites, go update that instead
+  bit8 RenderLevelWithSprites
+  bpl :+
+    assert_same_banks AdjustCamera, UpdateSpriteFGLayer
+    .import UpdateSpriteFGLayer
+    jmp UpdateSpriteFGLayer
+  :
 
   ; Is a column update required?
   lda ScrollX

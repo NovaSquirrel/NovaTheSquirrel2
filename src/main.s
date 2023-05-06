@@ -266,6 +266,14 @@ DelayedBlockLoop:
     jsl CallGameplayHook
   :
 
+  .if 1
+  lda keydown
+  and #KEY_L
+  beq :+
+    lda FG2OffsetX
+    add #16
+    sta FG2OffsetX
+  :
   ; Calculate the integer versions of the scroll positions now,
   ; so that the player and actors can use them for their own positioning.
   lda ScrollX
@@ -278,6 +286,15 @@ DelayedBlockLoop:
   sta BGScrollXPixels
   sta Layer2_ScrollXPixels
   ; ---
+  ; Get position in camera shake table first
+  lda CameraShake
+  and #255
+  beq :+
+    dec CameraShake ; 16-bit decrement, but it should be fine since it shouldn't decrement if low byte is zero
+  :
+  asl
+  tax
+
   lda ScrollY
   lsr
   lsr
@@ -285,6 +302,7 @@ DelayedBlockLoop:
   lsr
   adc #0
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
+  add f:CameraShakeTable,x
   sta FGScrollYPixels
   lsr
   add #128
@@ -518,6 +536,11 @@ padwait:
   ; Go on with game logic again
   jmp forever
 .endproc
+
+CameraShakeTable:
+;  .word 0, .loword(-1), .loword(-1), .loword(2), .loword(-1), .loword(-2), .loword(-1), .loword(1), .loword(-2)
+;  .word 0, .loword(-1), .loword(1), .loword(-2), .loword(2), .loword(-3), .loword(3), .loword(-4), .loword(4)
+  .word 0, .loword(-1), .loword(1), .loword(-1), .loword(1), .loword(-2), .loword(2), .loword(-2), .loword(2)
 
 .a16
 .proc CallGameplayHook
