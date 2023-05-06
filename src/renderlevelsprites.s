@@ -128,8 +128,8 @@ XOffset = 0
     bcs UpdateRight
   UpdateLeft: ; Moved left, so move everything right and update the left side
     lda #((HORIZ_SPRITE_COLS-1)*HORIZ_SPRITE_ROWS*2)-1
-    ldx #.loword(RenderLevelSpriteBuffer+(HORIZ_SPRITE_ROWS*(HORIZ_SPRITE_COLS-2)*2+1)) ; Source
-    ldy #.loword(RenderLevelSpriteBuffer+(HORIZ_SPRITE_ROWS*(HORIZ_SPRITE_COLS-1)*2+1)) ; Destination
+    ldx #.loword(RenderLevelSpriteBuffer+(HORIZ_SPRITE_ROWS*(HORIZ_SPRITE_COLS-1)*2-1)) ; Source
+    ldy #.loword(RenderLevelSpriteBuffer+(HORIZ_SPRITE_ROWS*(HORIZ_SPRITE_COLS)*2-1)) ; Destination
     mvp #^RenderLevelSpriteBuffer,#^RenderLevelSpriteBuffer
 
     jsr IndexOfBottomOfLevelAtScrollX
