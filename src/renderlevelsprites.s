@@ -117,8 +117,6 @@ FillLoopTop:
 .export UpdateSpriteFGLayer
 .proc UpdateSpriteFGLayer
 XOffset = 0
-
-  phb ; for MVN and MVP
   lda ScrollX
   eor OldScrollX
   and #$0100
@@ -150,6 +148,7 @@ XOffset = 0
     ldy #HORIZ_SPRITE_ROWS*(HORIZ_SPRITE_COLS-1)*2
     jsr FillInColumnForSpriteRender
   NoBufferChangeNeeded:
+  phk ; Fix B and also point it here for the Positions,x accesses
   plb
 
 ; .--------------------------------------------------------

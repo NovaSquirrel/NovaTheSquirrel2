@@ -396,6 +396,13 @@ DelayedBlockLoop:
 
   jsl RunAllActors
   jsl DrawPlayer
+
+  bit8 RenderLevelWithSprites
+  bpl :+
+    .import UpdateSpriteFGLayer
+    jsl UpdateSpriteFGLayer
+  :
+
   .a16
   .i16
 

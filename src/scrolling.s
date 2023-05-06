@@ -241,12 +241,10 @@ NoScreenChangeRight:
 
   ; -----------------------------------
 
-  ; If the foreground should be shown with sprites, go update that instead
+  ; If the foreground should be shown with sprites, drawing the level will be handled elsewhere
   bit8 RenderLevelWithSprites
   bpl :+
-    assert_same_banks AdjustCamera, UpdateSpriteFGLayer
-    .import UpdateSpriteFGLayer
-    jmp UpdateSpriteFGLayer
+    rtl
   :
 
   ; Is a column update required?
