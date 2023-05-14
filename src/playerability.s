@@ -996,6 +996,7 @@ SkipCharge:
         lda #PlayerProjectileType::ThrownSword
         sta ActorProjectileType,x
         stz ActorTimer,x ; Animation timer here
+        stz ActorVarA,x  ; Whether the sword hit a button yet
         stz ActorVarB,x  ; Vertical deceleration
         stz ActorVY,x    ; Vertical speed
         lda #$38

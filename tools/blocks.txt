@@ -13,7 +13,7 @@ alias special_push $2800
 alias fg_water $1a00
 alias common_pal_sand $1c00
 alias treehouse $1c00
-alias common_pal_indoor_decor $1d00
+alias common_pal_indoor_decor $1e00
 alias toggleblocks $2500
 alias linefollowing $2400
 
@@ -1584,16 +1584,19 @@ editor_category Puzzle
 
 +Toggle1Switch
 when Touch, BlockToggleSwitch
+class Button
 t 8,1 9,1
 t 10,1 11,1
 
 +Toggle2Switch
 when Touch, BlockToggleSwitch
+class Button
 t 4,2 5,2
 t 6,2 7,2
 
 +Toggle3Switch
 when Touch, BlockToggleSwitch
+class Button
 t 14,1 15,1
 t 0,2 1,2
 

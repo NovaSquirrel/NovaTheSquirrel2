@@ -341,7 +341,7 @@ RoundOldScrollY = 6
     lda RoundScrollY
     cmp RoundOldScrollY
     bcs UpdateDown
-  UpdateUp: ; Moved left, so move everything right and update the left side
+  UpdateUp: ; Moved up, so move everything down and update the top side
     lda #((VERT_SPRITE_ROWS-1)*VERT_SPRITE_COLS*2)-1
     ldx #.loword(RenderLevelSpriteBuffer+(VERT_SPRITE_COLS*(VERT_SPRITE_ROWS-1)*2-1)) ; Source
     ldy #.loword(RenderLevelSpriteBuffer+(VERT_SPRITE_COLS*(VERT_SPRITE_ROWS)*2-1)) ; Destination
@@ -356,7 +356,7 @@ RoundOldScrollY = 6
     jsr FillInRowForSpriteRender
 
     bra NoBufferChangeNeeded
-  UpdateDown: ; Moved right, so move everything left and update the right side
+  UpdateDown: ; Moved down, so move everything up and update the bottom side
     lda #((VERT_SPRITE_ROWS-1)*HORIZ_SPRITE_COLS*2)-1
     ldx #.loword(RenderLevelSpriteBuffer+(VERT_SPRITE_COLS*2)) ; Source
     ldy #.loword(RenderLevelSpriteBuffer) ; Destination

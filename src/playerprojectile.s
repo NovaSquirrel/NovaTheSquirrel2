@@ -22,7 +22,7 @@
 .smart
 
 .import ActorBecomePoof, ActorTurnAround, TwoActorCollision, DispActor8x8, DispActor8x8WithOffset, DispActor16x16, ActorExpire
-.import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorWalk, ActorFall, ActorAutoBump
+.import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorTryDownInteractionIfClass, ActorWalk, ActorFall, ActorAutoBump
 .import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256, DispParticle8x8
 .import ActorSafeRemoveY, BlockRunInteractionBelow, PoofAtBlockFar
@@ -106,6 +106,67 @@ DrawPlayerProjectileTable:
   .word .loword(DrawProjectileSwordSwipe-1)
   .word .loword(DrawProjectileSwordSwipeNearby-1)
   .word .loword(DrawProjectileThrownSword-1)
+
+
+; Look up the block at a coordinate and run the interaction routine it has, if applicable
+; But *only* if it's a specific class, passed in with 0
+; Will try the second layer if the first is not solid or solid on top
+; A = X coordinate, Y = Y coordinate
+.a16
+.i16
+.export TryInsideInteractionIfClass
+.proc TryInsideInteractionIfClass
+  bit8 TwoLayerInteraction
+  bmi TwoLayer
+FirstLayer:
+  jsl GetLevelPtrXY
+Run:
+  phx
+  tax
+  lda f:BlockFlags,x
+  sta BlockFlag
+  and #BLOCK_FLAGS_CLASS << 8
+  cmp 0
+  beq :+
+    plx
+    clc
+    rtl
+  :
+
+  lda BlockFlag
+  plx
+  phx ; Block interaction may overwrite X, so preserve it
+  .import BlockRunInteractionInsideBody
+  jsl BlockRunInteractionInsideBody
+  plx
+  sec
+  rtl
+
+TwoLayer:
+  pha
+  phy
+  jsl FirstLayer
+  bcs AlreadyDidFirstLayer
+
+  ; Try second layer
+  pla
+  add FG2OffsetY
+  tay
+  pla
+  add FG2OffsetX
+  jsl GetLevelPtrXY
+  lda #$4000
+  tsb LevelBlockPtr
+  lda [LevelBlockPtr]
+  bra Run
+
+AlreadyDidFirstLayer:
+  ply
+  pla
+  ; Carry will be set
+  rtl
+.endproc
+
 .a16
 .i16
 .proc RunProjectileStun
@@ -1013,6 +1074,32 @@ Frame2:
   sta ActorVY,x
   add ActorPY,x
   sta ActorPY,x
+
+  ; Check for buttons
+
+  lda ActorVarA,x ; Only hit one button per sword
+  bne :+
+
+  ; Try underneath
+  lda #BlockClass::Button << 8
+  sta 0
+  lda ActorPY,x
+  tay
+  lda ActorPX,x
+  jsl TryInsideInteractionIfClass
+  bcs DidActivateButton
+  ; Try above
+  lda ActorPY,x
+  sub #10*16
+  tay
+  lda ActorPX,x
+  jsl TryInsideInteractionIfClass
+  bcc :+
+DidActivateButton:
+    lda #1
+    sta ActorVarA,x
+  :
+
   rtl
 .endproc
 

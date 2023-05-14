@@ -51,6 +51,7 @@ PlayerCollideWidth = 8*16
 
 .global RunPlayer, DrawPlayer, DrawPlayerStatus, AdjustCamera
 .global BlockFlags
+BLOCK_FLAGS_CLASS = %111111
 
 .global ChangeBlock, DelayChangeBlock
 .global GetBlockX, GetBlockY, GetBlockXCoord, GetBlockYCoord
