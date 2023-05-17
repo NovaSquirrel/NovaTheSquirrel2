@@ -214,11 +214,19 @@ def convert_layer(layer):
 			output.append("LObjN LO::Rect%d, %d, %d, %d, LN%d::%s, %d" % (which, offset, r.y, r.h-1, which, r.type, r.w-1))
 			byte_count += 4
 		elif r.w == 1 and r.h == 1:
-			output.append("LSCustom Block::%s, %d, %d" % (r.type, offset, r.y))
-			byte_count += 2
-		elif r.w <= 16 and r.h <= 16:
-			output.append("LRCustom Block::%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
+			output.append("LSByteRef BlockByteReference::%s, %d, %d" % (r.type, offset, r.y))
 			byte_count += 3
+		elif r.w <= 16 and r.h <= 16:
+			output.append("LRByteRef BlockByteReference::%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
+			byte_count += 4
+		# TODO: Use LSCustom and LRCustom for blocks that LSByteRef and LRByteRef don't work on (that is, anything that isn't in the byte reference table)
+		# but right now the level editor only shows blocks that are in that table anyway.
+#		elif r.w == 1 and r.h == 1:
+#			output.append("LSCustom Block::%s, %d, %d" % (r.type, offset, r.y))
+#			byte_count += 4
+#		elif r.w <= 16 and r.h <= 16:
+#			output.append("LRCustom Block::%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
+#			byte_count += 5
 		else:
 			print("Unhandled rectangle: %s" % r)
 

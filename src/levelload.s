@@ -24,6 +24,7 @@
 .import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
 .import GetBlockX_Horizontal, GetBlockY_Horizontal, GetBlockXCoord_Horizontal, GetBlockYCoord_Horizontal
 .import GetBlockX_Vertical, GetBlockY_Vertical, GetBlockXCoord_Vertical, GetBlockYCoord_Vertical
+.import BlockByteReferenceTable
 
 .segment "C_LevelDecompress"
 
@@ -592,9 +593,17 @@ ActorListInRAM:
 ; Make sure to keep synchronized with the LO enum in leveldata.inc
 ; Maxes out at 120 commands? Last 8 correspond to special commands.
 .proc LevelCommands
+  ; Commands that place one or multiple blocks with the block specified with two bytes
   .word $ffff&CustomBlockSingle,    0
   .word $ffff&CustomBlockRectangle, 0
 
+  ; Commands that place one or multiple blocks with the block specified with a byte
+  .word $ffff&BlockByteReferenceSingle,    0
+  .word $ffff&BlockByteReferenceSingle,    256
+  .word $ffff&BlockByteReferenceRectangle, 0
+  .word $ffff&BlockByteReferenceRectangle, 256
+
+  ; Commands that place multiple blocks with the block specified with a nybble
   .word $ffff&BlockWideList,        32*0
   .word $ffff&BlockTallList,        32*0
   .word $ffff&BlockRectList,        32*0
@@ -608,6 +617,7 @@ ActorListInRAM:
   .word $ffff&BlockTallList,        32*3
   .word $ffff&BlockRectList,        32*3
 
+  ; Commands that place a rectangle of a fixed type
   .word $ffff&BlockRectangle,       Block::Empty
   .word $ffff&BlockRectangle,       Block::Bricks
   .word $ffff&BlockRectangle,       Block::SolidBlock
@@ -616,6 +626,7 @@ ActorListInRAM:
   .word $ffff&BlockRectangle,       Block::Stone
   .word $ffff&BlockRectangle,       Block::Sand
 
+  ; Commands that place one block of a fixed type
   .word $ffff&BlockSingle,          Block::Bricks
   .word $ffff&BlockSingle,          Block::Prize
   .word $ffff&BlockSingle,          Block::SolidBlock
@@ -632,7 +643,10 @@ ActorListInRAM:
   .word $ffff&BlockSingle,          Block::LedgeSolidLeft
   .word $ffff&BlockSingle,          Block::LedgeSolidRight
   .word $ffff&BlockSingle,          Block::DoorTop
+  .word $ffff&BlockSingle,          Block::SmallTreeTopLeft
+  .word $ffff&BlockSingle,          Block::SmallTreeBushTopLeft
 
+  ; Special slope commands
   .word $ffff&SlopeLGradual,        0
   .word $ffff&SlopeLMedium,         0
   .word $ffff&SlopeLSteep,          0
@@ -640,8 +654,6 @@ ActorListInRAM:
   .word $ffff&SlopeRMedium,         0
   .word $ffff&SlopeRSteep,          0
 
-  .word $ffff&BlockSingle,          Block::SmallTreeTopLeft
-  .word $ffff&BlockSingle,          Block::SmallTreeBushTopLeft
 .assert (* - LevelCommands) < 120*4, error, "Too many level commands defined"
 .endproc
 
@@ -759,6 +771,35 @@ ActorListInRAM:
   sta DecodeValue+0
   jsr NextLevelByte
   sta DecodeValue+1
+  jmp HasRectangleParameter
+.endproc
+
+.a8
+.proc BlockByteReferenceSingle ; XY TT
+  jsr XYLevelByte
+  tdc ; Clear entire accumulator
+  jsr NextLevelByte
+  seta16
+  ora LevelCommands+2,x
+  asl
+  tax
+  lda f:BlockByteReferenceTable,x
+  sta [LevelBlockPtr],y
+  seta8
+  rts
+.endproc
+
+.proc BlockByteReferenceRectangle ; XY TT WH
+  jsr XYLevelByte
+  tdc ; Clear entire accumulator
+  jsr NextLevelByte
+  seta16
+  ora LevelCommands+2,x
+  asl
+  tax
+  lda f:BlockByteReferenceTable,x
+  sta DecodeValue
+  seta8
   jmp HasRectangleParameter
 .endproc
 

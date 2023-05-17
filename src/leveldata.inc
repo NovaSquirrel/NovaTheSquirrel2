@@ -1,6 +1,10 @@
 .enum LO
   S_Custom
   R_Custom
+  S_ByteRef1
+  S_ByteRef2
+  R_ByteRef1
+  R_ByteRef2
   Wide1
   Tall1
   Rect1
@@ -36,14 +40,14 @@
   S_LedgeSolidLeft
   S_LedgeSolidRight
   S_DoorTop
+  S_SmallTreeTopLeft
+  S_SmallTreeBushTopLeft
   SlopeL_Gradual
   SlopeL_Medium
   SlopeL_Steep
   SlopeR_Gradual
   SlopeR_Medium
   SlopeR_Steep
-  S_SmallTreeTopLeft
-  S_SmallTreeBushTopLeft
 .endenum
 
 .enum LN1
@@ -162,6 +166,25 @@
   .assert Height >= 0 && Height <= 15, error, "Invalid height"
   LObj LO::R_Custom, XPos, YPos
   .word Type
+  .byt (Width<<4)|Height
+.endmacro
+
+.macro LSByteRef Type, XPos, YPos
+  .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
+  .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
+  .assert Type < 512, error, "Invalid block type"
+  LObj (LO::S_ByteRef1 + >Type), XPos, YPos
+  .byte <Type
+.endmacro
+
+.macro LRByteRef Type, XPos, YPos, Width, Height
+  .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
+  .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
+  .assert Width >= 0 && Width <= 15, error, "Invalid width"
+  .assert Height >= 0 && Height <= 15, error, "Invalid height"
+  .assert Type < 512, error, "Invalid block type"
+  LObj (LO::R_ByteRef1 + >Type), XPos, YPos
+  .byte <Type
   .byt (Width<<4)|Height
 .endmacro
 

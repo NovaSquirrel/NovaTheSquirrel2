@@ -11,6 +11,7 @@ all_classes = set()
 all_interaction_procs = set()
 all_interaction_sets = []
 all_markers = {}
+all_byte_reference_blocks = []
 
 # Read and process the file
 with open("tools/blocks.txt") as f:
@@ -27,6 +28,9 @@ def saveBlock():
 		block['interaction_set'] = all_interaction_sets.index(block['interaction']) + 1 # + 1 because zero is no interaction
 
 	all_blocks.append(block)
+	# Keep track of what blocks are available in the level editor
+	if not block['editor_hide']:
+		all_byte_reference_blocks.append(block['name'])
 
 # Nametable format:
 # Bit 0-9   - Character Number (000h-3FFh)
@@ -46,7 +50,7 @@ for line in text:
 		priority = False
 		block = {"name": line[1:], "solid": False, "solid_top": False, \
 		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None", "autotile": None,
-		  "sprite_tile": 0}
+		  "sprite_tile": 0, "editor_hide": False}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -119,6 +123,8 @@ for line in text:
 		block["solid"] = True
 	elif word == "solid_top":
 		block["solid_top"] = True
+	elif word == "editor_hide":
+		block["editor_hide"] = True
 	elif word == "priority":
 		priority = True
 	elif word == "no_priority":
@@ -207,12 +213,20 @@ outfile.write('.segment "BlockExtraData"\n\n')
 outfile.write('.export BlockSpriteTile\n')
 outfile.write('.proc BlockSpriteTile\n')
 for b in all_blocks:
-	outfile.write('  .addr $%x\n' % b['sprite_tile'])
+	outfile.write('  .word $%x\n' % b['sprite_tile'])
+outfile.write('.endproc\n\n')
+
+outfile.write('.export BlockByteReferenceTable\n')
+outfile.write('.proc BlockByteReferenceTable ; %d items\n' % len(all_byte_reference_blocks))
+for b in all_byte_reference_blocks:
+	outfile.write('  .word Block::%s\n' % b)
 outfile.write('.endproc\n\n')
 
 # --------------------------------
 
 outfile.close()
+
+
 
 # Generate the enum in a separate file
 outfile = open("src/blockenum.s", "w")
@@ -233,6 +247,12 @@ outfile.write('.endenum\n\n')
 outfile.write('.enum BlockRangeMarker\n')
 for k, v in all_markers.items():
 	outfile.write('  %s = %d\n' % (k, v*2))
+outfile.write('.endenum\n\n')
+
+# Generate the byte reference enum
+outfile.write('.enum BlockByteReference\n')
+for b in all_byte_reference_blocks:
+	outfile.write('  %s\n' % b)
 outfile.write('.endenum\n\n')
 
 outfile.close()
