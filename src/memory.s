@@ -197,8 +197,10 @@
   HighPriorityOAMIndex: .res 2
 
   ; Mirrors, for effects
-  FGScrollXPixels: .res 2 ; Gets copied into first layer's scroll registers
+  FGScrollXPixels: .res 2 ; Foreground position, whether it's a background or sprites
   FGScrollYPixels: .res 2
+  Layer1_ScrollXPixels: .res 2
+  Layer1_ScrollYPixels: .res 2
   Layer2_ScrollXPixels: .res 2
   Layer2_ScrollYPixels: .res 2
   Layer3_ScrollXPixels: .res 2
@@ -234,6 +236,7 @@ LevelZeroWhenLoad_Start:
   LevelFadeIn:            .res 1 ; Timer for fading the level in
   LevelIrisIn:            .res 1 ; Timer for doing the "iris in" effect
   GameplayHook:           .res 3 ; Pointer for a routine to call every frame - meant for foreground layer 2 movement
+  ScrollOverrideHook:     .res 3 ; Pointer for a routine to call every frame *after* calculating the SNES background scroll values
   ToggleSwitch1:          .res 1
   ToggleSwitch2:          .res 1
   ToggleSwitch3:          .res 1

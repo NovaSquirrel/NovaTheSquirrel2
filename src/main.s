@@ -313,6 +313,7 @@ DelayedBlockLoop:
   lsr
   lsr
   sta FGScrollXPixels
+  sta Layer1_ScrollXPixels
   lsr
   sta BGScrollXPixels
   sta Layer2_ScrollXPixels
@@ -335,6 +336,7 @@ DelayedBlockLoop:
   dec a ; SNES displays lines 1-224 so shift it up to 0-223
   add f:CameraShakeTable,x
   sta FGScrollYPixels
+  sta Layer1_ScrollYPixels
   lsr
   add #128
   sta BGScrollYPixels
@@ -422,6 +424,12 @@ DelayedBlockLoop:
     cpx #ActorEnd
     bne @TwoLayerActorLoop
   @NotTwoLayer:
+ 
+  ; Allow changing the scroll positions after they have been calculated
+  lda ScrollOverrideHook
+  beq :+
+    jsl CallScrollOverrideHook
+  :
 
   jsl DrawPlayerStatus
 
@@ -512,9 +520,6 @@ padwait:
   ; Update scroll registers
   pea $2100
   pld
-  lda FGScrollXPixels+0
-  sta <BGSCROLLX
-  lda FGScrollXPixels+1
   sta <BGSCROLLX
   lda FGScrollYPixels+0
   sta <BGSCROLLY

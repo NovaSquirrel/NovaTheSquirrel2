@@ -267,13 +267,14 @@ SF_SPECIAL_MASK     = %00001111
 .global LevelBackgroundColor
 .global LevelBackgroundId
 .global FGScrollXPixels, FGScrollYPixels, BGScrollXPixels, BGScrollYPixels, BGEffectRAM
-.global Layer2_ScrollXPixels, Layer2_ScrollYPixels, Layer3_ScrollXPixels, Layer3_ScrollYPixels, Layer4_ScrollXPixels, Layer4_ScrollYPixels
+.global Layer1_ScrollXPixels, Layer1_ScrollYPixels, Layer2_ScrollXPixels, Layer2_ScrollYPixels
+.global Layer3_ScrollXPixels, Layer3_ScrollYPixels, Layer4_ScrollXPixels, Layer4_ScrollYPixels
 
 .globalzp LevelActorPointer
 .global VerticalLevelFlag
 .global VerticalScrollEnabled
 .global LevelBGMode, GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, RenderLevelWithSprites, SecondFGTilemapPointer
-.global LevelFadeIn, LevelIrisIn, GameplayHook
+.global LevelFadeIn, LevelIrisIn, GameplayHook, ScrollOverrideHook
 .global ToggleSwitch1, ToggleSwitch2, ToggleSwitch3
 .global UploadLevelGraphicsHook
 
