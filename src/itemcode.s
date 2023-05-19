@@ -213,11 +213,13 @@ NoRoutine:
   stz TailAttackTimer
   stz OldTailAttackTimer
   seta16
-  lda #ProjectileStart
-: tax
-  stz ActorType,x
+  ldx #ProjectileStart
+: .import ActorSafeRemoveX
+  jsl ActorSafeRemoveX
+  txa
   add #ActorSize
-  cmp #ProjectileEnd
+  tax
+  cpx #ProjectileEnd
   bcc :-
   seta8
   rts
