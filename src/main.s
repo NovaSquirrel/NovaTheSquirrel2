@@ -183,12 +183,18 @@ forever:
   setaxy16
   inc framecount
 
-  ; If the frame counter is too high, adjust any timestamps the game has saved, in
-  ; order to avoid potentially weird stuff when comparing pre-wrap and post-wrap timestamps.
-  framecount_limit = $ff00
+  ; If the frame counter is too high, adjust the frame counter and any timestamps the game has saved,
+  ; in order to avoid potentially weird stuff when comparing pre-wrap and post-wrap timestamps.
+  framecount_limit = $f000
+  framecount_limit_subtract = $8000
   lda framecount
   cmp #framecount_limit
   bcc @DontFixFramecount
+    ; Set the timer back
+    ;sec <-- Carry is set because BCC not taken
+    sbc #framecount_limit_subtract
+    sta framecount
+
     ; Fix the saved SpriteTilesUseTime timestamps, which are used when trying to figure out which
     ; actor graphic slot to replace, based on which slot has gone the longest without being used.
     ldx #2*8-2
@@ -196,9 +202,9 @@ forever:
     lda SpriteTilesUseTime,x
     ina ; Leave $ffff timestamps alone, which should just stay at $ffff
     beq :+
-      sub #framecount_limit-1 ; Anything that was set to the previous timestamp will be 1 now
+      sub #framecount_limit_subtract
       sta SpriteTilesUseTime,x
-      bcs :+
+      bcs :+ ; If it would go negative, set it to zero
       stz SpriteTilesUseTime,x
     :
     dex

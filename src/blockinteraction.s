@@ -962,6 +962,8 @@ LevelDoor:
   sta 15
 FadeOut:
   inc framecount
+  ;^- Does not do the same checking that main.s does, but there's enough room before the wrap to notice the framecounter is too high in main.s and adjust it
+
   lda PlayerDrawX
   sta 0
   lda PlayerDrawY
