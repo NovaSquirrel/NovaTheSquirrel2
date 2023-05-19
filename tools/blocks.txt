@@ -5,17 +5,17 @@ alias common $0000
 alias terrain $0800
 alias terrain_rocks $1200
 alias wood $0e00
-alias small_trees $1400
-alias common_pal_flowertops $1700
-alias colorfulflower $1800
-alias colored_locks $2e00
-alias special_push $2800
-alias fg_water $1a00
+alias small_trees $1600
+alias common_pal_flowertops $1900
+alias colorfulflower $1a00
+alias colored_locks $2600
+alias special_push $2400
+alias fg_water $1400
 alias common_pal_sand $1c00
 alias treehouse $1c00
-alias common_pal_indoor_decor $1e00
-alias toggleblocks $2500
-alias linefollowing $2400
+alias common_pal_indoor_decor $1d00
+alias toggleblocks $2c00
+alias linefollowing $2f00
 
 alias global_palette 1
 alias terrain_palette 2
@@ -1480,7 +1480,7 @@ editor_hide
 #######################################
 # Arrow blocks
 #######################################
-base $2a00
+base $2800
 palette global_palette
 tileset FGHannah
 editor_category Puzzle

@@ -20,8 +20,8 @@
 3e00 OWPaths
 0000 SolidTiles
 4200 Mode7Sprites
-1400 FGSmallTrees
-1700 FGCommonPalFlowertops
+1600 FGSmallTrees
+1900 FGCommonPalFlowertops
 7000 SPFire
 7000 SPFire2
 7000 SPGeorge
@@ -31,8 +31,8 @@
 7000 SPBomberTree
 3800 CurlyFont
 6c00 DialogForest
-2e00 FGSuitLocks
-2800 FGSpecialPush
+2600 FGSuitLocks
+2400 FGSpecialPush
 4200 InventoryItem
 1400 FGGlassBlocks
 1600 FGGlassBlocksGray
@@ -42,19 +42,19 @@
 3000 BGHillsMountains
 3000 BGLake
 5000 MapBGLake
-2a00 FGHannah
+2800 FGHannah
 7000 SPHannah
-1800 FGColorfulFlowers
-1a00 FGWater
+1a00 FGColorfulFlowers
+1400 FGWater
 1c00 FGCommonPalSand
 4800 layer3test
-2500 FGToggleBlocks define
-2500 FGToggleBlocksSwapped define
+2c00 FGToggleBlocks define
+2c00 FGToggleBlocksSwapped define
 7000 SPMoai
 7000 SPBubble
 7000 SPBurgerRider
 1c00 FGTreehouse
-1e00 FGIndoorDecor
+1d00 FGIndoorDecor
 4600 Mode7HUDSprites
 7000 SPLife
 7000 SPKnuckleSandwich
@@ -62,7 +62,7 @@
 7000 SPStrider
 7000 SPSwordSlime
 7000 SPStrifeCloud
-2400 FGLineFollowing
+2f00 FGLineFollowing
 7000 SPActorBlocks
 7c00 MapBGMode7Clouds
 6000 BGMode7Clouds

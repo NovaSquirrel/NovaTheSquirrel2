@@ -618,19 +618,19 @@ SpriteLoop:
   ; Make sure to synchronize these with wherever the toggle blocks are located!
   lda ToggleSwitch1
   beq :+
-    ldx #$2500
+    ldx #$2c00
     ldy #.loword(File_FGToggleBlocksSwapped+256*0)
     jsr ToggleSwitchDMA
   :
   lda ToggleSwitch2
   beq :+
-    ldx #$2580
+    ldx #$2c80
     ldy #.loword(File_FGToggleBlocksSwapped+256*1)
     jsr ToggleSwitchDMA
   :
   lda ToggleSwitch3
   beq :+
-    ldx #$2600
+    ldx #$2d00
     ldy #.loword(File_FGToggleBlocksSwapped+256*2)
     jsr ToggleSwitchDMA
   :
