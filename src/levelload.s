@@ -181,6 +181,7 @@
 
   ; Initialize variables related to optimizations
   seta16
+  stz framecount
   lda #ActorEnd
   sta ActorIterationLimit
   lda #ParticleEnd

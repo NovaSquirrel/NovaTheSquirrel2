@@ -182,7 +182,31 @@ forever:
   ; Draw the player to a display list in main memory
   setaxy16
   inc framecount
-  seta16
+
+  ; If the frame counter is too high, adjust any timestamps the game has saved, in
+  ; order to avoid potentially weird stuff when comparing pre-wrap and post-wrap timestamps.
+  framecount_limit = $ff00
+  lda framecount
+  cmp #framecount_limit
+  bcc @DontFixFramecount
+    ; Fix the saved SpriteTilesUseTime timestamps, which are used when trying to figure out which
+    ; actor graphic slot to replace, based on which slot has gone the longest without being used.
+    ldx #2*8-2
+  @FixSpriteTilesUseTime:
+    lda SpriteTilesUseTime,x
+    ina ; Leave $ffff timestamps alone, which should just stay at $ffff
+    beq :+
+      sub #framecount_limit-1 ; Anything that was set to the previous timestamp will be 1 now
+      sta SpriteTilesUseTime,x
+      bcs :+
+      stz SpriteTilesUseTime,x
+    :
+    dex
+    dex
+    bpl @FixSpriteTilesUseTime
+
+    stz framecount
+  @DontFixFramecount:
 
   ; Update keys
   lda keydown
@@ -274,6 +298,7 @@ DelayedBlockLoop:
     add #16
     sta FG2OffsetX
   :
+
   ; Calculate the integer versions of the scroll positions now,
   ; so that the player and actors can use them for their own positioning.
   lda ScrollX
