@@ -815,14 +815,14 @@
 					"Id":	"LedgeMiddle",
 					"X":	75,
 					"Y":	0,
-					"W":	10,
+					"W":	18,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidRight",
-					"X":	85,
+					"X":	93,
 					"Y":	0,
 					"W":	1,
-					"H":	16
+					"H":	12
 				}, {
 					"Id":	"WoodCrate",
 					"X":	69,
@@ -1448,18 +1448,6 @@
 					"W":	1,
 					"H":	9
 				}, {
-					"Id":	"SolidBlock",
-					"X":	86,
-					"Y":	14,
-					"W":	10,
-					"H":	1
-				}, {
-					"Id":	"SolidBlock",
-					"X":	95,
-					"Y":	15,
-					"W":	2,
-					"H":	1
-				}, {
 					"Id":	"Fence",
 					"X":	110,
 					"Y":	25,
@@ -1479,7 +1467,7 @@
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	91,
+					"X":	90,
 					"Y":	22,
 					"W":	2,
 					"H":	1
@@ -1906,9 +1894,9 @@
 				}, {
 					"Id":	"LedgeSolidRight",
 					"X":	85,
-					"Y":	16,
+					"Y":	18,
 					"W":	1,
-					"H":	5
+					"H":	3
 				}, {
 					"Id":	"LedgeSolidBottom",
 					"X":	82,
@@ -1921,6 +1909,72 @@
 					"Y":	17,
 					"W":	1,
 					"H":	4
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	86,
+					"Y":	17,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	91,
+					"Y":	15,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	97,
+					"Y":	11,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	92,
+					"Y":	14,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	94,
+					"Y":	11,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	91,
+					"Y":	18,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	90,
+					"Y":	18,
+					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"Vines",
+					"X":	88,
+					"Y":	18,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"SmallTreeTopLeft",
+					"X":	92,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	95,
+					"Y":	9,
+					"W":	2,
+					"H":	2
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	107,
+					"Y":	10,
+					"W":	1,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",

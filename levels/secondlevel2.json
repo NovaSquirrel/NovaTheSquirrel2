@@ -397,6 +397,12 @@
 					"W":	4,
 					"H":	1
 				}, {
+					"Id":	"FloatingPlatform",
+					"X":	67,
+					"Y":	10,
+					"W":	5,
+					"H":	1
+				}, {
 					"Id":	"LedgeSolidBottom",
 					"X":	76,
 					"Y":	19,
@@ -544,7 +550,7 @@
 					"Id":	"Ledge",
 					"X":	50,
 					"Y":	25,
-					"W":	8,
+					"W":	7,
 					"H":	1
 				}, {
 					"Id":	"WoodPlatform",
@@ -697,10 +703,16 @@
 					"W":	1,
 					"H":	1
 				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	57,
+					"Y":	25,
+					"W":	1,
+					"H":	3
+				}, {
 					"Id":	"Ledge",
-					"X":	63,
+					"X":	58,
 					"Y":	27,
-					"W":	4,
+					"W":	10,
 					"H":	1
 				}, {
 					"Id":	"Pier",
@@ -736,8 +748,14 @@
 					"Id":	"Ledge",
 					"X":	55,
 					"Y":	18,
-					"W":	7,
+					"W":	2,
 					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	57,
+					"Y":	18,
+					"W":	1,
+					"H":	2
 				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	54,
@@ -841,12 +859,6 @@
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"CliffSlab",
-					"X":	67,
-					"Y":	10,
-					"W":	4,
-					"H":	1
-				}, {
 					"Id":	"Ladder",
 					"X":	69,
 					"Y":	10,
@@ -882,6 +894,18 @@
 					"Y":	15,
 					"W":	1,
 					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	77,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Vines",
+					"X":	79,
+					"Y":	20,
+					"W":	1,
+					"H":	2
 				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	81,
@@ -932,7 +956,13 @@
 					"H":	1
 				}, {
 					"Id":	"Fence",
-					"X":	87,
+					"X":	67,
+					"Y":	9,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Fence",
+					"X":	77,
 					"Y":	22,
 					"W":	2,
 					"H":	1
@@ -1333,6 +1363,24 @@
 					"W":	2,
 					"H":	1
 				}, {
+					"Id":	"LedgeSolidBottom",
+					"X":	150,
+					"Y":	18,
+					"W":	8,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	157,
+					"Y":	16,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"Ledge",
+					"X":	153,
+					"Y":	16,
+					"W":	4,
+					"H":	1
+				}, {
 					"Id":	"LedgeSolidLeft",
 					"X":	156,
 					"Y":	23,
@@ -1393,10 +1441,34 @@
 					"W":	2,
 					"H":	1
 				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	150,
+					"Y":	3,
+					"W":	1,
+					"H":	15
+				}, {
 					"Id":	"SpikesUp",
 					"X":	150,
 					"Y":	2,
 					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidRight",
+					"X":	152,
+					"Y":	3,
+					"W":	1,
+					"H":	14
+				}, {
+					"Id":	"Ledge",
+					"X":	151,
+					"Y":	3,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"Pier",
+					"X":	150,
+					"Y":	19,
+					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Fence",
@@ -1417,6 +1489,24 @@
 					"W":	3,
 					"H":	1
 				}, {
+					"Id":	"FloatingPlatform",
+					"X":	154,
+					"Y":	13,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	153,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlatform",
+					"X":	156,
+					"Y":	13,
+					"W":	1,
+					"H":	1
+				}, {
 					"Id":	"Spring",
 					"X":	156,
 					"Y":	12,
@@ -1434,6 +1524,12 @@
 					"Y":	15,
 					"W":	4,
 					"H":	16
+				}, {
+					"Id":	"Grass",
+					"X":	152,
+					"Y":	24,
+					"W":	4,
+					"H":	1
 				}, {
 					"Id":	"RedFlower",
 					"X":	149,
@@ -1833,10 +1929,28 @@
 					"W":	2,
 					"H":	3
 				}, {
+					"Id":	"CliffVineOverCliffBottom",
+					"X":	9,
+					"Y":	14,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"CliffVineOverCliff",
+					"X":	9,
+					"Y":	9,
+					"W":	1,
+					"H":	5
+				}, {
 					"Id":	"CliffWallGrassTop",
 					"X":	8,
 					"Y":	8,
 					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"CliffWallGrassTopVine",
+					"X":	9,
+					"Y":	8,
+					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"CliffWallGrassTopLeft",
@@ -1851,11 +1965,41 @@
 					"W":	1,
 					"H":	1
 				}, {
+					"Id":	"CliffVine",
+					"X":	9,
+					"Y":	15,
+					"W":	1,
+					"H":	3
+				}, {
 					"Id":	"CliffWall",
 					"X":	15,
 					"Y":	10,
 					"W":	1,
 					"H":	2
+				}, {
+					"Id":	"CliffVine",
+					"X":	8,
+					"Y":	15,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"CliffVine",
+					"X":	11,
+					"Y":	14,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"SolidBlock",
+					"X":	53,
+					"Y":	9,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"CliffWall",
+					"X":	58,
+					"Y":	18,
+					"W":	5,
+					"H":	9
 				}, {
 					"Id":	"GuideRailRight",
 					"X":	62,
@@ -1898,336 +2042,6 @@
 					"Y":	13,
 					"W":	1,
 					"H":	4
-				}, {
-					"Id":	"CliffWall",
-					"X":	150,
-					"Y":	3,
-					"W":	3,
-					"H":	16
-				}, {
-					"Id":	"CliffWall",
-					"X":	153,
-					"Y":	16,
-					"W":	5,
-					"H":	3
-				}, {
-					"Id":	"CliffCaveBG",
-					"X":	151,
-					"Y":	19,
-					"W":	6,
-					"H":	4
-				}, {
-					"Id":	"CliffCaveBG",
-					"X":	151,
-					"Y":	23,
-					"W":	5,
-					"H":	2
-				}, {
-					"Id":	"CliffCaveBGFlowers",
-					"X":	152,
-					"Y":	24,
-					"W":	4,
-					"H":	1
-				}, {
-					"Id":	"CliffCaveBGVine",
-					"X":	155,
-					"Y":	19,
-					"W":	1,
-					"H":	3
-				}, {
-					"Id":	"CliffCaveBGVine",
-					"X":	154,
-					"Y":	19,
-					"W":	1,
-					"H":	2
-				}, {
-					"Id":	"GuideRailPillar",
-					"X":	157,
-					"Y":	19,
-					"W":	1,
-					"H":	4
-				}, {
-					"Id":	"GuideRailPillar",
-					"X":	150,
-					"Y":	19,
-					"W":	1,
-					"H":	6
-				}, {
-					"Id":	"CliffCaveBG",
-					"X":	77,
-					"Y":	20,
-					"W":	4,
-					"H":	3
-				}, {
-					"Id":	"CliffCaveBGFlowers",
-					"X":	78,
-					"Y":	22,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffCaveMushroom",
-					"X":	80,
-					"Y":	22,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffSlab",
-					"X":	16,
-					"Y":	10,
-					"W":	2,
-					"H":	1
-				}, {
-					"Id":	"CliffSlabWithLeft",
-					"X":	15,
-					"Y":	9,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffSlab",
-					"X":	16,
-					"Y":	9,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"Prize",
-					"X":	9,
-					"Y":	4,
-					"W":	3,
-					"H":	1
-				}, {
-					"Id":	"RedFlowerSpiral",
-					"X":	7,
-					"Y":	4,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"BlueFlowerCircle",
-					"X":	13,
-					"Y":	5,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffWallGrassTop",
-					"X":	153,
-					"Y":	16,
-					"W":	4,
-					"H":	1
-				}, {
-					"Id":	"CliffWallGrassTopRight",
-					"X":	157,
-					"Y":	16,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffWallGrassTopLeft",
-					"X":	150,
-					"Y":	3,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffWallGrassTopRight",
-					"X":	152,
-					"Y":	3,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffWallGrassTopVine",
-					"X":	151,
-					"Y":	3,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffVineOverCliff",
-					"X":	151,
-					"Y":	4,
-					"W":	1,
-					"H":	14
-				}, {
-					"Id":	"CliffCaveBGVine",
-					"X":	151,
-					"Y":	19,
-					"W":	1,
-					"H":	2
-				}, {
-					"Id":	"CliffWallGrassTopVine",
-					"X":	155,
-					"Y":	16,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffVineOverCliff",
-					"X":	155,
-					"Y":	17,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"Water",
-					"X":	20,
-					"Y":	30,
-					"W":	7,
-					"H":	2
-				}, {
-					"Id":	"Spring",
-					"X":	20,
-					"Y":	29,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"LedgeSolidLeft",
-					"X":	58,
-					"Y":	21,
-					"W":	1,
-					"H":	5
-				}, {
-					"Id":	"LedgeSolidRight",
-					"X":	62,
-					"Y":	18,
-					"W":	1,
-					"H":	10
-				}, {
-					"Id":	"CliffSlab",
-					"X":	66,
-					"Y":	24,
-					"W":	4,
-					"H":	1
-				}, {
-					"Id":	"CliffSlabWithRight",
-					"X":	71,
-					"Y":	10,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GuideRailRight",
-					"X":	71,
-					"Y":	9,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GuideRailMiddle",
-					"X":	68,
-					"Y":	9,
-					"W":	3,
-					"H":	1
-				}, {
-					"Id":	"GuideRailLeft",
-					"X":	67,
-					"Y":	9,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffWall",
-					"X":	192,
-					"Y":	0,
-					"W":	16,
-					"H":	15
-				}, {
-					"Id":	"CliffWall",
-					"X":	196,
-					"Y":	16,
-					"W":	12,
-					"H":	1
-				}, {
-					"Id":	"CliffWall",
-					"X":	200,
-					"Y":	18,
-					"W":	8,
-					"H":	1
-				}, {
-					"Id":	"CliffWall",
-					"X":	193,
-					"Y":	15,
-					"W":	15,
-					"H":	1
-				}, {
-					"Id":	"CliffWall",
-					"X":	197,
-					"Y":	17,
-					"W":	11,
-					"H":	1
-				}, {
-					"Id":	"CliffWall",
-					"X":	202,
-					"Y":	19,
-					"W":	6,
-					"H":	1
-				}, {
-					"Id":	"GuideRailPillar",
-					"X":	207,
-					"Y":	23,
-					"W":	1,
-					"H":	5
-				}, {
-					"Id":	"GuideRailPillar",
-					"X":	202,
-					"Y":	23,
-					"W":	1,
-					"H":	5
-				}, {
-					"Id":	"LogPlatform",
-					"X":	202,
-					"Y":	22,
-					"W":	6,
-					"H":	1
-				}, {
-					"Id":	"Vines",
-					"X":	11,
-					"Y":	14,
-					"W":	1,
-					"H":	2
-				}, {
-					"Id":	"Vines",
-					"X":	8,
-					"Y":	15,
-					"W":	1,
-					"H":	2
-				}, {
-					"Id":	"Vines",
-					"X":	9,
-					"Y":	15,
-					"W":	1,
-					"H":	3
-				}, {
-					"Id":	"CliffVineOverCliffBottom",
-					"X":	151,
-					"Y":	18,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffVineOverCliffBottom",
-					"X":	155,
-					"Y":	18,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffDoubleSlab",
-					"X":	153,
-					"Y":	13,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffDoubleSlab",
-					"X":	156,
-					"Y":	13,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"CliffSlab",
-					"X":	154,
-					"Y":	13,
-					"W":	2,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatformPole",
-					"X":	153,
-					"Y":	14,
-					"W":	1,
-					"H":	2
-				}, {
-					"Id":	"WoodPlatformPole",
-					"X":	156,
-					"Y":	14,
-					"W":	1,
-					"H":	2
 				}]
 		}, {
 			"Name":	"Sprites",

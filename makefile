@@ -152,6 +152,7 @@ $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
 $(objdir)/main.o: $(srcdir)/vblank.s
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
+$(objdir)/levelautotile.o: $(srcdir)/blockenum.s
 $(objdir)/mode7/m7blockdata.o: $(srcdir)/mode7/m7blockenum.s
 $(objdir)/mode7/m7actors.o: $(srcdir)/mode7/m7blockenum.s tilesetsX/M7SoftSprites.chr
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s

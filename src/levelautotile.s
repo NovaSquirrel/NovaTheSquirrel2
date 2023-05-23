@@ -152,6 +152,24 @@ No:
   rts
 .endproc
 
+.export AutotileGuideRailPillar
+.proc AutotileGuideRailPillar
+  lda #Block::GuideRailPillarTop
+  sta [MidPointer],y
+Loop:
+  iny
+  iny
+  lda [MidPointer],y
+  cmp #Block::GuideRailPillar
+  beq Loop
+Stop:
+  dey
+  dey
+  lda #Block::GuideRailPillarBottom
+  sta [MidPointer],y
+  rts
+.endproc
+
 .proc IsLedgeTile
   cmp #Block::LedgeMiddle
   beq No
@@ -741,7 +759,7 @@ Yes:
 
   lda 0
   asl
-  add #Block::StoneSingle
+  adc #Block::StoneSingle
   sta [MidPointer],y
   rts
 
@@ -749,6 +767,55 @@ IsStone:
   cmp #Block::StoneMossy+1
   bcs No
   cmp #Block::StoneSingle
+  bcs Yes
+No:
+  clc
+Yes:
+  rts
+.endproc
+
+.export AutotileCliffWall
+.proc AutotileCliffWall
+  stz 0
+
+  ; Up
+  dey
+  dey
+  lda [MidPointer],y
+  jsr IsCliff
+  rol 0
+  iny
+  iny
+
+  ; Down
+  iny
+  iny
+  lda [MidPointer],y
+  jsr IsCliff
+  rol 0
+  dey
+  dey
+
+  ; Right
+  lda [RightPointer],y
+  jsr IsCliff
+  rol 0
+
+  ; Left
+  lda [LeftPointer],y
+  jsr IsCliff
+  rol 0
+
+  lda 0
+  asl
+  adc #Block::CliffWallSingle
+  sta [MidPointer],y
+  rts
+
+IsCliff:
+  cmp #Block::CliffWall+1
+  bcs No
+  cmp #Block::CliffVineOverCliff
   bcs Yes
 No:
   clc

@@ -66,3 +66,5 @@
 7000 SPActorBlocks
 7c00 MapBGMode7Clouds
 6000 BGMode7Clouds
+1e00 FGCliffCave
+2200 FGGuideRails
