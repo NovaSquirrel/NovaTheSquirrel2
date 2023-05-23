@@ -520,11 +520,14 @@ padwait:
   ; Update scroll registers
   pea $2100
   pld
-  sta <BGSCROLLX
-  lda FGScrollYPixels+0
-  sta <BGSCROLLY
-  lda FGScrollYPixels+1
-  sta <BGSCROLLY
+  lda Layer1_ScrollXPixels
+  sta <BGSCROLLX+0
+  lda Layer1_ScrollXPixels+1
+  sta <BGSCROLLX+0
+  lda Layer1_ScrollYPixels
+  sta <BGSCROLLY+0
+  lda Layer1_ScrollYPixels+1
+  sta <BGSCROLLY+0
 
   lda Layer2_ScrollXPixels
   sta <BGSCROLLX+2
@@ -588,4 +591,8 @@ CameraShakeTable:
 .a16
 .proc CallGameplayHook
   jml [GameplayHook]
+.endproc
+
+.proc CallScrollOverrideHook
+  jml [ScrollOverrideHook]
 .endproc
