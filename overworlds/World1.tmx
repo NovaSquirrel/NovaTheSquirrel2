@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.0" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="54">
+<map version="1.10" tiledversion="1.10.0" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="54">
  <tileset firstgid="1" source="tiles/Background.tsx"/>
  <tileset firstgid="65" source="tiles/Path.tsx"/>
  <tileset firstgid="129" source="tiles/Sprites.tsx"/>
@@ -123,14 +123,14 @@
   </object>
   <object id="48" gid="137" x="96" y="160" width="16" height="16">
    <properties>
-    <property name="Level" value="bombertree"/>
+    <property name="Level" value="firstlevel"/>
     <property name="Slot" type="int" value="4"/>
    </properties>
   </object>
   <object id="49" gid="138" x="128" y="112" width="16" height="16">
    <properties>
     <property name="Directions" value="D"/>
-    <property name="Level" value="woodtest2"/>
+    <property name="Level" value="firstlevel"/>
     <property name="Slot" type="int" value="8"/>
    </properties>
   </object>

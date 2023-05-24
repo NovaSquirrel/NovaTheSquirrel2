@@ -1562,9 +1562,9 @@
 					"H":	1
 				}, {
 					"Id":	"Money",
-					"X":	191,
+					"X":	190,
 					"Y":	19,
-					"W":	3,
+					"W":	5,
 					"H":	1
 				}, {
 					"Id":	"SmallTreeBushTopLeft",
@@ -2117,9 +2117,9 @@
 				}, {
 					"Id":	"CliffWall",
 					"X":	192,
-					"Y":	0,
+					"Y":	8,
 					"W":	16,
-					"H":	15
+					"H":	7
 				}, {
 					"Id":	"CliffWall",
 					"X":	196,
@@ -2217,17 +2217,71 @@
 					"W":	2,
 					"H":	1
 				}, {
-					"Id":	"WoodPlatformPole",
+					"Id":	"CliffPillar",
+					"X":	156,
+					"Y":	14,
+					"W":	1,
+					"H":	2
+				}, {
+					"Id":	"CliffPillar",
 					"X":	153,
 					"Y":	14,
 					"W":	1,
 					"H":	2
 				}, {
-					"Id":	"WoodPlatformPole",
-					"X":	156,
-					"Y":	14,
+					"Id":	"Vines",
+					"X":	7,
+					"Y":	5,
 					"W":	1,
+					"H":	3
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	190,
+					"Y":	8,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Money",
+					"X":	193,
+					"Y":	5,
+					"W":	2,
 					"H":	2
+				}, {
+					"Id":	"Money",
+					"X":	196,
+					"Y":	5,
+					"W":	2,
+					"H":	2
+				}, {
+					"Id":	"CliffWall",
+					"X":	199,
+					"Y":	0,
+					"W":	9,
+					"H":	8
+				}, {
+					"Id":	"CliffWall",
+					"X":	208,
+					"Y":	0,
+					"W":	16,
+					"H":	16
+				}, {
+					"Id":	"CliffWall",
+					"X":	208,
+					"Y":	16,
+					"W":	16,
+					"H":	16
+				}, {
+					"Id":	"GuideRailPillar",
+					"X":	196,
+					"Y":	17,
+					"W":	1,
+					"H":	7
+				}, {
+					"Id":	"GuideRailPillar",
+					"X":	192,
+					"Y":	15,
+					"W":	1,
+					"H":	6
 				}]
 		}, {
 			"Name":	"Sprites",

@@ -13,11 +13,11 @@
 	},
 	"Header":	{
 		"Music":	null,
-		"Background":	"Lake",
+		"Background":	"Clouds",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", "FGSuitLocks", null, null, "BGLake"],
-		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGLake", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGTreehouse", "FGIndoorDecor", "FGLineFollowing", "FGHannah", "FGToggleBlocks", "FGSuitLocks"],
+		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGClouds", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGTreehouse", "FGIndoorDecor", "FGLineFollowing", "FGHannah", "FGToggleBlocks", "FGSuitLocks"],
 		"BGColor":	"RGB(15,23,31)"
 	},
 	"Layers":	[{

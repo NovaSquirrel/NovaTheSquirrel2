@@ -68,3 +68,5 @@
 6000 BGMode7Clouds
 1e00 FGCliffCave
 2200 FGGuideRails
+3000 BGClouds
+5000 MapBGClouds

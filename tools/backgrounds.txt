@@ -16,3 +16,7 @@ map BGLake
 size wide
 init SetupSkyGradient
 run UpdateSkyGradient
+
++Clouds
+map BGClouds
+size wide

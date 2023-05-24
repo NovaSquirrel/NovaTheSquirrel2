@@ -1232,8 +1232,19 @@ q 4,2
 +CliffFlowers
 q 6,2
 
-+CliffVine
-q 8,2
++CliffPillar
+t 8,2 9,2
+t 8,2 9,2
+
++CliffPurpleSlab
+solid_top
+t 8,3 9,3
+t 0:0 0:0
+
++CliffDoublePurpleSlab
+solid_top
+t 8,3 9,3
+t 8,3 9,3
 
 +CliffMushroom
 t 0:0 0:0

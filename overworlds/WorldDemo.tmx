@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.0" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="58">
+<map version="1.10" tiledversion="1.10.0" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="58">
  <tileset firstgid="1" source="tiles/Background.tsx"/>
  <tileset firstgid="65" source="tiles/Path.tsx"/>
  <tileset firstgid="129" source="tiles/Sprites.tsx"/>
@@ -48,7 +48,7 @@
   <object id="37" gid="138" x="32" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="RDU"/>
-    <property name="Level" value="firstlevel"/>
+    <property name="Level" value="tutorial"/>
     <property name="Slot" type="int" value="1"/>
    </properties>
   </object>
@@ -111,7 +111,7 @@
   <object id="50" gid="138" x="128" y="144" width="16" height="16">
    <properties>
     <property name="Directions" value="LUR"/>
-    <property name="Level" value="demolevel1"/>
+    <property name="Level" value="swordlevel"/>
     <property name="Slot" type="int" value="4"/>
    </properties>
   </object>
