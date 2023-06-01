@@ -448,93 +448,6 @@ Yes:
   rts
 .endproc
 
-.export AutotileFence
-.proc AutotileFence
-  stz 0
-
-  lda [LeftPointer],y
-  jsr IsFence
-  rol 0
-  lda [RightPointer],y
-  jsr IsFence
-  rol 0
-  asl 0 ; Multiply by 2 for the 16-bit table below
-
-  lda #Block::Fence
-  add 0
-  sta [MidPointer],y
-  rts
-
-IsFence:
-  cmp #Block::FenceMiddle+1
-  bcs No
-  cmp #Block::Fence
-  bcc No
-  ; Carry set
-  rts
-No:
-  clc
-  rts
-.endproc
-
-.export AutotileFloatingPlatform
-.proc AutotileFloatingPlatform
-  stz 0
-
-  lda [LeftPointer],y
-  jsr IsPlatform
-  rol 0
-  lda [RightPointer],y
-  jsr IsPlatform
-  rol 0
-  asl 0 ; Multiply by 2 for the 16-bit table below
-
-  lda #Block::FloatingPlatform
-  add 0
-  sta [MidPointer],y
-  rts
-
-IsPlatform:
-  cmp #Block::FloatingPlatformMiddle+1
-  bcs No
-  cmp #Block::FloatingPlatform
-  bcc No
-  ; Carry set
-  rts
-No:
-  clc
-  rts
-.endproc
-
-.export AutotileFloatingPlatformFallthrough
-.proc AutotileFloatingPlatformFallthrough
-  stz 0
-
-  lda [LeftPointer],y
-  jsr IsPlatform
-  rol 0
-  lda [RightPointer],y
-  jsr IsPlatform
-  rol 0
-  asl 0 ; Multiply by 2 for the 16-bit table below
-
-  lda #Block::FloatingPlatformFallthrough
-  add 0
-  sta [MidPointer],y
-  rts
-
-IsPlatform:
-  cmp #Block::FloatingPlatformMiddleFallthrough+1
-  bcs No
-  cmp #Block::FloatingPlatformFallthrough
-  bcc No
-  ; Carry set
-  rts
-No:
-  clc
-  rts
-.endproc
-
 .export AutotilePier
 .proc AutotilePier
   stz 0
@@ -585,36 +498,6 @@ No:
   lda #Block::RopeLadderTop
   sta [MidPointer],y
 No:
-  rts
-.endproc
-
-.export AutotileWoodPlatform
-.proc AutotileWoodPlatform
-  stz 0
-
-  lda [LeftPointer],y
-  jsr IsWoodPlatform
-  rol 0
-  lda [RightPointer],y
-  jsr IsWoodPlatform
-  rol 0
-  asl 0 ; Multiply by 2 for the 16-bit table below
-
-  lda #Block::WoodPlatform
-  add 0
-  sta [MidPointer],y
-
-  lda #Block::WoodPlatformPole
-  jmp AutotileExpandOther
-
-IsWoodPlatform:
-  cmp #Block::WoodPlatformMiddle+1
-  bcs No
-  cmp #Block::WoodPlatform
-  bcs Yes
-No:
-  clc
-Yes:
   rts
 .endproc
 
@@ -1013,35 +896,6 @@ Yes:
   rts
 .endproc
 
-.export AutotileWoodPlanks
-.proc AutotileWoodPlanks
-  stz 0
-
-  lda [LeftPointer],y
-  jsr IsWood
-  rol 0
-  lda [RightPointer],y
-  jsr IsWood
-  rol 0
-  asl 0 ; Multiply by 2 for the 16-bit table below
-
-  lda #Block::WoodPlanks
-  add 0
-  sta [MidPointer],y
-  rts
-
-IsWood:
-  cmp #Block::WoodPlanksMiddle+1
-  bcs No
-  cmp #Block::WoodPlanks
-  bcc No
-  ; Carry set
-  rts
-No:
-  clc
-  rts
-.endproc
-
 .export AutotileGlassPillar
 .proc AutotileGlassPillar
   lda #Block::GlassPillarTop
@@ -1081,5 +935,144 @@ Exit:
   ; Back this up since it'll INY INY after this routine
   dey
   dey
+  rts
+.endproc
+
+
+.export AutotileWoodPlankPlatform
+.proc AutotileWoodPlankPlatform
+  pea Block::WoodPlankPlatformSingle        ; >=
+  pea Block::WoodPlankPlatformPillarRight+1 ; <
+  pea Block::WoodPlankPlatformSingle        ; Base
+  jsr AutotileHorizontalGeneric
+  lsr
+  dea
+  beq Left
+  dea
+  beq Right
+  rts
+Left:
+  lda #Block::WoodPlankPlatformPillarLeft
+  jmp AutotileExpandOther
+Right:
+  lda #Block::WoodPlankPlatformPillarRight
+  jmp AutotileExpandOther
+.endproc
+
+.export AutotileWoodPlanks
+.proc AutotileWoodPlanks
+  pea Block::WoodPlanks         ; >=
+  pea Block::WoodPlanksMiddle+1 ; <
+  pea Block::WoodPlanks         ; Base
+  jsr AutotileHorizontalGeneric
+  rts
+.endproc
+
+.export AutotileFence
+.proc AutotileFence
+  pea Block::Fence         ; >=
+  pea Block::FenceMiddle+1 ; <
+  pea Block::Fence         ; Base
+  jsr AutotileHorizontalGeneric
+  rts
+.endproc
+
+.export AutotileFloatingPlatform
+.proc AutotileFloatingPlatform
+  pea Block::FloatingPlatform         ; >=
+  pea Block::FloatingPlatformMiddle+1 ; <
+  pea Block::FloatingPlatform         ; Base
+  jsr AutotileHorizontalGeneric
+  rts
+.endproc
+
+.export AutotileFloatingPlatformFallthrough
+.proc AutotileFloatingPlatformFallthrough
+  pea Block::FloatingPlatformFallthrough         ; >=
+  pea Block::FloatingPlatformMiddleFallthrough+1 ; <
+  pea Block::FloatingPlatformFallthrough         ; Base
+  jsr AutotileHorizontalGeneric
+  rts
+.endproc
+
+.export AutotileWoodPlatform
+.proc AutotileWoodPlatform
+  pea Block::WoodPlatform         ; >=
+  pea Block::WoodPlatformMiddle+1 ; <
+  pea Block::WoodPlatform         ; Base
+  jsr AutotileHorizontalGeneric
+  lda #Block::WoodPlatformPole
+  jmp AutotileExpandOther
+.endproc
+
+.export AutotileGRCanopyPillar
+.proc AutotileGRCanopyPillar
+  ; When placing the pillar on its own, change the block above to accomodate for this
+  dey
+  dey
+  lda [MidPointer],y
+  cmp #Block::GRCanopy
+  bne :+
+    lda #Block::GRCanopyOnPillar
+    sta [MidPointer],y
+  :
+  iny
+  iny
+DontFixAbove:
+  lda #Block::GRCanopyPillar
+  jsr AutotileExpandOther
+  lda #Block::GRCanopyPillarBottom
+  sta [MidPointer],y
+  rts
+.endproc
+
+.export AutotileGRCanopy
+.proc AutotileGRCanopy
+  pea Block::GRCanopySingle     ; >=
+  pea Block::GRCanopyOnPillar+1 ; <
+  pea Block::GRCanopySingle     ; Base
+  jsr AutotileHorizontalGeneric
+
+  ; Expand
+  cmp #3*2
+  bne AutotileGRCanopyPillar::DontFixAbove
+  rts
+.endproc
+
+.proc AutotileHorizontalGeneric
+  ; 1,s Return address
+  ; 3,s Must be >=
+  ; 5,s Must be <
+  ; 7,s Base block value
+  stz 0
+
+  lda [LeftPointer],y
+  jsr IsInRange
+  rol 0
+  lda [RightPointer],y
+  jsr IsInRange
+  rol 0
+  asl 0 ; Multiply by 2 because tile numbers are only even
+
+  lda 7,s
+  add 0
+  sta [MidPointer],y
+
+  ; Remove the parameters before returning
+  pla
+  sta 7-2,s ; Move the return address over
+  pla
+  pla
+  lda 0 ; Reload the results from the side checking so it's ready to go for code to act on
+  rts
+
+IsInRange: ;+2 for the jsr into here
+  cmp 5+2,s
+  bcs No
+  cmp 3+2,s
+  bcs Yes
+No:
+  clc
+Yes:
   rts
 .endproc

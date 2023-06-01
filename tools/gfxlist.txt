@@ -53,8 +53,8 @@
 7000 SPMoai
 7000 SPBubble
 7000 SPBurgerRider
-1c00 FGTreehouse
-1d00 FGIndoorDecor
+1d00 FGTreehouse
+1c00 FGIndoorDecor
 4600 Mode7HUDSprites
 7000 SPLife
 7000 SPKnuckleSandwich
@@ -68,5 +68,6 @@
 6000 BGMode7Clouds
 1e00 FGCliffCave
 2200 FGGuideRails
+2200 FGGuideRailsCanopy
 3000 BGClouds
 5000 MapBGClouds

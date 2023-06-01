@@ -12,8 +12,8 @@ alias colored_locks $2600
 alias special_push $2400
 alias fg_water $1400
 alias common_pal_sand $1c00
-alias treehouse $1c00
-alias common_pal_indoor_decor $1d00
+alias treehouse $1d00
+alias common_pal_indoor_decor $1c00
 alias cliff_and_cave $1e00
 alias guiderails $2200
 alias toggleblocks $2c00
@@ -27,6 +27,7 @@ alias glass_palette_gray 6
 alias colorfulflower_palette 3
 alias foreststone_palette 4
 alias cliffcave_palette 5
+alias canopy_palette 6
 
 #######################################
 # Global tile stuff
@@ -845,6 +846,50 @@ t 4,0 5,0
 t 6,0 7,0
 editor_hide
 
+
+
++WoodPlankPlatformSingle
+solid_top
+t 2,0 3,0
+t 10,0 12,0
+editor_hide
+
++WoodPlankPlatformLeft
+solid_top
+t 2,0 7,0
+t 8,0 10,0
+editor_hide
+
++WoodPlankPlatformRight
+solid_top
+t 6,0 3,0
+t 12,0 8,0
+editor_hide
+
++WoodPlankPlatform
+solid_top
+autotile AutotileWoodPlankPlatform
+t 6,0 7,0
+t 11,0 11,0
+
++WoodPlankPlatformPillarLeft
+t 9,0 0:0
+t 9,0 0:0
+editor_hide
+
++WoodPlankPlatformPillarRight
+t 0:0 9,0
+t 0:0 9,0
+editor_hide
+
++WoodPlankPlatformCapLeft
+t 13,0 0:0
+t 0:0 0:0
+
++WoodPlankPlatformCapRight
+t 0:0 13,0
+t 0:0 0:0
+
 #######################################
 # Small indoor decor, for treehouses
 #######################################
@@ -1421,17 +1466,61 @@ t 12,0 13,0
 
 +GuideRailPillar
 autotile AutotileGuideRailPillar
-t 12,1 13,1
-t 12,1 13,1
+t 14,1 15,1
+t 14,1 15,1
 
 +GuideRailPillarTop
-t 14,1 15,1
-t 12,1 13,1
+q 14,0
 editor_hide
 
 +GuideRailPillarBottom
-t 12,1 13,1
-t 14,1v 15,1v
+t 14,1 15,1
+t 14,0v 15,0v
+editor_hide
+
+#######################################
+# Canopy (attaches to guide rails)
+#######################################
+base guiderails
+palette canopy_palette
+tileset FGGuideRailsCanopy
+editor_category Themed
+
++GRCanopyPillar
+autotile AutotileGRCanopyPillar
+t 10,0 11,0
+t 10,0 11,0
+
++GRCanopyPillarBottom
+q 10,0
+editor_hide
+
++GRCanopySingle
+solid_top
+t 4,0 9,0
+t 4,1 9,1
+editor_hide
+
++GRCanopyLeft
+solid_top
+q 4,0
+editor_hide
+
++GRCanopyRight
+solid_top
+q 8,0
+editor_hide
+
++GRCanopy
+autotile AutotileGRCanopy
+solid_top
+t 8,0 5,0
+t 6,1 7,1
+
++GRCanopyOnPillar
+solid_top
+t 8,0 5,0
+t 8,1 5,1
 editor_hide
 
 #######################################

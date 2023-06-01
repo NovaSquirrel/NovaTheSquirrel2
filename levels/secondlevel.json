@@ -16,8 +16,8 @@
 		"Background":	"Forest",
 		"SpriteGFX":	["SPWalker", "SPGeorge", "SPFire", "SPFire2"],
 		"Flags":	["VerticalScrolling"],
-		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", "FGForestStone", "FGCliffCave", null, "BGForest"],
-		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGCommonPalSand", "FGWater", "FGCliffCave", "FGGuideRails"],
+		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", "FGForestStone", "FGCliffCave", "FGCanopy", "BGForest"],
+		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGCommonPalSand", "FGWater", "FGCliffCave", "FGGuideRailsCanopy", "FGTreehouse"],
 		"BGColor":	"RGB(15,23,31)"
 	},
 	"Layers":	[{
@@ -475,30 +475,6 @@
 					"W":	1,
 					"H":	6
 				}, {
-					"Id":	"FloatingPlatform",
-					"X":	84,
-					"Y":	20,
-					"W":	2,
-					"H":	1
-				}, {
-					"Id":	"FloatingPlatform",
-					"X":	87,
-					"Y":	20,
-					"W":	2,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	86,
-					"Y":	20,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	89,
-					"Y":	20,
-					"W":	1,
-					"H":	1
-				}, {
 					"Id":	"Stone",
 					"X":	72,
 					"Y":	13,
@@ -545,12 +521,6 @@
 					"X":	50,
 					"Y":	25,
 					"W":	8,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	46,
-					"Y":	27,
-					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidBottom",
@@ -907,30 +877,6 @@
 					"W":	4,
 					"H":	9
 				}, {
-					"Id":	"FloatingPlatform",
-					"X":	90,
-					"Y":	20,
-					"W":	4,
-					"H":	1
-				}, {
-					"Id":	"FloatingPlatform",
-					"X":	95,
-					"Y":	20,
-					"W":	2,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	94,
-					"Y":	20,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	97,
-					"Y":	20,
-					"W":	1,
-					"H":	1
-				}, {
 					"Id":	"Fence",
 					"X":	87,
 					"Y":	22,
@@ -1001,12 +947,6 @@
 					"X":	111,
 					"Y":	23,
 					"W":	7,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	107,
-					"Y":	25,
-					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"LedgeSolidRight",
@@ -1123,22 +1063,10 @@
 					"W":	1,
 					"H":	3
 				}, {
-					"Id":	"FloatingPlatform",
-					"X":	119,
-					"Y":	19,
-					"W":	3,
-					"H":	1
-				}, {
 					"Id":	"Grass",
 					"X":	122,
 					"Y":	16,
 					"W":	2,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	118,
-					"Y":	19,
-					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Ladder",
@@ -1168,24 +1096,6 @@
 					"Id":	"LedgeSolidRight",
 					"X":	134,
 					"Y":	24,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"FloatingPlatform",
-					"X":	131,
-					"Y":	22,
-					"W":	3,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	130,
-					"Y":	22,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	134,
-					"Y":	22,
 					"W":	1,
 					"H":	1
 				}, {
@@ -1423,12 +1333,6 @@
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"FloatingPlatform",
-					"X":	167,
-					"Y":	13,
-					"W":	3,
-					"H":	1
-				}, {
 					"Id":	"Sand",
 					"X":	172,
 					"Y":	15,
@@ -1439,12 +1343,6 @@
 					"X":	149,
 					"Y":	24,
 					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"FloatingPlatform",
-					"X":	179,
-					"Y":	17,
-					"W":	3,
 					"H":	1
 				}, {
 					"Id":	"FloatingPlatform",
@@ -1499,30 +1397,6 @@
 					"X":	202,
 					"Y":	28,
 					"W":	6,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	166,
-					"Y":	13,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	170,
-					"Y":	13,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	178,
-					"Y":	17,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"WoodPlatform",
-					"X":	182,
-					"Y":	17,
-					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"Money",
@@ -2282,6 +2156,84 @@
 					"Y":	15,
 					"W":	1,
 					"H":	6
+				}, {
+					"Id":	"Ledge",
+					"X":	166,
+					"Y":	13,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"CliffSlab",
+					"X":	166,
+					"Y":	14,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	178,
+					"Y":	17,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"CliffSlab",
+					"X":	178,
+					"Y":	18,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"GRCanopy",
+					"X":	86,
+					"Y":	20,
+					"W":	12,
+					"H":	1
+				}, {
+					"Id":	"GRCanopy",
+					"X":	130,
+					"Y":	22,
+					"W":	5,
+					"H":	1
+				}, {
+					"Id":	"GRCanopyPillar",
+					"X":	89,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"GRCanopyPillar",
+					"X":	94,
+					"Y":	21,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	84,
+					"Y":	20,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"WoodPlankPlatform",
+					"X":	46,
+					"Y":	27,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"WoodPlankPlatform",
+					"X":	118,
+					"Y":	19,
+					"W":	4,
+					"H":	1
+				}, {
+					"Id":	"WoodPlankPlatformCapRight",
+					"X":	121,
+					"Y":	20,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlankPlatform",
+					"X":	107,
+					"Y":	25,
+					"W":	3,
+					"H":	1
 				}]
 		}, {
 			"Name":	"Sprites",
