@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Nova the Squirrel 2 level VRAM previewer</title>
+<script src="leveltilesetpicker.js">
+</script>
+
+</head>
+<body onLoad="updatePreview();">
+
+<textarea id="gfxUpload" style="width:100%;">["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGCommonPalSand", "FGWater", "FGCliffCave", "FGGuideRailsCanopy", "FGTreehouse"]</textarea><br>
+<button onClick="updatePreview();">Update preview</button>
+<hr>
+
+<table border="0">
+<tr>
+<td style="vertical-align:top;">
+FG:<br>
+<div id="vramPreviewFg" style="border: 1px solid black; width:128px; height:384px; background: rgb(255,255,255); background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(182,182,182,1) 100%);">
+</div>
+</td>
+<td style="vertical-align:top;">
+BG:<br>
+<div id="vramPreviewBg" style="border: 1px solid black; width:128px; height:256px; background: rgb(255,255,255); background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(182,182,182,1) 100%);">
+</div>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
