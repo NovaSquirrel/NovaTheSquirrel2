@@ -74,11 +74,25 @@ let gfxlistText = `
 3000 BGClouds
 5000 MapBGClouds
 `.split('\n');
-let gfxListDestination = {};
-let gfxListPreload = {};
-let gfxListHeight = {};
+
+let gfxListDestination = {};   // Destination addresses
+let gfxListPreload = {};       // Images for each file, to get the height
+let gfxListHeight = {};        // Height in pixels of each file
+let gfxListAllNames = [];      // All file names sorted by destination
+
+let gfxListAllCheckboxes = []; // Used to uncheck all check boxes
+let gfxListAllNameSpans = [];  // Used to reset conflict for all the names
+let gfxListCheckboxForFile = {}; // Used to set checkboxes
+let gfxListNameSpanForFile = {}; // Used to mark conflict
+
+function pngFromName(name) {
+	return "../tilesets4/"+name+".png";
+}
 function isRenderable(name) {
 	return !name.startsWith("BG") && !name.startsWith("MapBG");
+}
+function compareByDestination(a, b) {
+	return gfxListDestination[a] - gfxListDestination[b];
 }
 for(let i=0; i<gfxlistText.length; i++) {
 	let words = gfxlistText[i].split(' ');
@@ -86,7 +100,7 @@ for(let i=0; i<gfxlistText.length; i++) {
 		continue;
 	let fileName = words[1];
 	let destination = parseInt(words[0], 16);
-	if(isNaN(destination))
+	if(isNaN(destination) || destination >= 0xa000)
 		continue;
 
 	gfxListDestination[fileName] = destination;
@@ -98,29 +112,110 @@ for(let i=0; i<gfxlistText.length; i++) {
 	gfxListPreload[fileName].onload = function(){
 		gfxListHeight[fileName] = gfxListPreload[fileName].naturalHeight;
 	};
-	gfxListPreload[fileName].src = "../tilesets4/"+fileName+".png";
+	gfxListPreload[fileName].src = pngFromName(fileName);
+	if(!fileName.startsWith("FG"))
+		continue;
+	gfxListAllNames.push(fileName);
+}
+gfxListAllNames.sort(compareByDestination);
+function setUpCheckboxes() {
+	let checkboxes = document.getElementById("checkboxes");
+	for(let i=0; i<gfxListAllNames.length; i++) {
+		let label = document.createElement("label");
+		let checkbox = document.createElement("input");
+		checkbox.setAttribute("type", "checkbox");
+
+		// Add or remove the item from the graphics upload list
+		checkbox.addEventListener("change", function (e) {
+			let fileName = gfxListAllNames[i];
+			let gfxUpload = getGfxUploadArray();
+			if(gfxUpload === null)
+				return;
+
+			if(this.checked && !gfxUpload.includes(fileName)) {
+				gfxUpload.push(fileName);				
+			} else if(!this.checked){
+				let index = gfxUpload.indexOf(fileName);
+				if(index > -1) {
+					gfxUpload.splice(index, 1);
+				}
+			}
+			setGfxUploadArray(gfxUpload);
+			updatePreview();
+		});
+
+		gfxListAllCheckboxes.push(checkbox);
+		gfxListCheckboxForFile[gfxListAllNames[i]] = checkbox;
+
+		// Image of the file
+		let im = new Image();
+		im.src = pngFromName(gfxListAllNames[i]);
+		label.appendChild(checkbox);
+		label.appendChild(im);
+
+		// Name, whose coloring is used to show conflicts
+		let name = document.createElement("span");
+		name.textContent = gfxListAllNames[i];
+		gfxListAllNameSpans.push(name);
+		gfxListNameSpanForFile[gfxListAllNames[i]] = name;
+		label.appendChild(name);
+
+		label.appendChild(document.createElement("br"));
+		checkboxes.appendChild(label);
+	}
 }
 
-function updatePreview() {
-	let gfxUpload = null;
+function getGfxUploadArray() {
 	try {
-		gfxUpload = JSON.parse(document.getElementById('gfxUpload').value);
+		return JSON.parse(document.getElementById("gfxUpload").value);
 	} catch (e) {
-		return console.error(e);
+		console.error(e);
+		return null;
 	}
+}
+function setGfxUploadArray(gfx) {
 	// Sort by destination address
-	gfxUpload.sort(function(a,b) {
-		return gfxListDestination[a] - gfxListDestination[b];
-	});
-	document.getElementById('gfxUpload').value = JSON.stringify(gfxUpload);
+	if(document.getElementById("autoSort").checked) {
+		gfx.sort(compareByDestination);
+	}
+	document.getElementById("gfxUpload").value = JSON.stringify(gfx);
+}
+function updatePreview() {
+	let gfxUpload = getGfxUploadArray();
+	if(gfxUpload === null)
+		return;
+	setGfxUploadArray(gfxUpload);
+
+	// Uncheck all checkboxes
+	for(let i=0; i<gfxListAllCheckboxes.length; i++) {
+		gfxListAllCheckboxes[i].checked = false;
+	}
+	// Don't show any conflicts
+	for(let i=0; i<gfxListAllNameSpans.length; i++) {
+		gfxListAllNameSpans[i].classList.remove("conflict");
+	}
 
 	// Create VRAM space
 	let vram = [];
 	for(let i=0; i<80; i++) {
 		vram.push(null);
 	}
+
+	function checkAndMarkConflict(index, use) {
+		if(vram[index] !== null) {
+			if(vram[index] in gfxListNameSpanForFile)
+				gfxListNameSpanForFile[vram[index]].classList.add("conflict");
+			if(use in gfxListNameSpanForFile)
+				gfxListNameSpanForFile[use].classList.add("conflict");
+		}
+	}
+
 	for(let i=0; i<gfxUpload.length; i++) {
 		let fileName = gfxUpload[i];
+		if(fileName in gfxListCheckboxForFile) {
+			gfxListCheckboxForFile[fileName].checked = true;
+		}
+
 		let destination = gfxListDestination[fileName];
 		let index = destination >> 8;
 
@@ -132,8 +227,10 @@ function updatePreview() {
 		}
 		
 		if(index < vram.length) {
+			checkAndMarkConflict(index, fileName);
 			vram[index] = fileName;
 			for(let j=1; j<height; j++) {
+				checkAndMarkConflict(index+j, fileName);
 				vram[index+j] = true;
 			}
 		}
@@ -171,7 +268,7 @@ function updatePreview() {
 			preview.appendChild(div);
 		} else if(isRenderable(row)){
 			let img = new Image();
-			img.src = "../tilesets4/"+row+".png";
+			img.src = pngFromName(row);
 			img.text = row;
 			preview.appendChild(img);
 		}

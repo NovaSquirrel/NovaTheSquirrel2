@@ -3,12 +3,24 @@
 <title>Nova the Squirrel 2 level VRAM previewer</title>
 <script src="leveltilesetpicker.js">
 </script>
-
+<style>
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.conflict {
+	color: red;
+}
+</style>
 </head>
-<body onLoad="updatePreview();">
+<body onLoad="setUpCheckboxes();updatePreview();">
 
 <textarea id="gfxUpload" style="width:100%;">["FGCommon", "FGGrassy", "FGTropicalWood", "BGForest", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGCommonPalSand", "FGWater", "FGCliffCave", "FGGuideRailsCanopy", "FGTreehouse"]</textarea><br>
-<button onClick="updatePreview();">Update preview</button>
+<button onClick="updatePreview();">Update preview</button><label class="unselectable"><input type="checkbox" id="autoSort" checked>Auto sort</label>
 <hr>
 
 <table border="0">
@@ -21,6 +33,11 @@ FG:<br>
 <td style="vertical-align:top;">
 BG:<br>
 <div id="vramPreviewBg" style="border: 1px solid black; width:128px; height:256px; background: rgb(255,255,255); background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(182,182,182,1) 100%);">
+</div>
+</td>
+<td style="vertical-align:top;">
+Selection:
+<div id="checkboxes" class="unselectable">
 </div>
 </td>
 </tr>
