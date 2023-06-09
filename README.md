@@ -7,19 +7,23 @@ This is a sequel to [[Nova the Squirrel 1](https://github.com/NovaSquirrel/NovaT
 
 The game also intends to be more polished and refined than the first one. Here's some of the plans:
 
-* More animation on lots of things
+* Lots more animation than the first game had
 * More copy abilities (currently planning to have 16 of them)
-* More story emphasis
+* Very prominent story emphasis, and lots of characters to meet and talk to
 * Enemies now have health and attacks do varying amounts of damage
 * Levels are now 256x32 or 32x256 (or potentially other sizes?) instead of exclusively 256x15
 * Levels can have a second foreground layer that can move independently from the first
-* Mode 7 perspective levels starring a mouse named Maffi
+* Mode 7 perspective levels starring a mouse named Maffi, inspired by Jumping Flash!
 
 Some parts based on [LoROM template](https://github.com/pinobatch/lorom-template).
 
 Mode 7 perspective code based on [Dizworld](https://github.com/bbbradsmith/SNES_stuff/tree/main/dizworld#readme), by rainwarrior.
 
 The corresponding level editor is [Princess Edit 2](https://github.com/NovaSquirrel/PrincessEdit2).
+
+Forum threads with news:
+* https://forums.nesdev.org/viewtopic.php?t=19067
+* https://www.videogamesage.com/forums/topic/822-nova-the-squirrel-2-wip/
 
 Building
 ========
