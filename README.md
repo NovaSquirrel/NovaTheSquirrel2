@@ -1,7 +1,7 @@
 Nova the Squirrel 2
 ===================
 
-This is a sequel to [[Nova the Squirrel 1](https://github.com/NovaSquirrel/NovaTheSquirrel) which came out on the NES. The sequel targets the SNES instead, and intends on making use of the SNES's features and graphics.
+This is a sequel to [Nova the Squirrel 1](https://github.com/NovaSquirrel/NovaTheSquirrel) which came out on the NES. The sequel targets the SNES instead, and intends on making use of the SNES's features and graphics.
 
 ![Screenshot](https://novasquirrel.com/rsc/nova2_2.png)
 
