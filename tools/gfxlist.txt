@@ -32,6 +32,7 @@
 3800 CurlyFont
 6c00 DialogForest
 2600 FGSuitLocks
+2600 FGGrassyDirtDeco
 2400 FGSpecialPush
 4200 InventoryItem
 1400 FGGlassBlocks

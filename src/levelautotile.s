@@ -826,6 +826,22 @@ Right:
 .endproc
 
 .a16
+.export AutotileDirtBigStar
+.proc AutotileDirtBigStar
+  lda #Block::GrassyDirtBigStar2
+  sta [RightPointer],y
+  iny
+  iny
+  lda #Block::GrassyDirtBigStar3
+  sta [MidPointer],y
+  lda #Block::GrassyDirtBigStar4
+  sta [RightPointer],y
+  dey
+  dey
+  rts
+.endproc
+
+.a16
 .export AutotileWater
 .proc AutotileWater
   stz 0

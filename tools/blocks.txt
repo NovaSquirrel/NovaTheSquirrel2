@@ -1529,6 +1529,7 @@ editor_hide
 base small_trees
 palette terrain_palette
 tileset FGSmallTrees
+editor_category Themed
 
 +LeafCube
 q 0,0
@@ -1659,6 +1660,54 @@ autotile AutotileVines
 t 12,0 13,0
 t 14,0 15,0
 
+
+#######################################
+# Grassy dirt decorations
+#######################################
+base colored_locks
+palette terrain_palette
+tileset FGGrassyDirtDeco
+editor_category Themed
+
++GrassyDirtStar
+autotile AutotileExpandDirt
+q 0,0
+
++GrassyDirtBigStar1
+autotile AutotileDirtBigStar
+q 2,0
+
++GrassyDirtBigStar2
+q 4,0
+editor_hide
+
++GrassyDirtBigStar3
+autotile AutotileExpandDirt
+q 6,0
+editor_hide
+
++GrassyDirtBigStar4
+autotile AutotileExpandDirt
+q 8,0
+editor_hide
+
++GrassyDirtXs
+autotile AutotileExpandDirt
+t 10,0 terrain:6,2
+t terrain:5,2 10,1
+
++GrassyDirtPlantLeft
+autotile AutotileExpandDirt
+q 11,0
+
++GrassyDirtPlantRight
+autotile AutotileExpandDirt
+q 13,0
+
++GrassyDirtPlantSmall
+autotile AutotileExpandDirt
+t 15,0 15,1
+t terrain:5,2 terrain:6,2
 
 #######################################
 # Colored stuff
