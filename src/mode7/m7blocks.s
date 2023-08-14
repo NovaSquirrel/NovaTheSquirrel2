@@ -574,8 +574,9 @@ Unlock:
 .proc M7BlockSpringOnce
 	lda #Mode7Block::Void
 	jsr Mode7ChangeBlock
+	fallthrough M7BlockSpring
 .endproc
-; Fall through
+
 .export M7BlockSpring
 .proc M7BlockSpring
 	lda #.loword($2c0)

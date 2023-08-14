@@ -1760,7 +1760,7 @@ pv_interpolate_4x_: ; interpolate from every 4th line to every 2nd line
 	asl
 	sta temp+2 ; reload counter for twice as many lines at 2x interpolation
 	;jmp pv_interpolate_2x_
-	; fall through
+    fallthrough pv_interpolate_2x_
 
 pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	.a16

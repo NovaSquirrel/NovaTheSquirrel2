@@ -398,6 +398,10 @@ DJ_Label:
   .assert ^symbol1 = ^symbol2, error, .sprintf("%s must be in the same bank as %s", .string(symbol1), .string(symbol2))
 .endmacro
 
+.macro fallthrough symbol
+  .assert * = symbol, error, "There can't be anything between this routine and the next"
+.endmacro
+
 .macro bit8 var
   .if .asize = 8
     bit var

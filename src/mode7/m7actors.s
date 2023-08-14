@@ -259,8 +259,8 @@ Fail:
   NoTilemapUpdate:
 
   lda ActorM7DynamicSlot,x
+  fallthrough Mode7FreeDynamicSlot
 .endproc
-; Inline tail call to Mode7FreeDynamicSlot
 
 ; Frees the slot index in A
 .a16

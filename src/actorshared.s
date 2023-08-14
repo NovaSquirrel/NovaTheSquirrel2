@@ -853,8 +853,9 @@ Left:
 .proc ActorWalkOnPlatform
   jsl ActorWalk
   jsl ActorAutoBump
+  fallthrough ActorStayOnPlatform
 .endproc
-; fallthrough
+
 .a16
 .export ActorStayOnPlatform
 .proc ActorStayOnPlatform
@@ -1046,7 +1047,7 @@ WalkDistance = 0
   lda ActorPX,x
   add WalkDistance
   sta ActorPX,x
-  ; Fall into ActorDownhillFix
+  fallthrough ActorDownhillFix
 .endproc
 
 .a16
@@ -1911,7 +1912,7 @@ CustomOffset:
   lsr
   seta16
   bcs DispActorMetaLeft
-  ; Fall into the next routine
+  fallthrough DispActorMetaRight
 .endproc
 ; -------------------- keep together --------------------
 .a16
@@ -2684,7 +2685,7 @@ Loop:
 .proc InitActorX
   lda #ActorStateValue::Init
   sta ActorState,x
-  ; Fall into UpdateActorSizeX
+  fallthrough UpdateActorSizeX
 .endproc
 .export UpdateActorSizeX
 .proc UpdateActorSizeX
@@ -2708,8 +2709,9 @@ Loop:
 .proc InitActorY
   lda #ActorStateValue::Init
   sta ActorState,y
-  ; Fall into UpdateActorSizeY
+  fallthrough UpdateActorSizeY
 .endproc
+
 .export UpdateActorSizeY
 .proc UpdateActorSizeY
   phx
