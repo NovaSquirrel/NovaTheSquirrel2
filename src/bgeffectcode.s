@@ -51,6 +51,51 @@ No:
 .endproc
 
 
+.export SetupForestBlueTint
+.proc SetupForestBlueTint
+  seta8
+  lda #^HDMABlueTable
+  sta DMAADDRBANK+$20
+
+  ldx #(<COLDATA << 8) | DMA_LINEAR
+  stx DMAMODE+$20
+
+  ldx #.loword(HDMABlueTable)
+  stx DMAADDR+$20
+
+  lda #%100
+  tsb HDMASTART_Mirror
+  lda #%00100010 ; On backgrounds, and layer 2
+  sta CGADSUB
+  stz CGADDR
+  stz CGDATA
+  stz CGDATA
+
+  lda #%11100000
+  sta COLDATA
+  setaxy16
+  rtl
+
+Blue = 128
+Between = 16
+
+HDMABlueTable:
+   .byt Between*4, Blue|0
+   .byt Between, Blue|1
+   .byt Between, Blue|2
+   .byt Between, Blue|3
+   .byt Between, Blue|4
+   .byt Between, Blue|5
+   .byt Between, Blue|6
+   .byt Between, Blue|7
+   .byt Between, Blue|8
+   .byt Between, Blue|9
+   .byt Between, Blue|10
+;   .byt Between, Blue|11
+   .byt $00
+.endproc
+
+
 .export SetupSkyGradient
 .proc SetupSkyGradient
   seta8

@@ -13,9 +13,9 @@
 	},
 	"Header":	{
 		"Music":	null,
-		"Background":	"Lake",
+		"Background":	"Forest",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
-		"Flags":	["TwoLayerLevel", "TwoLayerInteraction", "VerticalScrolling", "ForegroundLayerThree"],
+		"Flags":	["TwoLayerLevel", "TwoLayerInteraction", "VerticalScrolling"],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", null, null, null, null, "BGLake"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGLake", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "layer3test"],
 		"BGColor":	"RGB(15,23,31)"

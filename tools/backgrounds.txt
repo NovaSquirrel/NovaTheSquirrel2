@@ -2,6 +2,11 @@
 map BGForest
 size tall
 
++ForestBlueTint
+map BGForest
+size tall
+init SetupForestBlueTint
+
 +GlassStars
 map BGGlass
 size tall
