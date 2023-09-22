@@ -59,7 +59,6 @@ src/itemenum.s
 *.sym
 audio/gss_enum.s
 audio/gss_data.s
-audio/brr/gssbrr.exe
 hubworld/*.bin
 hubworld/*.chrsfc
 tools/lut/*.bin
