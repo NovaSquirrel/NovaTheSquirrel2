@@ -66,7 +66,7 @@ endif
 # one for the shell that executes sed, one for sed, and one for the shell
 # that executes wine
 # TODO: convert to use winepath -w
-wincwd := $(shell pwd | sed -e "s'/'\\\\\\\\'g")
+#wincwd := $(shell pwd | sed -e "s'/'\\\\\\\\'g")
 
 # .PHONY means these targets aren't actual filenames
 .PHONY: all run nocash-run spcrun dist clean
