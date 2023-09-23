@@ -35,7 +35,8 @@ AbilityGraphics:
   .incbin "../tilesets4/AbilityHammerBubbles.chrsfc"
   .incbin "../tilesets4/AbilityMirror.chrsfc"
   .incbin "../tilesets4/AbilityRemote.chrsfc"
-  .incbin "../tilesets4/AbilityWaterFishing.chrsfc"
+  .incbin "../tilesets4/AbilityWater.chrsfc"
+  .incbin "../tilesets4/AbilityFishing.chrsfc"
   .incbin "../tilesets4/AbilityBurger.chrsfc"
   .incbin "../tilesets4/AbilityFire.chrsfc"
   .incbin "../tilesets4/AbilityIce.chrsfc"
@@ -48,6 +49,7 @@ SetHammer
 SetMirror
 SetRemote
 SetWater
+SetFishing
 SetBurger
 SetFire
 SetIce
@@ -65,7 +67,7 @@ AbilityTilesetForId:
   .byt SetFire   ; Fire
   .byt SetWater  ; Water
   .byt SetHammer ; Hammer
-  .byt SetWater  ; Fishing
+  .byt SetFishing; Fishing
   .byt SetMisc   ; Yoyo
   .byt SetSword  ; Sword
   .byt SetMirror ; Mirror
@@ -897,6 +899,7 @@ NoCreateHook:
 
 .a8
 .proc DrawAbilityFishing
+  .import DispActor8x8
   ; Display fishing rod
   tdc ; Clear A
   lda PlayerDir
@@ -941,6 +944,7 @@ NoCreateHook:
   txa
   add #4*4
   sta HighPriorityOAMIndex
+
   ; sizes get restored after this
   rts
 RodOffsetX: .lobytes 0, -8

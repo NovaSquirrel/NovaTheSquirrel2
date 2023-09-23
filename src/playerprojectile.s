@@ -959,8 +959,80 @@ Divide:
 .a16
 .i16
 .proc DrawProjectileFishingHook
+IncreaseByX = BlockTemp + 0 ; Actor drawing shouldn't touch it, so it should be fine
+IncreaseByY = BlockTemp + 2
   lda #OAM_PRIORITY_2|$2c
-  jml DispActor16x16
+  jsl DispActor16x16
+
+  ; Save the position since we'll be changing it around here
+  lda ActorPX,x
+  pha
+  lda ActorPY,x
+  pha
+
+  ; Nudge the target to be up higher on the hook
+  lda ActorPY,x
+  sub #8 * 16
+  sta ActorPY,x
+
+  ; Calculate the end of the rod, then get the distance to hook and divide it
+  lda #10 * 16
+  jsl PlayerNegIfLeft
+  add PlayerPX
+  tay
+  rsb ActorPX,x
+  asr_n 3
+  sta IncreaseByX
+  sty ActorPX,x
+  ; ---
+  lda PlayerPY
+  sub #20 * 16
+  tay
+  rsb ActorPY,x
+  asr_n 3
+  sta IncreaseByY
+  sty ActorPY,x
+
+;  lda framecount
+;  lsr
+;  bcc :+
+;    lda IncreaseByX
+;    asr_n 1
+;    add ActorPX,x
+;    sta ActorPX,x
+;    lda IncreaseByY
+;    asr_n 1
+;    add ActorPY,x
+;    sta ActorPY,x
+;  :
+
+  ; Draw each segment
+  ldy #7
+Loop:
+  lda ActorPX,x
+  add IncreaseByX
+  sta ActorPX,x
+  ; ---
+  lda ActorPY,x
+  add IncreaseByY
+  sta ActorPY,x
+
+  phy
+  tya
+  and #1
+  eor #OAM_PRIORITY_2|$20|1
+  jsl DispActor8x8
+  ply
+  dey
+  bne Loop
+
+  ; --------------------
+  ; Restore the position
+  pla
+  sta ActorPY,x
+  pla
+  sta ActorPX,x
+  rtl
 .endproc
 
 .a16
