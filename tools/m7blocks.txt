@@ -335,6 +335,11 @@ when Enter, M7BlockIceSkates
 t 3,10 3,10
 t 3,10 3,10
 
++PushedBarrier
+impassable
+t 2,1 2,1
+t 2,1 2,1
+
 # ------- Park tileset ---------
 +Flowers1
 q 0,11
@@ -420,4 +425,3 @@ t 6,13 6,13
 solid
 t 7,13 7,13
 t 7,13 7,13
-

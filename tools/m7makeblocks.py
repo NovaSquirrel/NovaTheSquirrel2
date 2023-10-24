@@ -33,7 +33,7 @@ for line in text:
 		saveBlock()
 		# Reset to prepare for the new block
 		priority = False
-		block = {"name": line[1:], "solid": False, "solid_air": False, \
+		block = {"name": line[1:], "solid": False, "solid_air": False, "show_barrier": False, \
 		  "solid_block": False, "solid_creature": False, "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None"}
 		continue
 	word, arg = separateFirstWord(line)
@@ -65,7 +65,8 @@ for line in text:
 		block['solid'] = True
 		block['solid_air'] = True
 		block['solid_block'] = True
-	elif word in ["solid", "solid_air", "solid_block", "solid_creature"]:
+		block['show_barrier'] = True
+	elif word in ["solid", "solid_air", "solid_block", "solid_creature", "show_barrier"]:
 		block[word] = True
 	elif word == "t": # add tiles
 		split = arg.split(" ")
@@ -111,6 +112,8 @@ for b in all_blocks:
 		flags |= 4
 	if b['solid_creature']:
 		flags |= 8
+	if b['show_barrier']:
+		flags |= 16
 	outfile.write('  .byt %d ; %s\n' % (flags, b['name']))
 outfile.write('.endproc\n\n')
 

@@ -41,6 +41,7 @@
 
 .import Mode7CallBlockStepOn, Mode7CallBlockStepOff, Mode7CallBlockBump, Mode7CallBlockJumpOn, Mode7CallBlockJumpOff, Mode7CallBlockTouching
 .import Mode7PlayerGraphics
+.import Mode7ChangeBlockAppearance
 
 ; Where to draw Maffi
 MODE7_PLAYER_SX = 128
@@ -65,6 +66,8 @@ Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
 
 Mode7HaveBlock:  .res 2
+
+Mode7BarrierShownAt: .res 2
 
 ;Mode7LastPositionPtr: .res 2
 ;Mode7ForceMove: .res 2
@@ -104,6 +107,9 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7PlayerVSpeed
   stz Mode7PlayerJumpCancel
   stz Mode7PlayerJumping
+
+  lda #$ffff
+  sta Mode7BarrierShownAt
 
   ldx #.loword(Mode7LevelMapBelow)
   ldy #64*64
@@ -803,6 +809,19 @@ SkipBlock:
 
 	setaxy16
 
+	; Remove barrier 
+	lda Mode7BarrierShownAt
+	ina
+	beq :+
+        dea
+        sta LevelBlockPtr
+        lda [LevelBlockPtr]
+		and #255
+		jsr Mode7ChangeBlockAppearance
+		lda #$ffff
+		sta Mode7BarrierShownAt
+	:
+
 	jsr Mode7LevelPtrXYAtPlayer
 	; React to fans
 	FanMaxHeight = $7000
@@ -1125,6 +1144,7 @@ SkipBlock:
 	lda M7BlockFlags,x
 	and SolidMask
 	beq :++
+        jsr ShowPushedBarrierAtBlock
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
 			txa
@@ -1165,6 +1185,7 @@ SkipBlock:
 	lda M7BlockFlags,x
 	and SolidMask
 	beq :++
+		jsr ShowPushedBarrierAtBlock
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
 			txa
@@ -1180,6 +1201,27 @@ SkipBlock:
 	sta M7PosY+2
 	rts
 .endproc
+
+.proc ShowPushedBarrierAtBlock
+	pha
+	lda mode7_height        ; Can't be on the ground
+	and #255
+	beq :+
+	lda M7BlockFlags,x      ; Has to be opted into 
+	and #M7_BLOCK_SHOW_BARRIER
+	beq :+
+	lda Mode7BarrierShownAt ; Has to be be $FFFF, which means there's no barrier shown yet
+	ina
+	bne :+
+		lda #Mode7Block::PushedBarrier
+		jsr Mode7ChangeBlockAppearance
+		lda LevelBlockPtr
+		sta Mode7BarrierShownAt
+	:
+	pla
+	rts
+.endproc
+
 
 .a16
 .proc ApplyToggleBlockIDSwap
