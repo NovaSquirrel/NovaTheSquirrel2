@@ -19,7 +19,7 @@
 ; 0000-3FFF: Mode 7
 ; 4000-5FFF: Sprites
 ; 6000-7BFF: Clouds tiles
-; 7C00-FFFF: Clouds map, 32x32
+; 7C00-7FFF: Clouds map, 32x32
 
 .include "../snes.inc"
 .include "../global.inc"
@@ -66,6 +66,8 @@ Mode7ShadowHUD = Scratchpad
 
 Mode7HaveBlock:  .res 2
 
+Mode7ShowForcefield: .res 2
+
 ;Mode7LastPositionPtr: .res 2
 ;Mode7ForceMove: .res 2
 
@@ -104,6 +106,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7PlayerVSpeed
   stz Mode7PlayerJumpCancel
   stz Mode7PlayerJumping
+  stz Mode7ShowForcefield
 
   ldx #.loword(Mode7LevelMapBelow)
   ldy #64*64
@@ -1125,6 +1128,10 @@ SkipBlock:
 	lda M7BlockFlags,x
 	and SolidMask
 	beq :++
+        pha
+        lda #1
+        sta Mode7ShowForcefield
+        pla
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
 			txa
@@ -1165,6 +1172,10 @@ SkipBlock:
 	lda M7BlockFlags,x
 	and SolidMask
 	beq :++
+        pha
+        lda #1
+        sta Mode7ShowForcefield
+        pla
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
 			txa
@@ -1455,8 +1466,15 @@ HUDTileNumberStart = 32
   lsr
   lsr
   lsr
-  and #%1110
+  lsr    ; <-- Extra shift to remove the least significant bit of the tile number and use it to alternate rows instead
+  bit #1
+  php
+  and #%110
   ora #$40|OAM_PRIORITY_2
+  plp
+  beq :+
+    ora #16
+  :
   sta 0
   sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
   ina
@@ -1618,6 +1636,54 @@ HealthLoopEnd:
   :
 
   sty OamPtr
+
+  ; -------------------------
+  ; Make the brick forcefield
+  lda Mode7ShowForcefield
+  stz Mode7ShowForcefield
+  beq NoForcefield
+  lda #MODE7_PLAYER_SY + 1 + 1 ; additional + 1 for the empty row on the bottom
+  sub mode7_height
+  and #$00ff
+  xba
+  sta 0
+
+  lda #MODE7_PLAYER_SY - 32 + 1 + 1 ; additional + 1 for the empty row on the bottom
+  sub mode7_height
+  and #$00f0
+  xba
+  sta 2
+ForcefieldLoop:
+  lda 2
+  ora #104
+  sta OAM_XPOS+(4*0),y
+  add #16
+  sta OAM_XPOS+(4*1),y
+  adc #16
+  sta OAM_XPOS+(4*2),y
+
+  lda #$02
+  sta OAMHI+1+(4*0),y
+  sta OAMHI+1+(4*1),y
+  sta OAMHI+1+(4*2),y
+
+  lda #HUDTileNumberStart + OAM_COLOR_1 + OAM_PRIORITY_3 + 12 + $20
+  sta OAM_TILE+(4*0),y
+  sta OAM_TILE+(4*1),y
+  sta OAM_TILE+(4*2),y
+
+  tya
+  add #3*4
+  tay
+
+  ; Go down a row
+  lda 2
+  add #$1000
+  sta 2
+  cmp 0
+  bcc ForcefieldLoop
+  sty OamPtr
+NoForcefield:
 
   rts
 
