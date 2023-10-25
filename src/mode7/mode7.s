@@ -21,6 +21,7 @@
 ; 6000-7BFF: Clouds tiles
 ; 7C00-7FFF: Clouds map, 32x32
 
+HALF_CAMERA_RATE = 1
 .include "../snes.inc"
 .include "../global.inc"
 .include "../graphicsenum.s"
@@ -770,6 +771,9 @@ SkipBlock:
 	; --------------------
 	lda z:mode7_height
 	and #$00FF
+	.ifdef HALF_CAMERA_RATE
+		lsr
+	.endif
 	beq OnGround
 		; set horizon
 		lsr
@@ -782,6 +786,9 @@ SkipBlock:
 		; set view scale
 		lda z:mode7_height
 		and #$00FF
+		.ifdef HALF_CAMERA_RATE
+			lsr
+		.endif
 		asl
 	;	asl ; Added by Nova for camera effect
 		add #384
@@ -789,6 +796,9 @@ SkipBlock:
 
 		lda z:mode7_height
 		and #$00FF
+		.ifdef HALF_CAMERA_RATE
+			lsr
+		.endif
 		lsr
 	;	lsr ; Added by Nova for camera effect
 		adc #64
@@ -986,6 +996,9 @@ SkipBlock:
 	ldy #MODE7_PLAYER_SY ; place focus at center of scanline SY
 	lda z:mode7_height
 	and #$00FF
+	.ifdef HALF_CAMERA_RATE
+		lsr
+	.endif
 	beq :+
 	jsr pv_set_origin
 	bra :++
@@ -1129,8 +1142,8 @@ SkipBlock:
 	and SolidMask
 	beq :++
         pha
-        lda #1
-        sta Mode7ShowForcefield
+;        lda #1
+;        sta Mode7ShowForcefield
         pla
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
@@ -1173,8 +1186,8 @@ SkipBlock:
 	and SolidMask
 	beq :++
         pha
-        lda #1
-        sta Mode7ShowForcefield
+;        lda #1
+;        sta Mode7ShowForcefield
         pla
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
@@ -1402,6 +1415,24 @@ HUDTileNumberStart = 32
       stx PlayerFrame
     @GoingUp:
 
+    seta8
+    lda mode7_height
+    lsr
+    lsr
+    lsr
+    lsr
+	.ifndef HALF_CAMERA_RATE
+		lsr
+	.endif
+    and #$fe
+	cmp #3*2
+	bcc :+
+      lda #3*2
+	:
+    add PlayerFrame
+    sta PlayerFrame
+    seta16
+
     lda framecount
     and #8
     beq :+
@@ -1470,7 +1501,7 @@ HUDTileNumberStart = 32
   bit #1
   php
   and #%110
-  ora #$40|OAM_PRIORITY_2
+  ora #(HUDTileNumberStart + $20) | OAM_PRIORITY_2
   plp
   beq :+
     ora #16
@@ -1479,6 +1510,18 @@ HUDTileNumberStart = 32
   sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
   ina
   sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
+
+  ; If over the void, use a different shadow
+  lda [LevelBlockPtr]
+  and #255
+  bne :+
+    lda #(HUDTileNumberStart + $34) | OAM_PRIORITY_2
+    sta 0
+    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
+    ina
+    sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
+  :
+
   lda framecount
   lsr
   bcc :+
@@ -1486,7 +1529,7 @@ HUDTileNumberStart = 32
     ora #OAM_XFLIP
     sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
     ina
-    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y    
+    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
   :
 
   ; Items left to get
@@ -1576,12 +1619,6 @@ HUDTileNumberStart = 32
   lda #MODE7_PLAYER_SY-4
   sta OAM_YPOS+(4*(ShadowSpriteStart+0)),y
   sta OAM_YPOS+(4*(ShadowSpriteStart+1)),y
-  lda [LevelBlockPtr]
-  bne :+
-    lda #240
-    sta OAM_YPOS+(4*(ShadowSpriteStart+0)),y
-    sta OAM_YPOS+(4*(ShadowSpriteStart+1)),y
-  :
 
   lda #$02
   sta OAMHI+1+(4*(PlayerSpriteStart+0)),y
