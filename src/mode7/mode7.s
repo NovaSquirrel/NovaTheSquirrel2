@@ -22,6 +22,8 @@
 ; 7C00-7FFF: Clouds map, 32x32
 
 HALF_CAMERA_RATE = 1
+FORCEFIELD_FLOOR_TILE = 1
+;FORCEFIELD_PILLAR = 1
 .include "../snes.inc"
 .include "../global.inc"
 .include "../graphicsenum.s"
@@ -110,6 +112,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7PlayerVSpeed
   stz Mode7PlayerJumpCancel
   stz Mode7PlayerJumping
+
   stz Mode7ShowForcefield
   stz Mode7ForcefieldTimer
 
@@ -820,6 +823,7 @@ SkipBlock:
 
 	setaxy16
 
+	.ifdef FORCEFIELD_FLOOR_TILE
 	; Remove barrier from the tilemap
 	lda Mode7ShowForcefield
 	beq :+
@@ -830,6 +834,7 @@ SkipBlock:
 		and #255
 		jsr Mode7ChangeBlockAppearance
 	:
+	.endif
 
 	jsr Mode7LevelPtrXYAtPlayer
 	; React to fans
@@ -1705,6 +1710,7 @@ HealthLoopEnd:
     bra :++
   : stz Mode7ForcefieldTimer
   :
+  lda Mode7ForcefieldPointer
 
   lda Mode7ShowForcefield
   cmp #1
@@ -1716,15 +1722,17 @@ YesForcefield:
   cmp #3
   bcc JumpToNoForcefield
 
+.ifdef FORCEFIELD_FLOOR_TILE
   lda Mode7ForcefieldPointer
   sta LevelBlockPtr
   lda #Mode7Block::PushedBarrier
   jsr Mode7ChangeBlockAppearance
-
+.endif
   lda keydown
   and #KEY_DOWN
   bne JumpToNoForcefield
-.if 0
+
+.ifdef FORCEFIELD_PILLAR
   ; LevelBlockPtr is 0000yyyyyyxxxxxx
   lda Mode7ForcefieldPointer ; X
   and #63   ; 0000000000xxxxxx
