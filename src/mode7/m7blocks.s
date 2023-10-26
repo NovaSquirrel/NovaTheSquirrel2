@@ -92,6 +92,7 @@ Temp = BlockTemp
   php
   seta8
   sta [LevelBlockPtr] ; Make the change in the level buffer itself
+WithoutLevelBufferWrite:
   tax                 ; assert((a>>8) == 0)
   setaxy16
   ; Find a free index in the block update queue
@@ -148,6 +149,15 @@ Exit:
   rts
 .endproc
 
+; A = Block whose appearance to use
+; LevelBlockPtr = block address
+.export Mode7ChangeBlockAppearance
+.proc Mode7ChangeBlockAppearance
+  phx
+  phy
+  php
+  jmp Mode7ChangeBlock::WithoutLevelBufferWrite
+.endproc
 
 .a16
 GetInteractionSet:
