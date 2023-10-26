@@ -19,8 +19,11 @@
 ; 0000-3FFF: Mode 7
 ; 4000-5FFF: Sprites
 ; 6000-7BFF: Clouds tiles
-; 7C00-FFFF: Clouds map, 32x32
+; 7C00-7FFF: Clouds map, 32x32
 
+HALF_CAMERA_RATE = 1
+FORCEFIELD_FLOOR_TILE = 1
+;FORCEFIELD_PILLAR = 1
 .include "../snes.inc"
 .include "../global.inc"
 .include "../graphicsenum.s"
@@ -41,6 +44,7 @@
 
 .import Mode7CallBlockStepOn, Mode7CallBlockStepOff, Mode7CallBlockBump, Mode7CallBlockJumpOn, Mode7CallBlockJumpOff, Mode7CallBlockTouching
 .import Mode7PlayerGraphics
+.import Mode7ChangeBlockAppearance
 
 ; Where to draw Maffi
 MODE7_PLAYER_SX = 128
@@ -65,6 +69,10 @@ Mode7Oops:        .res 2
 Mode7ShadowHUD = Scratchpad
 
 Mode7HaveBlock:  .res 2
+
+Mode7ShowForcefield: .res 2
+Mode7ForcefieldPointer: .res 2
+Mode7ForcefieldTimer: .res 2
 
 ;Mode7LastPositionPtr: .res 2
 ;Mode7ForceMove: .res 2
@@ -104,6 +112,9 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz Mode7PlayerVSpeed
   stz Mode7PlayerJumpCancel
   stz Mode7PlayerJumping
+
+  stz Mode7ShowForcefield
+  stz Mode7ForcefieldTimer
 
   ldx #.loword(Mode7LevelMapBelow)
   ldy #64*64
@@ -767,6 +778,9 @@ SkipBlock:
 	; --------------------
 	lda z:mode7_height
 	and #$00FF
+	.ifdef HALF_CAMERA_RATE
+		lsr
+	.endif
 	beq OnGround
 		; set horizon
 		lsr
@@ -779,6 +793,9 @@ SkipBlock:
 		; set view scale
 		lda z:mode7_height
 		and #$00FF
+		.ifdef HALF_CAMERA_RATE
+			lsr
+		.endif
 		asl
 	;	asl ; Added by Nova for camera effect
 		add #384
@@ -786,6 +803,9 @@ SkipBlock:
 
 		lda z:mode7_height
 		and #$00FF
+		.ifdef HALF_CAMERA_RATE
+			lsr
+		.endif
 		lsr
 	;	lsr ; Added by Nova for camera effect
 		adc #64
@@ -802,6 +822,19 @@ SkipBlock:
 	:
 
 	setaxy16
+
+	.ifdef FORCEFIELD_FLOOR_TILE
+	; Remove barrier from the tilemap
+	lda Mode7ShowForcefield
+	beq :+
+		stz Mode7ShowForcefield
+        lda Mode7ForcefieldPointer
+        sta LevelBlockPtr
+        lda [LevelBlockPtr]
+		and #255
+		jsr Mode7ChangeBlockAppearance
+	:
+	.endif
 
 	jsr Mode7LevelPtrXYAtPlayer
 	; React to fans
@@ -983,6 +1016,9 @@ SkipBlock:
 	ldy #MODE7_PLAYER_SY ; place focus at center of scanline SY
 	lda z:mode7_height
 	and #$00FF
+	.ifdef HALF_CAMERA_RATE
+		lsr
+	.endif
 	beq :+
 	jsr pv_set_origin
 	bra :++
@@ -1125,6 +1161,7 @@ SkipBlock:
 	lda M7BlockFlags,x
 	and SolidMask
 	beq :++
+		jsr Mode7SetForcefield
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
 			txa
@@ -1165,6 +1202,7 @@ SkipBlock:
 	lda M7BlockFlags,x
 	and SolidMask
 	beq :++
+		jsr Mode7SetForcefield
 		and #M7_BLOCK_SOLID_AIR
 		bne :+
 			txa
@@ -1178,6 +1216,20 @@ SkipBlock:
 	sta M7PosY+0
 	lda 2
 	sta M7PosY+2
+	rts
+.endproc
+
+.a16
+.proc Mode7SetForcefield
+	pha
+	lda M7BlockFlags,x
+	and #M7_BLOCK_SOLID_AIR
+	beq :+
+		inc Mode7ShowForcefield
+		lda LevelBlockPtr
+		sta Mode7ForcefieldPointer
+	:
+	pla
 	rts
 .endproc
 
@@ -1391,6 +1443,24 @@ HUDTileNumberStart = 32
       stx PlayerFrame
     @GoingUp:
 
+    seta8
+    lda mode7_height
+    lsr
+    lsr
+    lsr
+    lsr
+	.ifndef HALF_CAMERA_RATE
+		lsr
+	.endif
+    and #$fe
+	cmp #3*2
+	bcc :+
+      lda #3*2
+	:
+    add PlayerFrame
+    sta PlayerFrame
+    seta16
+
     lda framecount
     and #8
     beq :+
@@ -1455,12 +1525,31 @@ HUDTileNumberStart = 32
   lsr
   lsr
   lsr
-  and #%1110
-  ora #$40|OAM_PRIORITY_2
+  lsr    ; <-- Extra shift to remove the least significant bit of the tile number and use it to alternate rows instead
+  bit #1
+  php
+  and #%110
+  ora #(HUDTileNumberStart + $20) | OAM_PRIORITY_2
+  plp
+  beq :+
+    ora #16
+  :
   sta 0
   sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
   ina
   sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
+
+  ; If over the void, use a different shadow
+  lda [LevelBlockPtr]
+  and #255
+  bne :+
+    lda #(HUDTileNumberStart + $34) | OAM_PRIORITY_2
+    sta 0
+    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
+    ina
+    sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
+  :
+
   lda framecount
   lsr
   bcc :+
@@ -1468,7 +1557,7 @@ HUDTileNumberStart = 32
     ora #OAM_XFLIP
     sta OAM_TILE+(4*(ShadowSpriteStart+1)),y
     ina
-    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y    
+    sta OAM_TILE+(4*(ShadowSpriteStart+0)),y
   :
 
   ; Items left to get
@@ -1558,12 +1647,6 @@ HUDTileNumberStart = 32
   lda #MODE7_PLAYER_SY-4
   sta OAM_YPOS+(4*(ShadowSpriteStart+0)),y
   sta OAM_YPOS+(4*(ShadowSpriteStart+1)),y
-  lda [LevelBlockPtr]
-  bne :+
-    lda #240
-    sta OAM_YPOS+(4*(ShadowSpriteStart+0)),y
-    sta OAM_YPOS+(4*(ShadowSpriteStart+1)),y
-  :
 
   lda #$02
   sta OAMHI+1+(4*(PlayerSpriteStart+0)),y
@@ -1618,6 +1701,98 @@ HealthLoopEnd:
   :
 
   sty OamPtr
+
+  ; -------------------------
+  ; Make the forcefield
+  lda Mode7ShowForcefield
+  beq :+
+    inc Mode7ForcefieldTimer
+    bra :++
+  : stz Mode7ForcefieldTimer
+  :
+  lda Mode7ForcefieldPointer
+
+  lda Mode7ShowForcefield
+  cmp #1
+  beq YesForcefield
+JumpToNoForcefield:
+  jmp NoForcefield
+YesForcefield:
+  lda Mode7ForcefieldTimer
+  cmp #3
+  bcc JumpToNoForcefield
+
+.ifdef FORCEFIELD_FLOOR_TILE
+  lda Mode7ForcefieldPointer
+  sta LevelBlockPtr
+  lda #Mode7Block::PushedBarrier
+  jsr Mode7ChangeBlockAppearance
+.endif
+  lda keydown
+  and #KEY_DOWN
+  bne JumpToNoForcefield
+
+.ifdef FORCEFIELD_PILLAR
+  ; LevelBlockPtr is 0000yyyyyyxxxxxx
+  lda Mode7ForcefieldPointer ; X
+  and #63   ; 0000000000xxxxxx
+  asl
+  asl
+  asl
+  asl
+  add #8
+  sta texelx
+
+  lda Mode7ForcefieldPointer ; Y
+  and #63*64 ; 0000yyyyyy000000
+  lsr
+  lsr
+  add #8
+  sta texely
+
+  jsr pv_texel_to_screen
+  lda screeny
+  cmp #$5FFF
+  beq :+
+    lda framecount
+	lsr
+	lsr
+    and #3
+    rsb screeny
+    sta screeny
+  ForcefieldLoop:
+    ldy OamPtr
+    lda #HUDTileNumberStart + OAM_COLOR_1 + OAM_PRIORITY_3 + 12 + $20
+    sta OAM_TILE+(4*0),y
+    sta OAM_TILE+(4*1),y
+    seta8
+    lda screenx
+    sub #16
+;    sub #8
+    sta OAM_XPOS+(4*0),y
+    add #16
+    sta OAM_XPOS+(4*1),y
+    lda screeny
+    sub #12
+    sta OAM_YPOS+(4*0),y
+    sta OAM_YPOS+(4*1),y
+
+    lda #$02
+    sta OAMHI+1+(4*0),y
+    sta OAMHI+1+(4*1),y
+    seta16
+
+	tya
+	add #4*2
+	sta OamPtr
+    lda screeny
+    bmi :+
+    sub #16
+    sta screeny
+    bra ForcefieldLoop
+  :
+.endif
+NoForcefield:
 
   rts
 
