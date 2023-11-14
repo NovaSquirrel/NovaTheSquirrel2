@@ -304,6 +304,7 @@ DelayedBlockLoop:
     add #16
     sta FG2OffsetX
   :
+  .endif
 
   ; Calculate the integer versions of the scroll positions now,
   ; so that the player and actors can use them for their own positioning.
