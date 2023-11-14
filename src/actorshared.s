@@ -1154,7 +1154,6 @@ Skip:
   seta16
 
   ; If going upwards, bounce against ceilings
-  stz 0
   lda ActorVY,x
   bmi ActorBumpAgainstCeiling
 
@@ -1162,35 +1161,35 @@ Skip:
   jsr ActorGetSlopeYPos
   bcc :+
     lda SlopeY
-;    cmp ActorPY,x
-;    bcs :+
+    cmp ActorPY,x
+    bcs :+
     sta ActorPY,x
     stz ActorVY,x
 
     seta8_sec
-    inc ActorOnGround,x
+    lda #2 ; Use 2 to indicate "yes, but it's a slope"
+    sta ActorOnGround,x
     seta16
     ; Don't do the normal ground check
     ;sec - SEC above
     rtl
   :
 
-  ; Maybe add checks for the sides
+  ; Check directly below. Maybe add checks for the sides in the future?
   ldy ActorPY,x
   lda ActorPX,x
   jsl ActorTryDownInteraction
   cmp #$4000
-  rol 0
-
-  lda 0
+  lda #0
+  rol
   seta8
-  sta ActorOnGround,x
+  sta ActorOnGround,x ; Should only be 0 or 1
+
   ; React to touching the ground
   beq NotSnapToGround
     lda LevelBlockPtr+1
     and #$40
     bne SecondLayer
-
     stz ActorPY,x ; Clear the low byte
     seta16
     stz ActorVY,x

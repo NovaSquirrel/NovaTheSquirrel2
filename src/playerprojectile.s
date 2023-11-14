@@ -750,6 +750,12 @@ ActorExists:
   bcc Exit
   lda #.loword(-$20)
   sta ActorVY,x
+
+  lda ActorOnGround,x
+  cmp #2 ; Slope
+  bne Exit
+  lda #.loword(-$40) ; Experimental; try bouncing higher if it bounces off of a slope?
+  sta ActorVY,x
 Exit:
   rtl
 .endproc

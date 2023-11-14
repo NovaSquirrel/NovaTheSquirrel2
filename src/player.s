@@ -412,6 +412,8 @@ NoFixWalkSpeed:
 
   ; Going downhill requires special help
   seta8
+  lda PlayerRidingSomething
+  bne NoSlopeDown
   lda PlayerOnGround ; Need to have been on ground last frame
   beq NoSlopeDown
   lda PlayerWantsToJump
