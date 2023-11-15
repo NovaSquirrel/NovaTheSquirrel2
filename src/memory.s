@@ -188,6 +188,7 @@
   PlayerWantsToJump: .res 1    ; true if player pressed the jump button
   PlayerWantsToAttack: .res 1  ; true if player pressed the attack button
   PlayerRidingSomething: .res 1 ; if 1, player is treated to be standing on a solid and can jump
+  PlayerRidingSomethingLast: .res 1 ; if 1, player was riding something last frame
   PlayerRidingFG2: .res 1
   PlayerDownRecently: .res 1   ; Player pressed down recently (for down+up abilities)
 

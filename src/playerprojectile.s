@@ -22,8 +22,8 @@
 .smart
 
 .import ActorBecomePoof, ActorTurnAround, TwoActorCollision, DispActor8x8, DispActor8x8WithOffset, DispActor16x16, ActorExpire
-.import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorTryDownInteractionIfClass, ActorWalk, ActorFall, ActorAutoBump
-.import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, PlayerNegIfLeft
+.import CollideRide, ThwaiteSpeedAngle2Offset, ActorTryUpInteraction, ActorTryDownInteraction, ActorTryDownInteractionIfClass, ActorWalk, ActorWalkInAir, ActorFall, ActorAutoBump
+.import ChangeToExplosion, PlayerActorCollision, ActorGravity, ActorApplyVelocity, ActorApplyXVelocity, ActorNegIfLeft, PlayerNegIfLeft
 .import DispActor16x16Flipped, DispActor16x16FlippedAbsolute, SpeedAngle2Offset256, DispParticle8x8
 .import ActorSafeRemoveY, BlockRunInteractionBelow, PoofAtBlockFar
 
@@ -418,13 +418,17 @@ DrawProjectileCopyFailAnimation = DrawProjectileCopy
   NotStopped:
 
   lda #$30
-  jsl ActorWalk
+  jsl ActorWalkInAir
   bcs GetReadyToExplode
 
   jsl CollideRide
   jsl RideOnProjectile
   ; Also move the player when the burger moves
   bcc :+
+    ; Keep player on top
+    lda ActorVX,x
+    jsr KeepPlayerOn16x16Projectile
+
     lda PlayerPX
     add ActorVX,x
     sta PlayerPX
@@ -631,6 +635,11 @@ Bigger:
   ; Without this, if the block falls fast enough the player will fall off
   lda ActorVY,x
   sta PlayerVY
+
+  ; Keep player on top
+  lda ActorVarA,x
+  jsl ActorNegIfLeft
+  jsr KeepPlayerOn16x16Projectile
 
   ; Add the speed to the player so they move with the block
   lda TempVal
@@ -2237,4 +2246,38 @@ CopyAbility:
 : clc
 Exit:
   rtl
+.endproc
+
+.a16
+.i16
+; Keeps the player from running past the front of the projectile
+; A = Projectile speed (signed)
+.proc KeepPlayerOn16x16Projectile
+  sta 0
+  ; If the projectile is moving slowly, then the behavior this is trying to prevent doesn't happen anyway
+  abs
+  cmp #$10
+  bcs :+
+    rts
+  :
+
+  lda 0
+  bpl Right
+Left:
+  lda ActorPX,x ; Try to avoid being sucked past the left level border
+  cmp #$0080
+  bcc :+
+  sub #6*16
+  cmp PlayerPX
+  bcc :+
+StaPlayerPX:
+    sta PlayerPX
+  :
+  rts
+Right:
+  lda ActorPX,x
+  add #6*16
+  cmp PlayerPX
+  bcc StaPlayerPX
+  rts
 .endproc

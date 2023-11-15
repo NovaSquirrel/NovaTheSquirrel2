@@ -412,10 +412,10 @@ NoFixWalkSpeed:
 
   ; Going downhill requires special help
   seta8
-  lda PlayerRidingSomething
-  bne NoSlopeDown
   lda PlayerOnGround ; Need to have been on ground last frame
   beq NoSlopeDown
+  lda PlayerRidingSomethingLast ; But that "ground" must not have been something you were riding
+  bne NoSlopeDown
   lda PlayerWantsToJump
   bne NoSlopeDown
   seta16
@@ -435,6 +435,9 @@ NoFixWalkSpeed:
     sta PlayerPY
     stz PlayerVY
   NoSlopeDown:
+
+  lda PlayerRidingSomething
+  sta PlayerRidingSomethingLast
   seta16
 
   ; Check for moving into a wall on the right

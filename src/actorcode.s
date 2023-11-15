@@ -31,7 +31,7 @@ CommonTileBase = $40
 .import DispActorMeta, DispActorMetaRight, DispActorMetaPriority2
 .import ActorWalk, ActorWalkOnPlatform, ActorFall, ActorAutoBump, ActorHopOverOrBump, ActorApplyXVelocity
 .import ActorTurnAround, ActorSafeRemoveX, ActorWalkIgnoreState
-.import ActorHover, ActorRoverMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
+.import ActorHover, ActorRoverMovement, ActorRoverAirMovement, CountActorAmount, ActorCopyPosXY, ActorClearY
 .import PlayerActorCollision, TwoActorCollision, PlayerActorCollisionMultiRect
 .import PlayerActorCollisionHurt, ActorLookAtPlayer
 .import FindFreeProjectileY, ActorApplyVelocity, ActorGravity
@@ -1247,7 +1247,7 @@ Shooting:
 .export RunGrillbert
 .proc RunGrillbert
   jsl ActorHover
-  jsl ActorRoverMovement
+  jsl ActorRoverAirMovement
   jml PlayerActorCollisionHurt
 .endproc
 

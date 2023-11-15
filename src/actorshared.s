@@ -1083,6 +1083,59 @@ WalkDistance = 0
 .endproc
 
 .a16
+; Similar to ActorWalk but instead of following a slope, it will treat a slope as a wall
+.export ActorWalkInAir
+.proc ActorWalkInAir
+WalkDistance = 0
+  jsl ActorNegIfLeft
+  sta WalkDistance
+
+  ; Don't walk if the state is nonzero
+  lda ActorState,x
+  beq :+
+    clc
+    rtl
+  :
+
+  ; Look up if the wall is solid
+  lda ActorPY,x
+  sub #1<<7
+  tay
+  lda ActorPX,x
+  add WalkDistance
+  jsl ActorTrySideInteraction
+  bpl NotSolid
+  Solid:
+     sec
+     rtl
+  NotSolid:
+
+  ; Apply the walk
+  lda ActorPX,x
+  add WalkDistance
+  sta ActorPX,x
+
+  ; Check for interaction with slopes
+  jsr ActorGetSlopeYPos
+  bcs GotSlope
+    ; Try again one block below
+    inc LevelBlockPtr
+    inc LevelBlockPtr
+    lda [LevelBlockPtr]
+    jsr ActorGetSlopeYPosBelow
+    bcc NoSlope
+  GotSlope:
+    lda SlopeY
+    cmp ActorPY,x
+    bcs NoSlope
+    sec
+    rtl
+  NoSlope:
+  clc
+  rtl
+.endproc
+
+.a16
 .export ActorGravity
 .proc ActorGravity
   lda ActorVY,x
@@ -2564,6 +2617,29 @@ Exit:
   asl
   asl
   jsl ActorWalk
+  jml ActorAutoBump
+.endproc
+
+; Same as ActorRoverMovement except it bumps into slopes
+.export ActorRoverAirMovement
+.a16
+.i16
+.proc ActorRoverAirMovement
+  lda ActorPX,x
+  sub PlayerPX
+  abs
+  ; Face the player if too far away
+  xba
+  and #255
+  cmp #5
+  bcc :+
+  pha
+  jsl ActorLookAtPlayer
+  pla
+: ; Run faster when farther away
+  asl
+  asl
+  jsl ActorWalkInAir
   jml ActorAutoBump
 .endproc
 
