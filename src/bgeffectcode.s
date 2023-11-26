@@ -24,6 +24,8 @@
 .proc BGEffectInit
   lda LevelBackgroundId
   and #255
+  cmp #255
+  beq No
   asl
   tax
   .import BackgroundSetup
@@ -39,6 +41,8 @@ No:
 .proc BGEffectRun
   lda LevelBackgroundId
   and #255
+  cmp #255
+  beq No
   asl
   tax
   .import BackgroundRoutine
@@ -66,6 +70,7 @@ No:
   lda #%100
   tsb HDMASTART_Mirror
   lda #%00100010 ; On backgrounds, and layer 2
+  ora CGADSUB_Mirror
   sta CGADSUB
   stz CGADDR
   stz CGDATA
@@ -125,6 +130,7 @@ HDMABlueTable:
   lda #%111100
   tsb HDMASTART_Mirror
   lda #%00100000 ; On backgrounds
+  ora CGADSUB_Mirror
   sta CGADSUB
   stz CGADDR
   stz CGDATA

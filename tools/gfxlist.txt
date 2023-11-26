@@ -48,7 +48,7 @@
 1a00 FGColorfulFlowers
 1400 FGWater
 1c00 FGCommonPalSand
-4800 layer3test
+4400 layer3test
 2c00 FGToggleBlocks define
 2c00 FGToggleBlocksSwapped define
 7000 SPMoai

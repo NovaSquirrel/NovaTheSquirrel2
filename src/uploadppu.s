@@ -518,14 +518,17 @@ SpriteLoop:
   ldy #9
   jsl DoPaletteUpload
 
-  ; Get level backround map from the background list
+  ; Get level background map from the background list, if there is one
   lda LevelBackgroundId
   and #255
-  tax
-  .import BackgroundMap
-  lda f:BackgroundMap,x
-  and #255
-  jsl DoGraphicUpload
+  cmp #255
+  beq :+
+    tax
+    .import BackgroundMap
+    lda f:BackgroundMap,x
+    and #255
+    jsl DoGraphicUpload
+  :
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
 
@@ -573,48 +576,50 @@ SpriteLoop:
     bne :+
       stz BGCHRADDR ; First two planes both at $0000
   :
+
+  ; plane 2 nametable defaults to $4c00, 1 screen, but if there's a foreground on it then it's $4800, 2 screens wide
   lda #0 | ((ExtraBG >> 10)<<2)
-  sta NTADDR+2   ; plane 2 nametable at $4c00, 1 screen
-  lda #0 | ((ExtraBGWide >> 10)<<2)
-  sta NTADDR+2   ; plane 3 nametable at $4800, 1 screen
-
-  stz PPURES
-  lda #%00010011  ; enable sprites, plane 0 and 1
-  sta BLENDMAIN
-  stz BLENDSUB
-  lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
-  sta PPUNMI
-  stz CGWSEL
-  stz CGWSEL_Mirror
-  stz CGADSUB
-  stz CGADSUB_Mirror
-
+  sta NTADDR+2
   lda ForegroundLayerThree
   beq :+
     lda #1 | ((ExtraBGWide >> 10)<<2)
-    sta NTADDR+2    ; plane 2 nametable at $4800, 2 screens wide
-    ; Tiles go on $3000 still
-    lda #BG3_PRIORITY | 1
-    sta BGMODE
-    lda #%00010111  ; enable layer 3 because it's being used now
-    sta BLENDMAIN
+    sta NTADDR+2
   :
 
-  lda GlassForegroundEffect
-  beq :+
-    lda #%00100110  ; add, enable on layers 0, 1 and backdrop
-    sta CGADSUB
-    sta CGADSUB_Mirror
-    lda #%00000010
-    sta CGWSEL
-    sta CGWSEL_Mirror
+  lda #VBLANK_NMI|AUTOREAD  ; Disable htime/vtime IRQ
+  sta PPUNMI
 
-    lda #%00010010
-    sta BLENDMAIN
-    lda #%00010011
-    sta BLENDSUB
+  ; Copy over the level's chosen color math settings
+  .import ColorMathTableBLENDMAIN, ColorMathTableBLENDSUB, ColorMathTableCGADSUB, ColorMathTableOptions
+  tdc ; A = zero
+  lda LevelColorMathId
+  tax
+  lda f:ColorMathTableBLENDMAIN,x
+  sta BLENDMAIN
+  lda f:ColorMathTableBLENDSUB,x
+  sta BLENDSUB
+  lda f:ColorMathTableCGADSUB,x
+  sta CGADSUB_Mirror
+
+  ; Color math options byte:
+  ; ....H.SC
+  ;     | |+- Black BG color, set COLDATA to background color
+  ;     | +-- Add sub screen
+  ;     +---- Pseudo hi-res
+  lda f:ColorMathTableOptions,x
+  tay
+  and #SUB_HIRES
+  sta PPURES
+  tya
+  and #ADD_SUB_SCREEN
+  sta CGWSEL_Mirror
+  tya
+  lsr
+  bcc :+
+    jsr LevelBGColorToCOLDATA
   :
 
+  ; ---------------------------------------------------------------------------
   ; Make sure to synchronize these with wherever the toggle blocks are located!
   lda ToggleSwitch1
   beq :+
@@ -634,6 +639,11 @@ SpriteLoop:
     ldy #.loword(File_FGToggleBlocksSwapped+256*2)
     jsr ToggleSwitchDMA
   :
+
+  lda CGADSUB_Mirror
+  sta CGADSUB
+  lda CGWSEL_Mirror
+  sta CGWSEL
 
   setaxy16
   .import BGEffectInit
@@ -667,6 +677,39 @@ ToggleSwitchDMA:
   rts
 .endproc
 
+.a8
+.proc LevelBGColorToCOLDATA
+  ; Set the actual background to black
+  stz CGADDR
+  stz CGDATA
+  stz CGDATA
+
+  ; Red
+  lda LevelBackgroundColor
+  and #31
+  ora #FIXED_COLOR_RED
+  sta COLDATA
+
+  ; Green
+  seta16
+  lda LevelBackgroundColor
+  asl
+  asl
+  asl
+  xba
+  seta8
+  and #31
+  ora #FIXED_COLOR_GREEN
+  sta COLDATA
+
+  ; Blue
+  lda LevelBackgroundColor+1
+  lsr
+  lsr
+  ora #FIXED_COLOR_BLUE
+  sta COLDATA
+  rts
+.endproc
 
 .a16
 .i16

@@ -270,7 +270,7 @@ def parseNumber(number):
 		return int(number[1:], 16)
 	return int(number)
 
-def parseMetatileTile(tile, default_palette, default_base, priority=False):
+def parseMetatileTile(tile, default_palette, default_base, priority=False, words_per_tile=16):
 	""" Parse the nametable value for one tile """
 	value = default_base
 
@@ -278,7 +278,7 @@ def parseMetatileTile(tile, default_palette, default_base, priority=False):
 		split = tile.split(":")
 		value = parseNumber(split[0])
 		tile = split[1]
-	value = value//16      # Divide by the words per tile to get tile number
+	value = value//words_per_tile # Divide by the words per tile to get tile number
 
 	if tile.endswith("v"): # Vertical flip
 		value |= 0x8000

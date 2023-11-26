@@ -249,6 +249,7 @@ outfile.write('.include "graphicsenum.s"\n')
 outfile.write('.include "paletteenum.s"\n')
 outfile.write('.include "backgroundenum.s"\n')
 outfile.write('.include "blockenum.s"\n')
+outfile.write('.include "color_math_settings_enum.s"\n')
 outfile.write('.include "leveldata.inc"\n\n')
 outfile.write('.segment "LevelBank1"\n\n')
 
@@ -336,16 +337,19 @@ for f in glob.glob("levels/*.json"):
 			flags |= 0x20
 		elif flag == "TwoLayerInteraction":
 			flags |= 0x10
-		elif flag == "GlassForeground":
-			flags |= 0x08
 		elif flag == "ForegroundLayerThree":
-			flags |= 0x04
+			flags |= 0x08
+	# In order: vertical level, vertical scrolling, two-layer, two-layer interaction, foreground layer 3, unused, unused, unused
+
 	outfile.write('  .byt $%.2x\n' % flags)
 	outfile.write('  .word %s\n' % level_json["Header"]["BGColor"])
 	if level_json["Header"]["Background"]:
-		outfile.write('  .word LevelBackground::%s\n' % level_json["Header"]["Background"])
+		outfile.write('  .byt LevelBackground::%s\n' % level_json["Header"]["Background"])
 	else:
-		outfile.write('  .word $0000\n')
+		outfile.write('  .byt 255\n') # No background
+
+	outfile.write('  .byt ColorMathSettings::%s\n' % level_json["Header"].get("ColorMath", "Default"))
+
 	outfile.write('  .addr .loword(level_%s_sp)\n' % plain_name)
 	#outfile.write('  .dbyt %d\n\n' % boundaries)
 	for i in range(8):

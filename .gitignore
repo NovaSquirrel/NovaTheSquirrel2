@@ -71,3 +71,5 @@ src/mode7/m7blockdata.s
 src/mode7/perspective_data.s
 tools/M7Tileset.chrm7
 
+src/color_math_settings.s
+src/color_math_settings_enum.s

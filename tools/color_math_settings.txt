@@ -1,0 +1,43 @@
+# Foreground layer on top of a parallax background layer
+# OR two foreground layers
++Default
+mode 1
+main 1,2,obj
+
+
+# Three layers, BG3 always under BG1 and BG2
++BG3Below
+mode 1
+main 1,2,3,obj
+
+
+# Three layers, BG3 always over BG1 and BG2, but can go above/below sprites
++BG3Above
+mode 1|BG3_PRIORITY
+main 3,obj
+sub 1,2
+math bgcolor
+coldata=bgcolor
+
+
+# Three layers, but have BG3 priority bit on, so it can go above/below everything else
++BG3Priority
+mode 1|BG3_PRIORITY
+main 1,2,3,obj
+
+
+# 2bpp layer under foreground, but above background
++BG3InMiddle
+mode 1
+main 1,obj
+sub 2,3
+math bgcolor
+coldata=bgcolor
+
+
+# Attempt at a glass effect
++TranslucentBG1
+mode 1
+main 1,2,obj
+sub 2
+math 1

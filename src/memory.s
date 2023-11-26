@@ -216,6 +216,7 @@
 
   LevelBackgroundColor:   .res 2 ; Palette entry
   LevelBackgroundId:      .res 1 ; Backgrounds specified in backgrounds.txt
+  LevelColorMathId:       .res 1 ; Color math setups specified in color_math_settings.txt
 
   OldFG2OffsetX: .res 2 ; Secondary foreground
   OldFG2OffsetY: .res 2

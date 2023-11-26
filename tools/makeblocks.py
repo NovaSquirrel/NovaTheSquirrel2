@@ -4,6 +4,7 @@ from nts2shared import *
 # Globals
 default_palette = 0
 default_base = 0
+layer_base = 0
 block = None
 priority = False
 all_blocks = []
@@ -12,6 +13,7 @@ all_interaction_procs = set()
 all_interaction_sets = []
 all_markers = {}
 all_byte_reference_blocks = []
+tile_size_in_words = 16
 
 # Read and process the file
 with open("tools/blocks.txt") as f:
@@ -63,8 +65,16 @@ for line in text:
 	# Tile info shared with several blocks
 	elif word == "base":
 		default_base = parseNumber(arg)
+	elif word == "layer_base":
+		layer_base = parseNumber(arg)
 	elif word == "palette":
 		default_palette = parseNumber(arg)
+	elif word == "layer_2bpp":
+		tile_size_in_words = 8
+	elif word == "layer_4bpp":
+		tile_size_in_words = 16
+	elif word == "layer_8bpp":
+		tile_size_in_words = 32
 
 	elif word == "when": #Behaviors
 		arg = arg.split(", ")
@@ -132,12 +142,12 @@ for line in text:
 	elif word == "t": # add tiles
 		split = arg.split(" ")
 		for tile in split:
-			block["tiles"].append(parseMetatileTile(tile, default_palette, default_base, priority))
+			block["tiles"].append(parseMetatileTile(tile, default_palette, default_base - layer_base, priority, words_per_tile=tile_size_in_words))
 	elif word == "q": # add four tiles at once
-		tile = parseMetatileTile(arg, default_palette, default_base, priority)
+		tile = parseMetatileTile(arg, default_palette, default_base - layer_base, priority, words_per_tile=tile_size_in_words)
 		block["tiles"] = [tile, tile+1, tile+16, tile+17]
 	elif word == "w": # add four tiles at once, but wide
-		tile = parseMetatileTile(arg, default_palette, default_base, priority)
+		tile = parseMetatileTile(arg, default_palette, default_base - layer_base, priority, words_per_tile=tile_size_in_words)
 		block["tiles"] = [tile, tile+1, tile+2, tile+3]
 
 # Save the last one

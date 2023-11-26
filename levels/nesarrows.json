@@ -15,10 +15,11 @@
 		"Music":	null,
 		"Background":	"GlassStars",
 		"SpriteGFX":	["SPWalker", "SPCannon", "SPHannah", "SPWalker2", "SPLife"],
-		"Flags":	["GlassForeground"],
+		"Flags":	[],
 		"BGPalette":	[null, "FGCommon", "FGGlassTerrain", "FGColorfulFlowers", "FGSuitLocks", "FGGlassBlocks", "FGGlassBlocksGray", "BGGlassRGB"],
 		"GFXUpload":	["FGCommon", "FGGlassTerrain", "FGTropicalWood", "BGGlass", "FGSuitLocks", "FGGlassBlocks", "FGGlassBlocksGray", "FGHannah", "FGToggleBlocks"],
-		"BGColor":	"RGB(15,23,31)"
+		"BGColor":	"RGB(15,23,31)",
+		"ColorMath": "TranslucentBG1"
 	},
 	"Layers":	[{
 			"Name":	"Foreground",

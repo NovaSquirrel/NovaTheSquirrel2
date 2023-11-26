@@ -2136,7 +2136,10 @@ t 0:0 0:0
 #################
 # Glass test I guess
 #################
-base 0
+layer_base $3000
+layer_2bpp
+
+base $4400
 palette 0
 editor_category Test
 tileset layer3test
@@ -2206,3 +2209,6 @@ t 2,0 2,0
 priority
 t 3,0 3,0
 t 3,0 3,0
+
+layer_base $0000
+layer_4bpp

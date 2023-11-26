@@ -3,7 +3,7 @@
 '---------------------------------------
 
 0        1        2        3
-DMMMMMMM XXXXXXXX ...YYYYY VvLIg3.. 
+DMMMMMMM XXXXXXXX ...YYYYY VvLI3... 
 D = If 1, player starts facing left
 M = Background music
 X = Starting X position (or Y position, for vertical levels)
@@ -12,7 +12,6 @@ V = Vertical level
 v = Enable vertical scrolling (or horizontal scrolling, for vertical levels)
 L = Layer 2 level
 I = Layer 2 interaction
-g = Translucent foreground
 3 = The second foreground layer is on background layer 3
 Room for more flags
 
@@ -21,8 +20,9 @@ gggrrrrr .bbbbbgg
 RGB Level background color
 
 6        7
-BBBBBBBB ........
+BBBBBBBB MMMMMMMM
 B = Background ID (or 255 for no background)
+M = Color math settings
 Room for more flags
 
 8        9       

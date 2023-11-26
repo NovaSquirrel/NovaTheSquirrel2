@@ -23,7 +23,7 @@ for line in text:
 		continue
 	if line.startswith("+"): # new item
 		saveItem()
-		# Reset to prepare for the new actor
+		# Reset to prepare for the new item
 		item = {"name": line[1:], "run": "0", "display_name": "", "description": [], "level-only": False, "pic": 0, "description": []}
 		continue
 	word, arg = separateFirstWord(line)

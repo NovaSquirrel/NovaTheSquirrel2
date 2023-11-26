@@ -229,10 +229,60 @@ WINDOWSUB  = $212F  ; Windows enabled for sub input of blending
 ; except that turning off both bits doesn't disable rendering.
 ; (Use PPUBRIGHT for that.)
 
+BLEND_BG1 = %00001
+BLEND_BG2 = %00010
+BLEND_BG3 = %00100
+BLEND_BG4 = %01000
+BLEND_OBJ = %10000
+
 ; PPU1 appears to generate a stream of (main, sub) pairs, which
 ; PPU2 combines to form output colors.
 
-; Blending parameters not documented yet.  Wait for a future demo.
+CGWSEL = $2130
+; 76543210
+; ||||  |+- Direct color mode
+; ||||  +-- 0=Add/subtract fixed color, 1=Add/subtract sub screen
+; ||++----- Sub screen color window transparent region
+; ++------- Main screen color window black region
+
+DIRECT_COLOR    = %00000001
+ADD_FIXED_COLOR = %00000000
+ADD_SUB_SCREEN  = %00000010
+SUB_SCREEN_BLANK_NEVER    = %00000000 
+SUB_SCREEN_BLANK_OUTSIDE  = %00010000
+SUB_SCREEN_BLANK_INSIDE   = %00100000
+SUB_SCREEN_BLANK_ALWAYS   = %00110000
+MAIN_SCREEN_BLANK_NEVER   = %00000000
+MAIN_SCREEN_BLANK_OUTSIDE = %01000000
+MAIN_SCREEN_BLANK_INSIDE  = %10000000
+MAIN_SCREEN_BLANK_ALWAYS  = %11000000
+
+CGADSUB = $2131
+; 76543210
+; |||||||+- BG1 color math enable
+; ||||||+-- BG2 color math enable
+; |||||+--- BG3 color math enable
+; ||||+---- BG4 color math enable
+; |||+----- OBJ color math enable (palettes 4-7 only)
+; ||+------ Background color math enable
+; |+------- Half color math
+; +-------- 0=Add, 1=Subtract
+COLOR_MATH_BG1     = %00000001
+COLOR_MATH_BG2     = %00000010
+COLOR_MATH_BG3     = %00000100
+COLOR_MATH_BG4     = %00001000
+COLOR_MATH_ALL_BG  = %00001111
+COLOR_MATH_OBJ     = %00010000
+COLOR_MATH_BGCOLOR = %00100000
+COLOR_MATH_HALF    = %01000000
+COLOR_MATH_ADD     = %00000000
+COLOR_MATH_SUB     = %10000000
+
+COLDATA = $2132
+FIXED_COLOR_RED    = %00100000
+FIXED_COLOR_GREEN  = %01000000
+FIXED_COLOR_BLUE   = %10000000
+FIXED_COLOR_ALL    = %11100000
 
 ; When BGMODE is 0-6 (or during vblank in mode 7), a fast 16x8
 ; signed multiply is available, finishing by the next CPU cycle.
@@ -447,9 +497,6 @@ TM      = BLENDMAIN
 TS      = BLENDSUB
 TMW     = WINDOWMAIN
 TSW     = WINDOWSUB
-CGWSEL  = $2130
-CGADSUB = $2131
-COLDATA = $2132
 SETINI  = PPURES
 
 ; S-PPU read

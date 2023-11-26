@@ -159,8 +159,6 @@
   jsl MemClear
 
   ; Initialize settings that don't start at zero
-  lda #1
-  sta LevelBGMode
 
   ; Health
   lda #4
@@ -276,23 +274,17 @@
   beq :+
     dec TwoLayerInteraction
   :
-  lda [DecodePointer],y
-  and #$08
-  beq :+
-    dec GlassForegroundEffect
-  :
   lda #>(BackgroundBG)
   sta SecondFGTilemapPointer+1
   stz SecondFGTilemapPointer+0
   lda [DecodePointer],y
-  and #$04
+  and #$08
   beq :+
     dec ForegroundLayerThree
     lda #>(ExtraBGWide)
     sta SecondFGTilemapPointer+1
   :
-  ; (TODO: use the other flags)
-
+  ; Flags $04, $02, $01 are free to use
 
   ; Background color
   iny ; Y = 4
@@ -306,11 +298,20 @@
   sta CGDATA
 
   iny ; Y = 6
-  ; Background, two bytes
+  ; Background, one byte
   lda [DecodePointer],y
   sta LevelBackgroundId
+
   iny ; Y = 7
-  ; Unused background byte
+  ; Color math settings, one byte
+  tdc ; Clear accumulator
+  lda [DecodePointer],y
+  wdm 0
+  sta LevelColorMathId
+  tax
+  .import ColorMathTableBGMODE
+  lda f:ColorMathTableBGMODE,x
+  sta LevelBGMode ; <--- Store default here, where it can be overridden later
 
   ; Actor data pointer
   iny ; Y = 8

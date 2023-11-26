@@ -18,7 +18,8 @@
 		"Flags":	[],
 		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", null, null, null, "BGLake"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGLake", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers"],
-		"BGColor":	"RGB(15,23,31)"
+		"BGColor":	"RGB(15,23,31)",
+		"ColorMath": "TranslucentBG1"
 	},
 	"Layers":	[{
 			"Name":	"Foreground",

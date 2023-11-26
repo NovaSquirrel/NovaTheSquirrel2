@@ -23,7 +23,7 @@ objlist = \
   mode7/mode7 mode7/m7blocks mode7/m7actors mode7/m7math mode7/m7leveldata mode7/m7blockdata mode7/perspective_data mode7/m7playergraphics \
   overworldblockdata overworlddata overworldcode sincos_data inventory vwf \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
-  lz4 dialog_npc_data dialog_text_data itemcode itemdata \
+  lz4 dialog_npc_data dialog_text_data itemcode itemdata color_math_settings \
   backgrounddata bgeffectcode playerdraw playerability iris \
   playerprojectile blarggapu \
   hubworld
@@ -159,7 +159,7 @@ $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
 $(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
 $(objdir)/actorshared.o: $(srcdir)/blockenum.s
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/blockenum.s
-$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/backgroundenum.s
+$(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/backgroundenum.s $(srcdir)/color_math_settings_enum.s
 $(objdir)/overworldcode.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/pathenum.s
 $(objdir)/overworlddata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/pathenum.s
 $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
@@ -214,13 +214,17 @@ $(srcdir)/dialog_npc_enum.s: $(portraits) $(all_npc_gfx) tools/makenpc.py
 $(srcdir)/palettedata.s: $(palettes) $(variable_palettes)
 $(srcdir)/paletteenum.s: $(palettes) $(variable_palettes) tools/encodepalettes.py
 	$(PY) tools/encodepalettes.py
+
 $(srcdir)/actorenum.s: tools/actors.txt tools/makeactor.py
 	$(PY) tools/makeactor.py
 $(srcdir)/itemenum.s: tools/items.txt tools/makeitems.py
 	$(PY) tools/makeitems.py
 $(srcdir)/backgroundenum.s: tools/backgrounds.txt tools/makebackgrounds.py
 	$(PY) tools/makebackgrounds.py
-$(srcdir)/leveldata.s: $(levels) tools/levelconvert.py 
+$(srcdir)/color_math_settings_enum.s: tools/color_math_settings.txt tools/makecolormathsettings.py
+	$(PY) tools/makecolormathsettings.py
+
+$(srcdir)/leveldata.s: $(levels) tools/levelconvert.py
 	$(PY) tools/levelconvert.py
 $(srcdir)/overworlddata.s: $(overworlds) tools/overworld.py
 	$(PY) tools/overworld.py
