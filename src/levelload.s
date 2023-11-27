@@ -283,6 +283,21 @@
     dec ForegroundLayerThree
     lda #>(ExtraBGWide)
     sta SecondFGTilemapPointer+1
+
+    phx
+    phy
+    phb
+    seta16
+    lda #Block::BG3Empty
+    sta f:LevelBufAlt
+    ldx #.loword(LevelBufAlt)
+    ldy #.loword(LevelBufAlt+2)
+    lda #256*32*2-2
+    mvn #^LevelBufAlt, #^LevelBufAlt 
+    seta8
+    plb
+    ply
+    plx
   :
   ; Flags $04, $02, $01 are free to use
 
@@ -306,7 +321,6 @@
   ; Color math settings, one byte
   tdc ; Clear accumulator
   lda [DecodePointer],y
-  wdm 0
   sta LevelColorMathId
   tax
   .import ColorMathTableBGMODE

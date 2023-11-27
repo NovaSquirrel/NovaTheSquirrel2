@@ -29,8 +29,8 @@ main 1,2,3,obj
 # 2bpp layer under foreground, but above background
 +BG3InMiddle
 mode 1
-main 1,obj
-sub 2,3
+main 1,3,obj
+sub 2
 math bgcolor
 coldata=bgcolor
 
@@ -41,3 +41,12 @@ mode 1
 main 1,2,obj
 sub 2
 math 1
+
+
+# Attempt at a glass effect
++TranslucentBG3
+mode 1
+main 3
+sub 1,2,obj
+math 3,bgcolor
+coldata=bgcolor

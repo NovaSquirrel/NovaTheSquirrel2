@@ -2145,17 +2145,14 @@ editor_category Test
 tileset layer3test
 
 +FG3Glass1A
-priority
-t 1,0 1,0
-t 1,0 1,0
+t 4,0 1,0
+t 1,0 4,0
 
 +FG3Glass1B
-priority
 t 2,0 2,0
 t 2,0 2,0
 
 +FG3Glass1C
-priority
 t 3,0 3,0
 t 3,0 3,0
 
@@ -2209,6 +2206,84 @@ t 2,0 2,0
 priority
 t 3,0 3,0
 t 3,0 3,0
+
+
+
+base $4600
+palette 0
+editor_category Test
+tileset layer3test2
+
++BG3WoodBacking
+palette 3
+q 0,2
+
++BG3FenceL
+palette 3
+q 4,0
+
++BG3FenceM
+palette 3
+t 5,0 5,0
+t 5,1 5,1
+
++BG3FenceR
+palette 3
+q 5,0
+
++BG3Flower
+palette 1
+t 7,0 8,0
+palette 2
+t 7,1 8,1
+
++BG3Vine
+palette 2
+q 9,0
+
++BG3FlowerSpiral
+palette 1
+q 11,0
+
++BG3FlowerCircle
+palette 1
+q 13,0
+
++BG3Grass
+palette 2
+t 15,1 15,1
+t 2,0 3,0
+
++BG3WavyFenceL
+palette 0
+t 15,1 15,1
+t 0,0 1,0
+
++BG3WavyFenceM
+palette 0
+t 15,1 15,1
+t 1,0h 1,0
+
++BG3WavyFenceR
+palette 0
+t 15,1 15,1
+t 1,0h 0,0h
+
++BG3HangingTrianglesL
+t 6,2 7,2
+t 15,1 15,1
+
++BG3HangingTrianglesM
+t 8,2 7,2
+t 15,1 15,1
+
++BG3HangingTrianglesR
+t 8,2 9,2
+t 15,1 15,1
+
++BG3Empty
+t 15,1 15,1
+t 15,1 15,1
 
 layer_base $0000
 layer_4bpp

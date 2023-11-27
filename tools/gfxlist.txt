@@ -49,6 +49,7 @@
 1400 FGWater
 1c00 FGCommonPalSand
 4400 layer3test
+4600 layer3test2
 2c00 FGToggleBlocks define
 2c00 FGToggleBlocksSwapped define
 7000 SPMoai
