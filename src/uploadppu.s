@@ -570,10 +570,10 @@ SpriteLoop:
   sta NTADDR+1   ; plane 1 nametable at $5000, size specified by BackgroundFlags
   lda TwoLayerLevel ; Force two screens wide on two-layer levels
   beq :+
-    lda #1 | ((BackgroundBG >> 10)<<2)
-    sta NTADDR+1   ; plane 0 nametable at $5000, 2 screens wide
     lda ForegroundLayerThree
     bne :+
+      lda #1 | ((BackgroundBG >> 10)<<2)
+      sta NTADDR+1   ; plane 0 nametable at $5000, 2 screens wide
       stz BGCHRADDR ; First two planes both at $0000
   :
 

@@ -2144,6 +2144,10 @@ palette 0
 editor_category Test
 tileset layer3test
 
++FG3Empty
+t 0,0 0,0
+t 0,0 0,0
+
 +FG3Glass1A
 priority
 t 1,0 1,0
