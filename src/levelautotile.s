@@ -932,20 +932,21 @@ Stop:
 
 .export AutotileSkipEmpty
 .proc AutotileSkipEmpty
+  lda [MidPointer],y
 Loop:
   .repeat 4
     iny
     iny
     cpy ChangeAtIndex
     bcs Exit
-    lda [MidPointer],y
+    cmp [MidPointer],y
     bne Exit
   .endrep
   iny
   iny
   cpy ChangeAtIndex
   bcs Exit
-  lda [MidPointer],y
+  cmp [MidPointer],y
   beq Loop
 Exit:
   ; Back this up since it'll INY INY after this routine

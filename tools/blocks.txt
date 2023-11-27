@@ -2145,6 +2145,7 @@ editor_category Test
 tileset layer3test
 
 +FG3Empty
+autotile AutotileSkipEmpty
 t 0,0 0,0
 t 0,0 0,0
 
