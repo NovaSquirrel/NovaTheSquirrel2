@@ -432,8 +432,8 @@
   ; Write actor number to the list, if the
   ; screen doesn't already have an actor set for it
   lda FirstActorOnScreen,x
-  cmp #255
-  bne :+
+  ina ; Test for 255
+  beq :+
   seta16
   tya
   ; Divide by 4 to fit a bigger range into 255 bytes
@@ -487,6 +487,7 @@ SpecialCommand:
   asl
   tax
   seta8
+
   jmp (.loword(SpecialCommandTable),x)
 
 SpecialCommandTable:
@@ -750,21 +751,20 @@ ActorListInRAM:
 .a8
 .proc BlockSingle ; XY
   jsr XYLevelByte
+  seta16
   lda LevelCommands+2,x
   sta [LevelBlockPtr],y
-  iny
-  lda LevelCommands+3,x
-  sta [LevelBlockPtr],y
+  seta8
   rts
 .endproc
 
 .a8
 .proc BlockRectangle ; XY WH
   jsr XYLevelByte
+  seta16
   lda LevelCommands+2,x
-  sta DecodeValue+0
-  lda LevelCommands+3,x
-  sta DecodeValue+1
+  sta DecodeValue
+  seta8
   jmp HasRectangleParameter
 .endproc
 
@@ -1157,7 +1157,7 @@ Horizontal:
   jsl GetLevelColumnPtr
 
   ; 16-bit read, we really want the sign bit on SecondLayer here
-  bit SecondLayer-1
+  bit8 SecondLayer
   bpl :+
     lda #$4000			; OR it with 16KB
     tsb LevelBlockPtr
@@ -1190,33 +1190,53 @@ HasRectangleParameter:
 ; locals: 0
 .a8
 .proc DecodeWriteRectangle
-  inc DecodeWidth  ; Increase width and height by 1
-  inc DecodeHeight ; So that 0 is 1 and 15 is 16
+  lda DecodeHeight
+  beq OnlyOneTall
 ColumnLoop:
-  lda DecodeHeight ; Save height
-  sta 0
+  tdc ; Clear accumulator for the 8-->16 bit TAX
+  lda DecodeHeight
+  tax
 
   phy
-RowLoop:
-  lda DecodeValue+0
+  seta16_clc
+  lda DecodeValue
+@RowLoop:
   sta [LevelBlockPtr],y
   iny
-  lda DecodeValue+1
-  sta [LevelBlockPtr],y
   iny
-  dec 0
-  bne RowLoop
+  dex ; Next row in column
+  bpl @RowLoop
   ply
 
   ; Next column
-  seta16
   lda LevelBlockPtr
-  add LevelColumnSize
+  adc LevelColumnSize
   sta LevelBlockPtr
   seta8
 
   dec DecodeWidth
-  bne ColumnLoop
+  bpl ColumnLoop
+  rts
+
+; ----------------------------------------------------------
+; Optimization for when the rectangle is only one block tall
+.a8
+OnlyOneTall:
+  tdc ; Clear accumulator for the 8-->16 bit TAX
+  lda DecodeWidth
+  tax
+  seta16_clc
+@RowLoop:
+  lda DecodeValue
+  sta [LevelBlockPtr],y
+
+  ; Next column
+  lda LevelBlockPtr
+  adc LevelColumnSize ; Can rely on this not to set carry
+  sta LevelBlockPtr
+  dex
+  bpl @RowLoop
+  seta8
   rts
 .endproc
 
