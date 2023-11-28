@@ -432,8 +432,8 @@
   ; Write actor number to the list, if the
   ; screen doesn't already have an actor set for it
   lda FirstActorOnScreen,x
-  ina ; Test for 255
-  beq :+
+  cmp #255
+  bne :+
   seta16
   tya
   ; Divide by 4 to fit a bigger range into 255 bytes

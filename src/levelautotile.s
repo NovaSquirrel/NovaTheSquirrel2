@@ -71,7 +71,6 @@ RightPointer      = 13 ; and 14 15
   sub LevelColumnSize ; Subtract one column to account for the middle pointer being offset
   jsr Process
 
-
   bit TwoLayerLevel-1
   bmi HasSecondLayer
   rtl
@@ -546,24 +545,23 @@ No:
   stz 0
 
   ; Up
+  tyx
   dey
   dey
   lda [MidPointer],y
   jsr IsSand
   rol 0
-  iny
-  iny
 
   ; Down
+  txy
   iny
   iny
   lda [MidPointer],y
   jsr IsSand
   rol 0
-  dey
-  dey
 
   ; Right
+  txy
   lda [RightPointer],y
   jsr IsSand
   rol 0
@@ -571,10 +569,10 @@ No:
   ; Left
   lda [LeftPointer],y
   jsr IsSand
-  rol 0
-
-  asl 0
-  ldx 0
+  lda 0
+  rol
+  asl
+  tax
   lda SandTable,x
   sta [MidPointer],y
   rts
@@ -610,100 +608,110 @@ Yes:
 
 .export AutotileStone
 .proc AutotileStone
+  .macro IsStone
+    cmp #Block::StoneMossy+1
+    bcs :+
+    cmp #Block::StoneSingle
+    bcs :++
+  :
+    clc
+  :
+  .endmacro
   stz 0
 
   ; Up
+  tyx
   dey
   dey
   lda [MidPointer],y
-  jsr IsStone
+  IsStone
   rol 0
-  iny
-  iny
 
   ; Down
+  txy
   iny
   iny
   lda [MidPointer],y
-  jsr IsStone
+  IsStone
   rol 0
-  dey
-  dey
 
   ; Right
+  txy
   lda [RightPointer],y
-  jsr IsStone
+  IsStone
   rol 0
 
   ; Left
   lda [LeftPointer],y
-  jsr IsStone
-  rol 0
+  IsStone
 
   lda 0
+  rol
   asl
   adc #Block::StoneSingle
   sta [MidPointer],y
-  rts
-
-IsStone:
-  cmp #Block::StoneMossy+1
-  bcs No
-  cmp #Block::StoneSingle
-  bcs Yes
-No:
-  clc
-Yes:
   rts
 .endproc
 
 .export AutotileCliffWall
 .proc AutotileCliffWall
+  .macro IsCliff
+    cmp #Block::CliffWall+1
+    bcs :+
+    cmp #Block::CliffVineOverCliff
+    bcs :++
+  :
+    clc
+  :
+  .endmacro
   stz 0
 
   ; Up
+  tyx
   dey
   dey
   lda [MidPointer],y
-  jsr IsCliff
+  IsCliff
   rol 0
-  iny
-  iny
 
   ; Down
+  txy
   iny
   iny
   lda [MidPointer],y
-  jsr IsCliff
+  IsCliff
   rol 0
-  dey
-  dey
 
   ; Right
+  txy
   lda [RightPointer],y
-  jsr IsCliff
+  IsCliff
   rol 0
 
   ; Left
   lda [LeftPointer],y
-  jsr IsCliff
-  rol 0
-
+  IsCliff
   lda 0
+  rol
   asl
   adc #Block::CliffWallSingle
   sta [MidPointer],y
-  rts
 
-IsCliff:
-  cmp #Block::CliffWall+1
-  bcs No
-  cmp #Block::CliffVineOverCliff
-  bcs Yes
-No:
-  clc
-Yes:
   rts
+  ; Is there cliff below?
+  lda 0
+  and #%0010 ; Down; not %0100 because a rol 0 was skipped on Left
+  bne :+
+    rts
+  :
+  iny
+  iny
+  cpy ChangeAtIndex
+  bcc :+
+    txy ; X is still the backed up Y position
+    rts
+  :
+  bra AutotileCliffWall
 .endproc
 
 .export AutotileSmallTreeBush
@@ -857,23 +865,22 @@ Right:
   rol 0
 
   ; Down
+  tyx
   iny
   iny
   lda [MidPointer],y
   jsr IsWater
   rol 0
-  dey
-  dey
 
   ; Up
+  txy
   dey
   dey
   lda [MidPointer],y
   jsr IsWater
   rol 0
-  iny
-  iny
 
+  txy
   lda 0
   asl
   add #Block::WaterSingle
@@ -893,8 +900,7 @@ Right:
   jsr IsWater
   lda 0
   rol
-  iny
-  iny
+  txy
   eor #3
   asl 
   adc #Block::Water
