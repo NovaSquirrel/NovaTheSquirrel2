@@ -73,6 +73,7 @@ Mode7HaveBlock:  .res 2
 Mode7ShowForcefield: .res 2
 Mode7ForcefieldPointer: .res 2
 Mode7ForcefieldTimer: .res 2
+Mode7Acceleration: .res 2
 
 ;Mode7LastPositionPtr: .res 2
 ;Mode7ForceMove: .res 2
@@ -107,6 +108,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz GenericUpdateLength
   stz ToggleSwitch1 ; and ToggleSwitch2
   stz Mode7HaveBlock
+  stz Mode7Acceleration
 
   stz Mode7PlayerHeight
   stz Mode7PlayerVSpeed
@@ -872,6 +874,7 @@ SkipBlock:
 		sta Mode7PlayerVSpeed
 	:
 
+	.if 0
 	; up/down moves player (depends on generated rotation matrix)
 	lda keydown
 	and #KEY_DOWN ; down
@@ -879,9 +882,20 @@ SkipBlock:
 		lda #1
 		sta Mode7BumpDirection
 
+		.import smul16
+		lda Mode7Acceleration
+		sta math_a
+		lda z:mode7_m7t + 2
+		sta math_b
+		setxy8
+		jsr smul16
+		lda math_p+1
+		setxy16
+		sta 0
+
 		; X += B * 2
-		lda z:mode7_m7t + 2 ; B
-		asl
+		lda 0 ;z:mode7_m7t + 2 ; B
+		;asl
 		pha
 		add z:M7PosX+0
 		sta 0
@@ -892,9 +906,20 @@ SkipBlock:
 		sta 2
 		jsr Mode7TryNewX
 
+		.import smul16
+		lda Mode7Acceleration
+		sta math_a
+		lda z:mode7_m7t + 6
+		sta math_b
+		setxy8
+		jsr smul16
+		lda math_p+1
+		setxy16
+		sta 0
+
 		; Y += D * 2
-		lda z:mode7_m7t + 6 ; D
-		asl
+		lda 0 ;z:mode7_m7t + 6 ; D
+		;asl
 		pha
 		add z:M7PosY+0
 		sta 0
@@ -905,9 +930,61 @@ SkipBlock:
 		sta 2
 		jsr Mode7TryNewY
 	:
+	.endif
+
+	lda keydown
+	and #KEY_UP|KEY_DOWN
+	bne @NoDecelerate
+		lda Mode7Acceleration
+		beq @NoDecelerate
+		; If negative, make positive
+		php ; Save if it was negative
+		bpl :+
+		  eor #$ffff
+		  ina
+		:
+
+		sub #32
+		bpl :+
+			tdc ; Clear accumulator
+		:
+
+		plp
+		; If it was previously negative, make it negative again
+		bpl :+
+			eor #$ffff
+			ina
+		:
+		sta Mode7Acceleration
+	@NoDecelerate:
 
 	lda keydown
 	and #KEY_UP ; up
+	beq @NoUpAccelerate
+		lda Mode7Acceleration
+		bmi :+
+		cmp #512
+		bcs :++
+		:
+			add #32
+			sta Mode7Acceleration
+		:
+	@NoUpAccelerate:
+
+	lda keydown
+	and #KEY_DOWN ; down
+	beq @NoDownAccelerate
+		lda Mode7Acceleration
+		bpl :+
+		cmp #.loword(-512)
+		bcc :++
+		:
+			sub #32
+			sta Mode7Acceleration
+		:
+	@NoDownAccelerate:
+
+	lda Mode7Acceleration
 	beq :+
 		jsr Mode7MoveForward
 	:
@@ -1363,11 +1440,26 @@ Mode7LevelPtrXYAtPlayer:
 .export Mode7MoveForward
 .proc Mode7MoveForward
 	stz Mode7BumpDirection
+	lda Mode7Acceleration
+	bpl :+
+		lda #1
+		sta Mode7BumpDirection
+	:
+
+	.import smul16
+	lda Mode7Acceleration
+	sta math_a
+	lda z:mode7_m7t + 2 ; B
+	sta math_b
+    setxy8
+	jsr smul16
+	lda math_p+1
+	setxy16
+	sta 0
 
 	; X -= B * 2
 	lda #0
-	sub z:mode7_m7t + 2 ; B
-	asl
+	sub 0
 	pha
 	add z:M7PosX+0
 	sta 0
@@ -1378,10 +1470,19 @@ Mode7LevelPtrXYAtPlayer:
 	sta 2
 	jsr Mode7TryNewX
 
+	lda Mode7Acceleration
+	sta math_b
+	lda z:mode7_m7t + 6 ; D
+	sta math_a
+	setxy8
+	jsr smul16
+	lda math_p+1
+	setxy16
+	sta 0
+
 	; Y -= D * 2
 	lda #0
-	sub z:mode7_m7t + 6 ; D
-	asl
+	sub 0
 	pha
 	add z:M7PosY+0
 	sta 0
