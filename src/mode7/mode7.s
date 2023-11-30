@@ -23,6 +23,8 @@
 
 HALF_CAMERA_RATE = 1
 FORCEFIELD_FLOOR_TILE = 1
+;CONSISTENT_CAMERA_HEIGHT = 1
+;COARSE_CAMERA_TURN = 1
 ;FORCEFIELD_PILLAR = 1
 .include "../snes.inc"
 .include "../global.inc"
@@ -757,10 +759,22 @@ SkipBlock:
 
 	; rotate with left/right
 	ldx z:angle
+
+	.ifdef COARSE_CAMERA_TURN
+	lda framecount
+	lsr
+	bcc @NoTurn
+	.endif
+
 	lda keydown
 	bit #KEY_LEFT
 	beq :+
 		inx
+		.ifdef COARSE_CAMERA_TURN
+		inx
+		inx
+		inx
+		.endif
 		bit #KEY_Y
 		beq :+
 			inx
@@ -769,15 +783,26 @@ SkipBlock:
 	bit #KEY_RIGHT
 	beq :+
 		dex
+		.ifdef COARSE_CAMERA_TURN
+		dex
+		dex
+		dex
+		.endif
 		bit #KEY_Y
 		beq :+
 			dex
 	:
+
+	.ifdef COARSE_CAMERA_TURN
+	@NoTurn:
+	.endif
+
 	stx z:angle
 
 	; Generate perspective, unless you're on the ground
 	; in which case use precalculated perspective
 	; --------------------
+	.ifndef CONSISTENT_CAMERA_HEIGHT
 	lda z:mode7_height
 	and #$00FF
 	.ifdef HALF_CAMERA_RATE
@@ -820,8 +845,11 @@ SkipBlock:
 		jsr pv_rebuild
 		bra :+
 	OnGround:
+	.endif
 		jsr pv_setup_for_ground
+	.ifndef CONSISTENT_CAMERA_HEIGHT
 	:
+	.endif
 
 	setaxy16
 
@@ -1091,6 +1119,7 @@ SkipBlock:
 	setxy8
 	; Set origin
 	ldy #MODE7_PLAYER_SY ; place focus at center of scanline SY
+	.ifndef CONSISTENT_CAMERA_HEIGHT
 	lda z:mode7_height
 	and #$00FF
 	.ifdef HALF_CAMERA_RATE
@@ -1099,9 +1128,11 @@ SkipBlock:
 	beq :+
 	jsr pv_set_origin
 	bra :++
-:	jsr pv_set_ground_origin
+:	.endif
+	jsr pv_set_ground_origin
+	.ifndef CONSISTENT_CAMERA_HEIGHT
 	:
-
+	.endif
 
 	jsr Mode7DrawPlayer
 	.a16
@@ -1545,6 +1576,7 @@ HUDTileNumberStart = 32
     @GoingUp:
 
     seta8
+	.ifndef CONSISTENT_CAMERA_HEIGHT
     lda mode7_height
     lsr
     lsr
@@ -1560,6 +1592,7 @@ HUDTileNumberStart = 32
 	:
     add PlayerFrame
     sta PlayerFrame
+	.endif
     seta16
 
     lda framecount
