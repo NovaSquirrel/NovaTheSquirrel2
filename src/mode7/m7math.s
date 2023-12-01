@@ -11,6 +11,7 @@
 .include "../global.inc"
 .smart
 
+;JITTER_WORKAROUND = 1
 .globalzp angle, scale, scale2, M7PosX, M7PosY, cosa, sina, math_a, math_b, math_p, math_r, det_r, texelx, texely, screenx, screeny
 .globalzp mode7_m7t
 .globalzp pv_l0, pv_l1, pv_s0, pv_s1, pv_sh, pv_interp
@@ -1854,6 +1855,20 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sec
 	adc #240
 	sta f:Layer2_ScrollYPixels
+
+	.ifdef JITTER_WORKAROUND
+	lda z:M7PosX+1
+	sub #8*16
+	sta f:FGScrollXPixels
+	add #128
+	sta f:mode7_m7x
+
+	lda z:M7PosY+1
+	sub #11*16-8
+	sta f:FGScrollYPixels
+	add #168 ;76
+	sta f:mode7_m7y
+	.endif
 	rts
 .endproc
 
@@ -2573,6 +2588,20 @@ abcd_banks      = 10 ; and 11
 	sec
 	adc f:mode7_m7y
 	sta f:FGScrollYPixels ; oy - L1
+
+	.ifdef JITTER_WORKAROUND
+	lda z:M7PosX+1
+	sub #8*16
+	sta f:FGScrollXPixels
+	add #128
+	sta f:mode7_m7x
+
+	lda z:M7PosY+1
+	sub #11*16-8
+	sta f:FGScrollYPixels
+	add #168 ;76
+	sta f:mode7_m7y
+	.endif
 
 	; scroll sky to meet L0 and pan with angle
 	lda z:angle
