@@ -241,7 +241,7 @@ with open(sys.argv[2], 'w') as f:
 		if snes:
 			start = 0x800000 + (bank * 0x10000)
 			if hirom:
-				if start >= 0xC00000: # Should run fom C0 to FF then 40 to 7D
+				if start >= 0xC00000: # Should run from C0 to FF then 40 to 7D
 					start -= 0xC00000
 				code_size = sum([all_segments[name] for name in bank_segments[bank] if isCodeSegment(name)])
 				data_size = sum([all_segments[name] for name in bank_segments[bank] if not isCodeSegment(name)])
