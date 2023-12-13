@@ -1729,7 +1729,7 @@ ExplodeBlock:
 .endproc
 
 .pushseg
-.segment "DynamicExplosion"
+.segment "D_DynamicExplosion"
 DSExplosion:
 .incbin "../tilesetsX/DSExplosion.chr"
 .popseg

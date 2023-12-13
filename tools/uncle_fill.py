@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Automatic ca65 bank picker
-# Copyright 2020 NovaSquirrel
+# Copyright 2020-2023 NovaSquirrel
 #
 # Copying and distribution of this file, with or without
 # modification, are permitted in any medium without royalty provided
@@ -13,17 +13,20 @@ import glob, os, subprocess, operator, sys
 reserve_banks = 1     # Do not do anything with the first N banks
 reserve_banks_end = 0 # Do not do anything with the last N banks
 code_segment_prefix = "C_"
+slow_segment_prefix = "D_"
+bank_zero_segment = "bankzero"
 
 # Read configuration from the command line
 def helpText():
 	print("Syntax: uncle_fill.py board:banks New.cfg Old.cfg List.o Of.o Objects.o")
-	print("Board can be lorom, hirom or unrom")
+	print("Board can be lorom, hirom, exhirom or unrom")
 	sys.exit(-1)
 
 # Defaults configuration
 code_bank_max_size = 0x8000
 hirom = False
-snes = False
+exhirom = False
+snes = True
 nes = False
 unrom = False
 
@@ -32,16 +35,24 @@ if len(sys.argv) < 5:
 board = sys.argv[1].split(':')
 if len(board) < 2:
 	helpText()
+# SNES
 if board[0].lower() == 'lorom':
 	hirom = False
-	snes = True
 	bank_max_size  = 0x8000
+	header_bank = 0
 elif board[0].lower() == 'hirom':
 	hirom = True
-	snes = True
 	bank_max_size  = 0x8000 * 2
+	header_bank = 0
+elif board[0].lower() == 'exhirom':
+	hirom = True
+	exhirom = True
+	bank_max_size  = 0x8000 * 2
+	header_bank = 64
+# NES
 elif board[0].lower() == 'unrom':
 	unrom = True
+	snes = False
 	nes = True
 	bank_max_size = 0x4000
 	code_bank_max_size = 0x4000
@@ -53,12 +64,15 @@ bank_count = int(board[1])
 
 # -------------------------------------
 
+code_segment_names = ("code", "snesheader", bank_zero_segment)
 def isCodeSegment(name):
-	return name.lower() == "code" or name.startswith(code_segment_prefix)
+	return name.lower() in code_segment_names or name.startswith(code_segment_prefix)
+def isSlowSegment(name):
+	return name.startswith(slow_segment_prefix)
 
 # Prep some status information
 all_segments  = {}               # For counting up how big each segment is
-bank_sizes    = [0] * bank_count # Sizes in each bank
+bank_sizes    = [0] * bank_count # Amount of bytes currently used in each bank
 bank_segments = []               # Segments placed in each bank
 for i in range(bank_count):
 	bank_segments.append([])
@@ -67,6 +81,8 @@ for i in range(bank_count):
 ignore_segments     = set() # Segments not to try and pack
 static_rom_segments = set() # ROM segments that go in specific banks
 static_rom_seg_bank = {}    # bank each of the above goes in
+
+# Text from original config template:
 original_config_before_memory = None
 original_config_middle = None
 original_config_after_segments = None
@@ -144,6 +160,7 @@ dynamic_segments = all_segments.copy()
 for name in static_rom_segments:
 	if name in all_segments:
 		bank_sizes[static_rom_seg_bank[name]] += all_segments[name]
+		bank_segments[static_rom_seg_bank[name]].append(name)
 #		print("%s goes in %d, is %d and it's now %d" % (name, static_rom_seg_bank[name], all_segments[name], bank_sizes[static_rom_seg_bank[name]]))
 		del dynamic_segments[name]
 
@@ -153,17 +170,20 @@ for name in static_rom_segments:
 
 code_segments = {}
 data_segments = {}
+slow_segments = {}
 
 for key,value in dynamic_segments.items():
 	if isCodeSegment(key):
 		code_segments[key] = value
+	elif isSlowSegment(key) and exhirom:
+		slow_segments[key] = value
 	else:
 		data_segments[key] = value
 
 ###############################################################################
 # Pack the code segments into banks
 ###############################################################################
-def fitSegments(which, bankSize, allowedBankCount):
+def fitSegments(which, max_bank_size, first_allowed_bank, allowed_bank_count, slow=False):
 	while bool(which):
 		# Find biggest segment
 		biggest = max(which.items(), key=operator.itemgetter(1))[0]
@@ -171,18 +191,38 @@ def fitSegments(which, bankSize, allowedBankCount):
 
 		# Put it in the first bank it can go in, if it's not empty
 		if size:
-			for i in range(reserve_banks, allowedBankCount):
-				if bank_sizes[i]+size <= bankSize:
+			for i in range(first_allowed_bank, allowed_bank_count):
+				if bank_sizes[i]+size <= max_bank_size:
 					bank_sizes[i] += size
 					bank_segments[i].append(biggest)
 					break
 			else:
-				print("Can't fit bank "+biggest+"!")
-				sys.exit(-1)
+				if slow: # Retry in the fast areas if there's no room in the slow areas
+					for i in range(reserve_banks, 64):
+						if bank_sizes[i]+size <= max_bank_size:
+							bank_sizes[i] += size
+							bank_segments[i].append(biggest)
+							break
+					else:
+						print("Can't fit bank "+biggest+"!")
+						sys.exit(-1)
+				else:
+					print("Can't fit bank "+biggest+"!")
+					sys.exit(-1)
 		del which[biggest]
 
-fitSegments(code_segments, code_bank_max_size, bank_count if hirom else min(64, bank_count))
-fitSegments(data_segments, bank_max_size, bank_count)
+# Place anything that should go in the header bank first, to guarantee room for it
+for segment in code_segments:
+	if segment.lower() == bank_zero_segment:
+		size = code_segments[segment]
+		bank_sizes[header_bank] += size
+		bank_segments[header_bank].append(segment)
+		del code_segments[segment]
+		break
+
+fitSegments(code_segments, code_bank_max_size, reserve_banks, bank_count if hirom else min(64, bank_count))
+fitSegments(slow_segments, bank_max_size,      64,            bank_count, slow=True)
+fitSegments(data_segments, bank_max_size,      reserve_banks, bank_count)
 
 #for i in range(bank_count):
 #	print(i)
@@ -201,6 +241,8 @@ with open(sys.argv[2], 'w') as f:
 		if snes:
 			start = 0x800000 + (bank * 0x10000)
 			if hirom:
+				if start >= 0xC00000: # Should run fom C0 to FF then 40 to 7D
+					start -= 0xC00000
 				code_size = sum([all_segments[name] for name in bank_segments[bank] if isCodeSegment(name)])
 				data_size = sum([all_segments[name] for name in bank_segments[bank] if not isCodeSegment(name)])
 
@@ -217,7 +259,8 @@ with open(sys.argv[2], 'w') as f:
 	f.write('\n  # Automatically placed segments\n')
 	for bank in range(bank_count):
 		for segment in bank_segments[bank]:
-			f.write("  %s: load = ROM%d%s, type = ro;\n" % (segment, bank, "_code" if (isCodeSegment(segment) and hirom) else ""))
+			if segment not in static_rom_segments:
+				f.write("  %s: load = ROM%d%s, type = ro;\n" % (segment, bank, "_code" if (isCodeSegment(segment) and hirom) else ""))
 
 	f.write(original_config_after_segments)
 

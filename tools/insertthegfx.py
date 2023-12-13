@@ -52,7 +52,7 @@ all_graphics = sorted(all_graphics, key=lambda g: g['size'], reverse=True)
 banks_free = {}
 banks_files = {}
 ordered_files = []
-for bank in ["Graphics1", "Graphics2", "Graphics3", "Graphics4"]:
+for bank in ["D_Graphics1", "D_Graphics2", "D_Graphics3", "D_Graphics4"]:
 	banks_free[bank] = 0x8000 * 2
 	banks_files[bank] = []
 

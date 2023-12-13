@@ -5239,11 +5239,11 @@ Flying:
 .endproc
 
 .pushseg
-.segment "SordSwing"
+.segment "D_SordSwing"
 DSSordSwing:
 .incbin "../tilesetsX/DSSordSwing.chr"
 
-.segment "SwordSwing"
+.segment "D_SwordSwing"
 DSSwordSwing:
 .incbin "../tilesetsX/DSSwordSwing.chr"
 .popseg

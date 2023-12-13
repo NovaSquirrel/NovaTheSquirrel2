@@ -35,7 +35,7 @@ map_mode        = $00FFD5
 ; For advanced users: Long stretches of STZ are a useful place to
 ; shuffle code when watermarking your binary.
 
-.segment "CODE"
+.segment "BankZero"
 .proc resetstub
   sei                ; turn off IRQs
   clc

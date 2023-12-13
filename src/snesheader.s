@@ -78,6 +78,7 @@ romname:
   .addr enmi_handler, resetstub, eirq_handler
   
 .segment "CODE"
+.segment "BankZero"
 
 ; Jumping out of bank $00 is especially important if you're using
 ; ROMSPEED_120NS.
