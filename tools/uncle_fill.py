@@ -70,8 +70,10 @@ def isCodeSegment(name):
 def isSlowSegment(name):
 	return name.startswith(slow_segment_prefix)
 
-# Prep some status information
-all_segments  = {}               # For counting up how big each segment is
+# Input status:
+all_segment_sizes      = {}      # For counting up how big each segment is
+all_segment_alignments = {}      # How much alignment each segment has
+# Output status:
 bank_sizes    = [0] * bank_count # Amount of bytes currently used in each bank
 bank_segments = []               # Segments placed in each bank
 for i in range(bank_count):
@@ -130,38 +132,56 @@ with open(sys.argv[3]) as f:
 		for params in segment[colon+1:].split(','):
 			key, value = params.split('=')
 			info[key] = value
-		# If it loads in ROM, it's not dynamically allocated, but takes up space in the bank specified
+		# If it loads in ROM, it's not dynamically allocated, but still takes up space in the bank specified
 		if info['load'].startswith('ROM'):
 			static_rom_segments.add(name)
 			static_rom_seg_bank[name] = int(info['load'][3:].rstrip("_code"))
 		ignore_segments.add(name)
 
 # Count up the sizes of all segments using od65
-process = subprocess.Popen(["od65", "--dump-segsize"] + sys.argv[4:], stdout=subprocess.PIPE)
+process = subprocess.Popen(["od65", "--dump-segments"] + sys.argv[4:], stdout=subprocess.PIPE)
 (od65_output, err) = process.communicate()
 exit_code = process.wait()
-od65_output = [x for x in od65_output.decode("utf-8").splitlines() if x.startswith("    ")]
+od65_output = [x for x in od65_output.decode("utf-8").splitlines()]
+segment_name = None
 for line in od65_output:
-	segment = line.split()
-	name = segment[0].rstrip(':')
-	if name in ignore_segments and name not in static_rom_segments:
+	words = [_.strip() for _ in line.split(":")]
+	if len(words) != 2:
+		print("Format from od65 not as expected")
+		sys.exit(-1)
+	key, value = words
+
+	if key == 'Name':
+		value = value.strip('"')
+		if value in ignore_segments and value not in static_rom_segments: # Defined but not in ROM --> probably RAM
+			# Ignore size and alignment when they come up
+			segment_name = None
+		else:
+			segment_name = value
+
+	if segment_name == None:
 		continue
-	size = int(segment[1])
-	if name in all_segments:
-		all_segments[name] += size
-	else:
-		all_segments[name] = size
+	elif key == 'Size':
+		if segment_name in all_segment_sizes:
+			all_segment_sizes[segment_name] += int(value)
+		else:
+			all_segment_sizes[segment_name] = int(value)
+	elif key == 'Alignment':
+		if segment_name in all_segment_alignments:
+			all_segment_alignments[segment_name] = max(int(value), all_segment_alignments[segment_name])
+		else:
+			all_segment_alignments[segment_name] = int(value)
 
 ###############################################################################
 # Add the static bank segments' sizes in first
 ###############################################################################
-dynamic_segments = all_segments.copy()
+dynamic_segments = all_segment_sizes.copy()
 
 for name in static_rom_segments:
-	if name in all_segments:
-		bank_sizes[static_rom_seg_bank[name]] += all_segments[name]
+	if name in all_segment_sizes:
+		bank_sizes[static_rom_seg_bank[name]] += all_segment_sizes[name]
 		bank_segments[static_rom_seg_bank[name]].append(name)
-#		print("%s goes in %d, is %d and it's now %d" % (name, static_rom_seg_bank[name], all_segments[name], bank_sizes[static_rom_seg_bank[name]]))
+#		print("%s goes in %d, is %d and it's now %d" % (name, static_rom_seg_bank[name], all_segment_sizes[name], bank_sizes[static_rom_seg_bank[name]]))
 		del dynamic_segments[name]
 
 ###############################################################################
@@ -184,11 +204,7 @@ for key,value in dynamic_segments.items():
 # Pack the code segments into banks
 ###############################################################################
 def fitSegments(which, max_bank_size, first_allowed_bank, allowed_bank_count, slow=False):
-	while bool(which):
-		# Find biggest segment
-		biggest = max(which.items(), key=operator.itemgetter(1))[0]
-		size = which[biggest]
-
+	for biggest, size in sorted(which.items(), key=lambda x: x[1], reverse=True):
 		# Put it in the first bank it can go in, if it's not empty
 		if size:
 			for i in range(first_allowed_bank, allowed_bank_count):
@@ -209,7 +225,6 @@ def fitSegments(which, max_bank_size, first_allowed_bank, allowed_bank_count, sl
 				else:
 					print("Can't fit bank "+biggest+"!")
 					sys.exit(-1)
-		del which[biggest]
 
 # Place anything that should go in the header bank first, to guarantee room for it
 for segment in code_segments:
@@ -243,8 +258,8 @@ with open(sys.argv[2], 'w') as f:
 			if hirom:
 				if start >= 0xC00000: # Should run from C0 to FF then 40 to 7D
 					start -= 0xC00000
-				code_size = sum([all_segments[name] for name in bank_segments[bank] if isCodeSegment(name)])
-				data_size = sum([all_segments[name] for name in bank_segments[bank] if not isCodeSegment(name)])
+				code_size = sum([all_segment_sizes[name] for name in bank_segments[bank] if isCodeSegment(name)])
+				data_size = sum([all_segment_sizes[name] for name in bank_segments[bank] if not isCodeSegment(name)])
 
 				f.write("  ROM%d: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x400000, bank_max_size - code_size))
 				if code_size:
