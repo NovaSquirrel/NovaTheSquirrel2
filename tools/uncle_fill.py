@@ -10,7 +10,7 @@
 import glob, os, subprocess, operator, sys
 
 # Configuration
-reserve_banks = 1     # Do not do anything with the first N banks
+reserve_banks = 0     # Do not do anything with the first N banks
 reserve_banks_end = 0 # Do not do anything with the last N banks
 code_segment_prefix = "C_"
 slow_segment_prefix = "D_"
@@ -72,7 +72,7 @@ def isSlowSegment(name):
 
 # Input status:
 all_segment_sizes      = {}      # For counting up how big each segment is
-all_segment_alignments = {}      # How much alignment each segment has
+all_segment_alignments = {}      # The maximum alignment for each segment, to go in the ld65 config
 # Output status:
 bank_sizes    = [0] * bank_count # Amount of bytes currently used in each bank
 bank_segments = []               # Segments placed in each bank
@@ -98,7 +98,7 @@ with open(sys.argv[3]) as f:
 	data = data[:data.index('}')]
 
 	# We're using special comment markers to indicate where to insert memory areas and segments
-	auto_memory_marker = "# Insert automatic memory here"
+	auto_memory_marker  = "# Insert automatic memory here"
 	auto_segment_marker = "# Insert automatic segments here"
 
 	# Find the places to insert the new stuff
@@ -124,6 +124,8 @@ with open(sys.argv[3]) as f:
 				pass
 			elif not comment:
 				segment += char
+		if segment == '':
+			continue
 
 		# Parse the segment and its options
 		colon = segment.index(':')
@@ -138,12 +140,36 @@ with open(sys.argv[3]) as f:
 			static_rom_seg_bank[name] = int(info['load'][3:].rstrip("_code"))
 		ignore_segments.add(name)
 
+###############################################################################
+# Figure out the size and alignment of each segment
+###############################################################################
+
 # Count up the sizes of all segments using od65
 process = subprocess.Popen(["od65", "--dump-segments"] + sys.argv[4:], stdout=subprocess.PIPE)
 (od65_output, err) = process.communicate()
 exit_code = process.wait()
 od65_output = [x for x in od65_output.decode("utf-8").splitlines()]
-segment_name = None
+
+this_segment_name  = None
+this_segment_size  = None
+this_segment_align = None
+
+def align_and_add(address, alignment, add):
+	if address % alignment == 0:
+		return address + add
+	return address + (alignment - (address % alignment)) + add
+
+def record_segment_info():
+	global this_segment_name
+	if this_segment_name == None:
+		return
+	# Pad forward to satisfy the per-object file alignment
+	total_size = all_segment_sizes.get(this_segment_name, 0)
+	all_segment_sizes[this_segment_name] = align_and_add(total_size, this_segment_align, this_segment_size)
+	# Keep track of the maximum align used across all the object files
+	all_segment_alignments[this_segment_name] = max(this_segment_align, all_segment_alignments.get(this_segment_name, 1))
+	this_segment_name = None
+
 for line in od65_output:
 	words = [_.strip() for _ in line.split(":")]
 	if len(words) != 2:
@@ -152,25 +178,19 @@ for line in od65_output:
 	key, value = words
 
 	if key == 'Name':
+		record_segment_info()
 		value = value.strip('"')
-		if value in ignore_segments and value not in static_rom_segments: # Defined but not in ROM --> probably RAM
-			# Ignore size and alignment when they come up
-			segment_name = None
+		if value in ignore_segments and value not in static_rom_segments: # If it's defined but not in ROM, it's probably RAM
+			this_segment_name = None # <-- So that record_segment_info() won't consider the segment valid
 		else:
-			segment_name = value
-
-	if segment_name == None:
-		continue
+			this_segment_name = value
+		this_segment_size = 0
+		this_segment_align = 0
 	elif key == 'Size':
-		if segment_name in all_segment_sizes:
-			all_segment_sizes[segment_name] += int(value)
-		else:
-			all_segment_sizes[segment_name] = int(value)
+		this_segment_size = int(value)
 	elif key == 'Alignment':
-		if segment_name in all_segment_alignments:
-			all_segment_alignments[segment_name] = max(int(value), all_segment_alignments[segment_name])
-		else:
-			all_segment_alignments[segment_name] = int(value)
+		this_segment_align = int(value)
+record_segment_info()
 
 ###############################################################################
 # Add the static bank segments' sizes in first
@@ -208,15 +228,17 @@ def fitSegments(which, max_bank_size, first_allowed_bank, allowed_bank_count, sl
 		# Put it in the first bank it can go in, if it's not empty
 		if size:
 			for i in range(first_allowed_bank, allowed_bank_count):
-				if bank_sizes[i]+size <= max_bank_size:
-					bank_sizes[i] += size
+				size_if_added = align_and_add(bank_sizes[i], all_segment_alignments[biggest], size)
+				if size_if_added <= max_bank_size:
+					bank_sizes[i] = size_if_added
 					bank_segments[i].append(biggest)
 					break
 			else:
 				if slow: # Retry in the fast areas if there's no room in the slow areas
 					for i in range(reserve_banks, 64):
-						if bank_sizes[i]+size <= max_bank_size:
-							bank_sizes[i] += size
+						size_if_added = align_and_add(bank_sizes[i], all_segment_alignments[biggest], size)
+						if size_if_added <= max_bank_size:
+							bank_sizes[i] = size_if_added
 							bank_segments[i].append(biggest)
 							break
 					else:
@@ -275,7 +297,10 @@ with open(sys.argv[2], 'w') as f:
 	for bank in range(bank_count):
 		for segment in bank_segments[bank]:
 			if segment not in static_rom_segments:
-				f.write("  %s: load = ROM%d%s, type = ro;\n" % (segment, bank, "_code" if (isCodeSegment(segment) and hirom) else ""))
+				line = "  %s: load = ROM%d%s, type = ro" % (segment, bank, "_code" if (isCodeSegment(segment) and hirom) else "")
+				if all_segment_alignments[segment] > 1:
+					line += ", align = %d" % all_segment_alignments[segment]
+				f.write(line + ";\n")
 
 	f.write(original_config_after_segments)
 

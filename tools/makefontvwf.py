@@ -4,7 +4,7 @@ from PIL import Image
 
 outfile = open("src/vwf_fontdata.s", "w")
 outfile.write('; This is automatically generated. Edit "makefont.py" or the font graphics instead\n')
-outfile.write('.segment "C_Dialog"\n')
+outfile.write('.segment "C_Inventory_VWF_Dialog"\n')
 
 def process_font(font_name):
 	im = Image.open("tools/fonts/" + font_name + ".png")

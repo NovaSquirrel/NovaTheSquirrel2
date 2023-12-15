@@ -20,7 +20,7 @@
 .include "paletteenum.s"
 .smart
 
-.segment "C_Inventory"
+.segment "C_Inventory_VWF_Dialog"
 .import InitVWF, DrawVWF, CopyVWF, KeyRepeat
 CursorTopMenu = CursorX + 1
 .import Mode7PlayerHeight, Mode7PlayerVSpeed; Reuse these since it's not used during the inventory
