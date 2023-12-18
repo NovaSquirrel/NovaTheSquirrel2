@@ -298,46 +298,19 @@ DelayedBlockLoop:
 
   ; Calculate the integer versions of the scroll positions now,
   ; so that the player and actors can use them for their own positioning.
-  ; Maybe in the future I can have levels (or backgrounds) specify different scroll speeds.
-  lda ScrollX
-  lsr
-  lsr
-  lsr
-  lsr
-  sta FGScrollXPixels
-  sta Layer1_ScrollXPixels
-  lsr
-  sta BGScrollXPixels
-  sta Layer2_ScrollXPixels
-  lsr
-  sta Layer3_ScrollXPixels
-  ; ---
-  ; Get position in camera shake table first
-  lda CameraShake
+  ; A background can pick its own routine here from a list of options for different scroll speeds.
+  lda LevelBackgroundId
   and #255
-  beq :+
-    dec CameraShake ; 16-bit decrement, but it should be fine since it shouldn't decrement if low byte is zero
-  :
   asl
   tax
-
-  lda ScrollY
+  .import BackgroundFlags
+  lda f:BackgroundFlags,x
   lsr
   lsr
   lsr
-  lsr
-  adc #0
-  dec a ; SNES displays lines 1-224 so shift it up to 0-223
-  add f:CameraShakeTable,x
-  sta FGScrollYPixels
-  sta Layer1_ScrollYPixels
-  lsr
-  add #128
-  sta BGScrollYPixels
-  sta Layer2_ScrollYPixels
-  lsr
-  add #128
-  sta Layer3_ScrollYPixels
+  and #%11110
+  tax
+  jsr (.loword(ParallaxScrollRoutines),x)
 
   ; If the level has two foreground layers, calculate the scroll positions for that
   ; second foreground layer, and also move actors and the player if they're standing on the second layer.
@@ -593,4 +566,53 @@ CameraShakeTable:
 
 .proc CallScrollOverrideHook
   jml [ScrollOverrideHook]
+.endproc
+
+.proc ParallaxScrollRoutines
+  ; Room for 16 options
+  .addr DefaultParallaxScroll ; 1, 1/2, 1/4
+
+DefaultParallaxScroll:
+  lda ScrollX
+  lsr
+  lsr
+  lsr
+  lsr
+  sta FGScrollXPixels
+  sta Layer1_ScrollXPixels
+  lsr
+  sta BGScrollXPixels
+  sta Layer2_ScrollXPixels
+  lsr
+  sta Layer3_ScrollXPixels
+  ; ---
+  ; Get position in camera shake table first
+  .if 0
+  lda CameraShake
+  and #255
+  beq :+
+    dec CameraShake ; 16-bit decrement, but it should be fine since it shouldn't decrement if low byte is zero
+  :
+  asl
+  tax
+  .endif
+
+  lda ScrollY
+  lsr
+  lsr
+  lsr
+  lsr
+  adc #0
+  dec a ; SNES displays lines 1-224 so shift it up to 0-223
+  ;add f:CameraShakeTable,x
+  sta FGScrollYPixels
+  sta Layer1_ScrollYPixels
+  lsr
+  add #128
+  sta BGScrollYPixels
+  sta Layer2_ScrollYPixels
+  lsr
+  add #128
+  sta Layer3_ScrollYPixels
+  rts
 .endproc

@@ -95,9 +95,10 @@ outfile.write('.endproc\n\n')
 
 outfile.write('.proc BackgroundFlags\n  .word $ffff\n')
 for b in all_backgrounds:
-	# ........ ....SSss
-	#              ||++- Size (Map 2)
-	#              ++--- Size (Map 3)
+	# ........ ppppSSss
+	#          ||||||++- Size (Map 2)
+	#          ||||++--- Size (Map 3)
+	#          ++++----- Background scroll speeds
 	flags = 0
 	if b['size'] == 'wide':
 		flags = 1
