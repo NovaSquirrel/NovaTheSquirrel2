@@ -301,6 +301,7 @@ hi_source:
 
 ;;
 ; Uploads a specific graphic asset to VRAM
+; Preserves X and Y
 ; @param A graphic number (0-255)
 .import GraphicsDirectory
 .proc DoGraphicUpload
@@ -517,36 +518,18 @@ SpriteLoop:
   lda #Palette::SPNova
   ldy #9
   jsl DoPaletteUpload
-
-  ; Get level background map from the background list, if there is one
-  lda LevelBackgroundId
-  and #255
-  cmp #255
-  beq :+
-    tax
-    .import BackgroundMap
-    lda f:BackgroundMap,x
-    and #255
-    jsl DoGraphicUpload
-  :
   lda #GraphicsUpload::SPCommon
   jsl DoGraphicUpload
 
   seta8
-  lda ForegroundLayerThree
-  bne :+
-    ; Clear layer 3
-    ldx #ExtraBG
-    ldy #32*4
-    jsl ppu_clear_nt
-    .a8 ; Side effect of ppu_clear_nt
-  :
 
   ; .------------------------------------.
   ; | Set up PPU registers for level use |
   ; '------------------------------------'
   lda LevelBGMode
   sta BGMODE
+  lda #VBLANK_NMI|AUTOREAD  ; Disable htime/vtime IRQ
+  sta PPUNMI
 
   lda #(BG1CHRBase>>12)|((BG2CHRBase>>12)<<4)
   sta BGCHRADDR+0  ; bg plane 0 CHR at $0000, plane 1 CHR at $2000
@@ -556,38 +539,71 @@ SpriteLoop:
   lda #SpriteCHRBase >> 13
   sta OBSEL      ; sprite CHR at $6000, sprites are 8x8 and 16x16
 
+  ; First layer always goes at $5800 and is two screens wide
   lda #1 | ((ForegroundBG >> 10)<<2)
   sta NTADDR+0   ; plane 0 nametable at $5800, 2 screens wide
-  tdc ; A = zero
-  lda LevelBackgroundId
-  tax
-  .import BackgroundFlags
-  lda f:BackgroundFlags,x
-  ; ......ss
-  ;       ++- Tilemap size
-  and #3
-  ora #(BackgroundBG >> 10)<<2
-  sta NTADDR+1   ; plane 1 nametable at $5000, size specified by BackgroundFlags
-  lda TwoLayerLevel ; Force two screens wide on two-layer levels
-  beq :+
-    lda ForegroundLayerThree
-    bne :+
-      lda #1 | ((BackgroundBG >> 10)<<2)
-      sta NTADDR+1   ; plane 0 nametable at $5000, 2 screens wide
-      stz BGCHRADDR ; First two planes both at $0000
-  :
 
-  ; plane 2 nametable defaults to $4c00, 1 screen, but if there's a foreground on it then it's $4800, 2 screens wide
+  ; Third layer nametable defaults to $4c00 (1 screen), but if there's a foreground on it then it's $4800, 2 screens wide
   lda #0 | ((ExtraBG >> 10)<<2)
   sta NTADDR+2
   lda ForegroundLayerThree
   beq :+
     lda #1 | ((ExtraBGWide >> 10)<<2)
     sta NTADDR+2
+    bra :++ ; This also means the second foreground layer is *not* on the second background layer
+  :
+  ; Force two screens wide on two-layer levels
+  lda TwoLayerLevel
+  beq :+
+    lda #1 | ((BackgroundBG >> 10)<<2)
+    sta NTADDR+1   ; plane 0 nametable at $5000, 2 screens wide
+    stz BGCHRADDR ; First two planes both at $0000
   :
 
-  lda #VBLANK_NMI|AUTOREAD  ; Disable htime/vtime IRQ
-  sta PPUNMI
+  ; Load in the background map and tiles
+  .import BackgroundFlags, BackgroundMap2, BackgroundTiles2, BackgroundMap3, BackgroundTiles3
+  lda LevelBackgroundId
+  seta16
+  and #255
+  cmp #255
+  beq NoBackground
+    asl
+    tax
+
+    lda f:BackgroundMap2,x
+    bmi @NoBG2
+      jsl DoGraphicUpload
+      lda f:BackgroundTiles2,x
+      jsl DoGraphicUpload
+      lda f:BackgroundFlags,x
+      seta8
+      and #3
+      ora #(BackgroundBG >> 10)<<2
+      sta NTADDR+1
+      seta16
+    @NoBG2:
+
+    lda f:BackgroundMap3,x
+    bmi @NoBG3
+      jsl DoGraphicUpload
+      lda f:BackgroundTiles3,x
+      jsl DoGraphicUpload
+      lda f:BackgroundFlags,x
+      lsr
+      lsr
+      seta8
+      and #3
+      beq :+ ; Change the amount of space reserved based on the map size
+        ora #(ExtraBGWide >> 10)<<2
+        bra :++
+      :
+        ora #(ExtraBG >> 10)<<2
+      :
+      sta NTADDR+2
+      seta16
+    @NoBG3:
+  NoBackground:
+  seta8
 
   ; Copy over the level's chosen color math settings
   .import ColorMathTableBLENDMAIN, ColorMathTableBLENDSUB, ColorMathTableCGADSUB, ColorMathTableOptions

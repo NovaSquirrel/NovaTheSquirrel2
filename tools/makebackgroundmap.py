@@ -20,7 +20,7 @@ def tilestring_vflip(ts):
 		out.append(ts[i^(7 << 3)])
 	return ''.join(out)
 
-def tilestring_bytes(ts):
+def tilestring_bytes(ts, bpp):
 	# First get the data for each plane
 	plane_data = []
 	for plane in range(4):
@@ -41,20 +41,25 @@ def tilestring_bytes(ts):
 	for i in range(8):
 		a.append(plane_data[0][i])
 		a.append(plane_data[1][i])
-		b.append(plane_data[2][i])
-		b.append(plane_data[3][i])
+		if bpp == 4:
+			b.append(plane_data[2][i])
+			b.append(plane_data[3][i])
 	return a+b
 
 def convert(f):
 	# Name of the background is the filename with path and extension taken out
 	name = os.path.splitext(os.path.basename(f))[0]
-	print("Name "+name)
+	#print("Name "+name)
 
 	# Palette to use
 	palette_base = 7
 	# Tile number the background tiles start at
 	tile_number_base = 256
 
+	tile_bpp = 4
+	tile_priority = False
+
+	# If there's a config file, read it and let it override the defaults
 	text_filename = Path(f).with_suffix('.txt')
 	if text_filename.is_file():
 		with open(text_filename) as config_file:
@@ -63,13 +68,18 @@ def convert(f):
 				word, arg = separateFirstWord(line)
 
 				if word == 'tile_base':
-					tile_number_base = int(arg)
+					tile_number_base = parseNumber(arg)
 				elif word == 'palette_base':
-					palette_base = int(arg)
+					palette_base = parseNumber(arg)
+				elif word == '2bpp':
+					tile_bpp = 2
+					palette_base = 0 # Assume this means we're using mode 1 too
+				elif word == 'priority':
+					tile_priority = True
 				else:
 					print("Unrecognized config word: "+word)
 	# Base value for a tilemap value
-	tile_base = (palette_base<<10) | tile_number_base
+	tile_base = (palette_base << 10) | (tile_priority * 0x2000) | tile_number_base
 
 	im = Image.open(f)
 
@@ -88,35 +98,54 @@ def convert(f):
 				row = []
 				for tw in range(32):
 					imtile = im.crop((screenw*256+tw*8, screenh*256+th*8, screenw*256+tw*8+8, screenh*256+th*8+8))
-					tilestring = ''.join(['%x' % p for p in imtile.getdata()])
+					tile_data = imtile.getdata()
+
+					# For 2bpp backgrounds, try to guess the palette number for the tile and strip it from the tile's data
+					tile_palette = None
+					if tile_bpp == 2:
+						tile_data = list(tile_data)
+						warning_shown = False
+						for i in range(64):
+							pixel = tile_data[i]
+							if pixel % 4 != 0: # Ignore transparent pixels
+								if not warning_shown and tile_palette != None and tile_palette != pixel // 4:
+									print("Ambiguous palette at tile %d,%d" % (screenw*32+tw, screenh*32+th))
+									warning_shown = True
+								tile_palette = pixel // 4
+							tile_data[i] = pixel % 4
+					if tile_palette == None: # If it's an empty tile, default to palette zero
+						tile_palette = 0
+
+					tilestring = ''.join(['%x' % p for p in tile_data])
 
 #					if tilestring in all_solid:
 #						row.append((palette_base<<10) | all_solid.index(tilestring))
 #						continue
 
+					# If a tile is already present as-is, just use it
 					if tilestring in all_tiles:
-						row.append(tile_base + all_tiles.index(tilestring))
+						row.append(tile_base + all_tiles.index(tilestring) + (tile_palette << 10))
 						continue
 
 					# Test for tiles that can be saved with flips
 					tilestring_h = tilestring_hflip(tilestring)
 					if tilestring_h in all_tiles:
-						row.append(0x4000 + tile_base + all_tiles.index(tilestring_h))
+						row.append(0x4000 + tile_base + all_tiles.index(tilestring_h) + (tile_palette << 10))
 						flips += 1
 						continue
 					tilestring_v = tilestring_vflip(tilestring)
 					if tilestring_v in all_tiles:
-						row.append(0x8000 + tile_base + all_tiles.index(tilestring_v))
+						row.append(0x8000 + tile_base + all_tiles.index(tilestring_v) + (tile_palette << 10))
 						flips += 1
 						continue
 					tilestring_hv = tilestring_hflip(tilestring_v)
 					if tilestring_hv in all_tiles:
-						row.append(0xc000 + tile_base + all_tiles.index(tilestring_hv))
+						row.append(0xc000 + tile_base + all_tiles.index(tilestring_hv) + (tile_palette << 10))
 						flips += 1
 						continue
 
 					all_tiles.append(tilestring)
-					row.append(tile_base + all_tiles.index(tilestring))
+					row.append(tile_base + all_tiles.index(tilestring) + (tile_palette << 10))
 
 				background_tilemap.append(row)
 
@@ -129,7 +158,7 @@ def convert(f):
 	outfile = open("backgrounds/%s.chrsfc" % name, "wb")
 	temp = []
 	for tile in all_tiles:
-		temp += tilestring_bytes(tile)
+		temp += tilestring_bytes(tile, tile_bpp)
 	temp = bytes(temp)
 	outfile.write(bytes(temp))
 	outfile.close()
@@ -144,6 +173,5 @@ def convert(f):
 	outfile.write(bytes(temp))
 	outfile.close()
 
-print(sys.argv)
 print("Converting "+sys.argv[1])
 convert(sys.argv[1])

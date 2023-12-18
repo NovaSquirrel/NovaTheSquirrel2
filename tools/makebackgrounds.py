@@ -24,7 +24,7 @@ for line in text:
 	if line.startswith("+"): # new background
 		saveBackground()
 		# Reset to prepare for the new actor
-		background = {"name": line[1:], "map": "", "size": "small", "run": None, "init": None}
+		background = {"name": line[1:], "map": "", "map3": "", "size": "small", "size3": "small", "run": None, "init": None}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -33,13 +33,13 @@ for line in text:
 		aliases[name] = value
 
 	# Attributes
-	elif word in ["map", "size"]:
+	elif word in ["map", "map3", "size", "size3"]:
 		background[word] = arg
 	elif word in ["run", "init"]:
 		background[word] = arg
 		if arg not in all_subroutines:
 			all_subroutines.append(arg)
-
+		
 # Save the last one
 saveBackground()
 
@@ -51,25 +51,63 @@ outfile = open("src/backgrounddata.s", "w")
 outfile.write('; This is automatically generated. Edit "backgrounds.txt" instead\n')
 outfile.write('.include "snes.inc"\n.include "global.inc"\n.include "graphicsenum.s"\n')
 
-outfile.write('.export BackgroundMap, BackgroundFlags, BackgroundSetup, BackgroundRoutine\n')
+outfile.write('.export BackgroundMap2, BackgroundTiles2, BackgroundMap3, BackgroundTiles3, BackgroundFlags, BackgroundSetup, BackgroundRoutine\n')
 
 if len(all_subroutines):
 	outfile.write('.import %s\n' % str(", ".join(all_subroutines)))
 outfile.write('\n.segment "BackgroundData"\n\n')
 
-outfile.write('.proc BackgroundMap\n  .byt 0\n')
+# --------
+
+outfile.write('.proc BackgroundMap2\n  .word $ffff\n')
 for b in all_backgrounds:
-	outfile.write('  .byt GraphicsUpload::Map%s ; %s\n' % (b["map"], b["name"]))
+	if b["map"]:
+		outfile.write('  .word GraphicsUpload::Map%s ; %s\n' % (b["map"], b["name"]))
+	else:
+		outfile.write('  .word $ffff ; %s\n' % (b["name"]))
 outfile.write('.endproc\n\n')
 
-outfile.write('.proc BackgroundFlags\n  .byt 0\n')
+outfile.write('.proc BackgroundTiles2\n  .word $ffff\n')
 for b in all_backgrounds:
+	if b["map"]:
+		outfile.write('  .word GraphicsUpload::%s ; %s\n' % (b["map"], b["name"]))
+	else:
+		outfile.write('  .word $ffff ; %s\n' % (b["name"]))
+outfile.write('.endproc\n\n')
+
+outfile.write('.proc BackgroundMap3\n  .word $ffff\n')
+for b in all_backgrounds:
+	if b["map3"]:
+		outfile.write('  .word GraphicsUpload::Map%s ; %s\n' % (b["map3"], b["name"]))
+	else:
+		outfile.write('  .word $ffff ; %s\n' % (b["name"]))
+outfile.write('.endproc\n\n')
+
+outfile.write('.proc BackgroundTiles3\n  .word $ffff\n')
+for b in all_backgrounds:
+	if b["map3"]:
+		outfile.write('  .word GraphicsUpload::%s ; %s\n' % (b["map3"], b["name"]))
+	else:
+		outfile.write('  .word $ffff ; %s\n' % (b["name"]))
+outfile.write('.endproc\n\n')
+
+# --------
+
+outfile.write('.proc BackgroundFlags\n  .word $ffff\n')
+for b in all_backgrounds:
+	# ........ ....SSss
+	#              ||++- Size (Map 2)
+	#              ++--- Size (Map 3)
 	flags = 0
 	if b['size'] == 'wide':
 		flags = 1
 	elif b['size'] == 'tall':
 		flags = 2
-	outfile.write('  .byt %d\n' % flags)
+	if b['size3'] == 'wide':
+		flags = 1 << 2
+	elif b['size3'] == 'tall':
+		flags = 2 << 2
+	outfile.write('  .word %d\n' % flags)
 outfile.write('.endproc\n\n')
 
 outfile.write('.proc BackgroundSetup\n  .addr 0\n')

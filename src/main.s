@@ -296,18 +296,9 @@ DelayedBlockLoop:
     jsl CallGameplayHook
   :
 
-  .if 1
-  lda keydown
-  and #KEY_L
-  beq :+
-    lda FG2OffsetX
-    add #16
-    sta FG2OffsetX
-  :
-  .endif
-
   ; Calculate the integer versions of the scroll positions now,
   ; so that the player and actors can use them for their own positioning.
+  ; Maybe in the future I can have levels (or backgrounds) specify different scroll speeds.
   lda ScrollX
   lsr
   lsr
@@ -318,6 +309,8 @@ DelayedBlockLoop:
   lsr
   sta BGScrollXPixels
   sta Layer2_ScrollXPixels
+  lsr
+  sta Layer3_ScrollXPixels
   ; ---
   ; Get position in camera shake table first
   lda CameraShake
@@ -342,6 +335,9 @@ DelayedBlockLoop:
   add #128
   sta BGScrollYPixels
   sta Layer2_ScrollYPixels
+  lsr
+  add #128
+  sta Layer3_ScrollYPixels
 
   ; If the level has two foreground layers, calculate the scroll positions for that
   ; second foreground layer, and also move actors and the player if they're standing on the second layer.
@@ -365,6 +361,7 @@ DelayedBlockLoop:
     ; Don't decrement A because FGScrollYPixels did it already
     tay
 
+    ; Figure out which SNES layer corresponds to the second foreground layer
     bit8 ForegroundLayerThree
     bpl :+
       ; Extra FG on layer 3
@@ -492,10 +489,10 @@ OnlyCheckHealth:
     jml ResumeLevelFromCheckpoint
   NotDie:
 
-    seta8
+;    seta8
 ;    lda #$0d
 ;    sta PPUBRIGHT
-    seta16
+;    seta16
 
   ; Include code for handling the vblank
   ; and updating PPU memory.
@@ -574,7 +571,7 @@ padwait:
   lda HDMASTART_Mirror
   sta HDMASTART
 
-  ; Now that we're done with vblank tasks, clean up after vblank
+  ; Clean up after vblank, now that everything that's time-sensitive is done
   seta16
   .repeat ::BLOCK_UPDATE_COUNT, I
     stz BlockUpdateAddressTop+(I*2)
