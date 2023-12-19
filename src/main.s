@@ -20,7 +20,7 @@
 .smart
 .export main, nmi_handler
 .import RunAllActors, DrawPlayer, DrawPlayerStatus
-.import StartLevel, ResumeLevelFromCheckpoint
+.import StartLevel, ResumeLevelFromCheckpoint, BGEffectRun
 
 IRIS_EFFECT_END = 30
 
@@ -401,6 +401,8 @@ DelayedBlockLoop:
   beq :+
     jsl CallScrollOverrideHook
   :
+  ; Call this after the scroll hook, in case the background update code wants to use the scroll values
+  jsl BGEffectRun
 
   jsl DrawPlayerStatus
 
@@ -528,10 +530,15 @@ padwait:
   sta <BGSCROLLY+6
   pea $0000
   pld
-
-  seta16
-  .import BGEffectRun
-  jsl BGEffectRun
+  ; Copy these over now so that BGEffectRun can run whenever without causing tearing
+  ldx BGEffectRAM_Mirror+0
+  stx BGEffectRAM+0
+  ldx BGEffectRAM_Mirror+2
+  stx BGEffectRAM+2
+  ldx BGEffectRAM_Mirror+4
+  stx BGEffectRAM+4
+  ldx BGEffectRAM_Mirror+6
+  stx BGEffectRAM+6
 
   ; Add iris effect
   seta8

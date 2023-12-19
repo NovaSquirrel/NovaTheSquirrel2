@@ -212,7 +212,8 @@
   BGScrollXPixels: .res 2 ; Gets copied into second layer's scroll registers
   BGScrollYPixels: .res 2
   ; Storage, for effects
-  BGEffectRAM:     .res 8
+  BGEffectRAM:        .res 8 ; Version used in effects
+  BGEffectRAM_Mirror: .res 8 ; In-progress version
 
   LevelBackgroundColor:   .res 2 ; Palette entry
   LevelBackgroundId:      .res 1 ; Backgrounds specified in backgrounds.txt

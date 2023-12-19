@@ -198,8 +198,8 @@ HDMAScrollTable:
 .proc UpdateSkyGradient
   lda BGScrollXPixels  
   lsr
-  sta BGEffectRAM+0
+  sta BGEffectRAM_Mirror+0
   lsr
-  sta BGEffectRAM+2
+  sta BGEffectRAM_Mirror+2
   rtl
 .endproc
