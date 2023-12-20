@@ -46,13 +46,7 @@
 					"Id":	"FloatingPlatform",
 					"X":	14,
 					"Y":	23,
-					"W":	6,
-					"H":	1
-				}, {
-					"Id":	"Ledge",
-					"X":	20,
-					"Y":	23,
-					"W":	8,
+					"W":	2,
 					"H":	1
 				}, {
 					"Id":	"Ledge",
@@ -315,12 +309,6 @@
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"SmallTreeBushTopLeft",
-					"X":	22,
-					"Y":	21,
-					"W":	1,
-					"H":	1
-				}, {
 					"Id":	"Grass",
 					"X":	34,
 					"Y":	26,
@@ -348,12 +336,6 @@
 					"Id":	"RedFlower",
 					"X":	5,
 					"Y":	29,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"BlueFlower",
-					"X":	20,
-					"Y":	22,
 					"W":	1,
 					"H":	1
 				}, {
@@ -1304,26 +1286,14 @@
 					"H":	1
 				}, {
 					"Id":	"SmallTreeTopLeft",
-					"X":	24,
-					"Y":	19,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"SmallTreeTopLeft",
 					"X":	26,
 					"Y":	19,
 					"W":	1,
 					"H":	1
 				}, {
-					"Id":	"Sand",
-					"X":	16,
-					"Y":	27,
-					"W":	4,
-					"H":	5
-				}, {
 					"Id":	"ColorfulFlower1",
-					"X":	21,
-					"Y":	22,
+					"X":	16,
+					"Y":	26,
 					"W":	1,
 					"H":	1
 				}, {
@@ -1373,12 +1343,6 @@
 					"X":	39,
 					"Y":	26,
 					"W":	4,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtBigStar1",
-					"X":	21,
-					"Y":	25,
-					"W":	1,
 					"H":	1
 				}, {
 					"Id":	"GrassyDirtBigStar1",
@@ -1444,18 +1408,6 @@
 					"Id":	"GrassyDirtStar",
 					"X":	30,
 					"Y":	31,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtStar",
-					"X":	26,
-					"Y":	30,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtStar",
-					"X":	23,
-					"Y":	28,
 					"W":	1,
 					"H":	1
 				}, {
@@ -1592,12 +1544,6 @@
 					"H":	1
 				}, {
 					"Id":	"GrassyDirtXs",
-					"X":	24,
-					"Y":	31,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtXs",
 					"X":	31,
 					"Y":	30,
 					"W":	1,
@@ -1606,18 +1552,6 @@
 					"Id":	"GrassyDirtPlantSmall",
 					"X":	30,
 					"Y":	28,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtPlantRight",
-					"X":	26,
-					"Y":	24,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtPlantLeft",
-					"X":	25,
-					"Y":	24,
 					"W":	1,
 					"H":	1
 				}, {
@@ -1898,12 +1832,6 @@
 					"H":	1
 				}, {
 					"Id":	"GrassyDirtPlantSmall",
-					"X":	26,
-					"Y":	27,
-					"W":	1,
-					"H":	1
-				}, {
-					"Id":	"GrassyDirtPlantSmall",
 					"X":	33,
 					"Y":	30,
 					"W":	1,
@@ -1913,6 +1841,48 @@
 					"X":	94,
 					"Y":	29,
 					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"LedgeSolidLeft",
+					"X":	16,
+					"Y":	27,
+					"W":	1,
+					"H":	4
+				}, {
+					"Id":	"Ledge",
+					"X":	17,
+					"Y":	27,
+					"W":	3,
+					"H":	1
+				}, {
+					"Id":	"BlueFlower",
+					"X":	17,
+					"Y":	26,
+					"W":	1,
+					"H":	1
+				}, {
+					"Id":	"WoodPlankPlatform",
+					"X":	20,
+					"Y":	23,
+					"W":	6,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	26,
+					"Y":	25,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"Ledge",
+					"X":	26,
+					"Y":	23,
+					"W":	2,
+					"H":	1
+				}, {
+					"Id":	"FloatingPlatform",
+					"X":	17,
+					"Y":	23,
+					"W":	2,
 					"H":	1
 				}]
 		}, {
