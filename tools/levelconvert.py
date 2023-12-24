@@ -399,6 +399,8 @@ for f in glob.glob("levels/*.json"):
 
 	# Write the actor data
 	actors = sorted(actors, key=lambda r: r.x)
+	if len(actors) > 256:
+		print("Warning: Level %s has %d actors, which is over the limit (256)" % (plain_name, len(actors)))
 	outfile.write("level_%s_sp:\n" % plain_name)
 	for actor in actors:
 		if len(actor.extra):

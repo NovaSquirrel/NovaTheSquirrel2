@@ -110,14 +110,16 @@
 .export DecompressLevel
 .proc DecompressLevel
   ; Clear out some buffers before the level loads stuff into them
+  ; Don't need to initialize the actor list because that'll happen in renderlevel.s
 
-  ; Don't clear any entities, that'll be done when rendering
-
-  ; Clear level buffer
+  ; Clear out the level itself
   ldx #.loword(LevelBuf)
   ldy #(256*32*2)*2
   jsl MemClear7F
 
+  ldx #.loword(ColumnWords)
+  ldy #512
+  jsl MemClear7F
 
   ; Clear sprite palette slots
   lda #$ffff
@@ -125,10 +127,6 @@
   sta SpritePaletteSlots+2*1
   sta SpritePaletteSlots+2*2
   sta SpritePaletteSlots+2*3
-
-  ldx #.loword(ColumnWords)
-  ldy #512
-  jsl MemClear7F
 
   ; Set defaults for horizontal levels
   lda #.loword(GetLevelPtrXY_Horizontal)

@@ -398,11 +398,15 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
 
 .segment "BSS7E"
   RenderBuffer:
-  Scratchpad:  .res 4096
-  NameFontRenderTop:    .res 384 ; Enough for 12 tiles
-  NameFontRenderBottom: .res 384 ; Enough for 12 tiles
+  Scratchpad:           .res 4096 ; Currently used for VWF and overworld map
+  NameFontRenderTop:    .res 384  ; Enough for 12 tiles
+  NameFontRenderBottom: .res 384  ; Enough for 12 tiles
 
-  LevelActorBuffer: .res 1024 ; Room for 256 actors if the list must be in RAM, not used by default
+  LevelActorBuffer:     .res 1024 ; Room for 256 actors if the list must be in RAM.
+                                  ; Normally this isn't used and the list is in ROM, in which case this buffer could be repurposed.
+
+  LevelActorDefeatedAt: .res 512  ; Contains 256 timestamps
+
   IrisEffectBuffer1: .res 224*3+5 ; HDMA table
   IrisEffectBuffer2: .res 224*3+5 ; HDMA table
 
@@ -410,7 +414,7 @@ LevelHeaderPointer: .res 3 ; For starting the same level from a checkpoint, or o
   LevelBuf:    .res 256*32*2 ; 16KB, primary buffer
   LevelBufAlt: .res 256*32*2 ; 16KB, for layer 2 levels or other purposes
   ColumnWords: .res 512      ; Two byte per column of the level
-  LevelSpriteFGBuffer: .res 512
+  LevelSpriteFGBuffer: .res 512 ; 2D grid of sprite tile/attribute words. See renderlevelsprites.s
 
 ;  ParallaxTilemap: .res 8192 ; four screens to DMA into layer 2
   HDMA_Buffer1: .res 2048    ; for building HDMA tables in

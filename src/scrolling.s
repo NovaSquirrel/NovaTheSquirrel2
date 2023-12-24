@@ -493,7 +493,21 @@ Index = 0
   phy
   php
   setaxy16
-  
+
+  ; Was this actor defeated too recently?
+  ; Actors that aren't enemies will always have a zero for LevelActorDefeatedAt and be allowed through.
+  tya
+  lsr ; Halve the index because LevelActorDefeatedAt is 2 bytes per entry, and the index is 4 bytes per entry.
+  tax
+  lda f:LevelActorDefeatedAt,x
+  beq NeverDefeated
+  cmp framecount
+  bcs Exit       ; If framecount wrapped around then it's probably been long enough
+  sbc framecount ; Carry guaranteed cleared because of the not-taken BCS
+  cmp #.loword(-6*60)
+  bcs Exit
+NeverDefeated:
+
   ; Ensure the actor has not already been spawned
   ldx #ActorStart
 CheckExistsLoop:

@@ -295,7 +295,7 @@ SF_SPECIAL_MASK     = %00001111
 
 .global Scratchpad
 .global RenderBuffer, NameFontRenderTop, NameFontRenderBottom
-.global LevelActorBuffer
+.global LevelActorBuffer, LevelActorDefeatedAt
 
 .global UseTapRun, TapReleaseTimer, TapReleaseButton, IsTapRun
 .global TailAttackTimer, OldTailAttackTimer, TailAttackDirection, TailAttackFrame, TailAttackCooldown, TailAttackVariable, TailAttackDynamicSlot

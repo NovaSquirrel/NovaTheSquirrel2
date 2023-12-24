@@ -1946,7 +1946,7 @@ BumpStunOnly:
 
 ; Instantly kill anything
 Kill:
-  jml ActorBecomePoof
+  jmp DefeatEnemyViaProjectile
 
 DamageALittleLess:
   jsr ProjectileBecomesLandingParticle
@@ -2000,7 +2000,7 @@ AddDamage:
   beq Defeated
   bcs Damaged
 Defeated:
-  jml ActorBecomePoof
+  jmp DefeatEnemyViaProjectile
 Damaged:
   lda #ActorStateValue::Stunned
   sta ActorState,x
@@ -2223,6 +2223,22 @@ CopyAbility:
   .byt Ability::Sword
   .byt Ability::Burger
   .byt Ability::Bubble
+.endproc
+
+.a16
+.i16
+.proc DefeatEnemyViaProjectile
+  lda ActorIndexInLevel,x
+  cmp #$ffff ; $ffff means the actor wasn't actually spawned from the level layout, so they don't have a real index
+  beq NotInActorList
+  phx
+  lsr ; Halve the index because LevelActorDefeatedAt is 2 bytes per entry, and the index is 4 bytes per entry.
+  tax
+  lda framecount
+  sta f:LevelActorDefeatedAt,x
+  plx
+NotInActorList:
+  jml ActorBecomePoof
 .endproc
 
 .a16

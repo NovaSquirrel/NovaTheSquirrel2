@@ -99,6 +99,12 @@
   ldx #ActorStart
   ldy #ProjectileEnd-ActorStart
   jsl MemClear
+
+  ; Allow all actors to spawn in
+  ldx #.loword(LevelActorDefeatedAt)
+  ldy #512
+  jsl MemClear
+
 DidPreserveEntities:
 
   seta8

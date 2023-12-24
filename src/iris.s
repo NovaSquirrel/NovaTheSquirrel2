@@ -48,12 +48,11 @@
   lsr
   bcc :+
     lda #.loword(IrisEffectBuffer1)
-    sta DMAADDR+$70
     bra :++
   :
     lda #.loword(IrisEffectBuffer2)
-    sta DMAADDR+$70
   :
+  sta DMAADDR+$70
 
   seta8
   lda #^IrisEffectBuffer1
