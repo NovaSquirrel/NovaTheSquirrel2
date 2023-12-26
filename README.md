@@ -51,4 +51,11 @@ This project uses a modified version of SNESGSS which [appears to be licensed un
 
 This project also uses LZ4 and SPC700 loading code from [libSFX](https://github.com/Optiroc/libSFX) which is under the MIT license.
 
-Characters and assets (such as art, levels, story) are not licensed to be used outside of this game. You may not use them without permission. See [snes-platformer-example](https://github.com/NovaSquirrel/snes-platformer-example) for the basic platformer game engine on its own, with free example assets.
+The following may not be used in other projects without permission:
+* Character designs
+* PNG files (and files generated from them) except for the `palettes` directory and fonts
+* TMX files (and files generated from them)
+* Levels (`levels` and `m7levels` directories)
+* Story (`dialog.txt`)
+
+See [snes-platformer-example](https://github.com/NovaSquirrel/snes-platformer-example) for an example that replaces all assets with free ones, uses a permissive license for the code, and 
