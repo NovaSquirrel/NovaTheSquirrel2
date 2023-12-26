@@ -58,4 +58,4 @@ The following may not be used in other projects without permission:
 * Levels (`levels` and `m7levels` directories)
 * Story (`dialog.txt`)
 
-See [snes-platformer-example](https://github.com/NovaSquirrel/snes-platformer-example) for an example that replaces all assets with free ones, uses a permissive license for the code, and 
+See [snes-platformer-example](https://github.com/NovaSquirrel/snes-platformer-example) for an example that replaces all assets with free ones, uses a permissive license for the code, and removes complexity specific to this game.
