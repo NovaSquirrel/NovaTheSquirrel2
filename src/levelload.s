@@ -616,6 +616,8 @@ ActorListInRAM:
   .word $ffff&BlockByteReferenceSingle,    256
   .word $ffff&BlockByteReferenceRectangle, 0
   .word $ffff&BlockByteReferenceRectangle, 256
+  .word $ffff&BlockByteReferenceHuge,      0
+  .word $ffff&BlockByteReferenceHuge,      256
 
   ; Commands that place multiple blocks with the block specified with a nybble
   .word $ffff&BlockWideList,        32*0
@@ -814,6 +816,24 @@ ActorListInRAM:
   sta DecodeValue
   seta8
   jmp HasRectangleParameter
+.endproc
+
+.proc BlockByteReferenceHuge ; XY TT WW HH
+  jsr XYLevelByte
+  tdc ; Clear entire accumulator
+  jsr NextLevelByte
+  seta16
+  ora LevelCommands+2,x
+  asl
+  tax
+  lda f:BlockByteReferenceTable,x
+  sta DecodeValue
+  seta8
+  jsr NextLevelByte
+  sta DecodeWidth
+  jsr NextLevelByte
+  sta DecodeHeight
+  jmp DecodeWriteRectangle
 .endproc
 
 .a8

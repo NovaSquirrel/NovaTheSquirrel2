@@ -31,7 +31,8 @@ def saveBlock():
 
 	all_blocks.append(block)
 	# Keep track of what blocks are available in the level editor
-	if not block['editor_hide']:
+	# so that the script can generate the BlockByteReference table
+	if not block['editor_hide'] and not block['byte_ref']:
 		all_byte_reference_blocks.append(block['name'])
 
 # Nametable format:
@@ -52,7 +53,7 @@ for line in text:
 		priority = False
 		block = {"name": line[1:], "solid": False, "solid_top": False, \
 		  "tiles": [], "interaction": {}, "interaction_set": 0, "class": "None", "autotile": None,
-		  "sprite_tile": 0, "editor_hide": False}
+		  "sprite_tile": 0, "editor_hide": False, "byte_ref": False}
 		continue
 	word, arg = separateFirstWord(line)
 	# Miscellaneous directives
@@ -129,12 +130,8 @@ for line in text:
 		all_classes.add(arg)
 
 	# Specifying tiles and tile attributes
-	elif word == "solid":
-		block["solid"] = True
-	elif word == "solid_top":
-		block["solid_top"] = True
-	elif word == "editor_hide":
-		block["editor_hide"] = True
+	elif word in ("solid", "solid_top", "editor_hide", "byte_ref"):
+		block[word] = True
 	elif word == "priority":
 		priority = True
 	elif word == "no_priority":

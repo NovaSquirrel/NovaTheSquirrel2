@@ -5,6 +5,8 @@
   S_ByteRef2
   R_ByteRef1
   R_ByteRef2
+  H_ByteRef1
+  H_ByteRef2
   Wide1
   Tall1
   Rect1
@@ -169,7 +171,7 @@
   .byt (Width<<4)|Height
 .endmacro
 
-.macro LSByteRef Type, XPos, YPos
+.macro LSByteRef Type, XPos, YPos ; Single
   .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
   .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
   .assert Type < 512, error, "Invalid block type"
@@ -177,7 +179,7 @@
   .byte <Type
 .endmacro
 
-.macro LRByteRef Type, XPos, YPos, Width, Height
+.macro LRByteRef Type, XPos, YPos, Width, Height ; Rectangle
   .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
   .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
   .assert Width >= 0 && Width <= 15, error, "Invalid width"
@@ -186,6 +188,17 @@
   LObj (LO::R_ByteRef1 + >Type), XPos, YPos
   .byte <Type
   .byt (Width<<4)|Height
+.endmacro
+
+.macro LHByteRef Type, XPos, YPos, Width, Height ; Huge
+  .assert XPos >= 0 && XPos <= 255, error, "Invalid X position"
+  .assert YPos >= 0 && YPos <= 31, error, "Invalid Y position"
+  .assert Width >= 0 && Width <= 255, error, "Invalid width"
+  .assert Height >= 0 && Height <= 255, error, "Invalid height"
+  .assert Type < 512, error, "Invalid block type"
+  LObj (LO::H_ByteRef1 + >Type), XPos, YPos
+  .byte <Type
+  .byt Width, Height
 .endmacro
 
 .macro LFinished

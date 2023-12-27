@@ -198,6 +198,9 @@ def convert_layer(layer):
 		elif r.w == 1 and r.h == 1 and r.type in available_singles:
 			output.append("LObj  LO::S_%s, %d, %d" % (r.type, offset, r.y))
 			byte_count += 2
+		elif r.w == 1 and r.h == 1: # I think LSByteRef is slightly faster than using a Wide command with a width of 1 block
+			output.append("LSByteRef BlockByteReference::%s, %d, %d" % (r.type, offset, r.y))
+			byte_count += 3
 		elif r.w <= 16 and r.h <= 16 and r.type in available_rectangles:
 			output.append("LObjN LO::R_%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
 			byte_count += 3
@@ -209,16 +212,16 @@ def convert_layer(layer):
 			which = which_nybble_list(r.type)
 			output.append("LObjN LO::Tall%d, %d, %d, %d, LN%d::%s" % (which, offset, r.y, r.h-1, which, r.type))
 			byte_count += 3
+		elif r.w <= 16 and r.h <= 16: # I think LRByteRef is slightly faster than using a Rect command
+			output.append("LRByteRef BlockByteReference::%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
+			byte_count += 4
 		elif r.w <= 256 and r.h <= 16 and is_available_nybble(r.type):
 			which = which_nybble_list(r.type)
 			output.append("LObjN LO::Rect%d, %d, %d, %d, LN%d::%s, %d" % (which, offset, r.y, r.h-1, which, r.type, r.w-1))
 			byte_count += 4
-		elif r.w == 1 and r.h == 1:
-			output.append("LSByteRef BlockByteReference::%s, %d, %d" % (r.type, offset, r.y))
-			byte_count += 3
-		elif r.w <= 16 and r.h <= 16:
-			output.append("LRByteRef BlockByteReference::%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
-			byte_count += 4
+		elif r.w <= 256 and r.h <= 256:
+			output.append("LHByteRef BlockByteReference::%s, %d, %d, %d, %d" % (r.type, offset, r.y, r.w-1, r.h-1))
+			byte_count += 5
 		# TODO: Use LSCustom and LRCustom for blocks that LSByteRef and LRByteRef don't work on (that is, anything that isn't in the byte reference table)
 		# but right now the level editor only shows blocks that are in that table anyway.
 #		elif r.w == 1 and r.h == 1:
