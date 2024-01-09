@@ -288,4 +288,4 @@ $(objdir)/snesgss_driver.o: $(audiodir)/gss_data.s
 $(audiodir)/gss_data.s: $(audiodir)/exportgss.py $(audiodir)/encodesong.py $(audiodir)/encodebrr.py $(snesgssall) $(audiodir)/brr/gssbrr
 	$(PY) $(audiodir)/exportgss.py $(audiodir)/gss_data.s $(audiodir)/gss_enum.s $(snesgssall)
 $(audiodir)/brr/gssbrr:
-	$(CC) $(audiodir)/brr/gssbrr.c -o $@
+	$(CC) $(audiodir)/brr/gssbrr.c -lm -o $@
