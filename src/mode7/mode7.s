@@ -76,6 +76,7 @@ Mode7ShowForcefield: .res 2
 Mode7ForcefieldPointer: .res 2
 Mode7ForcefieldTimer: .res 2
 Mode7Acceleration: .res 2
+Mode7TurnAcceleration: .res 2
 
 ;Mode7LastPositionPtr: .res 2
 ;Mode7ForceMove: .res 2
@@ -760,43 +761,117 @@ SkipBlock:
 	; rotate with left/right
 	ldx z:angle
 
-	.ifdef COARSE_CAMERA_TURN
-	lda framecount
-	lsr
-	bcc @NoTurn
-	.endif
+	.ifdef SMOOTHER_TURNING
+		lda keydown
+		and #KEY_LEFT|KEY_RIGHT
+		bne @NoDecelerate
+			lda Mode7TurnAcceleration
+			beq @NoDecelerate
+			; If negative, make positive
+			php ; Save if it was negative
+			bpl :+
+			  eor #$ffff
+			  ina
+			:
 
-	lda keydown
-	bit #KEY_LEFT
-	beq :+
-		inx
+			dea ; Decrease speed
+			bpl :+
+				tdc ; Clear accumulator
+			:
+
+			plp
+			; If it was previously negative, make it negative again
+			bpl :+
+				eor #$ffff
+				ina
+			:
+			sta Mode7TurnAcceleration
+		@NoDecelerate:
+
+		lda keydown
+		and #KEY_RIGHT
+		beq @NoRightAccelerate
+			lda Mode7TurnAcceleration
+			bmi :+
+			cmp #5
+			bcs :++
+			:
+				inc Mode7TurnAcceleration
+			:
+		@NoRightAccelerate:
+
+		lda keydown
+		and #KEY_LEFT
+		beq @NoLeftAccelerate
+			lda Mode7TurnAcceleration
+			bpl :+
+			cmp #.loword(-6)
+			bcc :++
+			:
+				dec Mode7TurnAcceleration
+			:
+		@NoLeftAccelerate:
+
+		lda Mode7TurnAcceleration
+		beq @NoTurnAcceleration
+		bit #1
+		beq @NoTurnAcceleration
+			bpl @TurnRight
+			@TurnLeft:
+				inx
+				lda keydown
+				and #KEY_Y
+				beq :+
+					inx
+				:
+				bra @NoTurnAcceleration
+			@TurnRight:
+				dex
+				lda keydown
+				and #KEY_Y
+				beq :+
+					dex
+				:
+		@NoTurnAcceleration:
+
+	.else
 		.ifdef COARSE_CAMERA_TURN
-		inx
-		inx
-		inx
+		lda framecount
+		lsr
+		bcc @NoTurn
 		.endif
-		bit #KEY_Y
+
+		lda keydown
+		bit #KEY_LEFT
 		beq :+
 			inx
-	:
-	lda keydown
-	bit #KEY_RIGHT
-	beq :+
-		dex
-		.ifdef COARSE_CAMERA_TURN
-		dex
-		dex
-		dex
-		.endif
-		bit #KEY_Y
+			.ifdef COARSE_CAMERA_TURN
+			inx
+			inx
+			inx
+			.endif
+			bit #KEY_Y
+			beq :+
+				inx
+		:
+		lda keydown
+		bit #KEY_RIGHT
 		beq :+
 			dex
-	:
+			.ifdef COARSE_CAMERA_TURN
+			dex
+			dex
+			dex
+			.endif
+			bit #KEY_Y
+			beq :+
+				dex
+		:
 
-	.ifdef COARSE_CAMERA_TURN
-	@NoTurn:
+		.ifdef COARSE_CAMERA_TURN
+		@NoTurn:
+		.endif
 	.endif
-
 	stx z:angle
 
 	; Generate perspective, unless you're on the ground

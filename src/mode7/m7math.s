@@ -1815,6 +1815,22 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 
 	jsr pv_buffer_x ; X = index to pv buffers
 
+	; Do some rounding on the positions
+	carry_x = temp+4
+	carry_y = temp+6
+	stz carry_x
+	stz carry_x+1
+	stz carry_y
+	stz carry_y+1
+	bit M7PosX
+	bpl :+
+		inc carry_x
+	:
+	bit M7PosY
+	bpl :+
+		inc carry_y
+	:
+
 	seta16
 
 	txa
@@ -1828,6 +1844,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	.i8
 	jsr smul16_u8
 	add z:M7PosX+1
+	add carry_x
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sub #128
 	sta f:FGScrollXPixels ; ox - 128
@@ -1835,6 +1852,7 @@ pv_interpolate_2x_: ; interpolate from every 2nd line to every line
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
 	add z:M7PosY+1
+	add carry_y
 	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 	lda z:pv_l1
 	and #$00FF
@@ -2531,6 +2549,8 @@ target_scanline = 0
 index_to_line   = 2 ; and 3
 ab_lut_pointer  = 4 ; and 5, 6
 abcd_banks      = 10 ; and 11
+carry_x         = 12 ; and 13
+carry_y         = 14 ; and 15
 	sty target_scanline ; temp+0 = target scanline
 	tya
 	sub #48 ; l0
@@ -2560,6 +2580,20 @@ abcd_banks      = 10 ; and 11
 	; Set the bank for the pointer
 	sta ab_lut_pointer+2
 
+	; Do some rounding on the positions
+	stz carry_x
+	stz carry_x+1
+	stz carry_y
+	stz carry_y+1
+	bit M7PosX
+	bpl :+
+		inc carry_x
+	:
+	bit M7PosY
+	bpl :+
+		inc carry_y
+	:
+
 	lda #224 ;l1
 	sub target_scanline
 	sta z:math_b ; math_b = scanlines above bottom
@@ -2574,6 +2608,7 @@ abcd_banks      = 10 ; and 11
 	.i8
 	jsr smul16_u8
 	add z:M7PosX+1
+	add carry_x
 	sta f:mode7_m7x ; ox = posx + (scanlines * b)
 	sub #128
 	sta f:FGScrollXPixels ; ox - 128
@@ -2581,6 +2616,7 @@ abcd_banks      = 10 ; and 11
 	sta z:math_a ; math_a = d coefficient
 	jsr smul16_u8
 	add z:M7PosY+1
+	add carry_y
 	sta f:mode7_m7y ; oy = posy + (scanlines * d)
 
 	lda #224 ;l1
