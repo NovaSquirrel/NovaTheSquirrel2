@@ -656,7 +656,7 @@ Yes:
 .export AutotileCliffWall
 .proc AutotileCliffWall
   .macro IsCliff
-    cmp #Block::CliffWall+1
+    cmp #Block::CliffWallNoAutotile+1
     bcs :+
     cmp #Block::CliffVineOverCliff
     bcs :++
