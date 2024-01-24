@@ -26,6 +26,7 @@ FORCEFIELD_FLOOR_TILE = 1
 ;CONSISTENT_CAMERA_HEIGHT = 1
 ;COARSE_CAMERA_TURN = 1
 ;FORCEFIELD_PILLAR = 1
+SMOOTHER_TURNING = 1
 .include "../snes.inc"
 .include "../global.inc"
 .include "../graphicsenum.s"
