@@ -553,9 +553,7 @@ padwait:
 
   ; Clean up after vblank, now that everything that's time-sensitive is done
   seta16
-  .repeat ::BLOCK_UPDATE_COUNT, I
-    stz BlockUpdateAddressTop+(I*2)
-  .endrep
+  stz ScatterUpdateLength
 
   ; Go on with game logic again
   jmp forever

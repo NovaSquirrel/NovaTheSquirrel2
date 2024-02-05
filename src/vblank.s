@@ -312,31 +312,24 @@ SkipGeneric:
   dex
   bpl GenericUpdateLoop
 
-  lda #$2100
-  tcd
+  ; ----------------
+  ; Do block updates (or any other tilemap updates that are needed)
+  lda ScatterUpdateLength
+  beq ScatterBufferEmpty
+    sta <DMALEN
 
-  ; -----------------------------------
-  ; Do block updates
-  lda BlockUpdateAddressTop+((BLOCK_UPDATE_COUNT-1)*2)
-  jeq CancelBlockUpdates
-  .repeat ::BLOCK_UPDATE_COUNT, I
-  lda BlockUpdateAddressTop+(I*2)
-  beq :+
-    sta <PPUADDR
-    lda BlockUpdateDataTL+(I*2)
-    sta <PPUDATA
-    lda BlockUpdateDataTR+(I*2)
-    sta <PPUDATA
+    lda #(<PPUADDR << 8) | DMA_0123 | DMA_FORWARD ; Alternate between writing to PPUADDR and PPUDATA
+    sta <DMAMODE
+    lda #.loword(ScatterUpdateBuffer)
+    sta <DMAADDR
 
-    lda BlockUpdateAddressBottom+(I*2)
-    sta <PPUADDR
-    lda BlockUpdateDataBL+(I*2)
-    sta <PPUDATA
-    lda BlockUpdateDataBR+(I*2)
-    sta <PPUDATA
-  :
-  .endrep
-CancelBlockUpdates:
+    seta8
+    lda #^ScatterUpdateBuffer
+    sta <DMAADDRBANK
+    lda #%00000001
+    sta COPYSTART
+    seta16
+  ScatterBufferEmpty:
 
   lda #0
   tcd

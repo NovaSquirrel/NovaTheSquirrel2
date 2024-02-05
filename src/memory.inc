@@ -98,14 +98,9 @@ RIDING_NO_PLATFORM_SNAP = 2
 .global RowUpdateAddress, RowUpdateAddress2
 .global RowUpdateBuffer, RowUpdateBuffer2
 
-BLOCK_UPDATE_COUNT = 8
-.global BlockUpdateAddressTop
-.global BlockUpdateAddressBottom
-.global BlockUpdateDataTL
-.global BlockUpdateDataTR
-.global BlockUpdateDataBL
-.global BlockUpdateDataBR
-.global BlockUpdateDataEnd
+SCATTER_BUFFER_LENGTH = 128
+.global ScatterUpdateLength
+.global ScatterUpdateBuffer
 
 MaxDelayedBlockEdits = 15
 .global DelayedBlockEditType

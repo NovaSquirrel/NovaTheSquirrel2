@@ -286,14 +286,9 @@ LevelZeroWhenLoad_Start:
   ColumnUpdateAddress2: .res 2     ; Address to upload to, or zero for none
   RowUpdateAddress2:    .res 2     ; Address to upload to, or zero for none
 
-  ; For ChangeBlock
-  BlockUpdateAddressTop:    .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateAddressBottom: .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
-  BlockUpdateDataEnd:
+  ; List of tilemap changes to make in vblank
+  ScatterUpdateLength: .res 2
+  ScatterUpdateBuffer: .res SCATTER_BUFFER_LENGTH ; Alternates between 2 bytes for a VRAM address, 2 bytes for VRAM data
 
   ; VRAM/CGRAM updates, for tiles and palette updates
   GenericUpdateDestination: .res GENERIC_UPDATE_COUNT*2

@@ -140,7 +140,9 @@ loop2:
 .a16
 .i16
 .proc ChangeBlock
-Temp = BlockTemp
+ADDRESS = 0
+DATA    = 2
+Temp    = BlockTemp
 ; Could reserve a second variable to avoid calling GetBlockX twice
   phx
   phy
@@ -148,21 +150,17 @@ Temp = BlockTemp
   setaxy16
   sta [LevelBlockPtr] ; Make the change in the level buffer itself
 
-  ; Find a free index in the block update queue
-  ldy #(BLOCK_UPDATE_COUNT-1)*2
-FindIndex:
-  ldx BlockUpdateAddressTop,y ; Test for zero (exact value not used)
-  beq Found
-  dey                      ; Next index
-  dey
-  bpl FindIndex            ; If you run out of slots, don't do the update now
-  ; Instead try to do it later
-  ldy #1
-  sty BlockTemp
-  jsl DelayChangeBlock ; Takes A and LevelBlockPtr just like ChangeBlock
-  jmp Exit
-Found:
-  ; From this point on in the routine, Y = free update queue index
+  ldy ScatterUpdateLength
+  cpy #SCATTER_BUFFER_LENGTH - (4*4) + 1 ; There needs to be enough room for four tiles
+  bcc :+
+    ; Instead try to do it later
+    ldy #1
+    sty BlockTemp
+    jsl DelayChangeBlock ; Takes A and LevelBlockPtr just like ChangeBlock
+    jmp Exit
+  :
+
+  ; From this point on in the routine, Y = index to write into the scatter buffer
 
   ; Save block number in X specifically, for 24-bit Absolute Indexed
   tax
@@ -223,13 +221,13 @@ Found:
 
   ; Copy the block appearance into the update buffer
   lda f:BlockTopLeft,x
-  sta BlockUpdateDataTL,y
+  sta ScatterUpdateBuffer+(4*0)+DATA,y
   lda f:BlockTopRight,x
-  sta BlockUpdateDataTR,y
+  sta ScatterUpdateBuffer+(4*1)+DATA,y
   lda f:BlockBottomLeft,x
-  sta BlockUpdateDataBL,y
+  sta ScatterUpdateBuffer+(4*2)+DATA,y
   lda f:BlockBottomRight,x
-  sta BlockUpdateDataBR,y
+  sta ScatterUpdateBuffer+(4*3)+DATA,y
 
   ; Now calculate the PPU address
   ; LevelBlockPtr is 00xxxxxxxxyyyyy0 (for horizontal levels)
@@ -243,7 +241,7 @@ Found:
   asl
   asl
   ora #ForegroundBG
-  sta BlockUpdateAddressTop,y
+  sta ScatterUpdateBuffer+(4*0)+ADDRESS,y
 
 CalculateRestOfAddress:
   ; Add in X
@@ -251,22 +249,33 @@ CalculateRestOfAddress:
   pha
   and #15
   asl
-  ora BlockUpdateAddressTop,y
-  sta BlockUpdateAddressTop,y
+  ora ScatterUpdateBuffer+(4*0)+ADDRESS,y
+  sta ScatterUpdateBuffer+(4*0)+ADDRESS,y
+  ina
+  sta ScatterUpdateBuffer+(4*1)+ADDRESS,y
 
   ; Choose second screen if needed
   pla
   and #16
   beq :+
-    lda BlockUpdateAddressTop,y
+    lda ScatterUpdateBuffer+(4*0)+ADDRESS,y
     ora #2048>>1
-    sta BlockUpdateAddressTop,y
+    sta ScatterUpdateBuffer+(4*0)+ADDRESS,y
+    lda ScatterUpdateBuffer+(4*1)+ADDRESS,y
+    ora #2048>>1
+    sta ScatterUpdateBuffer+(4*1)+ADDRESS,y
   :
 
   ; Precalculate the bottom row
-  lda BlockUpdateAddressTop,y
+  lda ScatterUpdateBuffer+(4*0)+ADDRESS,y
   add #(32*2)>>1
-  sta BlockUpdateAddressBottom,y
+  sta ScatterUpdateBuffer+(4*2)+ADDRESS,y
+  ina
+  sta ScatterUpdateBuffer+(4*3)+ADDRESS,y
+
+  tya
+  adc #16 ; Carry guaranteed to be clear
+  sta ScatterUpdateLength
 
   ; Restore registers
 Exit:
@@ -280,8 +289,10 @@ Exit:
 .a16
 .i16
 .proc ChangeBlockFG2
-Temp = ChangeBlock::Temp
-Exit = ChangeBlock::Exit
+ADDRESS = ChangeBlock::ADDRESS
+DATA    = ChangeBlock::DATA
+Temp    = ChangeBlock::Temp
+Exit    = ChangeBlock::Exit
   ; First, make sure the block is actually onscreen (Horizontally)
   lda LevelBlockPtr ; Get level column
   asl
@@ -292,7 +303,7 @@ Exit = ChangeBlock::Exit
 
   jmp InRange
   lda ScrollX+1
-  add FG2OffsetX+1
+  add FG2OffsetX+1 ; <--
   sub #1
   bcc @FineLeft
   cmp Temp
@@ -301,7 +312,7 @@ Exit = ChangeBlock::Exit
 @FineLeft:
 
   lda ScrollX+1
-  add FG2OffsetX+1
+  add FG2OffsetX+1 ; <--
   add #16+1
   bcs @FineRight
   cmp Temp
@@ -320,7 +331,7 @@ Exit = ChangeBlock::Exit
   sta Temp ; Store row so it can be compared against
 
   lda ScrollY+1
-  add FG2OffsetY+1
+  add FG2OffsetY+1 ; <--
   sub #1
   bcc @FineUp
   cmp Temp
@@ -329,7 +340,7 @@ Exit = ChangeBlock::Exit
 @FineUp:
 
   lda ScrollY+1
-  add FG2OffsetY+1
+  add FG2OffsetY+1 ; <--
   add #14+1
   bcs @FineDown
   cmp Temp
@@ -343,13 +354,13 @@ InRange:
 
   ; Copy the block appearance into the update buffer
   lda f:BlockTopLeft,x
-  sta BlockUpdateDataTL,y
+  sta ScatterUpdateBuffer+(4*0)+DATA,y
   lda f:BlockTopRight,x
-  sta BlockUpdateDataTR,y
+  sta ScatterUpdateBuffer+(4*1)+DATA,y
   lda f:BlockBottomLeft,x
-  sta BlockUpdateDataBL,y
+  sta ScatterUpdateBuffer+(4*2)+DATA,y
   lda f:BlockBottomRight,x
-  sta BlockUpdateDataBR,y
+  sta ScatterUpdateBuffer+(4*3)+DATA,y
 
   ; Now calculate the PPU address
   ; LevelBlockPtr is 00xxxxxxxxyyyyy0 (for horizontal levels)
@@ -362,8 +373,8 @@ InRange:
   asl
   asl
   asl
-  ora SecondFGTilemapPointer
-  sta BlockUpdateAddressTop,y
+  ora SecondFGTilemapPointer ; <--
+  sta ScatterUpdateBuffer+(4*0)+ADDRESS,y
   jmp ChangeBlock::CalculateRestOfAddress
 .endproc
 

@@ -49,4 +49,14 @@ DIRECTION_LEFT  = 1
 DIRECTION_DOWN  = 2
 DIRECTION_RIGHT = 3
 
-BlockUpdateAddress = BlockUpdateAddressTop
+; Repurpose ScatterUpdateBuffer because this technique doesn't work for mode 7
+BLOCK_UPDATE_COUNT = 8
+BlockUpdateAddressTop    = ScatterUpdateBuffer
+BlockUpdateAddressBottom = BLOCK_UPDATE_COUNT*2 + BlockUpdateAddressTop
+BlockUpdateDataTL        = BLOCK_UPDATE_COUNT*2 + BlockUpdateAddressBottom
+BlockUpdateDataTR        = BLOCK_UPDATE_COUNT*2 + BlockUpdateDataTL
+BlockUpdateDataBL        = BLOCK_UPDATE_COUNT*2 + BlockUpdateDataTR
+BlockUpdateDataBR        = BLOCK_UPDATE_COUNT*2 + BlockUpdateDataBL
+BlockUpdateDataEnd       = BLOCK_UPDATE_COUNT*2 + BlockUpdateDataBR
+
+BlockUpdateAddress       = BlockUpdateAddressTop
