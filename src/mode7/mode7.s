@@ -77,6 +77,7 @@ Mode7ShowForcefield: .res 2
 Mode7ForcefieldPointer: .res 2
 Mode7ForcefieldTimer: .res 2
 Mode7Acceleration: .res 2
+Mode7SideAcceleration: .res 2
 Mode7TurnAcceleration: .res 2
 
 ;Mode7LastPositionPtr: .res 2
@@ -113,6 +114,7 @@ PORTRAIT_LOOK   = $C0 | OAM_PRIORITY_3
   stz ToggleSwitch1 ; and ToggleSwitch2
   stz Mode7HaveBlock
   stz Mode7Acceleration
+  stz Mode7SideAcceleration
 
   stz Mode7PlayerHeight
   stz Mode7PlayerVSpeed
@@ -759,13 +761,11 @@ SkipBlock:
 		lsr Mode7PlayerVSpeed
 	:
 
-	; rotate with left/right
-	ldx z:angle
-
 	.ifdef SMOOTHER_TURNING
 		lda keydown
-		and #KEY_LEFT|KEY_RIGHT
+		and #KEY_L|KEY_R
 		bne @NoDecelerate
+		@YesDecelerate:
 			lda Mode7TurnAcceleration
 			beq @NoDecelerate
 			; If negative, make positive
@@ -790,11 +790,11 @@ SkipBlock:
 		@NoDecelerate:
 
 		lda keydown
-		and #KEY_RIGHT
+		and #KEY_R
 		beq @NoRightAccelerate
 			lda Mode7TurnAcceleration
 			bmi :+
-			cmp #5
+			cmp #TURN_TABLE_LENGTH
 			bcs :++
 			:
 				inc Mode7TurnAcceleration
@@ -802,17 +802,34 @@ SkipBlock:
 		@NoRightAccelerate:
 
 		lda keydown
-		and #KEY_LEFT
+		and #KEY_L
 		beq @NoLeftAccelerate
 			lda Mode7TurnAcceleration
 			bpl :+
-			cmp #.loword(-6)
+			cmp #.loword(-TURN_TABLE_LENGTH+1)
 			bcc :++
 			:
 				dec Mode7TurnAcceleration
 			:
 		@NoLeftAccelerate:
 
+		; ---
+
+		lda Mode7TurnAcceleration
+		abs
+		asl
+		tay
+		lda TurnAccelerationTable,y
+		bit Mode7TurnAcceleration
+		bmi :+
+			eor #$ffff
+			ina
+		:
+		add z:angle
+		and #255
+		sta z:angle
+
+		.if 0
 		lda Mode7TurnAcceleration
 		beq @NoTurnAcceleration
 		bit #1
@@ -821,7 +838,7 @@ SkipBlock:
 			@TurnLeft:
 				inx
 				lda keydown
-				and #KEY_Y
+				and #KEY_X
 				beq :+
 					inx
 				:
@@ -829,13 +846,17 @@ SkipBlock:
 			@TurnRight:
 				dex
 				lda keydown
-				and #KEY_Y
+				and #KEY_X
 				beq :+
 					dex
 				:
 		@NoTurnAcceleration:
+		.endif
 
 	.else
+		; rotate with left/right
+		ldx z:angle
+
 		.ifdef COARSE_CAMERA_TURN
 		lda framecount
 		lsr
@@ -843,7 +864,7 @@ SkipBlock:
 		.endif
 
 		lda keydown
-		bit #KEY_LEFT
+		bit #KEY_L
 		beq :+
 			inx
 			.ifdef COARSE_CAMERA_TURN
@@ -856,7 +877,7 @@ SkipBlock:
 				inx
 		:
 		lda keydown
-		bit #KEY_RIGHT
+		bit #KEY_R
 		beq :+
 			dex
 			.ifdef COARSE_CAMERA_TURN
@@ -872,8 +893,8 @@ SkipBlock:
 		.ifdef COARSE_CAMERA_TURN
 		@NoTurn:
 		.endif
+		stx z:angle
 	.endif
-	stx z:angle
 
 	; Generate perspective, unless you're on the ground
 	; in which case use precalculated perspective
@@ -1036,6 +1057,8 @@ SkipBlock:
 	:
 	.endif
 
+    ; ---------------------------------------------------------------
+
 	lda keydown
 	and #KEY_UP|KEY_DOWN
 	bne @NoDecelerate
@@ -1093,6 +1116,68 @@ SkipBlock:
 		jsr Mode7MoveForward
 	:
 
+    ; ---------------------------------------------------------------
+
+	lda keydown
+	and #KEY_LEFT|KEY_RIGHT
+	bne @NoSideDecelerate
+    @YesSideDecelerate:
+		lda Mode7SideAcceleration
+		beq @NoSideDecelerate
+		; If negative, make positive
+		php ; Save if it was negative
+		bpl :+
+		  eor #$ffff
+		  ina
+		:
+
+		sub #32
+		bpl :+
+			tdc ; Clear accumulator
+		:
+
+		plp
+		; If it was previously negative, make it negative again
+		bpl :+
+			eor #$ffff
+			ina
+		:
+		sta Mode7SideAcceleration
+	@NoSideDecelerate:
+
+	lda keydown
+	and #KEY_LEFT
+	beq @NoLeftAccelerate
+		lda Mode7SideAcceleration
+		bmi :+
+		cmp #512
+		bcs :++
+		:
+			add #32
+			sta Mode7SideAcceleration
+		:
+	@NoLeftAccelerate:
+
+	lda keydown
+	and #KEY_RIGHT
+	beq @NoRightAccelerate
+		lda Mode7SideAcceleration
+		bpl :+
+		cmp #.loword(-512)
+		bcc :++
+		:
+			sub #32
+			sta Mode7SideAcceleration
+		:
+	@NoRightAccelerate:
+
+	lda Mode7SideAcceleration
+	beq :+
+		jsr Mode7MoveSideways
+	:
+
+    ; ---------------------------------------------------------------
+
 	; Calculate LevelBlockPtr again
 	jsr Mode7LevelPtrXYAtPlayer
 	lda LevelBlockPtr
@@ -1118,7 +1203,7 @@ SkipBlock:
 	lda Mode7PlayerHeight
 	bne :+
 	lda keynew
-	and #KEY_A|KEY_R
+	and #KEY_A
 	bne :++
 	:	jmp @NotPickupPush
 	:
@@ -1318,6 +1403,10 @@ SkipBlock:
 	;sta PPUBRIGHT
 
 	jmp Loop
+
+TURN_TABLE_LENGTH = 16 ; Doesn't include the initial zero
+TurnAccelerationTable:
+  .word 0, 1, 0, 1, 0, 1, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 2
 .endproc
 
 
@@ -1580,6 +1669,61 @@ Mode7LevelPtrXYAtPlayer:
 	lda Mode7Acceleration
 	sta math_b
 	lda z:mode7_m7t + 6 ; D
+	sta math_a
+	setxy8
+	jsr smul16
+	lda math_p+1
+	setxy16
+	sta 0
+
+	; Y -= D * 2
+	lda #0
+	sub 0
+	pha
+	add z:M7PosY+0
+	sta 0
+	pla
+	jsr sign
+	adc z:M7PosY+2
+	and #$0003
+	sta 2
+	jmp Mode7TryNewY
+.endproc
+
+.a16
+.export Mode7MoveSideways
+.proc Mode7MoveSideways
+	stz Mode7BumpDirection
+
+	.import smul16
+	lda Mode7SideAcceleration
+	sta math_a
+	lda z:mode7_m7t + 6 ; D
+	sta math_b
+    setxy8
+	jsr smul16
+	lda math_p+1
+	setxy16
+	sta 0
+
+	; X -= B * 2
+	lda #0
+	sub 0
+	pha
+	add z:M7PosX+0
+	sta 0
+	pla
+	jsr sign
+	adc z:M7PosX+2
+	and #$0003
+	sta 2
+	jsr Mode7TryNewX
+
+	lda Mode7SideAcceleration
+	sta math_b
+	lda z:mode7_m7t + 2 ; B
+    eor #$ffff
+    ina
 	sta math_a
 	setxy8
 	jsr smul16
