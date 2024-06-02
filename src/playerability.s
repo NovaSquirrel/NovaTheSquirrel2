@@ -775,7 +775,7 @@ No:
     sta ActorProjectileType,x
 
     lda PlayerPY
-    sub #7<<4
+    sub #20<<4
     sta ActorPY,x
     lda PlayerPX
     sta ActorPX,x

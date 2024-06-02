@@ -230,6 +230,7 @@ HaveY:
 
   lda TailAttackTimer
   beq NoTailAttack
+    stz PlayerFrameXFlip
     lda TailAttackFrame
     sta PlayerFrame
     jmp Exit
