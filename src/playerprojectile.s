@@ -19,6 +19,8 @@
 .include "global.inc"
 .include "actorenum.s"
 .include "blockenum.s"
+.include "audio_enum.inc"
+.include "tad-audio.inc"
 .smart
 
 .import ActorBecomePoof, ActorTurnAround, TwoActorCollision, DispActor8x8, DispActor8x8WithOffset, DispActor16x16, ActorExpire

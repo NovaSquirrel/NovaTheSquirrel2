@@ -1,0 +1,7 @@
+Generated with Audacity.
+
+Waveform:           Square, no alias
+Frequency (Hz):     500
+Amplitude (0-1):    0.75
+Duration:           64 samples
+

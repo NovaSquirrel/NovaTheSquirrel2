@@ -1,7 +1,6 @@
 *.sfc
 *.sw[a-p]
 *.o
-*.brr
 *~
 *.chrgb
 *.chrsfc
@@ -57,8 +56,12 @@ src/backgroundenum.s
 *.namsfc
 src/itemenum.s
 *.sym
-audio/gss_enum.s
-audio/gss_data.s
+
+audio/audio_common.bin
+audio/songs/*.bin
+src/audio_enum.inc
+src/audio_incbins.s
+
 hubworld/*.bin
 hubworld/*.chrsfc
 tools/lut/*.bin

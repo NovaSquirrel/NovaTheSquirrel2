@@ -17,6 +17,8 @@
 
 .include "snes.inc"
 .include "global.inc"
+.include "audio_enum.inc"
+.include "tad-audio.inc"
 .smart
 .export main, nmi_handler
 .import RunAllActors, DrawPlayer, DrawPlayerStatus
@@ -86,39 +88,17 @@ IRIS_EFFECT_END = 30
   lda #^NoNMIHandler
   sta NMIHandler+2
 
-  ; In the same way that the CPU of the Commodore 64 computer can
-  ; interact with a floppy disk only through the CPU in the 1541 disk
-  ; drive, the main CPU of the Super NES can interact with the audio
-  ; hardware only through the sound CPU.  When the system turns on,
-  ; the sound CPU is running the IPL (initial program load), which is
-  ; designed to receive data from the main CPU through communication
-  ; ports at $2140-$2143.  Load a program and start it running.
-.if 0
-  jsl spc_boot_apu
+.if 1
+  ; Load in the audio engine
   seta8
-  .import GSS_SendCommand, GSS_SendCommandParamX, GSS_LoadSong
-  lda #GSS_Commands::INITIALIZE
-  jsl GSS_SendCommand
+  setxy16
+  phk
+  plb
 
-  lda #0
-  jsl GSS_LoadSong
-  seta8
+  jsl Tad_Init
 
-  ldx #0 | ($00<<8) ; volume, channels
-  lda #GSS_Commands::ECHO_VOLUME_CHANNELS
-  jsl GSS_SendCommandParamX	
-  ldx #$df | (4<<8) ; address, delay
-  lda #GSS_Commands::ECHO_ADDRESS_DELAY
-  jsl GSS_SendCommandParamX
-  ldx #28 | ($3f<<8) ; Volume, channels
-  lda #GSS_Commands::ECHO_VOLUME_CHANNELS
-  jsl GSS_SendCommandParamX
-  ldx #0 | ($50<<8) ; FIR set, feedback
-  lda #GSS_Commands::ECHO_FIR_FEEDBACK
-  jsl GSS_SendCommandParamX
-
-  lda #GSS_Commands::MUSIC_START
-  jsl GSS_SendCommand
+;  lda #Song::gimo_297
+;  jsr Tad_LoadSong
 .endif
 
   ; Clear three screens
@@ -179,6 +159,8 @@ IRIS_EFFECT_END = 30
   plb
   stz framecount
 forever:
+  jsl UpdateAudio
+
   ; Draw the player to a display list in main memory
   setaxy16
   inc framecount

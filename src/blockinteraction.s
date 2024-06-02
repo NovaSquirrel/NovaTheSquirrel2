@@ -19,6 +19,8 @@
 .include "blockenum.s"
 .include "actorenum.s"
 .include "itemenum.s"
+.include "audio_enum.inc"
+.include "tad-audio.inc"
 .smart
 
 .segment "C_BlockInteraction"

@@ -1,0 +1,10 @@
+
+Public domain BRR samples by nesdoug (Doug Fraker).
+
+Samples are tuned to B +21 cents (wavelength of 32, 64, 128 or 256 samples per loop)
+
+SOURCE:
+ * https://nesdoug.com/2022/01/27/why-b21-cents/#free-samples
+ * https://github.com/nesdoug/SNES_13/tree/master/MUSIC/More_Samples
+
+

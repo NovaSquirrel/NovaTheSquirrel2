@@ -1,0 +1,135 @@
+{
+  "_about": {
+    "file_type": "Terrific Audio Driver project file",
+    "version": "0.0.8"
+  },
+  "instruments": [
+    {
+      "name": "sine",
+      "source": "samples/sine.wav",
+      "freq": 500.0,
+      "loop": "dupe_block_hack_filter_1",
+      "loop_setting": 2,
+      "first_octave": 1,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "square",
+      "source": "samples/square.wav",
+      "freq": 500.0,
+      "loop": "loop_reset_filter",
+      "loop_setting": 0,
+      "first_octave": 1,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "sawtooth",
+      "source": "samples/sawtooth.wav",
+      "freq": 500.0,
+      "loop": "dupe_block_hack",
+      "loop_setting": 2,
+      "first_octave": 1,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "triangle",
+      "source": "samples/triangle.wav",
+      "freq": 500.0,
+      "loop": "dupe_block_hack_filter_1",
+      "loop_setting": 2,
+      "first_octave": 1,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "piano",
+      "source": "samples/nesdoug/PIANO_C5.brr",
+      "freq": 2000.0,
+      "loop": "none",
+      "first_octave": 1,
+      "last_octave": 6,
+      "envelope": "adsr 12 2 2 16",
+      "comment": "Sample by Doug Fraker. public domain, source: https://github.com/nesdoug/SNES_13/blob/master/MUSIC/More_Samples"
+    },
+    {
+      "name": "violin",
+      "source": "samples/nesdoug/ViolinC4.brr",
+      "freq": 500.0,
+      "loop": "none",
+      "first_octave": 1,
+      "last_octave": 5,
+      "envelope": "gain F127",
+      "comment": "Sample by Doug Fraker. public domain, source: https://github.com/nesdoug/SNES_13/blob/master/MUSIC/More_Samples"
+    },
+    {
+      "name": "violin_spicato",
+      "source": "samples/nesdoug/ViolinSpicatoB.brr",
+      "freq": 1000.0,
+      "loop": "none",
+      "first_octave": 1,
+      "last_octave": 5,
+      "envelope": "gain F127",
+      "comment": "Sample by Doug Fraker. public domain, source: https://github.com/nesdoug/SNES_13/blob/master/MUSIC/More_Samples"
+    }
+  ],
+  "samples": [
+    {
+      "name": "conga",
+      "source": "samples/nesdoug/Conga.brr",
+      "loop": "none",
+      "sample_rates": [
+        16000,
+        18000
+      ],
+      "envelope": "gain F127",
+      "comment": "Sample by Doug Fraker. public domain, source: https://github.com/nesdoug/SNES_13/blob/master/MUSIC/More_Samples"
+    },
+    {
+      "name": "cowbell",
+      "source": "samples/nesdoug/Cowbell.brr",
+      "loop": "none",
+      "sample_rates": [
+        32000
+      ],
+      "envelope": "gain F127",
+      "comment": "Sample by Doug Fraker. public domain, source: https://github.com/nesdoug/SNES_13/blob/master/MUSIC/More_Samples"
+    }
+  ],
+  "sound_effects": [
+    "menu_cursor",
+    "menu_select",
+    "menu_incorrect",
+    "player_hurt",
+    "player_hurt_low_health",
+    "jump",
+    "vibrato_alarm",
+    "play_samples_bytecode",
+    "spawn_item",
+    "collect_coin",
+    "robot_notices_player",
+    "robot_ascend",
+    "robot_fires_laser",
+    "fire_arrow",
+    "spring",
+    "collect_item",
+    "brick_break"
+  ],
+  "sound_effect_file": "sound-effects.txt",
+  "songs": [
+    {
+      "name": "gimo_297",
+      "source": "songs/gimo-297.mml"
+    },
+    {
+      "name": "ode_to_joy",
+      "source": "songs/ode-to-joy.mml"
+    }
+  ]
+}

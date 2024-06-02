@@ -1,0 +1,16 @@
+#Title Ode To Joy (G Major)
+#Composer Ludwig van Beethoven
+#Tempo 144
+
+@1 triangle
+
+!repeated_notes l4 o4 b b > c d d c < b a g g a b
+
+
+A @1 l4 o4 v16
+
+A !repeated_notes b. a8 a2
+A !repeated_notes a. g8 g2
+A a a b g a b8 > c8 < b g a b8 > c8 < b a g a d2
+A !repeated_notes a. g8 g2
+

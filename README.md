@@ -47,9 +47,9 @@ License
 
 All game and tool code is available under GPL version 3.
 
-This project uses a modified version of SNESGSS which [appears to be licensed under Apache License 2.0](https://code.google.com/archive/p/snesgss/). These modifications and the new exporter are licensed under the same.
+This project uses [Terrific Audio Driver](https://github.com/undisbeliever/terrific-audio-driver) which is under the zlib license.
 
-This project also uses LZ4 and SPC700 loading code from [libSFX](https://github.com/Optiroc/libSFX) which is under the MIT license.
+This project also uses LZ4 code from [libSFX](https://github.com/Optiroc/libSFX) which is under the MIT license.
 
 The following may not be used in other projects without permission:
 * Character designs

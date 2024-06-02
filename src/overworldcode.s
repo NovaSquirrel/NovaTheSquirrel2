@@ -542,8 +542,8 @@ PathRenderLoop:
   ; -----------------------------------
 OverworldLoop:
   setaxy16
+  jsl UpdateAudio
   jsl WaitKeysReady ; Also clears OamPtr
-
 
   seta8
   lda MapPlayerMoving

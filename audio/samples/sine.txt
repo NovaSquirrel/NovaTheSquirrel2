@@ -1,0 +1,7 @@
+Generated with Audacity.
+
+Waveform:           Sine
+Frequency (Hz):     500
+Amplitude (0-1):    0.95
+Duration:           64 samples
+

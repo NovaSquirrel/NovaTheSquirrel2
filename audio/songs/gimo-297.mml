@@ -1,0 +1,426 @@
+#Title Concerto Per Mandolino, Violino Primo, Violino Secondo e Basso (Gimo 297)
+#Composer Vito Ugolino
+#Copyright Public Domain
+#Date c. 1760
+
+#Tempo 90
+#ZenLen 192
+
+
+; SOURCE: MutopiaProject
+; https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=333
+; Transcribed by Erik Sandberg for Mutopia
+;
+; Concerto Per Mandolino, Violino Primo, Violino Secondo e Basso (Gimo 297)
+; by V. Ugolino (?–?)
+; Instrument(s): Ensemble: Mandolin, 2 Violins, 'Cello
+; Style: Baroque
+; Date of composition: c. 1760
+; Source: Gimo Music Collection
+; Copyright: Public Domain
+; Last updated: 2013/Apr/10
+; Music ID Number: Mutopia-2013/04/10-333
+
+
+; This MML file was generated with midi2smw and then edited by hand.
+;
+; Changes from midi2smw output:
+;   * Dropped notes (not enough channels).  The dropped notes are included in this MML file
+;      * The violin's last note in section 1 is a chord.  The lowest pitches were dropped.
+;      * The mandolin plays 4 notes at once in a few bits in section 3.  The lowest pitch were dropped.
+;      * The violin's play 2 chords in section 3.  The lowest pitches were dropped.
+;   * Added dots to notes and rests
+;   * Unrolled rest loops
+;   * Unrolled short loops
+;   * Replaced `o` commands with `< ` and `> `
+;   * Improved spacing
+;   * Changed rests in loops from `[r4 c d e]2 r4` to `r4 [c d e r4]2` (this way more loops start at a new bar)
+;   * Change violin octave from o5 to o4 (sounds better with the samples I add)
+
+
+; Mandolin: channels A, B, C
+; ViolinI:	channel  D
+; ViolinII: channel  E
+; Basso:    channel  F
+
+
+@mandolin piano           adsr 15 3 6 18
+@violin   violin          adsr 10 3 4 10
+; No cello in nesdoug's music pack. violin_spicato works OK (not great)
+; ::TODO find a better Basso sample::
+@cello    violin_spicato  gain 127
+
+
+ABC @mandolin o5 v11
+DE  @violin   o4 v8
+F   @cello    o3 v10
+
+
+;; Allegro
+;  -------
+
+A d4 d4 d4 < r8 [b16 > c16 d8 d8 d8 g8 e8 d8 r8]2 d8 e8 d8 c8 < b8 b8 a8 r4 >
+B b4 b4 b4 < r8 [g16 a16 b8 b8 b8 > r8 c8 < b8 r8]2 b8 > c8 < b8 a8 g8 g8 f+8 r4 >
+C r2 r2 r2 r2 r2 r2 r2 r2
+D d4 d4 d4 < r8 [b16 > c16 d8 d8 d8 g8 e8 d8 r8]2 d8 e8 d8 c8 < b8 b8 a8 r4 >
+E < b4 b4 b4 r8 [g16 a16 b8 b8 b8 b8 > c8 < b8 r8]2 b8 > c8 < b8 a8 g8 g8 f+8 > r4
+F g8 a8 b8 a8 [g8]8 c8 < g8 r4 [g8]4 > c8 < g8 g8 > g8 c8 c8 c8 c+8 [d8]4
+
+A [a8 g16 f+16 g8 f+16 e16 f+8 d8 c+8 d8]2 g4 g4 g8 f+16 e16 d16 c+16 < b16 a16 > g4 g4 g8 f+16 e16 d16 c+16 < b16 a16 >
+B [f+8 r8 e8 r8 d8 r4.]2 e4 e4 e8 r4. e4 e4 e8 r4.
+C r2 r2 r2 r2 r2 r2 r2 r2
+D [a8 g16 f+16 g8 f+16 e16 f+8 d8 c+8 d8]2 g4 g4 g8 f+16 e16 d16 c+16 < b16 a16 > g4 g4 g8 f+16 e16 d16 c+16 < b16 a16 >
+E f+8 e16 d16 e8 d16 c+16 d4 r4 f+8 e16 d16 e8 d16 c+32 c+32 d4 r4 [e4 e4 e4 r4]2
+F d4 a4 d4 r4 d4 < a4 > d4 [r4 e8 d8 c+8 < b8 a4]2 > r4
+
+A a8 g16 f+16 g8 f+16 e16 f+4 e4 d4 r4
+B f+8 r8 e8 r8 d4 c+4 < f+4 r4
+C r2. < a4 d4 r4
+D a8 g16 f+16 g8 f+16 e16 f+8 e16 d16 e8 d16 c+16 d4 < r16 a16 b16 > c+16
+E f+8 e16 d16 e8 d16 c+16 a8 g16 f+16 g8 f+16 e32 e32 f+4 < r16 a16 b16 > c+16
+F d4 a4 d4 a8 < a8 > [d8]4
+
+A r2 r2 r2 r2 r2
+B r2 r2 r2 r2 r2
+C r2 r2 r2 r2 r2
+D d16 e16 f+16 g16 a16 f+16 e16 d16 a16 g16 f+16 e16 d16 a16 d16 c32 c32 < b4 > r8 d8 e16 c16 < b16 > c16 f+16 a16 g16 f+16 g8. f+32 e32 d8 c8 <
+E d16 e16 f+16 g16 a16 f+16 e16 d16a16 g16 f+16 e16 d16 a16 d16 c32 c32 < b4 > r8 d8 e16 c16 < b16 > c16 f+16 a16 g16 f+16 g8 f+16 e16 d8 c8 <
+F [d8]8 [g8]4 c4 d4 e8 e8 f+8 f+8
+
+A r2 r2 r2 r2
+B r2 r2 r2 r2
+C r2 r2 r2 r2
+D b32 > c32 d8^32 < a32 g4 a32 b32 > c8^32 < g32 f+4 g8 < b8 > c8 d8 < g4 r4
+E b32 > c32 d8^32 < a32 g4 a32 b32 > c8^32 < g32 f+4 g8 < b8 > c8 d8 < g4 r4
+F g8 < b8 b8 b8 > c4 d4 e8 < b8 > c8 d8 < g4 > r4
+
+A d4 d4 d4 < r8 [b16 > c16 d8 d8 d8 g8 e8 d8 r8]2 d8 e8 d8 c8 < b8 b8 a8 r4 >
+B b4 b4 b4 r8 [g16 a16 b8 b8 b8 > r8 c8 < b8 r8]2 b8 > c8 < b8 a8 g8 g8 f+8 r4 >
+C r2 r2 r2 r2 r2 r2 r2 r2
+D r2 r8 r2 r2 r2 r2 r2 r2 > d16 d16 f+16 f+16 a16 a16 >
+E r2 r2 r2 r2 r2 r2 r2 r8 > d16 d16 f+16 f+16 a16 a16 >
+F g8 a8 b8 a8 [g8 < g8]2 > [g8]4 c8 < g8 r4 > [g8]4 c8 < g8 > g8 < g8 > c4. c+8 [d8]4
+
+A [a8 g16 f+16 g8 f+16 e16 f+8 d8 c+8 d8]2 g4 g4 g8 f+16 e16 d16 c+16 < b16 a16 > g4 g4 g8 f+16 e16 d16 c+16 < b16 a16 >
+B [f+8 r8 e8 r8 d8 r4.]2 e4 e4 e8 r4. e4 e4 e8 r4.
+C r2 r2 r2 r2 r2 r2 r2 r2
+D d4 r4 r2 < d4 < a4 > d4 r4 [c+8 d8 e8 d8 c+4 r4]2
+E d4 r2. < d4 < a4 > d4 r4 a8 b8 > c+8 < b8 a4 < r4 a8 b8 > c+8 < b8 a4 > r4
+F [d4 < a4 > d4 r4]2 < [a8 b8 > c+8 < b8 a4 r4]2 >
+
+A a8 g16 f+16 g8 f+16 e16 f+8 e16 d16 e8 d16 c+16 d4 d4 d8 c+16 < b16 a16 g16 f+16 e16
+B f+8 r8 e8 < r2 r8 f+4 f+4 f+8 r4.
+C r2 r2 d4 d4 d8 r4.
+D d4 < a4 > d4 < g8 a8 >> d4 d4 d8 c+16 < b16 a16 g16 f+16 e16
+E d4 < a4 > d4 < g8 a8 >> d4 d4 d8 c+16 < b16 a16 g16 f+16 e16
+F d4 < a4 > d4 g8 a8 d8 e8 f+8 e8 d8 d8 c+8 c+8
+
+A a4 a4 a4 > r4 d16 e16 f+16 g16 a16 f+16 e16 d16 < b8 > b8 a16 g16 f+16 e16
+B f+4 e4 f+4 > r4 r2 r2
+C d4 c+4 d4 r4 r2 r2
+D f+8 e16 d16 e8 d16 c+16 d8 e16 f+16 g16 a16 b16 > c+16 d16 e16 f+16 g16 a16 f+16 e16 d16 < b8 > b8 a16 g16 f+16 e16
+E f+8 e16 d16 e8 d16 c+16 d8 e16 f+16 g16 a16 b16 > c+16 d16 e16 f+16 g16 a16 f+16 e16 d16 < b8 > b8 a16 g16 f+16 e16
+F d8 f+8 g8 a8 [d8]8 g8 g8 f+8 d8
+
+A f+4 e4 d4 r4
+B d4 c+4 < f+4 r4
+C r4 a4 d4 r4
+D d16 c+16 d16 < a16 > e4 d4 < r4
+E d16 c+16 d16 < a32 > f+32 e4 d4 r4
+F r8 f+8 g8 a8 d4 r4
+
+A d4 d4 d4 r8 f+16 g16 a8 a8 a8 > d8 < b8 a8 > r8 d8 < a8 g8 f+8 e8
+B f+4 f+4 f+4 > r8 d16 e16 f+8 f+8 f+8 r8 g8 f+8 r4 f+8 e8 d8 c+8 <
+C d4 d4 d4 r4 r2 r2 r2
+D r2 r2 r2 r2 r2
+E r2 r2 r2 r2 r2
+F [d8 e8 f+8 e8]2 [d8]4 g8 d8 d8 d8 r8 g8 a8 < a8 >
+
+A f+16 e16 d16 c+16 d16 e16 f+16 [g16 a16]2 b16 a16 g16 a16 b16 [g16 f+16 g16 a16]2 [f+16 e16 f+16 g16]2
+B r2 r2 r2 r2
+C r2 r2 r2 r2
+D r2 r8 f+8 f+8 f+8 [e8]4 [d8]4 <
+E r2 r8 < f+8 f+8 f+8 r8 e8 e8 e8 [d8]4 <
+F d8 < d8 d4 > r2 r2 r2
+
+A [e16 d16 e16 f+16]2 [c+16 < a16 > c+16 e16]4 < [f+16 d16 f+16 a16]2 [e16 g16 > c+16 < g16]2 > d8 c+16 < b16 a16 g16 f+16 e16
+B r2 r2 r2 r2 r2 f+8 r4.
+C r2 r2 r2 r2 r2 d8 r4.
+D [a8]12 > [d8]4 c+8 < a8 a8 a8 > d8 d8 c+8 c+8
+E [a8]12 > [d8]4 c+8 a8 a8 a8 d8 d8 c+8 c+8
+F r2 r2 r2 r2 r2 r2
+
+A f+8 d8 > r8 d16 e16 f+8 e16 d16 c+8 < b16. b32 a+4 r8 f+8 > [d16 < b16 > d16 f+16]2 [e16 < b16 > e16 g16]2 f+16 e16 d16 c+16 d8 < a+16. a+32
+B r2 r2 r2 r2 r2 r2
+C r2 r2 r2 r2 r2 r2
+D d8 f+16 a16 > d4 < d4 e4 f+8 a+8 a+8 a+8 [b8]8 d8 e8 f+8 f+8 <
+E d8 f+16 a16 > d4 < d4 e4 [f+8]8 [b8]4 d8 e8 f+8 f+8 <
+F r8 d8 < d4 > d4 e4 f+8 f+8 e8 e8 [d8]4 [g8]4 d8 e8 f+8 < f+8
+
+A b4 > r4 r2 r2 r2 r2 r2
+B r2 r2 r2 r2 r2 r2
+C r2 r2 r2 r2 r2 r2
+D b8 >> b8 g8 f+16 e16 f+8 b8 f+8 e16 d16 e8 > c+8 < e8 d16 c+16 d16 < b16 > c+16 d16 e16 f+16 g+16 a+16 b8 a4 g16 f+16 g8 f+4 e8
+E b8 >> b8 g8 f+16 e16 f+8 b8 f+8 e16 d16 e8 > c+8 < e8 d16 c+16 d16 < b16 > c+16 d16 e16 f+16 g+16 a+16 b8 a4 g16 f+16 g8 f+4 e8
+F b4 > e8 e8 [d8]4 [c+8]4 < b4 r4. > d+8 d+8 d+8 e8 < a+8 a+8 a+8
+
+A r2 r2 r2 r2
+B r2 r2 r2 r2
+C r2 r2 r2 r2
+D d8 c+16 d16 e8 c+8 d8 b8 a+16 g16 f+16 e16 d8 c+16 < b32 > d32 c+4 < b4 d16 c16 < b16 a16
+E d8 c+16 d16 e8 c+8 d8 b8 a+16 g16 f+16 e16 d8 c+16 < b16 > c+4 < b4 d16 c16 < b16 a16
+F b4 a+4 b4 r4. > d8 e8 f+8 < b4 > d16 c16 < b16 a16
+
+A d4 d4 d4 < r8 b16 > c16 d8 d8 d8 g8 e8 d8 < r8 b16 > c16 d8 d8 d8 g8
+B b4 b4 b4 r8 g16 a16 b8 b8 b8 > r8 c8 < b8 r8 g16 a16 b8 b8 b8 r8
+C r2 r2 r2 r2 r2
+D g4 r4 r2 r2 r2 r2
+E g4 r4 r2 r2 r2 r2
+F g8 a8 b8 a8 g8 > g8 < g4 > [g8]4 c8 < g8 > r4 g8 g8 g8 < b8 >
+
+A c8 < b8 b8 a8 b16 > c16 d8 d8 g8 c8 < b8 b8 a8 > g8 f+16 e16 d16 c16 < b16 a16
+B r2 r2 r2 b8 r4.
+C r2 r2 r2 d8 r4.
+D r2 r2 r2 r2
+E r2 r2 r2 r2
+F c4 d4 < g8 g8 g8 b8 > c4 d4 g8 g8 f+8 f+8
+
+A b8 g8 > r8 d8 < [g16 > d16 < b16 > d16 g16 d16 < b16 > d16]2 < b8 > c16 e16 g16 e16 c16 e16 < g16 > e16 c16 e16 g16 e16 c16 e16 <
+B r2 r2 r2 g16 > e16 < r4. r2
+C r2 r2 r2 r2 r2
+D r8 >> [d8 < b8 > d8 r8]2 < b8 > d8 < b8 > [r8 g8 e8 g8]2
+E r8 > [b8 g8 b8 r8]2 > d8 < b8 g8 > [r8 e8 c8 e8]2
+F [g8]4 < [g8]6 b8 b8 > [c8]8 <
+
+A [g16 > d16 < b16 > d16 g16 d16 < b16 > d16]2 < [d16 a16 f+16 a16 > c16 < a16 f+16 a16]2
+B r2 r2 r2 r2
+C r2 r2 r2 r2
+D [r8 g8 d8 g8]2 < [r8 a8 f+8 a8]2
+E [r8 d8 < b8 > d8]2 < [r8 f+8 d8 f+8]2
+F [b8]7 g8 > [d8]8
+
+A [g16 > g16 f+16 g16]2 < f+16 > g16 f+16 g16 < e16 > g16 f+16 g16 < d16 > g16 f+16 g16 < c16 > g16 f+16 g16 << b16 >> g16 f+16 g16 << a16 >> g16 f+16 g16
+B r2 r2 r2 r2
+C r2 r2 r2 r2
+D b4 r4 r2 r2 r2
+E g4 r4 r2 r2 r2
+F g4 g4 f+4 e4 d4 c4 < b4 a4
+
+A g4 g4 g8 f+16 e16 d16 c16 < b16 a16 b8 a16 g16 a8 g16 f+16 g4 r8 [a8 b8 > c4]2 < a8 b8 > c32. < b32. r32 g8 f+8 >
+B b4 b4 r2 d8 r8 f+8 < r8 b4 r8 > [f+8 g8 a4]2 f+8 g8 r16 r64 a32. r4
+C r2 r2 r2 r2 r2 r2 r2
+D r2 r2 r2 r8 g8 f+8 d8 [g8 e8 f+4]2 g8 c8 d8 d8 <
+E r2 r2 r2 r8 g8 f+8 d8 [g8 e8 f+4]2 g8 c8 d8 d8 <
+F g8 a8 b8 a8 g8 a8 b8 > c8 d4 < d4 g8 > g8 f+8 d8 [g8 e8 f+4]2 g8 c8 d8 < d8
+
+A [g8 f+16 e16 d16 c16 < b16 a16]2 b8 a16 g16 a8 g16 f+16 g4 > d4
+B r2 r2 g8 r8 f+8 < r8 b4 > r4
+C r2 r2 r4 d8 r8 r2
+D g4 r2 r2 r2 >> d4
+E g4 r2 r2 r2 >> d4
+F g4 f+4 g8 a8 b8 > c8 d4 < d4 > g8 a8 b8 a8
+
+A g16 b16 a16 g16 a8 c8 < b16 > b16 a16 g16 a8 c8 < b8 g8 b8 > d8 [g8 f+16 e16 d16 c16 < b16 a16]2
+B r2 r2 r2 r2 r2
+C r2 r2 r2 r2 r2
+D g16 b16 a16 g16 a8 c8 < b16 > b16 a16 g16 a8 c8 < b8 g8 b8 > d8 [g8 f+16 e16 d16 c16 < b16 a16]2
+E g16 b16 a16 g16 a8 c8 < b16 > b16 a16 g16 a8 c8 < b8 g8 b8 > d8 [g8 f+16 e16 d16 c16 < b16 a16]2
+F g8 g8 f+8 f+8 g8 g8 f+8 f+8 [g8]6 f+8 f+8 g8 g8 f+8 f+8
+
+A b4 a4 g8 b8 > c8 d8 g4 r4
+B g4 f+4 < b8 r4. > b4 r4
+C r4 d4 r2 d4 r4
+D b8 a16 g16 a8 g16 f+16 g8 b8 > c8 d8 g4 r4
+E b8 a16 g16 a8 g16 f+16 g8 b8 > c8 d8 g4 r4
+F g8 < b8 > c8 d8 e8 < b8 > c8 d8 < g4 r4
+
+
+; ViolinI:
+; Dropped (not enough channels)
+; _ [r2 r2]62 r2 < b4
+
+; ViolinI:
+; Dropped (not enough channels)
+; _ [r2 r2]62 r2 < d4
+
+; ViolinII:
+; Dropped (not enough channels)
+; _ [r2 r2]62 r2 < b4
+
+; ViolinII:
+; Dropped (not enough channels)
+; _ [r2 r2]62 r2 < d4
+
+
+
+;; Largo
+;  -----
+A t 40
+
+
+; Reset octaves
+ABC o5
+DE  o4
+F   o3
+
+; unused
+BC [r2]15
+
+A e16 < b16 > c16 < [b16 > e16]2 g16 f+16 < b16 > c16 < [b16 > f+16]2 a16 g16 e16 b16 a16 g+16 f+16 e16 g+16
+D e16 < b16 > c16 < [b16 > e16]2 g16 f+16 < b16 > c16 < [b16 > f+16]2 a16 g16 e16 b16 a16 g+16 f+16 e16 g+16
+E < [g8]4 r8 [b8]4 g16 a16 b8 b8 >
+F [e8]4 [d+8]4 e8 e8 d8 d8
+
+A a16 e16 a16 g16 f+16 e16 d16 f+16 g16 d16 g4 f4 e8 a8 g4 f+8 b8 a4 g8 b8 e8
+D a16 e16 a16 g16 f+16 e16 d16 f+16 g16 d16 g4 f4 e8 a8 g4 f+8 b8 a4 g8 b8 e8
+E e8 e8 < a8 f+8 > [d8]4 < g8 g8 > e8 e8 < a8 a8 > [f+8]2 < b8 b8 > g8 < g8 >
+F c8 c8 d8 c8 < [b8]4 > c8 c8 [c+8]2 d8 d8 [d+8]2 [e8]4
+
+A [f16 e16 f16 a16]2 e16 d+16 e8 f16 f+16 g16 g+16 a16 g+16 a8. < b16 > c16 < b16 >
+D [f16 e16 f16 a16]2 e16 d+16 e8 f16 f+16 g16 g+16 a16 g+16 a8. < b16 > c16 < b16 >
+E [c8]4 < b8 b8 r4. [f+8]3
+F [a8]4 g8 e8 r4. [d+8]3
+
+A g16 a16 b16 e16 f+16 g16 a16 d+16 e16 < b16 > c16 < b16 b8 b8. > d16 c16 < b16 a8 a+8 b2
+D g16 a16 b16 e16 f+16 g16 a16 d+16 e16 < b16 > c16 < b16 b8 b8. > d16 c16 < b16 a8 a+8 b2
+E b8 b8 > c8 < f+8 g8 g8 [f+8]2 e2 d+2
+F e8 g8 a8 b8 e8 e8 d8 d8 c2 < b2
+
+
+
+;; Allegro
+;  -------
+A t100
+
+; Reset octaves
+ABC o5
+DE  o4
+F   o3
+
+A [g8]4 < [g16 a16 b16 > c16 d8 e8 f+8 g8]2 < g8 r8 > b16 a16 g16 f+16 e16 d16 c8 a8 c8 a16 g16 f+16 e16 d16 c16 <
+B < [b8]4 r4 r8 > c8 d8 < b8 r4 r8 > c8 d8 r2 r2 < a8 r4 r8
+C < [d8]4 r2 r8 d8 r8 r4 r2 r2 r2 r4
+D [g8]4 < [g16 a16 b16 > c16 d8 e8 f+8 g8]2 < g8 r8 > b16 a16 g16 f+16 e16 d16 c8 a8 c8 a16 g16 f+16 e16 d16 c16 <
+E [g8]4 < [g16 a16 b16 > c16 d8 e8 f+8 g8]2 < g8 r8 > b16 a16 g16 f+16 e16 d16 c8 a8 c8 a16 g16 f+16 e16 d16 c16 <
+F g8 b8 a8 g4 r8 g8 c8 d8 < g4 r8 > g8 c8 d8 g8 < g8 g8 g4 > g8 [a8]3 [f+8]3
+
+A [b8 > d8 g8 f+8 < a8 > c8]2 < b8 > d8 f+8 g8 f+16 e16 d16 c16 < b32. a32. r32 b8 a8 g4 r8 >
+B r8 r4 > d8 r8 < a8 g8 r4 > d8 r8 < a8 g8 r8 > d8 < b8 r4 r16 r64 g32. g8 f+8 < b4 r8 >
+C r2 r2 r2 r4 r8 d8 r2 r2
+D [b8 > d8 g8 f+8 < a8 > c8]2 < b8 > d8 f+8 g8 f+16 e16 d16 c16 < b32. a32. r32 b8 a8 g4 r8
+E [b8 > d8 g8 f+8 < a8 > c8]2 < b8 > d8 f+8 g8 f+16 e16 d16 c16 < b32. a32. r32 b8 a8 g4 r8
+F [g8]3 [d8]3 [g8]3 [d8]3 g8 < b8 a8 g4 r8 g8 > d8 < d8 g4 r8
+
+A [g8]4 < [g16 a16 b16 > c16 d8 e8 f+8 g8]2 f+16 e16 d16 c16 g8 f+16 e16 d16 c16 < b16 > c16 < b8 a8 g4 r8 >
+B [b8]4 r4 r8 > c8 d8 < b8 r4 r8 > c8 d8 r2 r4 < g16 a16 g8 f+8 < b4 r8
+C [d8]4 r2 r8 d8 r8 r2 r2 r2 r2
+D r2 r2 r2 r2 r2 r2 r8 b8 > d8
+E r2 r2 r2 r2 r2 r2 r8 b8 > d8
+F g8 b8 a8 [g4 r8 b8 > c8 d8]2 < [g4 r8]2 > g16 c16 d8 < d8 [g8]3 >
+
+A [g8 a8 b8 a16 g16 f+16 e16 d8]2 [e8 f+8 g8 f+16 e16 d16 c+16 d8]2 b16 a16 g16 f+16 e16 d16 c+8 < a16 b16 > c+16 d16
+B r2 r2 r2 >> c+8 d8 e8 r4 r8 c+8 d8 e8 r2 r2 r8
+C r2 r2 r2 r2 r2 r2 r2 r4
+D g8 a8 b8 a16 g16 f+16 e16 d8 r2 r2 r2 r2 r2 r2
+E g8 a8 b8 a16 g16 f+16 e16 d8 r2 r2 r2 r2 r2 r2
+F g8 f+8 g8 d8 < d8 > d8 g8 f+8 g8 d4 r8 < [a8]3 > d4 < d8 [a8]3 > [d8]3 g4 g8 a4 < a8
+
+A e8 f+8 g8 f+16 e16 d16 c+16 d8 b8 a8 g8 f+8 e16 f+16 d8 [g16 e16 f+16 d16 e16 c+16]2 d8 c+16 < b16 a16 g16 f+8 g8 a8 d8 [a16]4 a4. >
+B c+8 d8 e8 r4 r8 g8 f+8 e8 r2 r2 r2 r2 < [f+16]4 f+4.
+C r2 r2 r2 r2 r2 r2 r8 [d16]4 d4.
+D << [a8]3 > d8 [f+8]2 g8 a8 < a8 > d8 r2 r2 > d8 c+16 < b16 a16 g16 f+8 g8 a8 d8 [d16]4 d4 r8 >
+E << [a8]3 > d8 [f+8]2 g8 a8 < a8 > d8 r2 r2 > d8 c+16 < b16 a16 g16 f+8 g8 a8 d8 [d16]4 d4 r8 >
+F [a8]3 > d8 [f+8]2 g8 a8 < a8 > d8 e8 f+8 [g8 a8 < a8]2 >> d8 c+16 < b16 a16 g16 f+8 g8 a8 d8 [d16]4 d4.
+
+A d8 [d16]4 d8 d16 e16 f+16 g16 a8 b8 > c+8 d8 < d8 r8
+B f+8 [f+16]4 r2 r2 r8
+C d8 [d16]4 r2 r2 r8
+D d8 [d16]4 d8 d16 e16 f+16 g16 a8 b8 > c+8 d8 < d8 r8
+E d8 [d16]4 d8 d16 e16 f+16 g16 a8 b8 > c+8 d8 < d8 r8
+F [d8]4 r4 f+8 g8 a8 d4 r8
+
+
+A [d8]4 < [d16 e16 f+16 g16 a8 b8 > c+8 d8]2 c+16 < b16 a16 g16 f+8 e16 f+16 d8 >
+B [f+8]4 r4 f+8 g8 a8 f+8 r4 f+8 g8 a8 r2 r4
+C [d8]4 r2 r8 d8 r4 r2 r2 r8
+D r2 r2 r2 r2 r2 r8
+E r2 r2 r2 r2 r2 r8
+F d8 d8 c+8 < b4 > [r8 f+8 g8 a8 d4]2 c+8 d4 r8
+
+A [g8]4 < [g16 a16 b16 > c16 d8 e8 f+8 g8]2 [f8 e8]2 d8
+B [b8]3 [r4 r8 b8 > c8 d8]2 < r2 r4
+C r2 r2 r2 r2 r2 r8
+D << g8 b8 a8 [g8 r4]3 b8 > c8 d8 < [g8]6 >
+E << g8 b8 a8 [g8 r4]3 b8 > c8 d8 [g8]6
+F r2 r2 r2 r2 r2 r8
+
+A e16 d16 c16 < b16 > c8 < a8 a16 b16 > c+16 d16 e8 f+8 g8 g8 f+8 e8 f+16 e16 d16 c+16 d8
+B r2 r2 r2 r4 r8
+C r2 r2 r2 r4 r8
+D [c8]3 c+8 < [a8]8 > [d8]3
+E [c8]3 c+8 < [a8]8 > [d8]3
+F r2 r2 r2 r4 r8
+
+A c16 e16 g16 e16 c16 e16 < b16 > d16 g16 d16 < b16 > d16 < f+16 a16 > c16 < a16 f+16 a16 >
+B r2 r2 r8
+C r2 r2 r8
+D e4 f+8 g4 < g8 > d4 d8 <
+E e4 f+8 g4 < g8 > d4 d8
+F e4 f+8 g4 < g8 > d4 d8 <
+
+A [g8]4 f+16 e16 d16 c16 < b16 > c16 < b8 a8 <
+B [b8]3 r4 r8 g16 a16 g8 f+8
+C [d8]3 r2 r4
+D g8 b8 a8 g8 r8 > f+8 g16 c16 d8 d8
+E g8 b8 a8 g8 r8 f+8 g16 c16 d8 d8
+F g8 b8 a8 g8 r8 > f+8 g16 c16 d8 < d8
+
+A b16 > b16 a16 g16 f+16 g16 c16 b16 a16 g16 f+16 g16 d16 b16 a16 g16 f+16 g16
+B r2 r2 r8
+C r2 r2 r8
+D < g8 r4 > c8 r4 d8 r4
+E < g8 r4 > c8 r4 d8 r4
+F   g8 r4 > c8 r4 d8 r4
+
+A e16 b16 a16 g16 f+16 g16 < b16 > b16 a16 g16 f+16 g16 c16 b16 a16 g16 f+16 g16
+B r2 r2 r8
+C r2 r2 r8
+D e8 r4 < b8 r4 > c8 r4
+E e8 r4 < b8 r4 > c8 r4
+F e8 r4 < b8 r4 > c8 r4
+
+A d16 b16 a16 g16 f+16 g16 > g8 f+16 e16 d16 c16 < b16 > c16 < b8 a8
+B r2 r4 g16 a16 g8 f+8 <
+C r2 r2 r8
+D d8 r4 g8 r8 r2
+E d8 r4 g8 r8 r2
+F d8 r4 g8 r8 f+8 g8 d8 < d8 >
+
+A g8 > [g8 b8 a8 < a8 > c8 < b8]2 > f+16 e16 d16 c16 < b8 > c8 d8 g4 r8
+B b8 r2 > a8 g8 r2 a8 g16 > g16 r2 r8 < b4 r8
+C r2 r2 r2 r2 r4 d4 r8
+D r8 > g8 b8 a8 < a8 > c8 < b8 > g8 b8 a8 < a8 > c8 < b16 > g16 f+16 e16 d16 c16 < b8 > c8 d8 g4 r8
+E r8 > g8 b8 a8 < a8 > c8 < b8 > g8 b8 a8 < a8 > c8 < b16 > g16 f+16 e16 d16 c16 < b8 > c8 d8 g4 r8
+F [g8]3 [d8]3 [g8]3 [d8]3 g8 r4 < b8 > c8 d8 < g4.
+
+
+; Mandolin:
+; Dropped (not enough channels)
+; _ << [g8]3 [r2 r2]33 r4 r8 g4 r8
+
+; ViolinI:
+; Dropped (not enough channels)
+; _ [r2 r2]5 r2 r8 r16 r64 < g32. [r2 r2]28 b4 r8
+
+; ViolinI:
+; Dropped (not enough channels)
+; _ [r2 r2]33 r2 r4 < d4 r8
+
+; ViolinII:
+; Dropped (not enough channels)
+; _ [r2 r2]5 r2 r8 r16 r64 < g32.  [r2 r2]28 b4 r8
+
+; ViolinII:
+; Dropped (not enough channels)
+; _ [r2 r2]33 r2 r4 < d4 r8
+

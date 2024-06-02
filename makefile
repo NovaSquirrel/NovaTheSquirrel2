@@ -17,7 +17,7 @@ version = 0.01
 # (use a backslash to continue on the next line)
 objlist = \
   snesheader init main player memory common renderlevel renderlevel2 renderlevelsprites \
-  uploadppu graphics blockdata snesgss_driver \
+  uploadppu graphics blockdata tad-audio_config audio_incbins audio_misc \
   scrolling playergraphics blockinteraction palettedata \
   levelload levelautotile leveldata actordata actorcode actorshared \
   mode7/mode7 mode7/m7blocks mode7/m7actors mode7/m7math mode7/m7leveldata mode7/m7blockdata mode7/perspective_data mode7/m7playergraphics \
@@ -25,15 +25,14 @@ objlist = \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \
   lz4 dialog_npc_data dialog_text_data itemcode itemdata color_math_settings \
   backgrounddata bgeffectcode playerdraw playerability iris \
-  playerprojectile blarggapu \
-  hubworld
-objlistspc = \
-  spcheader spcimage musicseq
+  playerprojectile hubworld
 
 CC := gcc
 AS65 := ca65
 LD65 := ld65
 CFLAGS65 = -g
+TAD_COMPILER := audio/tad-compiler
+
 objdir := obj/snes
 audiodir := audio
 srcdir := src
@@ -45,11 +44,6 @@ bgdir := backgrounds
 ifndef SNESEMU
 SNESEMU := ./mesen
 endif
-
-# game-music-emu by blargg et al.
-# Using paplay-based wrapper from
-# https://forums.nesdev.com/viewtopic.php?f=6&t=16218
-SPCPLAY := gmeplay
 
 lz4_flags    := -f -9
 
@@ -84,7 +78,7 @@ spcrun: $(title).spc
 all: $(title).sfc $(title).spc
 
 clean:
-	-rm $(objdir)/*.o $(objdir)/mode7/*.o $(objdir)/*.chr $(objdir)/*.ov53 $(objdir)/*.sav $(objdir)/*.pb53 $(objdir)/*.s
+	-rm $(objdir)/*.o $(objdir)/mode7/*.o $(objdir)/*.chr $(objdir)/*.ov53 $(objdir)/*.sav $(objdir)/*.s
 
 dist: zip
 zip: $(title)-$(version).zip
@@ -105,7 +99,6 @@ $(objdir)/index.txt: makefile
 # Rules for ROM
 
 objlisto = $(foreach o,$(objlist),$(objdir)/$(o).o)
-objlistospc = $(foreach o,$(objlistspc),$(objdir)/$(o).o)
 chrXall := $(patsubst %.png,%.chr,$(wildcard tilesetsX/*.png))
 chr4all := $(patsubst %.png,%.chrsfc,$(wildcard tilesets4/*.png))
 chr2all := $(patsubst %.png,%.chrgb,$(wildcard tilesets2/*.png))
@@ -119,7 +112,6 @@ overworlds := $(wildcard overworlds/*.tmx)
 m7levels_lz4 := $(patsubst %.tmx,%.lz4,$(wildcard m7levels/*.tmx))
 m7levels_bin := $(patsubst %.tmx,%.bin,$(wildcard m7levels/*.tmx))
 all_npc_gfx := $(wildcard npc/*.png)
-snesgssall := $(wildcard $(audiodir)/*.gsm)
 
 # Background conversion
 # (nametable conversion is implied)
@@ -131,9 +123,6 @@ auto_linker.cfg: linker_template.cfg $(objlisto)
 map.txt $(title).sfc: auto_linker.cfg
 	$(LD65) -o $(title).sfc -m map.txt --dbgfile $(title).dbg -C auto_linker.cfg $(objlisto)
 	$(PY) tools/fixchecksum.py $(title).sfc
-
-spcmap.txt $(title).spc: spc.cfg $(objlistospc)
-	$(LD65) -o $(title).spc -m spcmap.txt -C $^
 
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/snes.inc $(srcdir)/global.inc
 	$(AS65) $(CFLAGS65) $< -o $@
@@ -150,13 +139,13 @@ $(srcdir)/backgrounddata.s: $(srcdir)/backgroundenum.s $(srcdir)/graphicsenum.s
 $(srcdir)/portraitdata.s: $(srcdir)/portraitenum.s
 $(objdir)/renderlevel.o: $(srcdir)/actorenum.s
 
-$(objdir)/main.o: $(srcdir)/vblank.s
+$(objdir)/main.o: $(srcdir)/vblank.s $(srcdir)/audio_enum.inc
 $(objdir)/blockdata.o: $(srcdir)/blockenum.s
 $(objdir)/levelautotile.o: $(srcdir)/blockenum.s
 $(objdir)/mode7/m7blockdata.o: $(srcdir)/mode7/m7blockenum.s
 $(objdir)/mode7/m7actors.o: $(srcdir)/mode7/m7blockenum.s tilesetsX/M7SoftSprites.chr
 $(objdir)/overworldblockdata.o: $(srcdir)/overworldblockenum.s
-$(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(objdir)/player.o: $(srcdir)/blockenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/audio_enum.inc
 $(objdir)/actorshared.o: $(srcdir)/blockenum.s
 $(objdir)/levelload.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/blockenum.s
 $(objdir)/leveldata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/backgroundenum.s $(srcdir)/color_math_settings_enum.s
@@ -166,10 +155,10 @@ $(objdir)/actordata.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/uploadppu.o: $(palettes) $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s
 $(objdir)/inventory.o: $(srcdir)/paletteenum.s $(srcdir)/graphicsenum.s $(srcdir)/vwf.inc
 $(objdir)/mode7/mode7.o: $(srcdir)/paletteenum.s $(srcdir)/mode7/m7palettedata.s $(srcdir)/graphicsenum.s $(srcdir)/portraitenum.s $(srcdir)/mode7/m7blockenum.s tilesetsX/M7Tileset.chr $(m7levels_lz4)
-$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s
+$(objdir)/blockinteraction.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/itemenum.s $(srcdir)/audio_enum.inc
 $(srcdir)/actordata.s: $(srcdir)/actorenum.s
 $(objdir)/actorcode.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
-$(objdir)/playerprojectile.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s
+$(objdir)/playerprojectile.o: $(srcdir)/actorenum.s $(srcdir)/blockenum.s $(srcdir)/audio_enum.inc
 $(objdir)/playerability.o: $(srcdir)/actorenum.s
 $(srcdir)/itemdata.s: $(srcdir)/itemenum.s $(srcdir)/vwf.inc
 $(objdir)/itemcode.o: $(srcdir)/itemenum.s
@@ -283,9 +272,17 @@ tilesets2/lz4/%.chrgb.lz4: tilesets2/lz4/%.chrgb
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
 
+# ----------------
 # Rules for audio
-$(objdir)/snesgss_driver.o: $(audiodir)/gss_data.s
-$(audiodir)/gss_data.s: $(audiodir)/exportgss.py $(audiodir)/encodesong.py $(audiodir)/encodebrr.py $(snesgssall) $(audiodir)/brr/gssbrr
-	$(PY) $(audiodir)/exportgss.py $(audiodir)/gss_data.s $(audiodir)/gss_enum.s $(snesgssall)
-$(audiodir)/brr/gssbrr:
-	$(CC) $(audiodir)/brr/gssbrr.c -lm -o $@
+$(srcdir)/audio_enum.inc: $(audiodir)/example-project.terrificaudio
+	$(TAD_COMPILER) ca65-enums --output $@ $(audiodir)/example-project.terrificaudio
+$(audiodir)/audio_common.bin: $(audiodir)/example-project.terrificaudio $(audiodir)/sound-effects.txt $(wildcard $(audiodir)/songs/*.mml)
+	$(TAD_COMPILER) common --output $@ $(audiodir)/example-project.terrificaudio
+$(patsubst %.mml,%.bin,$(wildcard $(audiodir)/songs/*.mml)): $(audiodir)/songs/*.mml
+	$(TAD_COMPILER) song --output $@ $(audiodir)/example-project.terrificaudio $(patsubst %.bin,%.mml, $@)
+
+$(objdir)/audio_incbins.o: $(audiodir)/audio_common.bin $(patsubst %.mml,%.bin,$(wildcard $(audiodir)/songs/*.mml))
+$(srcdir)/audio_incbins.s: $(audiodir)/example-project.terrificaudio $(patsubst %.mml,%.bin,$(wildcard $(audiodir)/songs/*.mml))
+	$(PY) tools/create_tad_incbins.py $< $@
+
+$(objdir)/audio_misc.o: $(audiodir)/audio_common.bin

@@ -1,0 +1,142 @@
+=== menu_cursor ===
+    set_instrument_and_gain square F127
+    set_volume          25
+
+    play_note           d4 8
+
+=== menu_select ===
+    set_instrument  sawtooth
+
+    play_note       c+4  $10
+    play_note       b-4  $60
+
+=== menu_incorrect ===
+    set_instrument  sawtooth
+
+    play_note       f3    16
+    play_note       b-2   32
+
+=== player_hurt ===
+
+    set_volume 255
+
+    set_instrument_and_adsr triangle    10 2 1 25
+
+    play_note  f3 no_keyoff 4
+    portamento c2 no_keyoff -25 8
+    portamento c1 keyoff -90 8
+
+=== player_hurt_low_health ===
+    set_volume 255
+
+    set_instrument_and_adsr triangle    10 2 1 25
+
+    play_note  f3 no_keyoff 4
+    portamento c2 no_keyoff -25 8
+    portamento c1 keyoff -90 8
+
+
+    set_adsr 12 2 2 28
+
+    start_loop 3
+        rest 6
+
+        play_note  f4 no_keyoff 4
+        play_note  g5 keyoff 8
+    end_loop
+
+=== jump ===
+
+    set_volume 100
+
+    set_instrument_and_adsr sawtooth    15 2 2 18
+
+    play_note g3 no_keyoff 4
+    portamento c3 no_keyoff -30 8
+    portamento g3 keyoff +20 20
+
+=== vibrato_alarm ===
+    set_volume 196
+    set_instrument_and_gain square I24
+
+    set_vibrato 60 12
+    play_note a4 240
+
+=== play_samples_bytecode ===
+
+    set_volume 255
+
+    start_loop 4
+        set_instrument conga
+        play_note 0, 30
+        play_note 1, 30
+
+        set_instrument cowbell
+        play_note 0, 30
+        rest         30
+    end_loop
+
+=== spawn_item ===
+MML
+@1 triangle adsr 10 6 3 12
+
+A @1 v9
+A o5 l6 c+ c+ e a > e.
+
+=== collect_coin ===
+MML
+@1 triangle adsr 14 2 6 27
+
+A @1 v8
+A o5 l12 f b-.
+
+=== robot_notices_player ===
+MML
+@1 sine adsr 10 2 4 28
+
+A @1 v8
+A o4 l32 [ e & >e & b & >e r ]2
+
+=== robot_ascend ===
+MML
+@1 sine adsr 7 3 0 0
+
+A @1 {{o4 b o5 c}}%75,%3
+
+=== robot_fires_laser ===
+MML
+@1 square adsr 12 7 7 25
+
+A @1 v10
+A o5 {{f a}}4
+
+=== fire_arrow ===
+MML
+@1 triangle adsr 10 6 3 28
+
+A @1 v10
+A o5 {e- g}6
+
+=== spring ===
+
+    set_volume 100
+
+    set_instrument_and_adsr sawtooth    15 2 2 18
+
+    play_note g3 no_keyoff 5
+    portamento c3 no_keyoff -30 8
+    portamento a4 keyoff +20 50
+
+=== collect_item ===
+MML
+@1 triangle adsr 14 2 6 27
+
+A @1 v8
+A o5 l12 a g-.
+
+=== brick_break ===
+MML
+@1 sawtooth adsr 10 6 3 12
+
+A @1 v9
+A o3 l13 bga .

@@ -1,0 +1,7 @@
+Generated with Audacity.
+
+Waveform:           Sawtooth
+Frequency (Hz):     500
+Amplitude (0-1):    0.8
+Duration:           64 samples
+

@@ -18,6 +18,8 @@
 .include "global.inc"
 .include "blockenum.s"
 .include "actorenum.s"
+.include "audio_enum.inc"
+.include "tad-audio.inc"
 .smart
 
 .import BlockRunInteractionAbove, BlockRunInteractionBelow
