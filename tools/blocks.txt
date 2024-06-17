@@ -19,15 +19,15 @@ alias guiderails $2200
 alias toggleblocks $2c00
 alias linefollowing $2f00
 
-alias global_palette 1
-alias terrain_palette 2
-alias locks_palette 4
-alias glass_palette 5
-alias glass_palette_gray 6
-alias colorfulflower_palette 3
-alias foreststone_palette 4
-alias cliffcave_palette 5
-alias canopy_palette 6
+alias global_palette 2
+alias terrain_palette 3
+alias locks_palette 5
+alias glass_palette 6
+alias glass_palette_gray 7
+alias colorfulflower_palette 4
+alias foreststone_palette 5
+alias cliffcave_palette 6
+alias canopy_palette 7
 
 #######################################
 # Global tile stuff

@@ -16,8 +16,8 @@
 		"Background":	"Lake",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	[],
-		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", null, null, null, "BGLake"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGLake", "FGForestStone", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGTreehouse", "FGIndoorDecor"],
+		"BGPalette":	["FG3GlassBlocks", "BGLake", "FGCommon", "FGGrassy", "FGColorfulFlowers", null, null, null],
 		"BGColor":	"RGB(15,23,31)"
 	},
 	"Layers":	[{

@@ -52,7 +52,7 @@ def convert(f):
 	#print("Name "+name)
 
 	# Palette to use
-	palette_base = 7
+	palette_base = 1
 	# Tile number the background tiles start at
 	tile_number_base = 256
 

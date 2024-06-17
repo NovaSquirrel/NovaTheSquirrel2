@@ -16,7 +16,7 @@
 		"Background":	"Clouds",
 		"SpriteGFX":	["SPWalker", "SPCannon"],
 		"Flags":	["VerticalScrolling"],
-		"BGPalette":	[null, "FGCommon", "FGGrassy", "FGColorfulFlowers", "FGSuitLocks", "FGCliffCave", "FGCanopy", "BGLake"],
+		"BGPalette":	[null, "BGLake", "FGCommon", "FGGrassy", "FGColorfulFlowers", "FGSuitLocks", "FGCliffCave", "FGCanopy"],
 		"GFXUpload":	["FGCommon", "FGGrassy", "FGTropicalWood", "BGClouds", "FGSmallTrees", "FGCommonPalFlowertops", "FGColorfulFlowers", "FGTreehouse", "FGIndoorDecor", "FGLineFollowing", "FGSuitLocks", "FGCliffCave", "FGGuideRailsCanopy"],
 		"BGColor":	"RGB(15,23,31)"
 	},
