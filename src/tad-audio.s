@@ -36,10 +36,12 @@
 .export Tad_Init : far, Tad_Process : far, Tad_FinishLoadingData : far
 .export Tad_QueueCommand, Tad_QueueCommandOverride
 .export Tad_QueuePannedSoundEffect, Tad_QueueSoundEffect
-.export Tad_LoadSong, Tad_ReloadCommonAudioData
+.export Tad_LoadSong, Tad_LoadSongIfChanged, Tad_GetSong, Tad_ReloadCommonAudioData
 .export Tad_SetMono, Tad_SetStereo, Tad_GetStereoFlag
 .export Tad_SongsStartImmediately, Tad_SongsStartPaused, Tad_SetTransferSize
-.export Tad_IsLoaderActive, Tad_IsSongLoaded, Tad_IsSongPlaying
+.export Tad_IsLoaderActive, Tad_IsSongLoaded, Tad_IsSfxPlaying, Tad_IsSongPlaying
+
+.exportzp Tad_sfxQueue_sfx, Tad_sfxQueue_pan
 
 
 ;; =======
@@ -159,17 +161,17 @@ LOADER_ARAM_ADDR = $0200
 
 
 ;; Minimum transfer size accepted by `Tad_SetTransferSize`
-;
+;;
 ;; MUST BE > 0
 MIN_TRANSFER_PER_FRAME = 32
 
 ;; Maximum transfer size accepted by `Tad_SetTransferSize`
-;
+;;
 ;; The loader can transfer ~849 bytes per 60Hz frame SlowROM or FastROM
 MAX_TRANSFER_PER_FRAME = 800
 
 ;; Default number of bytes to transfer to Audio-RAM per `Tad_Process` call.
-;
+;;
 ;; MUST BE > 0
 DEFAULT_TRANSFER_PER_FRAME = 256
 
@@ -184,17 +186,18 @@ DEFAULT_TRANSFER_PER_FRAME = 256
 ;; Used by `tad-compiler ca65-export` to verify the IO protocol in `tad-audio.s` matches the audio-driver.
 ;;
 ;; This constant MUST be increased if `LOADER_ADDR` or the IO Communication protocol changes.
-.export TAD_IO_VERSION : abs = 14
+.export TAD_IO_VERSION : abs = 16
 
 
 ; MUST match `audio-driver/src/io-commands.wiz`
 .enum Command
     PAUSE = 0
-    UNPAUSE = 2
-    PLAY_SOUND_EFFECT_COMMAND = 4
+    PAUSE_MUSIC_PLAY_SFX = 2
+    UNPAUSE = 4
+    PLAY_SOUND_EFFECT_COMMAND = 6
     STOP_SOUND_EFFECTS = 8
     SET_MAIN_VOLUME = 10
-    SET_ENABLED_CHANNELS = 12
+    SET_MUSIC_CHANNELS = 12
     SET_SONG_TEMPO = 14
 .endenum
 
@@ -358,8 +361,10 @@ CENTER_PAN = MAX_PAN / 2
     ;; Song is loaded into Audio-RAM and the audio driver is paused.
     ;; No play-sound-effect commands will be sent when the driver is paused.
     PAUSED                              = $80
+    ;; Song is loaded into Audio-RAM and the audio driver is playing sfx (song paused).
+    PLAYING_SFX                         = $81
     ;; Song is loaded into Audio-RAM and the audio driver is playing the song.
-    PLAYING                             = $81
+    PLAYING                             = $82
 .endenum
 __FIRST_LOADING_STATE      = State::LOADING_COMMON_AUDIO_DATA
 __FIRST_LOADING_SONG_STATE = State::LOADING_SONG_DATA_PAUSED
@@ -449,19 +454,9 @@ __FIRST_LOADING_SONG_STATE = State::LOADING_SONG_DATA_PAUSED
 ;; Queue 4 - The next sound effect to play
 ;; ---------------------------------------
 .zeropage
-    ;; The sound effect to play next.
-    ;;
-    ;; Lower sound effect indexes take priority over higher sound effect indexes
-    ;; (as defined by the project file sound effect export order).
-    ;;
-    ;; If `Tad_sfxQueue == $ff`, then the queue is considered empty.
-    Tad_sfxQueue: .res 1
-
-
-.bss
-    ;; The pan value for the next sound effect to play.
-    ;; (Using 2 bytes so this variable can be written to using a 16 bit register)
-    Tad_sfxQueue_pan: .res 2
+    ;; see tad-audio.inc
+    Tad_sfxQueue_sfx: .res 1
+    Tad_sfxQueue_pan: .res 1
 
 
 ;; Memory Map Asserts
@@ -871,7 +866,7 @@ ReturnFalse:
 
     lda     #$ff
     sta     Tad_nextCommand_id
-    sta     Tad_sfxQueue
+    sta     Tad_sfxQueue_sfx
 
     stz     Tad_nextSong
 
@@ -922,11 +917,13 @@ ReturnFalse:
     bcs     @NotPauseOrPlay
         ; Change state if the command is a pause or play command
         .assert Command::PAUSE = 0, error
-        .assert Command::UNPAUSE = 2, error
-        .assert (Command::PAUSE >> 1) & 1 | $80 = State::PAUSED, error
-        .assert (Command::UNPAUSE >> 1) & 1 | $80 = State::PLAYING, error
+        .assert Command::PAUSE_MUSIC_PLAY_SFX = 2, error
+        .assert Command::UNPAUSE = 4, error
+        .assert (Command::PAUSE >> 1) & 3 | $80 = State::PAUSED, error
+        .assert (Command::PAUSE_MUSIC_PLAY_SFX >> 1) & 3 | $80 = State::PLAYING_SFX, error
+        .assert (Command::UNPAUSE >> 1) & 3 | $80 = State::PLAYING, error
         lsr
-        and     #1
+        and     #3
         ora     #$80
         sta     Tad_state
 @NotPauseOrPlay:
@@ -943,7 +940,7 @@ ReturnFalse:
 ;; REQUIRES: state == PLAYING
 ;; REQUIRES: The previous command has been processed by the audio-driver.
 ;;
-;; IN: A = Tad_sfxQueue
+;; IN: A = Tad_sfxQueue_sfx
 ;;
 ;; A8
 ;; I8
@@ -974,7 +971,8 @@ ReturnFalse:
 
     ; Reset the SFX queue
     ldy     #$ff
-    sty     Tad_sfxQueue
+    sty     Tad_sfxQueue_sfx
+    sty     Tad_sfxQueue_pan
 .endmacro
 
 
@@ -1003,11 +1001,13 @@ ReturnFalse:
             bpl     @SendCommand
 
             ; X = Tad_state
-            .assert State::PLAYING = $81, error
+            .assert State::PAUSED < $81, error
+            .assert State::PLAYING >= $81, error
+            .assert State::PLAYING_SFX >= $81, error
             dex
             bpl     @Return_I8
                 ; Playing state
-                lda     Tad_sfxQueue
+                lda     Tad_sfxQueue_sfx
                 cmp     #$ff
                 beq     @Return_I8
                     __Tad_Process_SendSfxCommand
@@ -1156,15 +1156,17 @@ ReturnFalse:
             ; Reset command and SFX queues
             lda     #$ff
             sta     Tad_nextCommand_id
-            sta     Tad_sfxQueue
+            sta     Tad_sfxQueue_sfx
+            sta     Tad_sfxQueue_pan
 
             ; Use `Tad_state` to determine if the song is playing or paused.
             ; Cannot use `Tad_flags` as it may have changed after the `LoaderDataType` was sent to
             ; the loader (while the song was loaded).
-            .assert State::LOADING_SONG_DATA_PAUSED & 1 | $80 = State::PAUSED, error
-            .assert State::LOADING_SONG_DATA_PLAY & 1 | $80 = State::PLAYING, error
+            .assert ((State::LOADING_SONG_DATA_PAUSED & 1) << 1) | $80 = State::PAUSED, error
+            .assert ((State::LOADING_SONG_DATA_PLAY & 1) << 1) | $80 = State::PLAYING, error
             lda     Tad_state
             and     #1
+            asl
             ora     #$80
 
         ; A = new state
@@ -1243,13 +1245,12 @@ Tad_QueueCommandOverride := Tad_QueueCommand::WriteCommand
 ; DB access lowram
 ; KEEP: X, Y
 .proc Tad_QueuePannedSoundEffect
-    cmp     Tad_sfxQueue
+    cmp     Tad_sfxQueue_sfx
     bcs     @EndIf
-        sta     Tad_sfxQueue
+        sta     Tad_sfxQueue_sfx
 
-        ; Safe to use a 16 bit index to write to `Tad_sfxQueue_pan`
-        .assert .sizeof(Tad_sfxQueue_pan) = 2, error
-        stx     Tad_sfxQueue_pan
+        txa
+        sta     Tad_sfxQueue_pan
 
 @EndIf:
     rts
@@ -1263,11 +1264,11 @@ Tad_QueueCommandOverride := Tad_QueueCommand::WriteCommand
 ; DB access lowram
 ; KEEP: X, Y
 .proc Tad_QueueSoundEffect
-    cmp     Tad_sfxQueue
+    cmp     Tad_sfxQueue_sfx
     bcs     @EndIf
-        sta     Tad_sfxQueue
+        sta     Tad_sfxQueue_sfx
 
-        lda     #MAX_PAN / 2
+        lda     #CENTER_PAN
         sta     Tad_sfxQueue_pan
 @EndIf:
     rts
@@ -1298,6 +1299,34 @@ Tad_QueueCommandOverride := Tad_QueueCommand::WriteCommand
         lda     #State::WAITING_FOR_LOADER
         sta     Tad_state
     :
+    rts
+.endproc
+
+
+; IN: A = song_id
+; OUT: carry set if `Tad_LoadSong` was called
+.a8
+; I unknown
+; DB access lowram
+.proc Tad_LoadSongIfChanged
+    cmp     Tad_nextSong
+    beq     :+
+        jsr     Tad_LoadSong
+        sec
+        rts
+    :
+    clc
+    rts
+.endproc
+
+
+;; OUT: A = The song_id used in the last `Tad_LoadSong` call.
+.a8
+; I unknown
+; DB access lowram
+.proc Tad_GetSong
+    ; `Tad_nextSong` is only written to in `Tad_Init` and `Tad_LoadSong`.
+    lda     Tad_nextSong
     rts
 .endproc
 
@@ -1395,16 +1424,32 @@ Tad_QueueCommandOverride := Tad_QueueCommand::WriteCommand
 
 
 
-; OUT: carry set if state is PAUSED or PLAYING
+; OUT: carry set if state is PAUSED, PLAYING_SFX or PLAYING
 .a8
 ; I unknown
 ; DB access lowram
 .proc Tad_IsSongLoaded
+    .assert State::PLAYING_SFX > State::PAUSED, error
     .assert State::PLAYING > State::PAUSED, error
     ; Assumes PLAYING is the last state
 
     lda     Tad_state
     cmp     #State::PAUSED
+    rts
+.endproc
+
+
+
+; OUT: carry set if state is PLAYING_SFX or PLAYING
+.a8
+; I unknown
+; DB access lowram
+.proc Tad_IsSfxPlaying
+    .assert State::PLAYING > State::PLAYING_SFX, error
+    ; Assumes PLAYING is the last state
+
+    lda     Tad_state
+    cmp     #State::PLAYING_SFX
     rts
 .endproc
 

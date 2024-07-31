@@ -63,7 +63,7 @@
 ;;
 ;;  * `loader.bin` - the custom spc700 loader.  Imported as `Tad_Loader_Bin`, `Tad_Loader_SIZE`.
 ;;  * `audio-driver.bin` - the spc700 audio driver.  Imported as `Tad_AudioDriver_Bin`, `Tad_AudioDriver_SIZE`.
-;;  * `blank-song.bin` - a blank (silent) song.  Imported as `Tad_BlankSong_Bin`, `Tad_BlankSong_Bin`.
+;;  * `blank-song.bin` - a blank (silent) song.  Imported as `Tad_BlankSong_Bin`, `Tad_BlankSong_SIZE`.
 ;;
 ;; Audio data is loaded using the external callback `LoadAudioData`.  `LoadAudioData` is
 ;; called when *Common Audio Data* or *Song Data* need to be loaded into Audio-RAM.
@@ -105,20 +105,20 @@ MIN_TICK_CLOCK = 64
 ;;
 ; MUST match `audio-driver/src/io-commands.wiz`
 .enum TadCommand
-    ;; Stop song and sound effect execution.
-    ;; * Commands will still be executed when the audio-driver is paused
+    ;; Pause the song and sound effect channels.
+    ;; * IO commands will still be executed when the audio-driver is paused.
     ;; * The audio driver starts paused unless the `LoaderDataType.PLAY_SONG_BIT` is set.
     PAUSE = 0
 
-    ;; Unpauses the audio driver.
-    ;;
-    ;; * Resets the S-SMP timer counters,
-    ;;   can cause issues if the S-CPU spams `UNPAUSE` commands.
-    UNPAUSE = 2
+    ;; Pauses the music channels, sound effects will continue to play.
+    ;; Unpauses the sound effects channels.
+    PAUSE_MUSIC_PLAY_SFX = 2
 
-    ;; MUST NOT USE PLAY_SOUND_EFFECT in `queue_command`
+    ;; Unpauses the music and sound effect channels.
+    UNPAUSE = 4
 
-    ;; reserved
+    ; SHOULD NOT USE PLAY_SOUND_EFFECT in `queue_command`
+    ; (command queue only holds 1 parameter byte and PLAY_SOUND_EFFECT has 2 parameters)
 
     ;; Stop all active sound effects
     STOP_SOUND_EFFECTS = 8
@@ -129,13 +129,11 @@ MIN_TICK_CLOCK = 64
     ;; NOTE: The main volume is reset whenever a new song is loaded.
     SET_MAIN_VOLUME = 10
 
-    ;; Enables or disable channels.
-    ;;  * parameter0: A bitmask of the 8 channels that can send key-on events
+    ;; Enables or disables music channels.
+    ;;  * parameter0: A bitmask of the 8 music channels that can send key-on events
     ;;
-    ;; Useful for disabling channels in a song.
-    ;;
-    ;; NOTE: The enabled channels bitmask is reset whenever a new song is loaded.
-    SET_ENABLED_CHANNELS = 12
+    ;; NOTE: The music channels bitmask is reset whenever a new song is loaded.
+    SET_MUSIC_CHANNELS = 12
 
     ;; Set the song tempo.
     ;;  * parameter0: The new S-DSP TIMER_0 register value
@@ -187,11 +185,11 @@ MIN_TICK_CLOCK = 64
 ;;
 ;; This function will do one of the following, depending on the state:
 ;;  * Transfer data to the Audio-RAM
-;;  * Wait for the loader and call `load_song_data()` when the loader is ready to receive new data
+;;  * Wait for the loader and call the `LoadAudioData` callback when the loader is ready to receive new data
 ;;  * Send a command to the audio driver
 ;;  * Send a play-sound effect command to the audio driver
 ;;
-;; NOTES: The command and sound-effect queues will be reset after a new song is loaded into Audio-RAM.
+;; NOTE: The command and sound-effect queues will be reset after a new song is loaded into Audio-RAM.
 ;;
 ;; TIMING:
 ;;  * MUST be called after `Tad_Init`.
@@ -206,6 +204,10 @@ MIN_TICK_CLOCK = 64
 
 
 ;; Finish loading the data into audio-RAM.
+;;
+;; `Tad_FinishLoadingData` will not transfer data if the state is `WAITING_FOR_LOADER`.
+;; It will only transfer data if the loader is in the middle of transferring data
+;; (when `Tad_IsLoaderActive` returns true).
 ;;
 ;; This function can be safely called by `LoadAudioData`.
 ;;
@@ -285,6 +287,11 @@ MIN_TICK_CLOCK = 64
 ;;
 ;; CAUTION: The audio driver starts in the paused state if the `PlaySongImmediately` flag is false.
 ;;
+;; CAUTION: `Tad_LoadSong` will switch the state to `WAITING_FOR_LOADER`.  `LoadAudioData` will
+;; not be called until `Tad_Process` is called **and** the audio-driver has switched to the loader.
+;; While the state remains `WAITING_FOR_LOADER`, no audio data will be transferred and calling
+;; `Tad_FinishLoadingData` will not transfer any audio data.
+;;
 ;; IN: A = 0 - play a blank (silent song)
 ;; IN: A >= 1 - Play song number `A`
 ;;
@@ -292,6 +299,31 @@ MIN_TICK_CLOCK = 64
 ;; I unknown
 ;; DB access lowram
 .import Tad_LoadSong
+
+
+;; Calls `Tad_LoadSong` if `A` != the song_id used in the last `Tad_LoadSong` call.
+;;
+;; See `Tad_LoadSong` for details about how songs are loaded into the audio driver.
+;;
+;; IN: A = 0 - play a blank (silent song)
+;; IN: A >= 1 - Play song number `A`
+;;
+;; OUT: Carry set if the song_id changed and `Tad_LoadSong` was called.
+;;
+;; A8
+;; I unknown
+;; DB access lowram
+.import Tad_LoadSongIfChanged
+
+
+;; Returns the current song id in the A register.
+;;
+;; OUT: A = The song_id used in the last `Tad_LoadSong` call.
+;;
+;; A8
+;; I unknown
+;; DB access lowram
+.import Tad_GetSong
 
 
 ;; If this subroutine is called, the *common audio data* will be reloaded into Audio-RAM.
@@ -367,7 +399,7 @@ MIN_TICK_CLOCK = 64
 .import Tad_IsLoaderActive
 
 
-;; OUT: Carry set if the song is loaded into audio-RAM (state is `PAUSED` or `PLAYING`)
+;; OUT: Carry set if the song is loaded into audio-RAM (state is `PAUSED`, `PLAYING_SFX` or `PLAYING`)
 ;;
 ;; A8
 ;; I unknown
@@ -375,12 +407,65 @@ MIN_TICK_CLOCK = 64
 .import Tad_IsSongLoaded
 
 
-;; OUT: Carry set if state is PLAYING
+;; OUT: Carry set if the song is loaded into audio-RAM and sound effects are not paused
+;;      (state is `PLAYING_SFX` or `PLAYING`)
+;;
+;; A8
+;; I unknown
+;; DB access lowram
+.import Tad_IsSfxPlaying
+
+
+;; OUT: Carry set if the song is playing (state is `PLAYING`)
 ;;
 ;; A8
 ;; I unknown
 ;; DB access lowram
 .import Tad_IsSongPlaying
+
+
+;; =========
+;; Variables
+;; =========
+
+;; Sound Effect Queue
+;; ==================
+;;
+;; This queue is read by `Tad_Process` and a `play_sound_effect` command is sent to the audio driver when:
+;;  * A song is loaded into Audio-RAM
+;;  * Sound effects are playing (not paused)
+;;  * The previous command sent to the audio driver has been acknowledged
+;;  * The command queue is empty
+;;  * `Tad_sfxQueue_sfx != $ff`
+;;
+;; If `Tad_sfxQueue_pan > MAX_PAN`, then `CENTER_PAN` will be used instead.
+;;
+;; After the `play_sound_effect` command (or when a song is loaded), `Tad_sfxQueue_sfx` and
+;; `Tad_sfxQueue_pan` will be reset to $ff.
+;;
+;; In `Tad_QueueSoundEffect` lower sound effect indexes take priority over higher sound effect
+;; indexes (as defined by the project file sound effect export order).
+;;
+;;
+;; The sound-effect queue variables are public to allow for custom queue sound-effect subroutines.
+;; For example, a queue-sound-effect subroutine with a different ABI or copies of
+;; `Tad_QueueSoundEffect` in multiple banks, etc.
+
+
+;; The next sound effect id to send to the audio driver.
+;;
+;; If `Tad_sfxQueue_sfx == $ff` then the queue is considered empty.
+;;
+;; (zeropage u8)
+.importzp Tad_sfxQueue_sfx
+
+
+;; The pan value to play `Tad_sfxQueue_sfx` with.
+;;
+;; If this value is greater than `MAX_PAN`, then `CENTER_PAN` will be used instead.
+;;
+;; (zeropage u8)
+.importzp Tad_sfxQueue_pan
 
 
 
@@ -425,7 +510,7 @@ MIN_TICK_CLOCK = 64
 ;;  * The data MUST remain in memory while it is being transferred to Audio-RAM
 ;;    (which may take several frames).
 ;;  * The data can be freed on the next `LoadAudioData` call.
-;;  * The data can be freed when the state changes to PAUSED or PLAYING.
+;;  * The data can be freed when the state changes to PAUSED, PLAYING_SFX or PLAYING.
 ;;  * The data can be freed if the `Tad_IsLoaderActive` function returns false.
 ;;  * The `Tad_FinishLoadingData` subroutine can be used to flush decompressed
 ;;    memory into Audio-RAM.  The data can be freed immediately after a

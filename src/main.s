@@ -425,7 +425,7 @@ NoIris:
   setaxy16
 
 
-  bit VerticalLevelFlag-1
+  bit8 VerticalLevelFlag
   bmi OnlyCheckHealth
   ; Going past the bottom of the screen results in dying
   lda PlayerPY
@@ -461,9 +461,8 @@ OnlyCheckHealth:
   sta PPUBRIGHT
   cmp #$0f
   beq :+
-    ina
+    inc LevelFadeIn
   :
-  sta LevelFadeIn
 
   ; Wait for control reading to finish
   ; (will almost certainly skip the loop immediately)
