@@ -19,7 +19,7 @@ objlist = \
   snesheader init main player memory common renderlevel renderlevel2 renderlevelsprites \
   uploadppu graphics blockdata tad-audio_config audio_incbins audio_misc \
   scrolling playergraphics blockinteraction palettedata \
-  levelload levelautotile leveldata actordata actorcode actorshared \
+  levelload levelautotile leveldata levelarray actordata actorcode actorshared \
   mode7/mode7 mode7/m7blocks mode7/m7actors mode7/m7math mode7/m7leveldata mode7/m7blockdata mode7/perspective_data mode7/m7playergraphics \
   overworldblockdata overworlddata overworldcode sincos_data inventory vwf \
   math portraitdata dialog namefont namefontwidth vwf_fontdata \

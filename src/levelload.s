@@ -21,8 +21,9 @@
 .include "leveldata.inc"
 .smart
 .import GameMainLoop, AutotileLevel, UploadLevelGraphics
-.import GetLevelPtrXY_Horizontal, GetLevelPtrXY_Vertical
+.import GetLevelPtrXY_Horizontal, GetLevelPtrXY_HorizontalTall, GetLevelPtrXY_Vertical
 .import GetBlockX_Horizontal, GetBlockY_Horizontal, GetBlockXCoord_Horizontal, GetBlockYCoord_Horizontal
+.import GetBlockX_HorizontalTall, GetBlockY_HorizontalTall, GetBlockXCoord_HorizontalTall, GetBlockYCoord_HorizontalTall
 .import GetBlockX_Vertical, GetBlockY_Vertical, GetBlockXCoord_Vertical, GetBlockYCoord_Vertical
 .import BlockByteReferenceTable
 
@@ -214,53 +215,7 @@
   ; Vertical scrolling and layer 2 flags
   iny ; Y = 3
   lda [DecodePointer],y
-  bpl :+
-    ; (Is a vertical level)
-    ; Swap starting X and Y positions
-    lda PlayerPY+1
-    pha
-    lda PlayerPX+1
-    sta PlayerPY+1
-    pla
-    sta PlayerPX+1
-
-    seta16
-    lda #.loword(GetLevelPtrXY_Vertical)
-    sta GetLevelPtrXY_Ptr
-    lda #.loword(GetBlockX_Vertical)
-    sta GetBlockX_Ptr
-    lda #.loword(GetBlockY_Vertical)
-    sta GetBlockY_Ptr
-    lda #.loword(GetBlockXCoord_Vertical)
-    sta GetBlockXCoord_Ptr
-    lda #.loword(GetBlockYCoord_Vertical)
-    sta GetBlockYCoord_Ptr
-    lda #256*2 ; 256 blocks tall
-    sta LevelColumnSize
-    dea
-    sta LevelColumnMask
-
-    lda #(15*16+2)*256 ; 15 screens of 16 tiles, each containing 256 subpixels. Add 2 tiles because (224 - 256) = 32 pixels.
-    sta ScrollYLimit
-    lda #16*256        ; 1 screen of 16 tiles, each containing 256 subpixels. 
-    sta ScrollXLimit
-    seta8
-
-    ; In vertical levels, columns are 256 blocks tall, multiplied by 2 bytes
-    stz LevelColumnSize+0
-    lda #2
-    sta LevelColumnSize+1
-
-    dec VerticalLevelFlag ; Set it to 255
-  :
-  lda [DecodePointer],y
-  and #$40
-  beq :+
-    dec VerticalScrollEnabled ; Set it to 255
-  :
-  lda [DecodePointer],y
-  and #$20
-  beq :+
+  bpl :+ ; Two-layer level
     dec TwoLayerLevel
     stz FG2OffsetX
     stz FG2OffsetX+1
@@ -268,7 +223,7 @@
     stz FG2OffsetY+1
   :
   lda [DecodePointer],y
-  and #$10
+  and #$40
   beq :+
     dec TwoLayerInteraction
   :
@@ -276,8 +231,8 @@
   sta SecondFGTilemapPointer+1
   stz SecondFGTilemapPointer+0
   lda [DecodePointer],y
-  and #$08
-  beq :+
+  and #$20
+  beq :+ ; Second background layer on 2bpp layer
     dec ForegroundLayerThree
     lda #>(ExtraBGWide)
     sta SecondFGTilemapPointer+1
@@ -296,7 +251,19 @@
     plb
     ply
   :
-  ; Flags $04, $02, $01 are free to use
+  lda [DecodePointer],y
+  and #$10
+  beq :+
+    dec VerticalScrollEnabled ; Set it to 255
+  :
+  ; Level shape
+  tdc ; Clear whole accumulator
+  lda [DecodePointer],y
+  and #%11
+  asl
+  tax
+  jsr (.loword(SetupLevelSize),x)
+  ; Flags $02, $04 are free to use
 
   ; Background color
   iny ; Y = 4
@@ -410,6 +377,76 @@
   ; Put the registers back in their expected sizes
   setaxy16
   rtl
+.endproc
+
+.a8
+.proc SetupLevelSize
+  .addr Horizontal
+  .addr Vertical
+  .addr HorizontalTall
+  .addr Horizontal ; Reserved
+
+Horizontal:
+  rts
+
+Vertical:
+  ; (Is a vertical level)
+  ; Swap starting X and Y positions
+  lda PlayerPY+1
+  pha
+  lda PlayerPX+1
+  sta PlayerPY+1
+  pla
+  sta PlayerPX+1
+
+  seta16
+  lda #.loword(GetLevelPtrXY_Vertical)
+  sta GetLevelPtrXY_Ptr
+  lda #.loword(GetBlockX_Vertical)
+  sta GetBlockX_Ptr
+  lda #.loword(GetBlockY_Vertical)
+  sta GetBlockY_Ptr
+  lda #.loword(GetBlockXCoord_Vertical)
+  sta GetBlockXCoord_Ptr
+  lda #.loword(GetBlockYCoord_Vertical)
+  sta GetBlockYCoord_Ptr
+
+  lda #256*2 ; 256 blocks tall
+  sta LevelColumnSize
+  dea
+  sta LevelColumnMask
+
+  lda #(15*16+2)*256 ; 15 screens of 16 tiles, each containing 256 subpixels. Add 2 tiles because (224 - 256) = 32 pixels.
+  sta ScrollYLimit
+  lda #16*256        ; 1 screen of 16 tiles, each containing 256 subpixels. 
+  sta ScrollXLimit
+  seta8
+
+  dec VerticalLevelFlag ; Set it to 255
+  rts
+
+HorizontalTall:
+  seta16
+  lda #.loword(GetLevelPtrXY_HorizontalTall)
+  sta GetLevelPtrXY_Ptr
+  lda #.loword(GetBlockX_HorizontalTall)
+  sta GetBlockX_Ptr
+  lda #.loword(GetBlockY_HorizontalTall)
+  sta GetBlockY_Ptr
+  lda #.loword(GetBlockXCoord_HorizontalTall)
+  sta GetBlockXCoord_Ptr
+  lda #.loword(GetBlockYCoord_HorizontalTall)
+  sta GetBlockYCoord_Ptr
+
+  lda #64*2 ; 64 blocks tall
+  sta LevelColumnSize
+  dea
+  sta LevelColumnMask
+
+  lda #(3*16+2)*256 ; 3 screens of 16 tiles, each containing 256 subpixels. Add 2 tiles because (224 - 256) = 32 pixels.
+  sta ScrollYLimit
+  seta8
+  rts
 .endproc
 
 .a8

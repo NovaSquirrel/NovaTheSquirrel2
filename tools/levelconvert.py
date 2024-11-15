@@ -332,17 +332,17 @@ for f in glob.glob("levels/*.json"):
 	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction
 	outfile.write('  .byt %d\n' % (player_y if vertical_level else player_x))
 	outfile.write('  .byt %d\n' % (player_x if vertical_level else player_y))
-	flags = 0x80 if vertical_level else 0
+	flags = 0x01 if vertical_level else 0
 	for flag in level_json["Header"]["Flags"]:
-		if flag == "VerticalScrolling":
-			flags |= 0x40
-		elif flag == "TwoLayerLevel": # Probably pull it from the layer count instead
-			flags |= 0x20
+		if flag == "TwoLayerLevel": # Probably pull it from the layer count instead
+			flags |= 0x80
 		elif flag == "TwoLayerInteraction":
-			flags |= 0x10
+			flags |= 0x40
 		elif flag == "ForegroundLayerThree":
-			flags |= 0x08
-	# In order: vertical level, vertical scrolling, two-layer, two-layer interaction, foreground layer 3, unused, unused, unused
+			flags |= 0x20
+		elif flag == "VerticalScrolling":
+			flags |= 0x10
+	# In order: two-layer, two-layer interaction, foreground layer 3, vertical scrolling, unused, unused, level shape, level shape
 
 	outfile.write('  .byt $%.2x\n' % flags)
 	outfile.write('  .word %s\n' % level_json["Header"]["BGColor"])
