@@ -550,7 +550,7 @@ CheckExistsLoop:
   asl
   php
   lsr
-  and #31
+  and #63
   sta ActorPY+1,x
   lda #$ff
   sta ActorPY+0,x

@@ -259,6 +259,10 @@
 
 LSpecialCmd = $f7
 
+.macro LToggleYExtension
+  .byt $f8
+.endmacro
+
 .enum LevelSpecialConfig
   AlternateBuffer
   ActorListInRAM

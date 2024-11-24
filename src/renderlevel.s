@@ -430,6 +430,11 @@ Loop:
   lda #20
   sta TempVal
 
+  lda f:LevelShapeIndex
+  cmp #2*2
+  beq Entire32K
+
+Only16K:
 : lda a:LevelBuf,x ; Get the next level tile
   phx
   tax
@@ -460,6 +465,38 @@ Loop:
 
   plb
   rtl
+
+Entire32K: ; Same as above, but with a different mask
+: lda a:LevelBuf,x ; Get the next level tile
+  phx
+  tax
+  ; Write the two tiles in
+  lda f:BlockTopLeft,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  lda f:BlockTopRight,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  pla
+
+  ; Next column
+  add LevelColumnSize
+  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE*2)-1 ; Mask for entire level, dimensions actually irrelevant
+  tax
+
+  ; Wrap around in the buffer
+  tya
+  and #(64*2)-1
+  tay
+
+  ; Stop after 64 tiles horizontally
+  dec TempVal
+  bne :-
+
+  plb
+  rtl
 .endproc
 
 ; Render the right tile of a column of blocks
@@ -477,6 +514,11 @@ Loop:
   lda #20
   sta TempVal
 
+  lda f:LevelShapeIndex
+  cmp #2*2
+  beq Entire32K
+
+Only16K:
 : lda a:LevelBuf,x ; Get the next level tile
   phx
   tax
@@ -494,6 +536,38 @@ Loop:
   ; Next column
   add LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
+  tax
+
+  ; Wrap around in the buffer
+  tya
+  and #(64*2)-1
+  tay
+
+  ; Stop after 64 tiles horizontally
+  dec TempVal
+  bne :-
+
+  plb
+  rtl
+
+Entire32K: ; Same as above, but with a different mask
+: lda a:LevelBuf,x ; Get the next level tile
+  phx
+  tax
+  ; Write the two tiles in
+  lda f:BlockBottomLeft,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  lda f:BlockBottomRight,x
+  sta RowUpdateBuffer,y
+  iny
+  iny
+  pla
+
+  ; Next column
+  add LevelColumnSize
+  and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE*2)-1 ; Mask for entire level, dimensions actually irrelevant
   tax
 
   ; Wrap around in the buffer

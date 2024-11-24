@@ -262,6 +262,7 @@
   and #%11
   asl
   tax
+  stx LevelShapeIndex
   jsr (.loword(SetupLevelSize),x)
   ; Flags $02, $04 are free to use
 
@@ -372,6 +373,8 @@
   plb
   stz DecodeColumn
   stz SecondLayer
+  stz YExtension
+  stz YExtension+1
   jsr LevelDecodeLoop
 
   ; Put the registers back in their expected sizes
@@ -500,6 +503,8 @@ DecodeHeight = 4
 DecodeColumn = 5 ; Current column to write to
 DecodeValue  = 6 ; and 7
 SecondLayer  = 8
+YExtension   = 9 ; and 10
+
 .a8
 .i16
 .proc LevelDecodeCommand
@@ -525,7 +530,7 @@ SpecialCommand:
 
   jmp (.loword(SpecialCommandTable),x)
 
-SpecialCommandTable:
+SpecialCommandTable: ; Room for 16 commands
   .addr SpecialFinished
   .addr SpecialSetX
   .addr SpecialWrite1Byte
@@ -534,15 +539,28 @@ SpecialCommandTable:
   .addr SpecialXMinus16
   .addr SpecialXPlus16
   .addr SpecialConfig
+  .addr SpecialToggleYExtension
+  .addr SpecialFinished ; Unused
+  .addr SpecialFinished ; Unused
+  .addr SpecialFinished ; Unused
+  .addr SpecialFinished ; Unused
+  .addr SpecialFinished ; Unused
+  .addr SpecialFinished ; Unused
 
 SpecialFinished:
   plx ; Pop two bytes
   rts
+
 SpecialSetX:
   jsr NextLevelByte
   sta DecodeColumn
   rts
 
+SpecialToggleYExtension:
+  lda YExtension
+  eor #64
+  sta YExtension
+  rts
 
 ; Helper routine
 ColumnWriteIndex:
@@ -1163,6 +1181,7 @@ Loop:
 .a8
 .i16
 .proc XYLevelByte
+SaveX = 2
   jsr NextLevelByte
 
   pha
@@ -1183,29 +1202,13 @@ Loop:
   :
   sta 0 ; Y position (0-31)
 
+  stx SaveX ; Most routines that call XYLevelByte need X preserved
+  ldx LevelShapeIndex
+  jmp (.loword(:+), x)
+: .addr Horizontal
+  .addr Vertical
+  .addr HorizontalTall
 
-  bit VerticalLevelFlag
-  bpl Horizontal
-; In vertical levels, X and Y values are swapped
-Vertical:
-  ; Use "Y" position as column instead
-  seta16
-  and #255
-  ; jsl GetLevelColumnPtr
-  xba ; * 256
-  asl ; * 512
-  sta LevelBlockPtr
-
-  ; Y is the current row times two
-  lda DecodeColumn
-  and #255
-Common:
-  asl
-  tay
-  seta8
-  rts
-
-; In horizontal levels, things are normal
 Horizontal:
   lda DecodeColumn
   seta16
@@ -1221,7 +1224,39 @@ Horizontal:
   ; Set Y to the height * 2
   lda 0
   and #255
-  bra Common
+  asl
+  tay
+  seta8
+  ldx SaveX
+  rts
+
+HorizontalTall:
+  jsr Horizontal
+  seta16
+  tya
+  ora YExtension
+  tay
+  seta8
+  rts
+
+; In vertical levels, X and Y values are swapped
+Vertical:
+  ; Use "Y" position as column instead
+  seta16
+  and #255
+  ; jsl GetLevelColumnPtr
+  xba ; * 256
+  asl ; * 512
+  sta LevelBlockPtr
+
+  ; Y is the current row times two
+  lda DecodeColumn
+  and #255
+  asl
+  tay
+  seta8
+  ldx SaveX
+  rts
 .endproc
 
 ; -------------------------------------

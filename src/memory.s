@@ -230,6 +230,8 @@ LevelZeroWhenLoad_Start:
   ScreenFlags:            .res (16)*(16+1) ; 256*256
 
   VerticalLevelFlag:      .res 1 ; Level is vertical instead of horizontal
+  LevelShapeIndex:        .res 2 ; Pre-multiplied by 2 so it can be plugged directly into a jump table
+
   VerticalScrollEnabled:  .res 1 ; Enable vertical scrolling
   GlassForegroundEffect:  .res 1
   TwoLayerLevel:          .res 1 ; Two foreground layer level

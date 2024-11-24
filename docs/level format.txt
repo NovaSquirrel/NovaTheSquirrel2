@@ -3,16 +3,20 @@
 '---------------------------------------
 
 0        1        2        3
-DMMMMMMM XXXXXXXX ...YYYYY VvLI3... 
+DMMMMMMM XXXXXXXX ..YYYYYY LI3v..ss
 D = If 1, player starts facing left
 M = Background music
 X = Starting X position (or Y position, for vertical levels)
 Y = Starting Y position (or X position, for vertical levels)
-V = Vertical level
-v = Enable vertical scrolling (or horizontal scrolling, for vertical levels)
 L = Layer 2 level
 I = Layer 2 interaction
 3 = The second foreground layer is on background layer 3
+v = Enable vertical scrolling (or horizontal scrolling, for vertical levels)
+s = Level size:
+    00: 256x32
+    01: 32x256
+    10: 256x64
+    11: Unused
 Room for more flags
 
 4        5
@@ -60,6 +64,9 @@ X - X position relative (0-15)
 S - Settings byte, if needed
     (may be more than one byte)
 
+For a 256x64 level, there aren't enough Y bits here, so the most significant Y bit
+sticks around from command to command, and is toggled via a command from the list below
+
 .---------------------------------------
 | Level data (commands)
 '---------------------------------------
@@ -73,7 +80,8 @@ T - 0 level is over, stop processing
     5 current X -= 16
     6 current X += 16
     7 special command (S selects which one, and additional parameters are taken)
-    8-F: Reserved
+    8 toggle Y coodinate extension
+    9-F: Reserved
 
 Special commands:
 (Numbers not assigned)
@@ -84,10 +92,12 @@ Per-level assembly routine
 .---------------------------------------
 | Actor data
 '---------------------------------------
-XXXXXXXX D..YYYYY tttttttt abcdTTTT
+XXXXXXXX D.YYYYYY tttttttt abcdTTTT
 tT - Actor number (T is higher bits)
 D - direction (1 is left)
 abcd - misc actor information
 X - X position (0-255) (or Y position for vertical levels)
-Y - Y position (0-31)  (or X position for vertical levels)
+Y - Y position (0-63)  (or X position for vertical levels)
 List ends in $ff (so you can't put anything on the rightmost column)
+
+Most significant Y bit could be repurposed for something else on levels that aren't 256x64

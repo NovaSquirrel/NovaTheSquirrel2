@@ -20,6 +20,7 @@ has_metadata = {} # Uses a Python function to insert metadata
 teleport_destinations = {}
 door_level_teleport_list = [] # List of levels, for doors that lead to other levels
 vertical_level = False
+horizontal_tall_level = False
 
 for line in define_lines:
 	if not len(line): # Skip empty lines
@@ -168,6 +169,7 @@ def convert_layer(layer):
 			r.x, r.y = r.y, r.x
 
 	byte_count, column, output = 0, 0, []
+	y_extension = False # For tracking when to toggle the Y extension
 
 	# Process each rectangle
 	for r in layer:
@@ -189,6 +191,12 @@ def convert_layer(layer):
 			offset = 0
 			column = r.x
 			byte_count += 2
+
+		if (not y_extension and r.y >= 32) or (y_extension and r.y < 32):
+			output.append("LToggleYExtension")
+			byte_count += 1
+			y_extension = not y_extension
+		r.y &= 31
 
 		# Decide the smallest way to represent this rectangle
 		if r.type in available_special:
@@ -271,6 +279,10 @@ for f in glob.glob("levels/*.json"):
 
 	num_layers = len(level_json["Layers"])
 	vertical_level = level_json["Meta"]["Width"] == 32 and level_json["Meta"]["Height"] > 32
+	horizontal_tall_level = level_json["Meta"]["Width"] > 32 and level_json["Meta"]["Height"] > 32
+
+	if (level_json["Meta"]["Width"] > 256) or (level_json["Meta"]["Height"] > 256) or (horizontal_tall_level and level_json["Meta"]["Height"] > 64):
+		sys.exit(f+" has an invalid level shape")
 
 	foreground = []
 	secondary = []
@@ -332,7 +344,7 @@ for f in glob.glob("levels/*.json"):
 	outfile.write('  .byt %d|0\n' % (0x80 if player_dir else 0)) # Music and starting direction
 	outfile.write('  .byt %d\n' % (player_y if vertical_level else player_x))
 	outfile.write('  .byt %d\n' % (player_x if vertical_level else player_y))
-	flags = 0x01 if vertical_level else 0
+	flags = 0x00 + vertical_level*0x01 + horizontal_tall_level*0x02
 	for flag in level_json["Header"]["Flags"]:
 		if flag == "TwoLayerLevel": # Probably pull it from the layer count instead
 			flags |= 0x80

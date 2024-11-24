@@ -267,7 +267,7 @@ SF_SPECIAL_MASK     = %00001111
 .global Layer3_ScrollXPixels, Layer3_ScrollYPixels, Layer4_ScrollXPixels, Layer4_ScrollYPixels
 
 .globalzp LevelActorPointer
-.global VerticalLevelFlag
+.global VerticalLevelFlag, LevelShapeIndex
 .global VerticalScrollEnabled
 .global LevelBGMode, GlassForegroundEffect, TwoLayerLevel, TwoLayerInteraction, ForegroundLayerThree, RenderLevelWithSprites, SecondFGTilemapPointer
 .global LevelFadeIn, LevelIrisIn, GameplayHook, ScrollOverrideHook

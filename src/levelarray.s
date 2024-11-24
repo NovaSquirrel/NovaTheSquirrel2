@@ -58,8 +58,11 @@ Temp    = BlockTemp
   ; Now the accumulator is free to do other things
 
   ; Use the second routine if it's on the second foreground layer
-  bit LevelBlockPtr
-  jvs ChangeBlockFG2
+  bit8 TwoLayerLevel ; But only if it actually is a two layer level
+  bpl :+
+    bit LevelBlockPtr
+    jvs ChangeBlockFG2
+  :
   ; -----------------------------------
 
   ; First, make sure the block is actually onscreen (Horizontally)
@@ -311,25 +314,36 @@ Exit:
 ; input: A (column), Y (row)
 ; output: LevelBlockPtr is set, also A = block at column,row
 ; Verify that LevelBlockPtr+2 is #^LevelBuf
+; Overwrites X
 .a16
 .proc GetLevelColumnPtr
-; TODO: tall
   ; Multiply by 32 (level height) and then once more for 16-bit values
   and #255
-  bit8 VerticalLevelFlag ; Check high bit
-  bmi :+
-  asl ; * 2
-  asl ; * 4
-  asl ; * 8
-  asl ; * 16
-  asl ; * 32
-  asl ; * 64
+
+  ldx LevelShapeIndex
+  jmp (.loword(:+), x)
+: .addr Horizontal
+  .addr Vertical
+  .addr HorizontalTall
+
+Horizontal: ; Each column is 64 bytes
+  xba ; * 256
+  lsr ; * 128
+  lsr ; * 64
   sta LevelBlockPtr
 
   lda [LevelBlockPtr],y
   rtl
 
-: ; For vertical levels, a column is 512 bytes instead
+HorizontalTall: ; Each column is 128 bytes
+  xba ; * 256
+  lsr ; * 128
+  sta LevelBlockPtr
+
+  lda [LevelBlockPtr],y
+  rtl
+
+Vertical: ; Each column is 512 bytes
   xba ; * 256
   asl ; * 512
   sta LevelBlockPtr

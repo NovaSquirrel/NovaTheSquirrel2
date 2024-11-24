@@ -43,6 +43,10 @@ RightPointer      = 13 ; and 14 15
   sta RightPointer+2
   seta16
 
+  lda LevelShapeIndex
+  cmp #2*2 ; Level shape is Horizontal Tall
+  beq ProcessEntire32K
+
   ; For the first column, do stuff a bit different
   ; and use LeftPointer and MidPointer
   ldy #0
@@ -73,6 +77,36 @@ RightPointer      = 13 ; and 14 15
 
   bit TwoLayerLevel-1
   bmi HasSecondLayer
+  rtl
+
+ProcessEntire32K:
+  ; For the first column, do stuff a bit different
+  ; and use LeftPointer and MidPointer
+  ldy #0
+  stz LeftPointer
+  stz MidPointer
+  lda LevelColumnSize
+  sta RightPointer
+  ; A is still LevelColumnSize
+  jsr Process
+
+  ; For the middle part, process it normally
+  ldy #0 ; Reset Y to zero
+  lda RightPointer ; Reuse it from here because it's in zeropage
+  sta MidPointer
+  asl RightPointer
+  lda #LEVEL_WIDTH * LEVEL_HEIGHT * LEVEL_TILE_SIZE * 2
+  sub LevelColumnSize ; Subtract two columns to account for the middle pointer being offset
+  sub LevelColumnSize
+  jsr Process
+
+  ; For the last column, right pointer = middle pointer
+  ; To avoid going off the end of the level
+  lda MidPointer
+  sta RightPointer
+  lda #LEVEL_WIDTH * LEVEL_HEIGHT * LEVEL_TILE_SIZE * 2
+  sub LevelColumnSize ; Subtract one column to account for the middle pointer being offset
+  jsr Process
   rtl
 
 HasSecondLayer:
