@@ -425,13 +425,11 @@ NoIris:
   setaxy16
 
 
-  bit8 VerticalLevelFlag
-  bmi OnlyCheckHealth
   ; Going past the bottom of the screen results in dying
+  ldx LevelShapeIndex
   lda PlayerPY
-  cmp #(512+32)*16
+  cmp f:MaximumAllowedPlayerY,x
   bcs Die
-OnlyCheckHealth:
     ; So does running out of health
     lda PlayerHealth
     and #255
@@ -544,6 +542,12 @@ CameraShakeTable:
 ;  .word 0, .loword(-1), .loword(-1), .loword(2), .loword(-1), .loword(-2), .loword(-1), .loword(1), .loword(-2)
 ;  .word 0, .loword(-1), .loword(1), .loword(-2), .loword(2), .loword(-3), .loword(3), .loword(-4), .loword(4)
   .word 0, .loword(-1), .loword(1), .loword(-1), .loword(1), .loword(-2), .loword(2), .loword(-2), .loword(2)
+
+MaximumAllowedPlayerY:
+  .word (512+64)*16 ; Horizontal
+  .word $1000-16*16 ; Vertical
+  .word (1024+64)*16 ; Horizontal tall
+  .word (512+64)*16 ; Unused
 
 .a16
 .proc CallGameplayHook
