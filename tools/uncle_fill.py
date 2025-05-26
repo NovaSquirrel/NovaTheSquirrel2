@@ -40,15 +40,18 @@ if board[0].lower() == 'lorom':
 	hirom = False
 	bank_max_size  = 0x8000
 	header_bank = 0
+	bank_start_offset = 0x8000
 elif board[0].lower() == 'hirom':
 	hirom = True
 	bank_max_size  = 0x8000 * 2
 	header_bank = 0
+	bank_start_offset = 0
 elif board[0].lower() == 'exhirom':
 	hirom = True
 	exhirom = True
 	bank_max_size  = 0x8000 * 2
 	header_bank = 64
+	bank_start_offset = 0
 # NES
 elif board[0].lower() == 'unrom':
 	unrom = True
@@ -276,7 +279,7 @@ with open(sys.argv[2], 'w') as f:
 	for bank in range(reserve_banks, bank_count-reserve_banks_end):
 
 		if snes:
-			start = 0x800000 + (bank * 0x10000)
+			start = 0x800000 + (bank * 0x10000) + bank_start_offset
 			if hirom:
 				if start >= 0xC00000: # Should run from C0 to FF then 40 to 7D
 					start -= 0xC00000
