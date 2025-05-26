@@ -40,18 +40,15 @@ if board[0].lower() == 'lorom':
 	hirom = False
 	bank_max_size  = 0x8000
 	header_bank = 0
-	bank_start_offset = 0x8000
 elif board[0].lower() == 'hirom':
 	hirom = True
 	bank_max_size  = 0x8000 * 2
 	header_bank = 0
-	bank_start_offset = 0
 elif board[0].lower() == 'exhirom':
 	hirom = True
 	exhirom = True
 	bank_max_size  = 0x8000 * 2
 	header_bank = 64
-	bank_start_offset = 0
 # NES
 elif board[0].lower() == 'unrom':
 	unrom = True
@@ -279,7 +276,7 @@ with open(sys.argv[2], 'w') as f:
 	for bank in range(reserve_banks, bank_count-reserve_banks_end):
 
 		if snes:
-			start = 0x800000 + (bank * 0x10000) + bank_start_offset
+			start = 0x800000 + (bank * 0x10000)
 			if hirom:
 				if start >= 0xC00000: # Should run from C0 to FF then 40 to 7D
 					start -= 0xC00000
@@ -290,7 +287,7 @@ with open(sys.argv[2], 'w') as f:
 				if code_size:
 					f.write("  ROM%d_code: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x10000 - code_size, code_size))
 			else:
-				f.write("  ROM%d: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start, bank_max_size))
+				f.write("  ROM%d: start = $%x, type = ro, size = $%x, fill = yes;\n" % (bank, start + 0x8000, bank_max_size))
 		elif nes:
 			f.write("  ROM%d: start = $8000, type = ro, size = $%x, fill = yes, bank=%d;\n" % (bank, bank_max_size, bank))
 		
