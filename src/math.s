@@ -1,7 +1,6 @@
 .include "snes.inc"
 .include "global.inc"
 .smart
-.import BlockTopLeft, BlockTopRight, BlockBottomLeft, BlockBottomRight
 .code
 
 ; Wrapper for GetAtan2 that saves X and the data bank, and automatically loads the angle
@@ -35,106 +34,154 @@
 ;
 ; Output:
 ; $00-$01 Angle (0x0000-0x01FF)
-; $02-$06 will be destructed.
+; $02-$06 will be overwritten.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .a16
 .i8
 .proc GetAtan2
+  ; Inputs:
+  XDistance = 0 ; and 1
+  YDistance = 2 ; and 3
+
+  ; Variables:
+  Divisor   = 0 ; and 1
+  Dividend  = 2 ; and 3,4,5
+  Quadrant  = 6
+
+  ; Outputs:
+  Angle     = 0 ; and 1
+
   phk
   plb
 
   ldy #0
-  lda 0
-  bpl :+    ; DX = abs(DX)
-    ldy #4
+
+  ; XDistance = abs(XDistance)
+  lda XDistance
+  bpl :+
+    ldy #4 ; Set bit 2 in Y if X distance was initially negative
     eor #$ffff
     ina
-    sta 0
+    sta XDistance
   :
 
-  lda 2
-  bpl :+    ; DY = abs(DY)
-    iny
-    iny
+  ; YDistance = abs(YDistance)
+  lda YDistance
+  bpl :+
+    iny ; \ Set bit 1 in Y if Y distance was initially negative
+    iny ; /
     eor #$ffff
     ina
-    sta 2
+    sta YDistance
   :
 
-  cmp 0    ; If X is smaller than Y, swap them
+  ; If X distance is smaller than Y distance, swap them, and record that this was done
+  cmp XDistance
   bcc :+
     pha
-    lda 0
-    sta 2
+    lda XDistance
+    sta YDistance
     pla
-    sta 0
-    iny
+    sta XDistance
+    iny ; Set bit 0 in Y
   :
 
-  sty 6
-  lda 2
-  sta 4
-  stz 2
-  ora 0
-  and #$ff00
-  beq Next
+  sty Quadrant
+  ; Quadrant keeps track of which adjustments were made above:
+  ; 00000xys
+  ;      ||+- X distance and Y distance were swapped
+  ;      |+-- Y distance is negative
+  ;      +--- X distance is negative
+
+  ; XDistance becomes Divisor
+  ; YDistance becomes Dividend
+  lda YDistance
+  sta Dividend+2
+  stz Dividend
+
+  ; Dividend+3     +2       +1       +0
+  ; YYYYYYYY[yyyyyyyy 00000000]00000000
+  ;          Divisor+1      +0
+  ;          XXXXXXXX[xxxxxxxx]
+  ; We want to divide the top [] by the bottom []
+  ; If the numbers don't fit into the bracketed areas, halve both Dividend and Divisor until they do
+  ora Divisor ; \ Check if the X and Y bits outside the brackets are anything but zero
+  and #$ff00  ; /
+  beq SmallEnoughAlready
     xba
-  : lsr 0
-    lsr 4
-    ror 2
+  : lsr Divisor
+    lsr Dividend+2
+    ror Dividend
     lsr a
     bne :-
-Next:
-  ldy 0
+SmallEnoughAlready:
+
+  ; Write the dividend and divisor to the division hardware
+  ldy Divisor
   beq DivZero
-  lda 3
+  lda Dividend+1
   sta CPUNUM
   sty CPUDEN
 
+  ; Wait 16 cycles for the division to finish
   seta8
-  ; Wait 16 cycles
-  stz 1
+  stz Angle+1
+  ; Are the divisor and dividend equal? Use angle $40 and skip the delay
   lda #$40
-  cpy 3
+  cpy Dividend+1
   beq :+
   bra Delay
 Delay:
-
   ldy CPUQUOT
   lda AtanTable,y
-: lsr 6
+:
+
+  ; Adjust angle to account for the signs of the numbers initially passed into the routine
+
+  ; Were the X and Y distances swapped?
+  lsr Quadrant
   bcc :+
-  eor #$7f
-  ina
-: lsr 6
+    eor #$7f
+    ina
+  : 
+
+  ; Was the initial Y distance negative?
+  lsr Quadrant
   bcc :+
-  eor #$ff
-  ina
-  beq :+
-  inc 1
-: lsr 6
+    eor #$ff
+    ina
+    beq :+
+      inc Angle+1
+  :
+
+  ; Was the initial X distance negative?
+  lsr Quadrant
   bcc :+
-  eor #$ff
-  ina
-  bne :+
-  inc 1
-: sta 0
+    eor #$ff
+    ina
+    bne :+
+      inc Angle+1
+  :
+  sta Angle
+
+  ; Limit angle to $000-$1FF range
   lda #$fe
-  trb 1
+  trb Angle+1
   rts
-		
+
+; Special handling for the divisor being zero
 DivZero:
   seta8
   ldy #0
-  lda 6
-  lsr a
+  lda Quadrant ; \ Were the X and Y distances swapped? 
+  lsr a        ; /
   bcs :+
-    lda #$80
+    ldy #$80
     lsr a
 : and #1
-  sta 1
-  sta 0
+  sta Angle+1
+  sty Angle
   rts
 .endproc
 
