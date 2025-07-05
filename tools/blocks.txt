@@ -21,7 +21,7 @@ alias linefollowing $2f00
 
 alias global_palette 2
 alias terrain_palette 3
-alias locks_palette 5
+alias locks_palette 7
 alias glass_palette 6
 alias glass_palette_gray 7
 alias colorfulflower_palette 4

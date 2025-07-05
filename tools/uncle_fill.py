@@ -129,7 +129,7 @@ with open(sys.argv[3]) as f:
 
 		# Parse the segment and its options
 		colon = segment.index(':')
-		name = segment[:colon]
+		name = segment[:colon].lstrip()
 		info = {}
 		for params in segment[colon+1:].split(','):
 			key, value = params.split('=')
@@ -137,7 +137,7 @@ with open(sys.argv[3]) as f:
 		# If it loads in ROM, it's not dynamically allocated, but still takes up space in the bank specified
 		if info['load'].startswith('ROM'):
 			static_rom_segments.add(name)
-			static_rom_seg_bank[name] = int(info['load'][3:].rstrip("_code"))
+			static_rom_seg_bank[name] = int(info['load'][3:].removesuffix("_code"))
 		ignore_segments.add(name)
 
 ###############################################################################

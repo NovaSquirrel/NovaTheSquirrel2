@@ -145,8 +145,6 @@ CalculateRestOfAddress:
   asl
   ora ScatterUpdateBuffer+(4*0)+ADDRESS,y
   sta ScatterUpdateBuffer+(4*0)+ADDRESS,y
-  ina
-  sta ScatterUpdateBuffer+(4*1)+ADDRESS,y
 
   ; Choose second screen if needed
   pla
@@ -155,14 +153,13 @@ CalculateRestOfAddress:
     lda ScatterUpdateBuffer+(4*0)+ADDRESS,y
     ora #2048>>1
     sta ScatterUpdateBuffer+(4*0)+ADDRESS,y
-    lda ScatterUpdateBuffer+(4*1)+ADDRESS,y
-    ora #2048>>1
-    sta ScatterUpdateBuffer+(4*1)+ADDRESS,y
   :
 
-  ; Precalculate the bottom row
+  ; Derive the other addresses from the first one
   lda ScatterUpdateBuffer+(4*0)+ADDRESS,y
-  add #(32*2)>>1
+  ina
+  sta ScatterUpdateBuffer+(4*1)+ADDRESS,y
+  add #31
   sta ScatterUpdateBuffer+(4*2)+ADDRESS,y
   ina
   sta ScatterUpdateBuffer+(4*3)+ADDRESS,y

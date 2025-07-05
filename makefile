@@ -42,7 +42,7 @@ imgdir2 := tilesets2
 bgdir := backgrounds
 
 ifndef SNESEMU
-SNESEMU := ./mesen
+SNESEMU := $(MESEN)
 endif
 
 lz4_flags    := -f -9
@@ -250,35 +250,33 @@ $(imgdir2)/%.chrgb: $(imgdir2)/%.png
 	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
 $(imgdir2)/lz4/%.chrgb: $(imgdir2)/lz4/%.png
 	$(PY) tools/pilbmp2nes.py --planes=0,1 $< $@
+$(imgdir2)/lz4/%.chrgb.lz4: tilesets2/lz4/%.chrgb
+	$(lz4_compress) $(lz4_flags) $< $@
+	@touch $@
+
 $(imgdir4)/%.chrsfc: $(imgdir4)/%.png
 	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+$(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
+	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
+$(imgdir4)/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc
+	$(lz4_compress) $(lz4_flags) $< $@
+	@touch $@
 
 $(imgdirX)/%.chr: $(imgdirX)/%.txt $(imgdirX)/%.png
 	$(PY) tools/pilbmp2nes.py "--flag-file" $^ $@
-
-$(imgdir4)/lz4/%.chrsfc: $(imgdir4)/lz4/%.png
-	$(PY) tools/pilbmp2nes.py "--planes=0,1;2,3" $< $@
-
-
-$(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
-	$(PY) tools/makebackgroundmap.py $<
-$(srcdir)/mode7/m7palettedata.s: tilesetsX/M7Tileset.png tools/mode7palette.py
-	$(PY) tools/mode7palette.py
-
-tilesets4/lz4/%.chrsfc.lz4: tilesets4/lz4/%.chrsfc
-	$(lz4_compress) $(lz4_flags) $< $@
-	@touch $@
-tilesets2/lz4/%.chrgb.lz4: tilesets2/lz4/%.chrgb
+$(imgdirX)/lz4/%.chr: $(imgdirX)/%.txt $(imgdirX)/%.png
+	$(PY) tools/pilbmp2nes.py "--flag-file" $^ $@
+$(imgdirX)/lz4/%.chr.lz4: tilesetsX/lz4/%.chr
 	$(lz4_compress) $(lz4_flags) $< $@
 	@touch $@
 
 # ----------------
 # Rules for audio
-$(srcdir)/audio_enum.inc: $(audiodir)/example-project.terrificaudio
+$(srcdir)/audio_enum.inc: $(audiodir)/example-project.terrificaudio $(TAD_COMPILER)
 	$(TAD_COMPILER) ca65-enums --output $@ $(audiodir)/example-project.terrificaudio
-$(audiodir)/audio_common.bin: $(audiodir)/example-project.terrificaudio $(audiodir)/sound-effects.txt $(wildcard $(audiodir)/songs/*.mml)
+$(audiodir)/audio_common.bin: $(audiodir)/example-project.terrificaudio $(audiodir)/sound-effects.txt $(wildcard $(audiodir)/songs/*.mml) $(TAD_COMPILER)
 	$(TAD_COMPILER) common --output $@ $(audiodir)/example-project.terrificaudio
-$(patsubst %.mml,%.bin,$(wildcard $(audiodir)/songs/*.mml)): $(audiodir)/songs/*.mml
+$(patsubst %.mml,%.bin,$(wildcard $(audiodir)/songs/*.mml)): $(audiodir)/songs/*.mml $(TAD_COMPILER)
 	$(TAD_COMPILER) song --output $@ $(audiodir)/example-project.terrificaudio $(patsubst %.bin,%.mml, $@)
 
 $(objdir)/audio_incbins.o: $(audiodir)/audio_common.bin $(patsubst %.mml,%.bin,$(wildcard $(audiodir)/songs/*.mml))

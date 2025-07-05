@@ -520,7 +520,6 @@ padwait:
   stx BGEffectRAM+6
 
   ; Add iris effect
-  seta8
   lda LevelIrisIn
   cmp #IRIS_EFFECT_END
   bcs :+
@@ -545,7 +544,7 @@ CameraShakeTable:
 
 MaximumAllowedPlayerY:
   .word (512+64)*16 ; Horizontal
-  .word $1000-16*16 ; Vertical
+  .word $10000-4*16 ; Vertical
   .word (1024+64)*16 ; Horizontal tall
   .word (512+64)*16 ; Unused
 

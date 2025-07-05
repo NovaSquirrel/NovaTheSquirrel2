@@ -3,7 +3,7 @@
 .smart
 .code
 
-; Wrapper for GetAtan2 that saves X and the data bank, and automatically loads the angle
+; Wrapper for GetAtan2 that saves X (because it would otherwise get changed by setxy8) and the data bank, and automatically loads the angle
 .export GetAngle512
 .a16
 .i16
@@ -129,7 +129,7 @@ SmallEnoughAlready:
   stz Angle+1
   ; Are the divisor and dividend equal? Use angle $40 and skip the delay
   lda #$40
-  cpy Dividend+1
+  cpy Dividend+1+1 ; Compare against high byte of what was put into the dividend register - bug fix
   beq :+
   bra Delay
 Delay:

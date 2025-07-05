@@ -58,7 +58,7 @@ L = High byte of level data pointer
 '---------------------------------------
 Level data:
 TTTTTTTY XXXXYYYY [SSSSSSSS]
-T - Object type (0-119)
+T - Object type (0-111)
 Y - Y position absolute (0-31)
 X - X position relative (0-15)
 S - Settings byte, if needed
@@ -73,10 +73,10 @@ sticks around from command to command, and is toggled via a command from the lis
 Level commands
 1111TTTT [SSSSSSSS]
 T - 0 level is over, stop processing
-    1 set X to S
+    1 set current X to S
     2 write 1 column byte at current column
     3 write 2 column bytes starting at this column
-    4 write 3 column bytes starting at this column
+    4 write a variable amount of column bytes starting at this column
     5 current X -= 16
     6 current X += 16
     7 special command (S selects which one, and additional parameters are taken)
