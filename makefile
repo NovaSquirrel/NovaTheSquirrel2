@@ -210,6 +210,8 @@ $(srcdir)/itemenum.s: tools/items.txt tools/makeitems.py
 	$(PY) tools/makeitems.py
 $(srcdir)/backgroundenum.s: tools/backgrounds.txt tools/makebackgrounds.py
 	$(PY) tools/makebackgrounds.py
+$(bgdir)/%.chrsfc: $(bgdir)/%.png tools/makebackgroundmap.py
+	$(PY) tools/makebackgroundmap.py $<
 $(srcdir)/color_math_settings_enum.s: tools/color_math_settings.txt tools/makecolormathsettings.py
 	$(PY) tools/makecolormathsettings.py
 
