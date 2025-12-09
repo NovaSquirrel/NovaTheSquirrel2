@@ -51,7 +51,7 @@ This project uses [Terrific Audio Driver](https://github.com/undisbeliever/terri
 
 This project also uses LZ4 code from [libSFX](https://github.com/Optiroc/libSFX) which is under the MIT license.
 
-The following may not be used in other projects without permission:
+The following are to be considered "all rights reserved". They are provided in this repository to allow other people to build the game, but may not be used in other projects without permission.
 * Character designs
 * PNG files (and files generated from them) except for the `palettes` directory and fonts
 * TMX files (and files generated from them)
